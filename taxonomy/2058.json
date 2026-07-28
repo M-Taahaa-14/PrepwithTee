@@ -1,0 +1,646 @@
+{
+  "syllabus": "2058",
+  "subject": "Islamiyat (O Level)",
+  "note": "Paper 1: Qur'an themes, Qur'an history, Prophet's life, First Islamic Community. Paper 2: Hadith teachings, Hadith history, Rightly Guided Caliphs, Articles of Faith & Pillars, Islamic Jurisprudence. Subtopics carry broad keyword coverage so the heuristic scorer can place almost every question.",
+  "topics": [
+    {
+      "name": "The Qur'an — Themes and Teachings",
+      "papers": [1],
+      "keywords": [
+        "quran", "quranic", "surah", "ayah", "verse", "passage", "passages from the quran",
+        "according to the passage", "what does the quran", "what do these verses",
+        "what does this passage", "what does this surah", "allah", "god in himself",
+        "nature of god", "attributes of allah", "tawhid", "oneness", "god's relationship",
+        "created world", "creation", "god's messengers", "prophethood in quran",
+        "themes of the quran", "teachings of the quran", "quranic message",
+        "guidance", "creator", "environment", "god and the world", "divine guidance",
+        "arabic of the passage", "knowledge of arabic", "similar or opposite meanings"
+      ],
+      "subtopics": [
+        {
+          "name": "Allah — His nature, attributes and tawhid",
+          "keywords": [
+            "god in himself", "tawhid", "oneness of god", "unity of god",
+            "oneness of allah", "attributes of allah", "nature of god",
+            "almighty", "omnipotent", "omniscient", "transcendence",
+            "99 names", "asmaul husna", "god is one", "allah is one",
+            "divine attributes", "characteristics of god", "god has no partner",
+            "immanence", "merciful", "compassionate", "rahman", "rahim",
+            "creator", "sustainer", "lord of all", "sovereign", "powerful"
+          ]
+        },
+        {
+          "name": "Allah's relationship with creation and the world",
+          "keywords": [
+            "god's relationship with the created world", "created world", "creation",
+            "nature", "environment", "universe", "signs of god", "signs of allah",
+            "god and his creation", "stewardship", "khalifah on earth",
+            "human beings created", "people he has created", "natural world",
+            "reflect on creation", "evidence of god", "ayah in nature"
+          ]
+        },
+        {
+          "name": "God's Messengers in the Qur'an",
+          "keywords": [
+            "god's messengers", "messengers in the quran", "prophethood in quran",
+            "god sent", "relationship god has with messengers",
+            "nabi", "rasul", "chain of prophets", "Ibrahim", "Moses", "Isa", "Jesus",
+            "messenger god sent", "quran talk about god's messengers",
+            "earlier prophets", "previous prophets", "other prophets"
+          ]
+        },
+        {
+          "name": "Qur'anic themes on worship, guidance and Muslim life",
+          "keywords": [
+            "guidance", "divine guidance", "how the quran guides", "quranic guidance",
+            "prayer in quran", "worship in quran", "salah in quran", "fasting in quran",
+            "hajj in quran", "charity in quran", "zakat in quran",
+            "moral teaching", "ethical teaching", "how muslims should live",
+            "what the quran says about", "teaches muslims", "islamic way of life",
+            "community", "justice", "fairness", "honest", "patience", "gratitude",
+            "families", "parents", "orphan", "neighbour", "quran on family",
+            "important for muslims today", "relevance of quran", "applying quran"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The History and Importance of the Qur'an",
+      "papers": [1],
+      "keywords": [
+        "history of quran", "compilation of quran", "how was quran compiled",
+        "revelation", "wahy", "preservation of quran", "mushaf", "collection of quran",
+        "uthman", "mushaf uthman", "written quran", "memorized", "hafiz",
+        "tilawah", "recitation", "importance of quran",
+        "significance of quran", "quran as guidance", "divine book",
+        "quran unchanged", "original arabic", "revealed to prophet",
+        "610", "632", "companions who wrote", "zayd ibn thabit", "hafsa"
+      ],
+      "subtopics": [
+        {
+          "name": "Revelation of the Qur'an — how and when",
+          "keywords": [
+            "revelation", "wahy", "revealed to the prophet", "610", "632",
+            "night of power", "laylat al qadr", "first revelation",
+            "jibril", "gabriel", "cave hira", "how the quran was revealed",
+            "gradual revelation", "revelations received", "first verse",
+            "people responded to revelation", "responses to revelations",
+            "revealed in arabic", "over 23 years", "makkan surahs", "madinan surahs"
+          ]
+        },
+        {
+          "name": "Compilation and preservation of the Qur'an",
+          "keywords": [
+            "compilation", "compiled into book form", "collected and compiled",
+            "abu bakr compiled", "uthman compiled", "mushaf", "standardised",
+            "zayd ibn thabit", "zaid ibn thabit", "hafsa", "written form",
+            "preservation", "memorised", "memorized", "hafiz", "oral transmission",
+            "why it was collected", "book form", "how it was preserved",
+            "ijaz", "miracle of quran", "unchanged", "authentic text",
+            "differences in recitation", "burning copies", "single mushaf"
+          ]
+        },
+        {
+          "name": "Importance of the Qur'an for Muslims",
+          "keywords": [
+            "importance of the quran", "significance of the quran", "why the quran is important",
+            "quran as guide", "quran in daily life", "how muslims use the quran",
+            "source of guidance", "basis of islamic life", "quran and muslim identity",
+            "role of the quran", "impact of the quran", "relevance today",
+            "quran for the individual", "quran for the community",
+            "learning quran", "reciting quran", "tilawah", "hifz"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Life of the Prophet Muhammad (pbuh)",
+      "papers": [1],
+      "keywords": [
+        "prophet", "muhammad", "pbuh", "makkah", "madinah", "hijrah", "migration",
+        "birth", "childhood", "orphan", "early life", "prophethood",
+        "first revelation", "isra", "miraj", "night journey",
+        "treaty of hudaybiyyah", "hudaybiyyah", "battle of badr", "badr",
+        "battle of uhud", "uhud", "battle of khandaq", "khandaq", "trench",
+        "conquest of makkah", "farewell sermon", "character", "seal of prophets",
+        "khadijah", "prophet's character", "prophet's importance",
+        "mission of prophet", "life in makkah", "life in madinah",
+        "battle of muta", "khaybar", "hunain", "tabuk", "expedition",
+        "persecution", "opponents", "hijra", "aqaba", "miraj"
+      ],
+      "subtopics": [
+        {
+          "name": "Early life — birth and background before prophethood",
+          "keywords": [
+            "birth", "childhood", "orphan", "birth of the prophet",
+            "before revelation", "before prophethood", "early life of prophet",
+            "life before prophethood", "arabia was like",
+            "parents", "grandfather", "uncle", "first wife", "khadijah", "married khadijah",
+            "merchant", "al amin", "trustworthy", "pre islamic", "young muhammad",
+            "al-amin", "growing up", "early childhood", "youth of the prophet",
+            "how did the prophet spend his youth", "prophet's family background",
+            "before he received prophethood", "before the call"
+          ]
+        },
+        {
+          "name": "The Makkah period — preaching, persecution and early prophethood",
+          "keywords": [
+            "activities in makkah", "experiences with opponents", "opponents",
+            "persecution", "persecution in makkah", "preaching in makkah", "makkah period",
+            "early years of prophethood", "after revelation", "after receiving prophethood",
+            "after the first revelation", "early prophethood", "early years in prophethood",
+            "announced his prophethood", "call to prophethood", "received prophethood",
+            "how he received the call", "how the prophet received the message",
+            "first revelation", "cave hira", "cave of hira", "angel jibril", "angel gabriel",
+            "jibril", "gabriel", "quraysh", "quraish", "opposition",
+            "followers faced", "abu talib", "abu lahab", "boycott", "torture",
+            "umar's conversion", "umar became muslim", "key converts", "first converts",
+            "bilal", "abu bakr accepted", "khadijah believed",
+            "migration to abyssinia", "abyssinia", "taif", "pledges of aqaba",
+            "miraj", "night journey", "year of grief", "early muslim community makkah",
+            "enemies of islam", "early believers"
+          ]
+        },
+        {
+          "name": "The Madinah period — community building and governance",
+          "keywords": [
+            "activities in madinah", "leadership of the community",
+            "hijra reasons", "why it happened", "madinah community",
+            "constitution of madinah", "ansar", "muhajirin", "brotherhood",
+            "islamic state", "establishing a community in madina",
+            "role muslims played", "role of companions", "role of aisha",
+            "aisha", "ali ibn abi talib as companion",
+            "muslim and non muslim relations", "jewish tribes",
+            "last days of the prophet", "last sermon", "farewell sermon",
+            "final pilgrimage", "death of the prophet",
+            "treaties", "diplomacy", "non muslims"
+          ]
+        },
+        {
+          "name": "Battles and military campaigns",
+          "keywords": [
+            "battle", "badr", "uhud", "khandaq", "trench", "hudaybiyyah",
+            "conquest of makkah", "conquest of makka", "conquest of mecca",
+            "entered makka", "entered makkah", "took control of it",
+            "main details of this event", "conduct of the muslims",
+            "muta", "khaybar", "hunain", "tabuk",
+            "military campaign", "expedition", "army", "war", "fighting",
+            "victory", "defeat", "archers", "cavalry", "martyr",
+            "main battles", "battles and treaties", "conflicts with makkans",
+            "fight against", "preparation for battle",
+            "cave of thawr", "thawr", "cave hira and thawr", "caves of hira and thawr"
+          ]
+        },
+        {
+          "name": "The Prophet's character, example and significance",
+          "keywords": [
+            "character of the prophet", "his character", "characteristics of the prophet",
+            "examples of how the prophet", "how he treated", "prophet's qualities",
+            "qualities of the prophet", "demonstrated the qualities", "demonstrated",
+            "honest", "trustworthy", "trustworthiness", "merciful", "gentle",
+            "humble", "brave", "patient", "patience", "simplicity",
+            "forgiveness", "self restraint", "self-restraint", "forbearance",
+            "honesty and simplicity", "mercy of the prophet", "mercy was clearly demonstrated",
+            "role model", "model for muslims", "example for muslims",
+            "lessons can muslims learn", "what lessons might muslims learn",
+            "using examples from the prophet", "show how he demonstrated",
+            "importance of the prophet", "significance of the prophet",
+            "seal of the prophets", "last prophet", "last messenger", "khatam an nabiyeen",
+            "why it is significant", "prophet today", "prophet for modern muslims",
+            "treatment of women", "treatment of non muslims", "with enemies",
+            "final year of the prophet", "events of the final year",
+            "letters to leaders", "letters to foreign rulers",
+            "letters sent by the prophet", "send letters to"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The First Islamic Community",
+      "papers": [1],
+      "keywords": [
+        "companions", "sahabah", "wives", "wives of the prophet",
+        "aisha", "fatimah", "descendants", "grandchildren",
+        "ten blessed", "ten promised paradise", "muhajirun", "ansar",
+        "emigrants", "helpers", "first islamic community", "early muslims",
+        "early followers", "early muslim community",
+        "constitution of madinah", "islamic community",
+        "aqaba", "bilal", "hamza", "abu bakr companion",
+        "hypocrites", "munafiqun", "scribes", "imams", "karbala"
+      ],
+      "subtopics": [
+        {
+          "name": "The Hijra — departure, journey and significance",
+          "keywords": [
+            "hijra", "hijrah", "migration from makkah", "reasons for hijra",
+            "departure from makkah", "journey to madinah", "cave of thawr",
+            "spider web", "abu bakr and the prophet", "plot to assassinate",
+            "escape", "significance of hijra", "turning point", "new beginning",
+            "why the hijra was important", "impact of the hijra",
+            "events of the hijra", "how the prophet left makkah"
+          ]
+        },
+        {
+          "name": "The Ansar, Muhajirin and brotherhood in Madinah",
+          "keywords": [
+            "ansar", "helpers", "muhajirin", "emigrants", "brotherhood",
+            "share property", "bond between", "welcome", "unite",
+            "aws", "khazraj", "helpers and emigrants",
+            "first mosque", "mosque of the prophet", "building the mosque",
+            "establish the community", "first acts in madinah",
+            "role of ansar", "muakhah", "pairing of companions",
+            "emigrants and helpers", "emigrants helpers"
+          ]
+        },
+        {
+          "name": "The Constitution of Madinah and relations with other groups",
+          "keywords": [
+            "constitution of madinah", "charter", "document", "agreement",
+            "jewish tribes", "jewish groups", "christians", "non muslims",
+            "rights and duties", "equal rights", "peaceful relations",
+            "how the prophet managed", "relations with jews",
+            "expulsion of tribes", "treaty", "pact", "banu qaynuqa",
+            "banu nadir", "banu qurayza", "community charter"
+          ]
+        },
+        {
+          "name": "Wives of the Prophet — their lives and significance",
+          "keywords": [
+            "wives of the prophet", "prophet's wives", "mothers of the believers",
+            "khadijah", "aisha", "hafsa", "umm salama", "zaynab", "umm habibah",
+            "importance of his wives", "identify and describe the wives",
+            "discuss the importance", "role of wives",
+            "mother of the believers", "aisha's role", "khadijah's support",
+            "wives role in early islam", "lessons from wives"
+          ]
+        },
+        {
+          "name": "Companions — Ten Blessed, scribes, leading figures and descendants",
+          "keywords": [
+            "companions of the prophet", "main companions",
+            "ten blessed companions", "ten promised paradise", "ashra mubasshara",
+            "scribes", "four caliphs during his lifetime",
+            "rightly guided caliphs during his lifetime",
+            "describe their relationship with the prophet",
+            "role of the scribes", "how they helped in the development",
+            "major characters who surrounded him",
+            "lives of the companions", "lives of the following companions",
+            "write about the lives of", "write a detailed account of the lives",
+            "khalid ibn walid", "zayd ibn haritha", "hamza ibn abd al muttalib",
+            "hamza ibn abd", "khalid", "zayd ibn",
+            "descendants", "children", "grandchildren",
+            "daughters of the prophet", "prophet's daughters",
+            "fatimah", "fatima", "zaynab", "ruqayyah", "umm kulthum",
+            "hasan", "husain", "hussain", "hassan ibn ali", "hussain ibn ali",
+            "karbala", "events of karbala", "importance of the imams",
+            "shia imams", "recognised among shia"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Teachings of the Hadiths",
+      "papers": [2],
+      "keywords": [
+        "hadith passage", "passage from hadith", "teachings of hadith",
+        "individual conduct", "life in community", "muslims should",
+        "what does this hadith", "hadith about", "hadith teaches",
+        "hadith on prayer", "hadith on honesty", "hadith on community",
+        "behaviour", "community life", "hadith teaching",
+        "according to the hadith", "what does this saying",
+        "islamic teaching on", "putting into practice", "practice of prophet",
+        "choose any two of the following hadiths",
+        "two of the following hadiths",
+        "describe their teachings about what muslims believe",
+        "put these teachings into action",
+        "from the teachings given in the set hadiths",
+        "guidance given to muslims in their everyday life",
+        "set hadiths", "following hadiths and", "the following hadith"
+      ],
+      "subtopics": [
+        {
+          "name": "Hadith on individual conduct, character and worship",
+          "keywords": [
+            "individual conduct", "personal behaviour", "personal conduct",
+            "hadith about individual", "hadith on individual",
+            "honesty", "truthfulness", "kindness", "patience", "humility",
+            "anger", "tongue", "backbiting", "lying", "deceive",
+            "cleanliness", "purity", "wudu", "prayer", "fasting",
+            "how a muslim should behave", "what a muslim should do",
+            "good character", "bad character", "actions of a muslim",
+            "ibadah", "worship", "remembrance of allah"
+          ]
+        },
+        {
+          "name": "Hadith on community life, brotherhood and social responsibility",
+          "keywords": [
+            "life in the community", "hadith about community", "community life",
+            "community responsibility", "brotherhood", "helping others",
+            "rights of neighbours", "ummah", "neighbour",
+            "poor", "needy", "orphan", "weak",
+            "rights and duties in community", "body of the ummah",
+            "how these hadith help muslims understand how they should act",
+            "community conduct", "social life", "relations with others in community",
+            "unity of muslims", "caring for others"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The History and Importance of the Hadiths",
+      "papers": [2],
+      "keywords": [
+        "compilation of hadith", "history of hadith", "how were hadiths compiled",
+        "isnad", "matn", "chain of narrators", "narrators", "collectors",
+        "hadith collectors", "bukhari", "muslim", "tirmidhi", "nasai",
+        "abu dawud", "ibn majah", "sahih bukhari", "musnad", "musannaf",
+        "sound hadith", "sahih", "hasan", "weak hadith", "daif",
+        "six books", "four books", "authentication of hadith",
+        "importance of hadith", "sunni hadith", "shia hadith",
+        "six sunni collections", "transmitter", "parts of hadith",
+        "relationship of hadiths", "hadiths and quran", "sources of islamic law",
+        "ijma", "qiyas", "hadith and law", "reliability of hadith",
+        "hadith criticism", "scholars of hadith", "collector", "sunnah"
+      ],
+      "subtopics": [
+        {
+          "name": "The Sunnah — definition, types and importance",
+          "keywords": [
+            "sunnah", "practice of the prophet", "saying of the prophet",
+            "action of the prophet", "tradition of the prophet",
+            "way of the prophet", "types of sunnah",
+            "verbal sunnah", "action sunnah", "tacit sunnah", "approval sunnah",
+            "importance of sunnah", "why sunnah is important",
+            "second source", "after the quran", "complement the quran",
+            "how the sunnah helps", "sunnah and quran together",
+            "following the prophet", "emulate the prophet",
+            "definition of hadith", "what is hadith", "meaning of hadith"
+          ]
+        },
+        {
+          "name": "Hadith compilation — isnad, matn and authentication",
+          "keywords": [
+            "isnad", "matn", "sanad", "chain of narrators", "chain of transmission",
+            "parts of hadith", "how the hadith was compiled",
+            "judged the authenticity", "categories of hadith", "authenticity",
+            "sahih", "hasan", "daif", "weak", "fabricated", "mawdu",
+            "how earliest companions", "started their compilations",
+            "why hadiths were compiled", "ahadith", "reliability",
+            "how hadiths were preserved", "testing narrators",
+            "criticism of hadith", "science of hadith", "hadith methodology"
+          ]
+        },
+        {
+          "name": "Major hadith scholars and their collections",
+          "keywords": [
+            "bukhari", "imam bukhari", "muslim ibn hajjaj",
+            "tirmidhi", "abu dawud", "nasai", "ibn majah",
+            "sahih bukhari", "sahih muslim", "sunan",
+            "main compilers", "their activities", "muhaddithun",
+            "qualities of compilers", "ways they judged authenticity",
+            "qualities required to be a reliable transmitter",
+            "how they authenticated", "reliable transmitter",
+            "six sunni collections", "kutub al sittah",
+            "four shia books", "shia hadith collections",
+            "musnad collections", "musannaf collections",
+            "imam malik", "muwatta", "travel to collect hadith",
+            "scholars of hadith"
+          ]
+        },
+        {
+          "name": "Importance of Hadith — guidance, law and Muslim life",
+          "keywords": [
+            "importance of hadith", "why hadiths are important",
+            "importance to muslims", "significance of hadith",
+            "role of hadith", "how hadith helps muslims",
+            "hadith in daily life", "using hadith", "benefit of hadith",
+            "hadith as guidance", "hadith and the quran",
+            "relationship of hadith with quran",
+            "hadith in islamic law", "ijma", "qiyas",
+            "sources of law", "second source of law",
+            "main sources of islamic legal thinking",
+            "hadith and quranic law", "complement the quran",
+            "special relationship to the quran",
+            "importance of using hadith in islamic law",
+            "four sources of law", "hadith and quran relationship"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "The Rightly Guided Caliphs",
+      "papers": [2],
+      "keywords": [
+        "caliph", "khalifah", "rightly guided", "abu bakr", "umar", "uthman", "ali",
+        "ridda wars", "apostasy wars", "expansion of islam", "conquest",
+        "persia", "byzantine", "egypt", "iraq", "battle of siffin",
+        "battle of the camel", "battle of qadisiyya", "battle of yarmuk",
+        "battle of nihawand", "fitna", "civil war", "muawiyah",
+        "succession", "shura", "consultation", "assassination", "caliphate",
+        "policies", "achievements of caliphs", "models for government",
+        "khulafa ur rashidun", "four caliphs"
+      ],
+      "subtopics": [
+        {
+          "name": "Abu Bakr al-Siddiq — caliphate and achievements (632–634 CE)",
+          "keywords": [
+            "abu bakr", "abu bakr al siddiq", "al siddiq", "first caliph",
+            "ridda wars", "apostasy wars", "wars of apostasy", "battle of yamama",
+            "yamama", "false prophets", "musaylimah", "khalid ibn walid",
+            "compilation under abu bakr", "abu bakr compiled the quran",
+            "short caliphate", "two year", "abu bakr's rule", "caliphate of abu bakr",
+            "election of abu bakr", "how abu bakr became caliph",
+            "achievements of abu bakr", "abu bakr expanded"
+          ]
+        },
+        {
+          "name": "Umar ibn al-Khattab — caliphate and governance (634–644 CE)",
+          "keywords": [
+            "umar", "umar ibn al khattab", "second caliph", "omar",
+            "golden era", "umar's caliphate", "caliphate of umar",
+            "ten year caliphate", "greatest achievement", "umar ruled",
+            "expansion under umar", "conquest of jerusalem", "jerusalem",
+            "persia", "iraq", "egypt", "byzantine", "palestine",
+            "diwan", "administrative system", "umar's administration",
+            "caliphs policies", "umar's policies", "umar's achievements",
+            "umar martyred", "umar assassinated",
+            "how umar became caliph", "election of umar"
+          ]
+        },
+        {
+          "name": "Uthman ibn Affan — caliphate and legacy (644–656 CE)",
+          "keywords": [
+            "uthman", "uthman ibn affan", "third caliph", "othman",
+            "uthman's caliphate", "caliphate of uthman",
+            "standardise the quran", "quran copies", "burning copies",
+            "mushaf uthman", "uthman compiled the quran",
+            "uthman expanded", "navy", "naval expansion",
+            "revolt against uthman", "criticism of uthman", "opposition to uthman",
+            "uthman assassinated", "uthman martyred",
+            "election of uthman", "how uthman became caliph",
+            "achievements of uthman", "uthman's policies",
+            "justified criticisms", "burning the copies"
+          ]
+        },
+        {
+          "name": "Ali ibn Abi Talib — caliphate and challenges (656–661 CE)",
+          "keywords": [
+            "ali", "ali ibn abi talib", "fourth caliph",
+            "ali's caliphate", "caliphate of ali",
+            "battle of siffin", "siffin", "battle of the camel", "camel",
+            "khawarij", "kharijites", "khariji",
+            "civil war", "fitna", "fitnah", "internal conflict",
+            "muawiyah", "aisha's role in battle of camel",
+            "ali assassinated", "ali martyred",
+            "election of ali", "how ali became caliph",
+            "challenges ali faced", "difficulties of ali",
+            "jamal", "siffin arbitration"
+          ]
+        },
+        {
+          "name": "Significance and legacy of the Rightly Guided Caliphs",
+          "keywords": [
+            "rightly guided caliphs significance", "why they were known as rightly guided",
+            "lessons from caliphs", "models for government", "models for leadership",
+            "importance of the four caliphs", "caliphs as examples",
+            "four caliphs together", "role they played in the development of islam",
+            "khulafa ur rashidun", "policies maintaining and expanding",
+            "difficulties they encountered", "opposition each caliph",
+            "expansion of the islamic state", "caliphs and the quran",
+            "who were the rightly guided caliphs", "identify the four caliphs"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Articles of Faith and Pillars of Islam",
+      "papers": [2],
+      "keywords": [
+        "articles of faith", "pillars of islam", "tawhid", "oneness of allah",
+        "angels", "malaikah", "divine books", "revealed books",
+        "day of judgement", "akhirah", "resurrection", "qadar",
+        "predestination", "divine decree", "shahada", "declaration of faith",
+        "salah", "prayer", "namaz", "zakat", "zakah", "charity",
+        "sawm", "fasting", "ramadan", "hajj", "pilgrimage",
+        "jihad", "greater jihad", "lesser jihad", "jihad of the self",
+        "armed jihad", "five pillars", "six articles", "six pillars of faith",
+        "iman", "faith", "belief"
+      ],
+      "subtopics": [
+        {
+          "name": "The Six Articles of Faith",
+          "keywords": [
+            "six articles of faith", "articles of faith", "iman",
+            "belief in god", "belief in angels", "malaikah", "nature and duties of angels",
+            "belief in books", "divine books", "revealed books",
+            "belief in prophets", "character and function of prophets",
+            "predestination", "qadar", "divine decree", "god's predestination",
+            "resurrection", "last day", "day of judgement", "akhirah",
+            "main events and significance", "identify the main articles of faith",
+            "six pillars of iman", "arkan al iman",
+            "angel", "jibril as angel", "malaika", "jibreel"
+          ]
+        },
+        {
+          "name": "Salah — prayer and its observance",
+          "keywords": [
+            "salah", "prayer", "five prayers", "five times",
+            "fajr", "zuhr", "asr", "maghrib", "isha",
+            "wudu", "ablution", "qiblah", "direction of prayer",
+            "rakat", "rakah", "imam", "congregation", "jumu'ah",
+            "friday prayers", "friday prayer", "congregational prayer",
+            "adhan", "call to prayer", "preparations for prayer",
+            "performance of prayer", "importance of prayer",
+            "namaz", "how salah is performed", "times of prayer",
+            "place of prayer", "prayer in congregation", "delayed prayer"
+          ]
+        },
+        {
+          "name": "Zakat, Sawm and Hajj",
+          "keywords": [
+            "zakat", "zakah", "almsgiving", "alms giving",
+            "nisab", "threshold", "two point five", "2.5",
+            "eligible recipients", "purify wealth", "annual payment",
+            "significance of zakat", "how zakat is performed",
+            "sawm", "fasting", "ramadan", "suhoor", "iftar",
+            "laylat al qadr", "exempted from fasting", "how fasting is observed",
+            "hajj", "pilgrimage", "ihram", "arafah", "mina", "muzdalifah",
+            "tawaf", "sa'i", "stoning of devil", "masjid al haram",
+            "main observances of hajj", "significance of hajj",
+            "identify the main pillars", "five pillars", "arkan al islam"
+          ]
+        },
+        {
+          "name": "Shahada and Jihad",
+          "keywords": [
+            "shahada", "declaration of faith", "what it contains", "kalima",
+            "la ilaha illallah", "there is no god", "witnessing",
+            "jihad", "greater jihad", "lesser jihad", "jihad of the self",
+            "armed jihad", "physical jihad", "mental jihad", "spiritual jihad",
+            "traditional meaning of jihad", "different ways jihad can be interpreted",
+            "role of muslims in the modern world", "jihad bil nafs",
+            "struggle", "range of meanings", "striving in the way of allah"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Islamic Jurisprudence (Fiqh)",
+      "papers": [2],
+      "keywords": [
+        "sources of islamic law", "islamic law", "fiqh", "jurisprudence",
+        "ijma", "qiyas", "ijtihad", "madhab", "mazhab", "school of law",
+        "four schools", "hanafi", "maliki", "shafi", "hanbali",
+        "abu hanifa", "imam malik", "imam shafi", "ahmad ibn hanbal",
+        "usul al fiqh", "principles of islamic law", "legal reasoning",
+        "analogy in law", "consensus", "independent reasoning",
+        "islamic legal thinking", "legal sources", "derive rulings",
+        "fatwa", "mufti", "legal opinion", "ruling in islam",
+        "halal", "haram", "permissible", "forbidden in islam"
+      ],
+      "subtopics": [
+        {
+          "name": "Sources of Islamic Law — Qur'an, Sunnah, Ijma' and Qiyas",
+          "keywords": [
+            "sources of islamic law", "four sources", "sources of law",
+            "quran as source", "sunnah as source",
+            "ijma", "consensus", "scholarly consensus",
+            "qiyas", "analogy", "analogical reasoning",
+            "primary sources", "secondary sources",
+            "how laws are derived", "basis of islamic law",
+            "relationship between sources", "quran and sunnah",
+            "all thought and action", "basis of all thought",
+            "main sources of islamic legal thinking",
+            "how muslims make legal decisions"
+          ]
+        },
+        {
+          "name": "Ijtihad and independent legal reasoning",
+          "keywords": [
+            "ijtihad", "independent reasoning", "independent judgment",
+            "scholarly reasoning", "personal reasoning",
+            "when quran and sunnah are silent", "new situations",
+            "applying islamic law to new issues", "contemporary issues",
+            "open the door of ijtihad", "closing of ijtihad",
+            "role of scholars", "qualified scholars", "mujtahid",
+            "how new rulings are made", "reasoning from sources"
+          ]
+        },
+        {
+          "name": "The Four Schools of Islamic Law (Madhabs)",
+          "keywords": [
+            "madhab", "mazhab", "school of fiqh", "school of law",
+            "four schools", "four madhabs",
+            "hanafi", "hanafi school", "abu hanifa",
+            "maliki", "maliki school", "imam malik",
+            "shafi", "shafii", "shafi school", "imam shafi",
+            "hanbali", "hanbali school", "ahmad ibn hanbal",
+            "differences between schools", "why schools differ",
+            "following a madhab", "choosing a school",
+            "contributions of scholars", "development of fiqh"
+          ]
+        }
+      ]
+    }
+  ]
+}

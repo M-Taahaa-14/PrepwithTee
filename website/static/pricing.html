@@ -1,0 +1,480 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pricing — PrepWithTee</title>
+  <meta name="description"
+    content="One-on-one Cambridge tutoring priced per subject, per month. Everything included: live lessons, topical past papers, mark schemes and topic tests.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260727a">
+  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+        <a href="resources.html" class="nav-link">Resources</a>
+        <a href="tutor.html" class="nav-link">AI Tutor</a>
+        <a href="pricing.html" class="nav-link active">Pricing</a>
+        <a href="index.html#contact" class="btn btn-gold">Book a demo lesson</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero hero-slim">
+    <div class="container">
+      <p class="eyebrow">Simple, per subject, per month</p>
+      <h1>Pay for the subjects<br>you actually <em>need.</em></h1>
+      <p class="sub">No joining fee, no annual lock-in, no paying for a timetable
+        of subjects you're already fine at. Add a subject when you need it, drop it
+        when you don't.</p>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- ============ BOARD SWITCHER ============ -->
+    <div class="centered" style="margin-top: 24px; margin-bottom: 28px;">
+      <div class="seg-large" id="pricing-board-toggle">
+        <button class="active" data-board="olevel">O Level</button>
+        <button data-board="igcse">IGCSE</button>
+        <button data-board="alevel">A Level</button>
+      </div>
+    </div>
+
+    <!-- ============ PLANS ============ -->
+    <section class="section" style="padding-top:10px">
+      <div class="plan-grid">
+
+        <!-- PLAN 1 -->
+        <div class="flip-card-container">
+          <div class="flip-card">
+            <!-- FRONT -->
+            <div class="flip-card-front plan">
+              <h3>One Subject</h3>
+              <p class="who-for">Focused 1-on-1 mastery for your target course code.</p>
+              <div class="price" id="p1-price">PKR 20,000<small> /month</small></div>
+              <p class="per" id="p1-per">per subject · billed monthly</p>
+              <ul>
+                <li>Weekly one-on-one live lessons</li>
+                <li>Full topical past-paper access</li>
+                <li>Mark schemes with every question</li>
+                <li>WhatsApp doubt support between lessons</li>
+              </ul>
+              <div class="plan-card-foot">
+                <a class="btn btn-outline" id="p1-btn-front" href="index.html#contact">Book a free demo</a>
+              </div>
+            </div>
+            <!-- BACK -->
+            <div class="flip-card-back plan tint-lav">
+              <div class="back-head">
+                <span class="back-badge">Methodology &amp; Details</span>
+                <button type="button" class="btn-flip-back">✕ Back</button>
+              </div>
+              <h4 class="back-title">Single Subject Plan</h4>
+              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
+              <ul class="back-points">
+                <li><b>Timings:</b> Scheduled around your school timetable.</li>
+                <li><b>Topicals:</b> Custom worksheets after every chapter.</li>
+                <li><b>Target:</b> Syllabus finished 2 months before exams.</li>
+                <li><b>Support:</b> Direct teacher support via WhatsApp.</li>
+              </ul>
+              <a class="btn btn-dark" id="p1-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLAN 2 (FEATURED) -->
+        <div class="flip-card-container">
+          <div class="flip-card">
+            <!-- FRONT -->
+            <div class="flip-card-front plan featured">
+              <span class="tag">Most popular</span>
+              <h3>Two Subjects</h3>
+              <p class="who-for">The ideal combo — Maths plus Physics or CS.</p>
+              <div class="price" id="p2-price">PKR 35,000<small> /month</small></div>
+              <p class="per" id="p2-per">for both subjects · saves PKR 5,000</p>
+              <ul>
+                <li>Everything in One subject, twice over</li>
+                <li>Topic tests with full mark schemes</li>
+                <li>Timed mock exams before papers</li>
+                <li>Monthly progress reports for parents</li>
+              </ul>
+              <div class="plan-card-foot">
+                <a class="btn btn-dark" id="p2-btn-front" href="index.html#contact">Book a free demo</a>
+              </div>
+            </div>
+            <!-- BACK -->
+            <div class="flip-card-back plan tint-pink">
+              <div class="back-head">
+                <span class="back-badge" style="background:var(--pink-ink)">Methodology &amp; Details</span>
+                <button type="button" class="btn-flip-back">✕ Back</button>
+              </div>
+              <h4 class="back-title">Dual Subject Pass</h4>
+              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
+              <ul class="back-points">
+                <li><b>Timings:</b> Flexible schedule across both subjects.</li>
+                <li><b>Mocks:</b> Full simulation before exam series.</li>
+                <li><b>Reports:</b> Chapter-by-chapter progress tracking.</li>
+                <li><b>Revision:</b> Exam crash course included.</li>
+              </ul>
+              <a class="btn btn-dark" id="p2-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLAN 3 -->
+        <div class="flip-card-container">
+          <div class="flip-card">
+            <!-- FRONT -->
+            <div class="flip-card-front plan">
+              <h3>Three Subjects</h3>
+              <p class="who-for">Complete exam-session coverage across your timetable.</p>
+              <div class="price" id="p3-price">PKR 50,000<small> /month</small></div>
+              <p class="per" id="p3-per">saves PKR 10,000 · full access</p>
+              <ul>
+                <li>Everything in Two subjects</li>
+                <li>Priority scheduling around your school</li>
+                <li>Full exam crash revision course</li>
+                <li>Custom paper-by-paper revision plan</li>
+              </ul>
+              <div class="plan-card-foot">
+                <a class="btn btn-outline" id="p3-btn-front" href="index.html#contact">Book a free demo</a>
+              </div>
+            </div>
+            <!-- BACK -->
+            <div class="flip-card-back plan tint-green">
+              <div class="back-head">
+                <span class="back-badge" style="background:var(--green-ink)">Methodology &amp; Details</span>
+                <button type="button" class="btn-flip-back">✕ Back</button>
+              </div>
+              <h4 class="back-title">Full Timetable Pass</h4>
+              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
+              <ul class="back-points">
+                <li><b>Timings:</b> Priority slots for all three subjects.</li>
+                <li><b>Topicals:</b> Unlimited custom past papers.</li>
+                <li><b>Strategy:</b> Cambridge command word training.</li>
+                <li><b>Guarantee:</b> Free trial demo lesson.</li>
+              </ul>
+              <a class="btn btn-dark" id="p3-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <p class="hint" style="text-align:center;margin-top:28px">
+        Every plan starts with a <b>free demo lesson</b> — meet the tutor, see the material, then decide.</p>
+    </section>
+
+    <!-- ============ SAVE BIG COMPARISON ============ -->
+    <section class="section section-cream" style="border-radius:var(--radius-lg);
+           padding:52px 34px;margin-bottom:16px">
+      <h2 class="section-title centered" style="color:var(--purple)">
+        What it replaces</h2>
+      <p class="centered hint" style="margin:-18px auto 26px;max-width:60ch">
+        Taking three subjects as the example. The figures on the right are typical
+        market rates, not quotes — check them against what you're paying now.</p>
+      <div class="vs-wrap">
+        <div class="vs-col">
+          <div class="vs-tile tint-lav">
+            <h3>PrepWithTee</h3>
+            <p class="amount tint-ink">PKR 50,000/month · all three subjects</p>
+            <ul class="tint-ink">
+              <li>One-on-one lessons, not a room of forty</li>
+              <li>Topical past papers built on demand</li>
+              <li>Mark schemes after every question</li>
+              <li>Timed topic tests and mock papers</li>
+              <li>The full paper library, 2019–2025</li>
+              <li>Doubt support between lessons</li>
+              <li>Learn from home — no commute</li>
+            </ul>
+            <span class="vs-op">=</span>
+          </div>
+          <p class="vs-total tint-ink" style="color:var(--lav-ink)">PKR 50,000/month</p>
+        </div>
+
+        <div class="vs-badge">VS</div>
+
+        <div class="vs-col">
+          <div class="vs-tile tint-pink">
+            <h3>Private tutors</h3>
+            <p class="amount tint-ink">≈ PKR 25,000/month each · three subjects
+              = PKR 75,000</p>
+            <span class="vs-op">+</span>
+          </div>
+          <div class="vs-tile tint-green">
+            <h3>Past-paper books</h3>
+            <p class="amount tint-ink">≈ PKR 3,000/month across three subjects</p>
+            <span class="vs-op">+</span>
+          </div>
+          <div class="vs-tile tint-orange">
+            <h3>Travel &amp; fuel</h3>
+            <p class="amount tint-ink">≈ PKR 12,000/month, both ways, every lesson</p>
+            <span class="vs-op">=</span>
+          </div>
+          <p class="vs-total tint-ink" style="color:var(--pink-ink)">PKR 90,000/month</p>
+        </div>
+      </div>
+      <p class="centered" style="margin-top:28px;font-family:'Playfair Display',Georgia,serif;
+       font-size:1.45rem;font-weight:700;color:var(--purple)">
+        That's around <span style="color:var(--green-ink)">PKR 40,000 a month</span>
+        back in your pocket.</p>
+    </section>
+
+    <!-- ============ WHAT'S INCLUDED ============ -->
+    <section class="section">
+      <h2 class="section-title centered">What's actually included?
+        <span style="font-family:'Hanken Grotesk',sans-serif;font-size:1rem;
+             font-weight:500;color:var(--grey)">Well — all of it.</span>
+      </h2>
+      <ul class="incl reveal-stagger">
+        <li class="reveal"><mark>One-on-one lessons</mark> with the same tutor every
+          week, not a rotating panel</li>
+        <li class="reveal"><mark>Topical past papers</mark> built on demand — pick a
+          chapter, get every question Cambridge has set on it</li>
+        <li class="reveal"><mark>Mark schemes</mark> printed right after each question,
+          so you can mark yourself honestly</li>
+        <li class="reveal"><mark>Timed topic tests</mark> with the answers in a separate
+          file, exactly like the real thing</li>
+        <li class="reveal"><mark>The full paper library</mark> — every question paper and
+          mark scheme, 2019 to 2025, readable in your browser</li>
+        <li class="reveal"><mark>Instant doubt solving</mark> — photograph any question
+          and get the full method back in seconds</li>
+      </ul>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section">
+      <h2 class="section-title centered">Questions parents ask</h2>
+      <div class="faq-wrap">
+        <details class="faq" open>
+          <summary>Can we try before paying anything?</summary>
+          <p>Yes. The first lesson is a free demo — you meet the tutor, see the
+            past-paper material and watch how a lesson actually runs. No card
+            details, no obligation.</p>
+        </details>
+        <details class="faq">
+          <summary>What if we need to stop mid-term?</summary>
+          <p>Billing is monthly, so you stop at the end of the month you've paid
+            for. There's no annual contract and no cancellation fee.</p>
+        </details>
+        <details class="faq">
+          <summary>Are the past papers included, or extra?</summary>
+          <p>Included, entirely. The topical builder, the mark schemes, the topic
+            tests and the full paper library all come with any plan.</p>
+        </details>
+        <details class="faq">
+          <summary>Which boards and subjects are covered?</summary>
+          <p>Cambridge O Level, IGCSE and A Level — Mathematics, Physics and
+            Computer Science. Every course code is listed on the
+            <a href="subjects.html">subjects page</a>.
+          </p>
+        </details>
+        <details class="faq">
+          <summary>Do lessons happen online or in person?</summary>
+          <p>Online one-on-one, so there's no commute and lessons can be recorded
+            for revision. Message us on WhatsApp if you'd like to discuss in-person
+            options.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="section">
+      <h2 class="section-title centered">What students say</h2>
+      <div class="tcards reveal-stagger">
+        <div class="tcard tint-blue reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"Sir Taahaa helped me jump from a C to an A* in A Level Maths P3. The topical papers cut straight to what examiners ask."</blockquote>
+          <div class="who tint-ink"><span class="dot">🎓</span> Rayyan K. · A Level Maths (9709)</div>
+        </div>
+        <div class="tcard tint-lav reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"The topic tests after every chapter gave my daughter immense confidence. We could see her exact score breakdowns every week!"</blockquote>
+          <div class="who tint-ink"><span class="dot">👨‍👩‍👧</span> Mrs. Tariq · Parent of IGCSE Student</div>
+        </div>
+        <div class="tcard tint-pink reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"I used to get stuck on Physics 0625 paper 4 calculation steps. The mark scheme breakdowns made method marks super clear."</blockquote>
+          <div class="who tint-ink"><span class="dot">🎓</span> Hamza M. · IGCSE Physics (0625)</div>
+        </div>
+        <div class="tcard tint-yellow reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"One-on-one attention made all the difference. No crowded batch, no skipped doubts. Went from B to A in O Level Maths 4024."</blockquote>
+          <div class="who tint-ink"><span class="dot">🎓</span> Zoha S. · O Level Maths (4024)</div>
+        </div>
+        <div class="tcard tint-green reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"Sir Taahaa’s topical engine is a game changer for past paper revision. Having mark schemes right under each question saves so much time."</blockquote>
+          <div class="who tint-ink"><span class="dot">🎓</span> Bilal A. · A Level Physics (9702)</div>
+        </div>
+        <div class="tcard tint-orange reveal-scale">
+          <div class="mark tint-ink">“</div>
+          <blockquote>"Finally a tutor who follows the exact syllabus code 2210! The structured approach gave us complete peace of mind."</blockquote>
+          <div class="who tint-ink"><span class="dot">👨‍👩‍👦</span> Mr. Usman · Parent of O Level CS Student</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="confused tint-pink">
+      <div>
+        <h2 class="tint-ink">Still confused? Get in touch.</h2>
+        <p>Get a personalised demo and straight answers to all your questions —
+          no sales pitch.</p>
+      </div>
+      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%27d%20like%20to%20know%20more%20about%20your%20tutoring%20pricing%20and%20book%20a%20demo.">Book a demo</a>
+    </section>
+  </main>
+
+      <footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Questions before you book?</p>
+          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img src="logo.png" alt="PrepWithTee">
+          <span>PrepWithTee</span>
+        </a>
+        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Study Tools</h4>
+        <a href="papers.html">Past Papers Engine</a>
+        <a href="resources.html">Resources &amp; Notes</a>
+        <a href="tutor.html">AI Tutor</a>
+        <a href="guide.html">Revision Study Guide</a>
+      </div>
+      <div class="footer-col">
+        <h4>What We Teach</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
+        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
+        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Enrol</h4>
+        <a href="pricing.html">Fees &amp; Pricing</a>
+        <a href="index.html#contact">Book a Free Demo</a>
+        <a href="subjects.html">Find Your Subject</a>
+        <a href="index.html#faq">Questions &amp; Answers</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span>Past papers &copy; Cambridge Assessment International Education</span>
+    </div>
+  </footer>
+
+  <script src="main.js?v=20260727a"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Board Switcher Pricing rates
+      const pricingData = {
+        olevel: {
+          name: "O Level",
+          p1: { price: "PKR 20,000<small> /month</small>", per: "per subject · billed monthly" },
+          p2: { price: "PKR 35,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
+          p3: { price: "PKR 50,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
+        },
+        igcse: {
+          name: "IGCSE",
+          p1: { price: "PKR 20,000<small> /month</small>", per: "per subject · billed monthly" },
+          p2: { price: "PKR 35,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
+          p3: { price: "PKR 50,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
+        },
+        alevel: {
+          name: "A Level",
+          p1: { price: "PKR 25,000<small> /month</small>", per: "per subject · AS & A2 level" },
+          p2: { price: "PKR 45,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
+          p3: { price: "PKR 65,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
+        }
+      };
+
+      const boardToggle = document.getElementById("pricing-board-toggle");
+
+      function updateWhatsAppLinks(boardName) {
+        const p1Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (1 Subject Plan).`;
+        const p2Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (2 Subjects Plan).`;
+        const p3Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (3 Subjects Plan).`;
+
+        document.getElementById("p1-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p1Msg);
+        document.getElementById("p1-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p1Msg);
+        document.getElementById("p2-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p2Msg);
+        document.getElementById("p2-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p2Msg);
+        document.getElementById("p3-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p3Msg);
+        document.getElementById("p3-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p3Msg);
+      }
+
+      if (boardToggle) {
+        boardToggle.querySelectorAll("button").forEach(btn => {
+          btn.addEventListener("click", () => {
+            boardToggle.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const board = btn.dataset.board;
+            const rates = pricingData[board] || pricingData.olevel;
+            
+            // Reset flipped cards back to front face on switch
+            document.querySelectorAll(".flip-card").forEach(c => c.classList.remove("is-flipped"));
+
+            document.getElementById("p1-price").innerHTML = rates.p1.price;
+            document.getElementById("p1-per").textContent = rates.p1.per;
+            document.getElementById("p2-price").innerHTML = rates.p2.price;
+            document.getElementById("p2-per").textContent = rates.p2.per;
+            document.getElementById("p3-price").innerHTML = rates.p3.price;
+            document.getElementById("p3-per").textContent = rates.p3.per;
+
+            updateWhatsAppLinks(rates.name);
+          });
+        });
+      }
+
+      // Initialize with O Level links on page load
+      updateWhatsAppLinks("O Level");
+
+      // 3D Flip Card handlers — Click anywhere on card to flip
+      document.querySelectorAll(".flip-card-container").forEach(container => {
+        const card = container.querySelector(".flip-card");
+
+        container.addEventListener("click", (e) => {
+          // If clicking a link, don't flip
+          if (e.target.closest("a")) {
+            return;
+          }
+          card.classList.toggle("is-flipped");
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

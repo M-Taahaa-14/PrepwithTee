@@ -1,0 +1,11 @@
+pymupdf>=1.24
+requests>=2.31
+python-dotenv>=1.0
+openpyxl>=3.1
+anthropic>=0.40
+
+# website (website/app.py) — these were previously only ever installed by hand,
+# so a server built from this file alone would not have started.
+fastapi>=0.110
+uvicorn[standard]>=0.29
+gunicorn>=21.2

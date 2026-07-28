@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Study Guide &amp; Roadmap — PrepWithTee</title>
+  <meta name="description"
+    content="How to make the best use of PrepWithTee resources. A complete step-by-step revision roadmap for Cambridge O Level, IGCSE &amp; A Level.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260727a">
+  <style>
+    /* Custom styles for the Roadmap Stepper */
+    .roadmap-section {
+      padding: 64px 0;
+    }
+    .roadmap-timeline {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-left: 32px;
+    }
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 24px;
+      bottom: 24px;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold) 0%, var(--lav-ink) 100%);
+      opacity: 0.3;
+    }
+    .roadmap-step {
+      position: relative;
+      margin-bottom: 48px;
+    }
+    .roadmap-step:last-child {
+      margin-bottom: 0;
+    }
+    .roadmap-badge {
+      position: absolute;
+      left: -40px;
+      top: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--page);
+      border: 3px solid var(--gold);
+      z-index: 2;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .roadmap-step:hover .roadmap-badge {
+      background: var(--gold);
+      transform: scale(1.15);
+    }
+    .roadmap-step.active .roadmap-badge {
+      border-color: var(--lav-ink);
+      background: var(--lav-ink);
+    }
+    .roadmap-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .roadmap-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(41, 53, 84, 0.08);
+    }
+    .step-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .step-num {
+      font-family: "Archivo", sans-serif;
+      font-weight: 800;
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+    }
+    .step-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .roadmap-card h3 {
+      font-size: 1.35rem;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .roadmap-card p {
+      color: var(--grey);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .roadmap-card .btn {
+      padding: 8px 20px;
+      font-size: 0.88rem;
+    }
+
+    /* Step tag — solid filled color pills */
+    .step-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 999px;
+      color: #fff !important;
+    }
+    .step-tag.tint-blue   { background: var(--blue-ink); }
+    .step-tag.tint-pink   { background: var(--pink-ink); }
+    .step-tag.tint-green  { background: var(--green-ink); }
+    .step-tag.tint-orange { background: var(--orange-ink); }
+    .step-tag.tint-lav    { background: var(--lav-ink); }
+
+    /* Embedded Study Tools Container */
+    .embedded-tools {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .embedded-tools-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 680px) {
+      .embedded-tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Solid-color tool cards — same energy as subject cards */
+    .tool-card {
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      border: none;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .tool-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(26,26,46,.12); }
+    .tool-card .tag {
+      font-size: 0.72rem; font-weight: 800; letter-spacing: .07em;
+      text-transform: uppercase; padding: 4px 12px; border-radius: 999px;
+      width: fit-content; background: rgba(255,255,255,.28); color: inherit;
+    }
+    .tool-card h3 { font-size: 1.15rem; margin: 4px 0 0; color: inherit; }
+    .tool-card p  { font-size: .9rem; color: inherit; opacity: .88; line-height: 1.5; margin: 0; flex: 1; }
+    .tool-card .go { font-weight: 800; font-size: .92rem; margin-top: 14px; color: inherit; }
+    .tool-card.green  { background: var(--green);  color: var(--green-ink); border: 1px solid var(--green-line); }
+    .tool-card.lav    { background: var(--lav);    color: var(--lav-ink);   border: 1px solid var(--lav-line); }
+    .tool-card.orange { background: var(--orange); color: var(--orange-ink); border: 1px solid var(--orange-line); }
+  </style>
+  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+        <a href="resources.html" class="nav-link">Resources</a>
+        <a href="tutor.html" class="nav-link">AI Tutor</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+        <a href="index.html#contact" class="btn btn-gold">Book a demo lesson</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero hero-slim">
+    <div class="container">
+      <p class="eyebrow">Your revision blueprint</p>
+      <h1>A Step-by-Step<br>Cambridge <em>Study Roadmap.</em></h1>
+      <p class="sub">No more studying blindly. Follow this structural methodology designed around past papers and syllabuses to maximize your exam scores.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="roadmap-section">
+      <div class="roadmap-timeline">
+
+        <!-- STEP 1 -->
+        <div class="roadmap-step">
+          <div class="roadmap-badge"></div>
+          <div class="roadmap-card">
+            <div class="step-meta">
+              <span class="step-num">STEP 01</span>
+              <span class="step-tag tint-blue">Orientation</span>
+            </div>
+            <h3>Verify Your Target Syllabus</h3>
+            <p>Every Cambridge exam is explicitly defined by its syllabus code. Do not waste time reviewing topics that won't be tested. Check what's included, how the papers are weighted, and what the assessment objective is.</p>
+            <a href="resources.html#/Official%20Syllabuses" class="btn btn-outline">Check Syllabuses →</a>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="roadmap-step">
+          <div class="roadmap-badge"></div>
+          <div class="roadmap-card">
+            <div class="step-meta">
+              <span class="step-num">STEP 02</span>
+              <span class="step-tag tint-pink">Revision</span>
+            </div>
+            <h3>Learn &amp; Summarize the Theory</h3>
+            <p>Read through chapter notes and formula sheets. Do not try to memorize everything: focus on understanding derivations, principles, and key definitions. Keep these resources open next to you as you solve questions.</p>
+            <a href="resources.html" class="btn btn-outline">Browse Chapter Notes →</a>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="roadmap-step">
+          <div class="roadmap-badge"></div>
+          <div class="roadmap-card">
+            <div class="step-meta">
+              <span class="step-num">STEP 03</span>
+              <span class="step-tag tint-green">Targeted Practice</span>
+            </div>
+            <h3>Build Custom Topical Question Papers</h3>
+            <p>Do not solve complete past papers early in your prep. Instead, practice chapter-by-chapter. Build custom topical question sheets using our builder below, choosing exact years and chapters you want to master.</p>
+            
+            <div class="embedded-tools">
+              <a class="tool-card green" href="papers.html">
+                <span class="tag">Interactive Builder</span>
+                <h3>Topical Past-Paper Builder</h3>
+                <p>Select subjects, tick topics, choose years, and download custom exam-style PDF question sheets and mark schemes.</p>
+                <span class="go">Open the Builder →</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="roadmap-step">
+          <div class="roadmap-badge"></div>
+          <div class="roadmap-card">
+            <div class="step-meta">
+              <span class="step-num">STEP 04</span>
+              <span class="step-tag tint-orange">Resolve Doubts</span>
+            </div>
+            <h3>Never Leave a Question Unsolved</h3>
+            <p>If you make a mistake or get stuck on a topic, resolve it instantly. Leaving holes in your understanding compounds later. Use our interactive AI tutor or photograph your question to get detailed step-by-step methods.</p>
+            
+            <div class="embedded-tools-grid">
+              <a class="tool-card lav" href="tutor.html">
+                <span class="tag">AI Tutor</span>
+                <h3>AI Study Partner</h3>
+                <p>Ask for practice questions on any topic, get instant concept explanations and step-by-step worked examples.</p>
+                <span class="go">Ask the tutor →</span>
+              </a>
+              <a class="tool-card orange" href="tutor.html?tab=solver">
+                <span class="tag">Photo Solver</span>
+                <h3>Stuck on a question?</h3>
+                <p>Snap a photo of your paper and get examiner-style step-by-step mark-saving working in seconds.</p>
+                <span class="go">Solve a photo →</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="roadmap-step">
+          <div class="roadmap-badge"></div>
+          <div class="roadmap-card">
+            <div class="step-meta">
+              <span class="step-num">STEP 05</span>
+              <span class="step-tag tint-lav">Simulation</span>
+            </div>
+            <h3>Simulate Full Past Papers under Time</h3>
+            <p>As the exam dates approach, move from topical revision to full yearly exams. Time yourself strictly, keep marks separate, and use the splits view to evaluate your answers directly against the examiner's mark schemes.</p>
+            <a href="papers.html?tab=yearly" class="btn btn-outline">Open the Paper Library →</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <div class="container">
+    <section class="confused tint-yellow">
+      <div>
+        <h2 class="tint-ink">Need a tailored study roadmap?</h2>
+        <p>Book a free demo lesson. I will audit your current syllabus prep and make you a custom revision plan.</p>
+      </div>
+      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%27d%20like%20a%20tailored%20Cambridge%20study%20roadmap%20for%20my%20revision.">Book a free roadmap session</a>
+    </section>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Questions before you book?</p>
+          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img src="logo.png" alt="PrepWithTee">
+          <span>PrepWithTee</span>
+        </a>
+        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Study Tools</h4>
+        <a href="papers.html">Past Papers Engine</a>
+        <a href="resources.html">Resources &amp; Notes</a>
+        <a href="tutor.html">AI Tutor</a>
+        <a href="guide.html">Revision Study Guide</a>
+      </div>
+      <div class="footer-col">
+        <h4>What We Teach</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
+        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
+        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Enrol</h4>
+        <a href="pricing.html">Fees &amp; Pricing</a>
+        <a href="index.html#contact">Book a Free Demo</a>
+        <a href="subjects.html">Find Your Subject</a>
+        <a href="index.html#faq">Questions &amp; Answers</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span>Past papers &copy; Cambridge Assessment International Education</span>
+    </div>
+  </footer>
+
+  <script src="main.js?v=20260727a"></script>
+</body>
+
+</html>

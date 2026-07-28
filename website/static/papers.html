@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Past Papers — PrepWithTee</title>
+<meta name="description" content="Build custom topical past-paper PDFs from real Cambridge questions — sorted by topic, with mark schemes. O Level & IGCSE Maths, Physics, CS.">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260727a">
+  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+<body>
+
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" href="index.html">
+      <img src="logo.png" alt="PrepWithTee owl logo">
+      <span>PrepWithTee</span>
+    </a>
+    <nav class="header-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="subjects.html" class="nav-link">Subjects</a>
+      <a href="papers.html" class="nav-link active">Past Papers</a>
+      <a href="resources.html" class="nav-link">Resources</a>
+      <a href="tutor.html" class="nav-link">AI Tutor</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+      <a href="index.html#contact" class="btn btn-gold">Book a demo lesson</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">Cambridge O&nbsp;Level, IGCSE &amp; A Level · 2020–2025</p>
+    <h1>Past papers — topical
+    or <em>by year.</em></h1>
+    <p class="sub">Build a custom PDF of real Cambridge questions sorted by topic — chapter by chapter, with mark schemes. Or browse every full past paper year by year in the Paper Library, both in one place.</p>
+    <div class="hero-stats" id="hero-stats">
+      <div><b id="stat-questions">—</b><span>classified questions</span></div>
+      <div><b id="stat-subjects">—</b><span>subjects live</span></div>
+      <div><b>2020–25</b><span>every session &amp; variant</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="centered" style="margin-top: 30px; margin-bottom: 34px;">
+  <div class="seg-large" id="paper-toggle">
+    <button class="active" data-tab="topical">Topical Builder</button>
+    <button data-tab="yearly">Yearly Library</button>
+  </div>
+</div>
+
+<main id="topical-container" class="container">
+  <section class="card" id="generator">
+    <h2>Build your paper</h2>
+
+    <div class="field">
+      <label class="field-label">1 · Subject</label>
+      <div class="subject-groups" id="subjects"></div>
+    </div>
+
+    <div class="field hidden" id="component-field">
+      <label class="field-label">2 · Paper component</label>
+      <div class="pill-row" id="components"></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label-row">
+        <label class="field-label" id="topics-label">
+          <span id="topics-step">2 · Topics</span>
+          <span class="topic-note" id="topic-note"></span>
+        </label>
+        <span class="mini-actions">
+          <button type="button" class="mini" id="all">select all</button>
+          <button type="button" class="mini" id="none">clear</button>
+        </span>
+      </div>
+      <input type="search" id="topic-search" class="topic-search"
+             placeholder="Search topics…" autocomplete="off">
+      <div class="topics" id="topics"></div>
+    </div>
+
+    <div class="field split">
+      <div>
+        <label class="field-label" id="years-label">3 · Years</label>
+        <div class="inline">
+          <select id="yfrom"></select><span class="dash">to</span><select id="yto"></select>
+        </div>
+      </div>
+      <div>
+        <label class="field-label" id="format-label">4 · Format</label>
+        <div class="pill-row">
+          <button type="button" class="pill mode active" data-mode="topical">Topical booklet</button>
+          <button type="button" class="pill mode" data-mode="test">Topic test</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" id="filter-field">
+      <label class="field-label" id="filter-label">5 · Narrow by session / variant</label>
+      <div class="filter-grid">
+        <div>
+          <div class="filter-sub-label">Session</div>
+          <div class="pill-row" id="session-pills"></div>
+        </div>
+        <div id="variant-wrap" class="hidden">
+          <div class="filter-sub-label">Variant</div>
+          <div class="pill-row" id="variant-pills"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" id="topical-opts">
+      <label class="check"><input type="checkbox" id="inc-ms" checked>
+        Mark scheme after each question</label>
+    </div>
+
+    <div class="field split hidden" id="test-opts">
+      <div>
+        <label class="field-label">Questions</label>
+        <input type="number" id="count" value="6" min="1" max="40">
+      </div>
+      <div>
+        <label class="field-label">…or target marks</label>
+        <input type="number" id="marks" placeholder="e.g. 50" min="5" max="200">
+      </div>
+      <p class="hint">Random pick, recent years first. Mark scheme comes as a
+      separate file (zipped together).</p>
+    </div>
+
+    <div class="gen-summary" id="gen-summary"></div>
+
+    <div class="progress-wrap" id="progress-wrap" hidden>
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-dark" id="go" disabled>Generate PDF</button>
+      <span class="status" id="status"></span>
+    </div>
+  </section>
+
+  <section class="how reveal-stagger">
+    <div class="step reveal-scale"><b>01</b><h3>Real questions</h3><p>Original Cambridge paper
+      crops — never re-typed, never redrawn. What you practise is what you'll see.</p></div>
+    <div class="step reveal-scale"><b>02</b><h3>Your filters</h3><p>Topic, year range, booklet
+      or timed test. The PDF is built for you on the spot.</p></div>
+    <div class="step reveal-scale"><b>03</b><h3>Mark it yourself</h3><p>Schemes follow each
+      question — or stay in a separate file until you're done.</p></div>
+  </section>
+
+  <div class="container">
+      <section class="confused tint-green">
+      <div>
+        <h2 class="tint-ink">Not sure which topics to pick?</h2>
+        <p>Tell us what you're revising and we'll build the right topical booklet with you — free, no commitment.</p>
+      </div>
+      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%20need%20help%20picking%20topics%20for%20my%20past%20paper%20booklet.">Ask on WhatsApp</a>
+    </section>
+  </div>
+</main>
+
+<main id="yearly-container" class="container-wide" style="padding-top:10px; display:none;">
+  <button class="lib-toggle-btn btn btn-outline" id="lib-panel-toggle" aria-expanded="false">
+    📂 Browse papers
+  </button>
+  <div class="lib">
+    <aside class="lib-panel" id="lib-panel">
+      <h3>Browse the archive</h3>
+      <div class="tree" id="tree"></div>
+    </aside>
+
+    <section class="lib-viewer">
+      <div class="lib-bar">
+        <div>
+          <b id="lib-title">Pick a paper to start reading</b>
+          <div class="sub" id="lib-sub">Open a subject on the left, then a year</div>
+        </div>
+        <div class="lib-actions">
+          <span class="seg" id="lib-layout" hidden>
+            <button type="button" data-layout="stacked" class="on">Stacked</button>
+            <button type="button" data-layout="split">Side by side</button>
+          </span>
+          <button type="button" class="btn btn-outline" id="lib-fullscreen-btn" hidden>⛶ Fullscreen</button>
+          <a class="btn btn-outline" id="lib-open" hidden target="_blank" rel="noopener">↗ Open</a>
+          <a class="btn btn-outline" id="lib-download" hidden download>Download</a>
+        </div>
+      </div>
+      <div class="lib-empty" id="lib-empty">
+        <span>📄</span>
+        <b>Nothing open yet</b>
+        <p>1,378 papers are sitting in the archive. Open any question paper and
+        its mark scheme loads with it.</p>
+      </div>
+      <div class="lib-panes stacked" id="panes" hidden></div>
+    </section>
+  </div>
+
+  <div class="container">
+    <section class="confused tint-blue">
+      <div>
+        <h2 class="tint-ink">Want to practice one topic at a time?</h2>
+        <p>Switch to the Topical Builder — it pulls every question on one chapter out of every paper here and generates a clean PDF with mark schemes.</p>
+      </div>
+      <button class="btn btn-tint" id="go-to-topical">Build a topical booklet →</button>
+    </section>
+  </div>
+</main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Questions before you book?</p>
+          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img src="logo.png" alt="PrepWithTee">
+          <span>PrepWithTee</span>
+        </a>
+        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Study Tools</h4>
+        <a href="papers.html">Past Papers Engine</a>
+        <a href="resources.html">Resources &amp; Notes</a>
+        <a href="tutor.html">AI Tutor</a>
+        <a href="guide.html">Revision Study Guide</a>
+      </div>
+      <div class="footer-col">
+        <h4>What We Teach</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
+        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
+        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Enrol</h4>
+        <a href="pricing.html">Fees &amp; Pricing</a>
+        <a href="index.html#contact">Book a Free Demo</a>
+        <a href="subjects.html">Find Your Subject</a>
+        <a href="index.html#faq">Questions &amp; Answers</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span>Past papers &copy; Cambridge Assessment International Education</span>
+    </div>
+  </footer>
+
+<script src="main.js?v=20260727a"></script>
+<script src="app.js?v=20260727a"></script>
+<script src="library.js?v=20260727a"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.getElementById("paper-toggle");
+    const topicalBtn = toggle.querySelector("[data-tab='topical']");
+    const yearlyBtn = toggle.querySelector("[data-tab='yearly']");
+    const topicalContainer = document.getElementById("topical-container");
+    const yearlyContainer = document.getElementById("yearly-container");
+
+    function switchTab(tab) {
+      if (tab === "topical") {
+        topicalBtn.classList.add("active");
+        yearlyBtn.classList.remove("active");
+        topicalContainer.style.display = "";
+        yearlyContainer.style.display = "none";
+      } else {
+        yearlyBtn.classList.add("active");
+        topicalBtn.classList.remove("active");
+        yearlyContainer.style.display = "";
+        topicalContainer.style.display = "none";
+      }
+    }
+
+    topicalBtn.addEventListener("click", () => switchTab("topical"));
+    yearlyBtn.addEventListener("click", () => switchTab("yearly"));
+    
+    const goToTopicalBtn = document.getElementById("go-to-topical");
+    if (goToTopicalBtn) {
+      goToTopicalBtn.addEventListener("click", () => switchTab("topical"));
+    }
+
+    // Check url hash/param to deep link
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get("tab") === "yearly" || location.hash === "#yearly") {
+      switchTab("yearly");
+    }
+
+    // Mobile: toggle lib-panel drawer
+    const panelToggle = document.getElementById("lib-panel-toggle");
+    const libPanel = document.getElementById("lib-panel");
+    if (panelToggle && libPanel) {
+      panelToggle.addEventListener("click", () => {
+        const open = libPanel.classList.toggle("open");
+        panelToggle.setAttribute("aria-expanded", open);
+        panelToggle.textContent = open ? "✕ Close browser" : "📂 Browse papers";
+      });
+    }
+  });
+</script>
+</body>
+</html>

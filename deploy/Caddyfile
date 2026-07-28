@@ -1,0 +1,40 @@
+# Caddy gets a TLS certificate automatically on first start, provided the
+# domain's A record already points at this server and ports 80 and 443 are
+# genuinely reachable (see the iptables note in DEPLOY.md — this is the step
+# that catches people out on Oracle Cloud).
+#
+# Replace prepwithtee.com with your domain, then:
+#   sudo cp Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+
+:80, prepwithtee.com, www.prepwithtee.com {
+	encode zstd gzip
+
+	# Booklet generation can run for minutes; the default 30s proxy timeout
+	# would cut it off and hand the student a 502 halfway through a download.
+	reverse_proxy 127.0.0.1:8017 {
+		transport http {
+			read_timeout 320s
+			write_timeout 320s
+		}
+	}
+
+	# Past papers never change once published, so let browsers keep them.
+	@archive path /api/library/pdf/*
+	header @archive Cache-Control "public, max-age=604800"
+
+	@static path *.css *.js *.png *.jpg *.svg *.woff2
+	header @static Cache-Control "public, max-age=86400"
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/prepwithtee.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}

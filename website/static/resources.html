@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resources — PrepWithTee</title>
+  <meta name="description"
+    content="Free Cambridge revision resources — topical past-paper builder, chapter notes, worked solutions. Built from the official syllabus.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260727a">
+  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+        <a href="resources.html" class="nav-link active">Resources</a>
+        <a href="tutor.html" class="nav-link">AI Tutor</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+        <a href="index.html#contact" class="btn btn-gold">Book a demo lesson</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero hero-slim">
+    <div class="container">
+      <p class="eyebrow">Free for every student</p>
+      <h1>Notes, papers,<br>and the <em>good stuff.</em></h1>
+      <p class="sub">Everything here is built from the official Cambridge syllabus
+        for the exact course code — the same materials used inside lessons.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <!-- ===== Downloadable notes & resources (from data/resources/) ===== -->
+    <section class="resource-section" id="notes">
+      <div id="res-grid" aria-live="polite">
+        <div class="res-loading">Loading resources…</div>
+      </div>
+
+      <!-- Detail view: file list + inline viewer, shown when a card is opened -->
+      <div class="res-detail" id="res-detail" hidden>
+        <div class="res-detail-head">
+          <button class="res-back" id="res-back">← All</button>
+          <h3 id="res-detail-title">Category</h3>
+          <a class="res-fullscreen" id="res-fullscreen" target="_blank" rel="noopener" href="#">Open full page ↗</a>
+        </div>
+        <div id="res-breadcrumb" class="res-breadcrumb"></div>
+        <div class="res-viewer">
+          <ul class="res-files" id="res-files"></ul>
+          <div class="res-pane" id="res-pane">
+            <div class="res-pane-empty" id="res-pane-empty">
+              <span>📄</span>
+              <b>Pick a file to read it here</b>
+              <p>PDFs and images open inline; other formats download.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="container">
+    <section class="confused tint-yellow">
+      <div>
+        <h2 class="tint-ink">Can't find what you need?</h2>
+        <p>Tell us what would actually help your revision and we'll put it together.</p>
+      </div>
+      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%20need%20revision%20resources%20for%20my%20Cambridge%20topic.">Request a resource</a>
+    </section>
+  </div>
+
+  <section class="cta-band">
+    <div class="container cta-row">
+      <div>
+        <h2>Want notes for your chapter first?</h2>
+        <p>Tell us what you're revising — it moves to the top of the queue.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-gold" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%27d%20like%20notes%20for%20a%20specific%20chapter.">Request on WhatsApp</a>
+        <a class="btn btn-white" href="mailto:nexgentutors6@gmail.com">Email PrepWithTee</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Questions before you book?</p>
+          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img src="logo.png" alt="PrepWithTee">
+          <span>PrepWithTee</span>
+        </a>
+        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Study Tools</h4>
+        <a href="papers.html">Past Papers Engine</a>
+        <a href="resources.html">Resources &amp; Notes</a>
+        <a href="tutor.html">AI Tutor</a>
+        <a href="guide.html">Revision Study Guide</a>
+      </div>
+      <div class="footer-col">
+        <h4>What We Teach</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
+        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
+        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Enrol</h4>
+        <a href="pricing.html">Fees &amp; Pricing</a>
+        <a href="index.html#contact">Book a Free Demo</a>
+        <a href="subjects.html">Find Your Subject</a>
+        <a href="index.html#faq">Questions &amp; Answers</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span>Past papers &copy; Cambridge Assessment International Education</span>
+    </div>
+  </footer>
+
+  <script src="main.js?v=20260727a"></script>
+  <script src="resources.js?v=20260727a"></script>
+</body>
+
+</html>
