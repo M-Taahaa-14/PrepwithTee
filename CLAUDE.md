@@ -286,6 +286,23 @@ linked), not agreement with any external file.
     which made covers read "0 marks"; all 1760 are now `marks = 1`, so
     `testgen --marks` works for MCQ too.
 
+24. **CS COMPLETE 2026-07-31: 2210 + 0478 classified.**
+    - 2210: 410 questions, 12 hard failures (all from 2210_s20_qp_22 over-segmentation artifact).
+    - 0478: 659 questions, 12 hard failures (8 from 0478_m20_ms_12 prose-style MS, 4 from w20
+      over-segmentation). Fixed 0478_s23_qp_23 duplicate (was stored twice: once as session='m',
+      once as session='s'; deleted the m-duplicate).
+    - link_ms fix: `table_pages()` now extends from the first header page to end-of-doc, fixing
+      pre-2022 MSs where the "Question | Answer | Marks" header only appears on the first page.
+      This also fixed 0478_m21_ms_12 (was 1 entry, now 8) and 0478_m21_ms_22 (1→5).
+    - Taxonomy: 10 parent topics + 22 subtopics per syllabus. Both 0478/2210 are standalone
+      files (not alias) matching the official 2026-2028 syllabus structure.
+    - Classification done via in-session rule-based classifier (`scratchpad/classify_cs_rules.py`)
+      — keyword rules with hard P1/P2 paper constraints; ingested as backend='session'.
+    - **CS traps:** Older P2 papers (m20/m21) have a Section A / Section B structure that can
+      confuse the table parser; the table_pages fix covers this. Some P2 papers over-segment
+      (one long pseudocode question → many row fragments); those fragments get classified as
+      Programming or Algorithm but have no MS link — acceptable, they show the question crop.
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

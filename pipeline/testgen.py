@@ -398,6 +398,9 @@ def main():
                    help="fix the random selection for a reproducible paper")
     p.add_argument("--uniform", action="store_true",
                    help="disable the default recent-years priority")
+    p.add_argument("--ids",
+                   help="comma-separated question IDs — bypasses filter/selection "
+                        "(used by the web preview-and-curate flow)")
     p.add_argument("--from", dest="year_from", type=int, default=config.YEAR_MIN)
     p.add_argument("--to", dest="year_to", type=int, default=config.YEAR_MAX)
     p.add_argument("--paper", type=int, help="single paper component (legacy; prefer --papers)")
@@ -428,7 +431,29 @@ def main():
         topics.append(name)
 
     con = db.connect()
-    chosen = select(con, args, topics)
+    if args.ids:
+        ids = [int(x.strip()) for x in args.ids.split(",") if x.strip()]
+        if not ids:
+            raise SystemExit("--ids: no valid IDs supplied")
+        ph = ",".join("?" for _ in ids)
+        rows = con.execute(
+            f"""
+            SELECT q.id, q.number, q.sub_part, q.marks, q.rects_json, q.text,
+                   c.topic, c.secondary_topic, c.subtopic,
+                   p.syllabus, p.rel_path, p.filename,
+                   p.year, p.session, p.paper, p.variant
+            FROM questions q
+            JOIN classifications c ON c.question_id = q.id
+            JOIN papers p ON p.id = q.paper_id
+            WHERE q.id IN ({ph})
+            """, ids
+        ).fetchall()
+        by_id = {r["id"]: r for r in rows}
+        chosen = [by_id[i] for i in ids if i in by_id]
+        if not chosen:
+            raise SystemExit("--ids: none of the given IDs found in the database")
+    else:
+        chosen = select(con, args, topics)
     subject = taxonomy.get("subject", args.syllabus)
     cache: dict[str, fitz.Document] = {}
 

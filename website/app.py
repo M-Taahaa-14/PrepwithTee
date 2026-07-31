@@ -13,6 +13,7 @@ Run:  python -m uvicorn app:app --app-dir website --port 8017   (from repo root)
 """
 
 import json
+import random
 import re
 import shutil
 import sqlite3
@@ -28,7 +29,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
@@ -79,6 +80,7 @@ class GenerateReq(BaseModel):
     sessions: list[str] | None = None      # [] or None = all; ["s","w"] = M/J + Oct/Nov
     variants: list[str] | None = None      # [] or None = all; ["1","2"] = v1 + v2
     contains: str | None = None            # regex keyword filter (cross-topic search)
+    question_ids: list[int] | None = None  # preview-and-curate: skip random sampling
     # Legacy single-value aliases kept for backward compatibility
     session: str | None = None
     variant: str | None = None
@@ -105,6 +107,178 @@ class GenerateReq(BaseModel):
         except re.error as exc:
             raise ValueError(f"invalid regex: {exc}")
         return v
+
+
+class QuestionListReq(BaseModel):
+    """Filters for the preview step — returns metadata, no PDF."""
+    syllabus: str
+    topics: list[str]
+    subtopics: list[str] | None = None
+    year_from: int = YEAR_MIN
+    year_to: int = YEAR_MAX
+    papers: list[int] | None = None
+    count: int | None = None
+    marks: int | None = None
+    seed: int | None = None
+    sessions: list[str] | None = None
+    variants: list[str] | None = None
+    contains: str | None = None
+
+    @field_validator("syllabus")
+    @classmethod
+    def _check_syllabus(cls, v: str) -> str:
+        if not re.match(r"^[0-9A-Za-z]{4,6}$", v):
+            raise ValueError("invalid syllabus code")
+        return v
+
+    @field_validator("contains")
+    @classmethod
+    def _check_contains(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if len(v) > 200:
+            raise ValueError("contains pattern too long")
+        if re.search(r"\([^)]*[+*{][^)]*\)[+*{]", v):
+            raise ValueError("contains pattern is too complex")
+        try:
+            re.compile(v, re.I)
+        except re.error as exc:
+            raise ValueError(f"invalid regex: {exc}")
+        return v
+
+
+def _question_pool(req, con):
+    """Shared query used by /api/questions and reused by generate when ids absent."""
+    syllabuses = [req.syllabus]
+    marks_ph = ",".join("?" for _ in syllabuses)
+
+    sessions = [s for s in (req.sessions or []) if s and s != "all"]
+    variants = [v for v in (req.variants or []) if v and v != "all"]
+    papers_list = list(req.papers or [])
+
+    session_clause = (f" AND p.session IN ({','.join('?' for _ in sessions)})"
+                      if sessions else "")
+    variant_clause = (f" AND p.variant IN ({','.join('?' for _ in variants)})"
+                      if variants else "")
+    paper_clause = (f" AND p.paper IN ({','.join('?' for _ in papers_list)})"
+                    if papers_list else "")
+
+    rows = con.execute(
+        f"""
+        SELECT q.id, q.number, q.sub_part, q.marks, q.text, c.topic,
+               c.secondary_topic, c.subtopic, p.syllabus, p.year,
+               p.session, p.paper, p.variant
+        FROM questions q
+        JOIN classifications c ON c.question_id = q.id
+        JOIN papers p ON p.id = q.paper_id
+        WHERE p.syllabus IN ({marks_ph}) AND p.kind = 'qp'
+          AND p.year BETWEEN ? AND ?
+          AND q.status IS NOT 'excluded'
+        """ + paper_clause + session_clause + variant_clause
+        + " ORDER BY p.year, p.session, p.variant, q.number",
+        [*syllabuses, req.year_from, req.year_to]
+        + papers_list + sessions + variants
+    ).fetchall()
+
+    if req.contains:
+        try:
+            pat = re.compile(req.contains, re.I)
+        except re.error:
+            raise HTTPException(400, "invalid contains regex")
+        rows = [r for r in rows if pat.search(r["text"] or "")]
+
+    subtopic_filter = set(req.subtopics or [])
+    pool, seen = [], set()
+    topics_list = req.topics
+    for r in rows:
+        if r["id"] in seen:
+            continue
+        home = (next((t for t in topics_list if r["topic"] == t), None)
+                or next((t for t in topics_list if r["secondary_topic"] == t), None))
+        if home:
+            if subtopic_filter and r["subtopic"] not in subtopic_filter:
+                continue
+            pool.append(r)
+            seen.add(r["id"])
+    return pool
+
+
+def _apply_random_selection(pool, count, marks, seed):
+    """Weighted random selection mirroring testgen.select()."""
+    if not pool:
+        return []
+    rng = random.Random(seed)
+
+    def _key(q):
+        w = 1.5 ** ((q["year"] or YEAR_MIN) - YEAR_MIN)
+        return rng.random() ** (1.0 / w)
+
+    order = sorted(pool, key=_key, reverse=True)
+    if marks:
+        chosen, total = [], 0
+        for q in order:
+            chosen.append(q)
+            total += q["marks"] or 0
+            if total >= marks:
+                break
+    else:
+        k = min(count or 6, len(pool))
+        chosen = order[:k]
+    chosen.sort(key=lambda q: (q["year"], q["session"], q["variant"], q["number"]))
+    return chosen
+
+
+_SESSION_ABBR = {"s": "M/J", "w": "O/N", "m": "F/M"}
+
+
+@app.post("/api/questions")
+def list_questions(req: QuestionListReq):
+    """Return matching question metadata without generating a PDF.
+
+    When count or marks is supplied, applies the same weighted random selection
+    as testgen so the preview matches what the test would contain.
+    Seed is echoed back so the caller can regenerate the exact same pick.
+    """
+    if not req.topics:
+        raise HTTPException(400, "pick at least one topic")
+
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    try:
+        pool = _question_pool(req, con)
+    finally:
+        con.close()
+
+    if req.count or req.marks:
+        chosen = _apply_random_selection(pool, req.count, req.marks, req.seed)
+    else:
+        chosen = pool
+
+    sess_abbr = _SESSION_ABBR
+    questions = []
+    for q in chosen:
+        sa = sess_abbr.get(q["session"], q["session"].upper())
+        ref = (f"{q['syllabus']}/P{q['paper']} {sa} {q['year']} "
+               f"Q{q['number']}{('(' + q['sub_part'] + ')') if q['sub_part'] else ''}")
+        snippet = (q["text"] or "")[:160].strip()
+        questions.append({
+            "id": q["id"],
+            "ref": ref,
+            "year": q["year"],
+            "session": q["session"],
+            "paper": q["paper"],
+            "variant": q["variant"],
+            "number": q["number"],
+            "sub_part": q["sub_part"],
+            "topic": q["topic"],
+            "subtopic": q["subtopic"],
+            "marks": q["marks"],
+            "text_snippet": snippet,
+        })
+
+    total_marks = sum(q["marks"] or 0 for q in chosen)
+    return {"questions": questions, "total_marks": total_marks,
+            "pool_size": len(pool), "seed": req.seed}
 
 
 @app.get("/api/health")
@@ -299,12 +473,15 @@ def generate(req: GenerateReq):
            "--syllabus", req.syllabus, "--topics", topics_arg,
            *span, "--out", str(out),
            *papers_arg, *session_arg, *variant_arg, *contains_arg]
-    if req.marks:
+    if req.question_ids:
+        # Preview-and-curate flow: exact IDs chosen by the student, skip sampling
+        cmd += ["--ids", ",".join(str(i) for i in req.question_ids)]
+    elif req.marks:
         cmd += ["--marks", str(req.marks)]
     else:
         cmd += ["--count", str(req.count or 6)]
-    if req.seed is not None:
-        cmd += ["--seed", str(req.seed)]
+        if req.seed is not None:
+            cmd += ["--seed", str(req.seed)]
     _run(cmd)
 
     zpath = tmp / f"{stem}_{slug}_test.zip"
@@ -854,6 +1031,12 @@ def _nice_name(name: str) -> str:
     return re.sub(r"[_\-]+", " ", Path(name).stem).strip()
 
 
+def _natural_key(name: str) -> list:
+    """Natural sort key: splits on digit runs so '10' sorts after '9', not after '1'."""
+    return [int(p) if p.isdigit() else p.lower()
+            for p in re.split(r"(\d+)", name)]
+
+
 def _build_tree(path: Path, resources_root: Path) -> dict | None:
     """Return a recursive {type, name, children|...} node, or None if empty."""
     if path.is_file():
@@ -869,12 +1052,12 @@ def _build_tree(path: Path, resources_root: Path) -> dict | None:
             "size": path.stat().st_size,
         }
     if path.is_dir() and not path.name.startswith((".", "_")):
-        # Dirs sort before files; within each group, alphabetical
+        # Dirs before files; within each group, natural (numeric-aware) alphabetical
         children = [
             n for n in (
                 _build_tree(c, resources_root)
                 for c in sorted(path.iterdir(),
-                                key=lambda x: (x.is_file(), x.name.lower()))
+                                key=lambda x: (x.is_file(), _natural_key(x.name)))
             )
             if n is not None
         ]
@@ -1376,6 +1559,52 @@ function show(tab, secId) {{
 </script>
 </body></html>"""
     return HTMLResponse(html)
+
+
+@app.get("/api/question/{question_id}/preview")
+def question_preview(question_id: int):
+    """Serve the question crop as a PNG — used by the lightbox in the preview panel.
+
+    Tries the pre-rendered debug PNG first (fast); falls back to rendering the
+    crop PDF on demand with PyMuPDF so the endpoint works even when debug PNGs
+    were not synced to the server.
+    """
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    row = con.execute(
+        """SELECT q.number, q.sub_part, p.syllabus, p.year, p.session, p.paper, p.variant
+           FROM questions q
+           JOIN papers p ON p.id = q.paper_id
+           WHERE q.id = ?""",
+        (question_id,)).fetchone()
+    con.close()
+    if row is None:
+        raise HTTPException(404, "question not found")
+
+    key = (f"{row['syllabus']}_{row['session']}{row['year'] % 100:02d}"
+           f"_{row['paper']}{row['variant']}")
+    slug = f"q{row['number']:02d}" + (row["sub_part"] or "")
+
+    # Fast path: pre-rendered debug PNG
+    png_path = (ROOT / "data" / "debug" / key / f"{slug}.png").resolve()
+    safe_debug = (ROOT / "data" / "debug").resolve()
+    if str(png_path).startswith(str(safe_debug)) and png_path.exists():
+        return FileResponse(png_path, media_type="image/png",
+                            headers={"Cache-Control": "public, max-age=86400"})
+
+    # Fallback: render first page of crop PDF with PyMuPDF
+    crop_path = (ROOT / "data" / "crops" / key / f"{slug}.pdf").resolve()
+    safe_crops = (ROOT / "data" / "crops").resolve()
+    if not str(crop_path).startswith(str(safe_crops)) or not crop_path.exists():
+        raise HTTPException(404, "preview image not available for this question")
+    try:
+        import fitz
+        with fitz.open(str(crop_path)) as doc:
+            img_bytes = doc[0].get_pixmap(dpi=150).tobytes("png")
+        return Response(content=img_bytes, media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=3600"})
+    except Exception as exc:
+        raise HTTPException(500, f"could not render preview: {exc}")
 
 
 app.mount("/", StaticFiles(directory=Path(__file__).parent / "static",

@@ -1,17 +1,114 @@
 {
   "syllabus": "2210",
   "subject": "Computer Science (O Level)",
-  "note": "Seed taxonomy from the Cambridge syllabus units: 1-6 examined in Paper 1, 7-10 in Paper 2. Keywords drive the heuristic classifier; refine freely.",
+  "note": "Taxonomy for 2026-2028 syllabus (stable since 2023). Paper 1 = Topics 1-6 (Computer Systems). Paper 2 = Topics 7-10 (Algorithms, Programming, Logic). Same topic structure as 0478 IGCSE. Subtopics map 1:1 to syllabus numbering 1.1-10. Classify at subtopic level where possible.",
   "topics": [
-    {"name": "Data representation", "keywords": ["binary", "hexadecimal", "denary", "two's complement", "ascii", "unicode", "bitmap", "resolution", "colour depth", "sample rate", "sampling resolution", "compression", "lossless", "lossy", "file size", "run-length encoding", "overflow", "logical shift", "character set"]},
-    {"name": "Data transmission", "keywords": ["packet", "packet switching", "serial", "parallel transmission", "simplex", "duplex", "usb", "error detection", "parity", "checksum", "check digit", "automatic repeat request", "encryption", "symmetric", "asymmetric", "plaintext", "ciphertext", "data transmission"]},
-    {"name": "Hardware", "keywords": ["cpu", "von neumann", "fetch-decode-execute", "register", "program counter", "accumulator", "alu", "cache", "clock speed", "embedded system", "input device", "output device", "sensor", "actuator", "ram", "rom", "secondary storage", "ssd", "solid-state", "hard disk", "optical", "virtual memory", "cloud storage", "network interface card", "mac address", "ip address", "router", "barcode", "qr code", "touch screen"]},
-    {"name": "Software", "keywords": ["operating system", "interrupt", "utility software", "defragmentation", "compiler", "interpreter", "assembler", "assembly language", "high-level language", "low-level language", "integrated development environment", "firmware", "bootloader", "device driver", "machine code", "system software", "application software"]},
-    {"name": "The internet and its uses", "keywords": ["internet", "world wide web", "url", "http", "https", "web browser", "web server", "cookie", "session cookie", "digital currency", "blockchain", "cyber security", "phishing", "pharming", "denial of service", "brute-force", "malware", "virus", "spyware", "ransomware", "firewall", "proxy server", "ssl", "access levels", "anti-malware", "domain name"]},
-    {"name": "Automated and emerging technologies", "keywords": ["automated system", "robotics", "robot", "artificial intelligence", "expert system", "machine learning", "knowledge base", "inference engine", "chatbot"]},
-    {"name": "Algorithm design and problem-solving", "keywords": ["algorithm", "flowchart", "pseudocode", "trace table", "validation", "verification", "dry run", "structure diagram", "decomposition", "abstraction", "library routine", "test data", "linear search", "bubble sort", "totalling", "counting", "maximum", "minimum"]},
-    {"name": "Programming", "keywords": ["variable", "constant", "loop", "iteration", "selection", "if statement", "case", "procedure", "function", "parameter", "array", "string handling", "file handling", "count-controlled", "condition-controlled", "nested", "declare", "input and output", "for ... next", "while", "repeat until", "substring", "concatenat", "one-dimensional", "two-dimensional", "local variable", "global variable", "write a program", "source code"]},
-    {"name": "Databases", "keywords": ["database", "table", "field", "record", "primary key", "sql", "select", "from", "where", "order by", "data type of the field", "query-by-example"]},
-    {"name": "Boolean logic", "keywords": ["logic gate", "truth table", "and gate", "or gate", "not gate", "nand", "nor", "xor", "logic circuit", "boolean expression", "logic expression", "logic diagram"]}
+    {
+      "name": "Data Representation",
+      "papers": [1],
+      "keywords": ["binary", "denary", "hexadecimal", "number system", "base", "convert", "representation", "character set", "ascii", "unicode", "sample", "image", "compression", "file size", "bit", "byte", "overflow", "shift"],
+      "subtopics": [
+        {"name": "Number Systems", "keywords": ["binary", "denary", "hexadecimal", "hex", "base 2", "base 10", "base 16", "convert", "two's complement", "negative number", "overflow", "logical shift", "arithmetic shift", "left shift", "right shift", "8-bit", "addition", "binary addition", "carry bit", "why hex is used"]},
+        {"name": "Text, Sound and Images", "keywords": ["ascii", "unicode", "character set", "character code", "sound", "audio", "sample rate", "sample resolution", "sampling", "bit depth", "image", "pixel", "resolution", "colour depth", "bitmap", "file size calculation", "number of colours"]},
+        {"name": "Data Storage and Compression", "keywords": ["compression", "lossless", "lossy", "run-length encoding", "rle", "file size", "storage unit", "bit", "byte", "kilobyte", "megabyte", "gigabyte", "terabyte", "kibibyte", "mebibyte", "gibibyte", "advantage of compression", "reduce file size"]}
+      ]
+    },
+    {
+      "name": "Data Transmission",
+      "papers": [1],
+      "keywords": ["transmission", "packet", "serial", "parallel", "simplex", "duplex", "usb", "parity", "checksum", "check digit", "error", "encrypt", "bandwidth", "latency"],
+      "subtopics": [
+        {"name": "Types and Methods of Data Transmission", "keywords": ["packet", "packet switching", "packet structure", "header", "payload", "trailer", "serial transmission", "parallel transmission", "simplex", "half-duplex", "full-duplex", "usb", "bandwidth", "latency", "transmission media", "wired", "wireless"]},
+        {"name": "Methods of Error Detection", "keywords": ["parity", "parity bit", "parity check", "even parity", "odd parity", "checksum", "echo check", "check digit", "isbn", "barcode", "arq", "automatic repeat request", "ack", "nak", "timeout", "error detection", "error correction"]},
+        {"name": "Encryption", "keywords": ["encrypt", "decrypt", "symmetric", "asymmetric", "public key", "private key", "plaintext", "ciphertext", "key", "encryption algorithm", "end-to-end"]}
+      ]
+    },
+    {
+      "name": "Hardware",
+      "papers": [1],
+      "keywords": ["cpu", "processor", "memory", "storage", "input", "output", "device", "ram", "rom", "sensor", "actuator", "network", "router", "mac address", "ip address", "cache", "clock", "register"],
+      "subtopics": [
+        {"name": "Computer Architecture", "keywords": ["cpu", "central processing unit", "microprocessor", "von neumann", "alu", "arithmetic logic unit", "control unit", "register", "program counter", "pc", "mar", "memory address register", "mdr", "memory data register", "cir", "current instruction register", "accumulator", "acc", "address bus", "data bus", "control bus", "fetch", "decode", "execute", "fde cycle", "fetch-decode-execute", "clock speed", "core", "multi-core", "cache", "instruction set", "embedded system", "dedicated system"]},
+        {"name": "Input and Output Devices", "keywords": ["input device", "output device", "keyboard", "mouse", "scanner", "microphone", "camera", "touchscreen", "barcode reader", "qr code", "sensor", "actuator", "monitor", "printer", "speaker", "select appropriate", "suitable input", "suitable output", "benefit of using", "temperature sensor", "light sensor", "sound sensor", "pressure sensor"]},
+        {"name": "Data Storage", "keywords": ["ram", "rom", "primary storage", "secondary storage", "virtual memory", "cloud storage", "magnetic", "optical", "solid-state", "ssd", "hard disk", "hdd", "dvd", "cd", "blu-ray", "usb flash", "volatile", "non-volatile", "read-only", "random access memory", "read-only memory", "storage capacity", "access speed", "compare storage"]},
+        {"name": "Network Hardware", "keywords": ["nic", "network interface card", "mac address", "ip address", "ipv4", "ipv6", "static ip", "dynamic ip", "router", "switch", "hub", "access point", "network hardware", "dhcp", "network address"]}
+      ]
+    },
+    {
+      "name": "Software",
+      "papers": [1],
+      "keywords": ["operating system", "software", "compiler", "interpreter", "assembler", "language", "translator", "ide", "interrupt", "utility", "driver", "firmware"],
+      "subtopics": [
+        {"name": "Types of Software and Interrupts", "keywords": ["operating system", "os", "system software", "application software", "utility software", "defragmentation", "anti-malware", "device driver", "firmware", "interrupt", "hardware interrupt", "software interrupt", "isr", "interrupt service routine", "os function", "memory management", "process management", "peripheral management", "multitasking", "bootloader"]},
+        {"name": "Programming Languages and Translators", "keywords": ["high-level language", "low-level language", "assembly language", "machine code", "assembler", "compiler", "interpreter", "translate", "translator", "ide", "integrated development environment", "editor", "debugger", "linker", "auto-correct", "syntax highlighting", "advantages of high-level", "advantages of low-level", "mnemonics"]}
+      ]
+    },
+    {
+      "name": "The Internet and its Uses",
+      "papers": [1],
+      "keywords": ["internet", "web", "url", "http", "browser", "cookie", "dns", "cyber", "malware", "firewall", "phishing", "blockchain", "security", "threat"],
+      "subtopics": [
+        {"name": "Internet and World Wide Web", "keywords": ["internet", "world wide web", "www", "url", "uniform resource locator", "http", "https", "web browser", "web server", "dns", "domain name system", "domain name", "ip address lookup", "cookie", "session cookie", "persistent cookie", "web page", "hyperlink", "html", "difference between internet and web"]},
+        {"name": "Digital Currency", "keywords": ["digital currency", "cryptocurrency", "bitcoin", "blockchain", "distributed ledger", "transaction", "mining", "block", "hash", "wallet"]},
+        {"name": "Cyber Security", "keywords": ["cyber", "threat", "attack", "brute force", "brute-force", "data interception", "ddos", "denial of service", "distributed denial", "hacking", "malware", "virus", "worm", "trojan", "spyware", "ransomware", "pharming", "phishing", "social engineering", "countermeasure", "access level", "authentication", "firewall", "ssl", "https", "proxy server", "anti-malware", "antivirus", "two-factor", "strong password", "protect against"]}
+      ]
+    },
+    {
+      "name": "Automated and Emerging Technologies",
+      "papers": [1],
+      "keywords": ["automated", "robot", "artificial intelligence", "ai", "expert system", "machine learning", "sensor", "actuator", "autonomous"],
+      "subtopics": [
+        {"name": "Automated Systems", "keywords": ["automated system", "automation", "sensor", "microprocessor", "actuator", "feedback", "control system", "autonomous", "self-driving", "advantages of automation", "disadvantages of automation", "without human intervention"]},
+        {"name": "Robotics", "keywords": ["robot", "robotics", "characteristic of robot", "reprogrammable", "multifunctional", "application of robots", "manufacturing", "surgery", "exploration", "replace human", "robotic arm"]},
+        {"name": "Artificial Intelligence", "keywords": ["artificial intelligence", "ai", "expert system", "knowledge base", "inference engine", "machine learning", "train", "training data", "neural network", "chatbot", "natural language", "pattern recognition", "chess", "diagnosis"]}
+      ]
+    },
+    {
+      "name": "Algorithm Design and Problem-Solving",
+      "papers": [2],
+      "keywords": ["algorithm", "flowchart", "pseudocode", "trace table", "dry run", "decomposition", "abstraction", "structure diagram", "validation", "verification", "linear search", "bubble sort", "test data", "identify the purpose", "describe what", "state the output", "complete the trace", "amend the algorithm", "write an algorithm"],
+      "subtopics": [
+        {"name": "Program Development", "keywords": ["program development", "life cycle", "pdlc", "analysis", "design", "coding", "testing", "decomposition", "abstraction", "structure diagram", "top-down design", "subroutine", "module", "identify the problem", "break down"]},
+        {"name": "Flowcharts and Pseudocode", "keywords": ["flowchart", "pseudocode", "draw a flowchart", "write pseudocode", "amend the flowchart", "complete the pseudocode", "write an algorithm", "algorithm to", "diamond", "process box", "terminal", "flow line", "decision box"]},
+        {"name": "Tracing and Dry Runs", "keywords": ["trace table", "dry run", "complete the trace", "state the output", "show the values", "identify the purpose", "what does the algorithm output", "describe what the algorithm does", "variable value"]},
+        {"name": "Standard Searching and Sorting", "keywords": ["linear search", "bubble sort", "sort", "search", "totalling", "running total", "counting", "maximum", "minimum", "average", "standard method", "find the largest", "find the smallest"]},
+        {"name": "Validation and Verification", "keywords": ["validation", "verification", "range check", "length check", "type check", "presence check", "format check", "check digit", "visual check", "double entry", "validate", "verify", "suitable validation", "test data", "normal data", "abnormal data", "extreme data", "boundary data", "erroneous data"]},
+        {"name": "Identifying and Correcting Errors", "keywords": ["identify the error", "correct the error", "logic error", "syntax error", "runtime error", "bug", "amend the algorithm", "line of code that causes"]}
+      ]
+    },
+    {
+      "name": "Programming",
+      "papers": [2],
+      "keywords": ["variable", "constant", "declare", "data type", "integer", "real", "string", "boolean", "char", "input", "output", "if", "else", "case", "for", "while", "repeat", "until", "procedure", "function", "parameter", "array", "openfile", "readfile", "writefile", "length", "substring", "mod", "div", "write a program", "write code", "program to"],
+      "subtopics": [
+        {"name": "Programming Concepts", "keywords": ["variable", "constant", "declare", "data type", "integer", "real", "string", "boolean", "char", "character", "input", "output", "sequence", "selection", "if", "else", "then", "case", "otherwise", "iteration", "for", "to", "next", "while", "do", "repeat", "until", "nested", "count-controlled", "condition-controlled", "totalling", "counting", "string handling", "length", "substring", "ucase", "lcase", "concatenate", "operator", "arithmetic", "relational", "logical", "and", "or", "not", "procedure", "function", "parameter", "return", "local variable", "global variable", "library routine", "mod", "div", "round", "random", "comment", "identifier", "maintainability", "write a program", "program to", "write code", "write a function", "write a procedure"]},
+        {"name": "Arrays", "keywords": ["array", "1d array", "2d array", "one-dimensional", "two-dimensional", "element", "index", "subscript", "declare an array", "store in array", "retrieve from array", "iterate through array", "array of", "for loop", "read into array", "output from array"]},
+        {"name": "File Handling", "keywords": ["file", "openfile", "readfile", "writefile", "closefile", "eof", "end of file", "read from file", "write to file", "file handling", "text file", "open a file", "close a file", "store data", "persistent storage", "purpose of file"]}
+      ]
+    },
+    {
+      "name": "Databases",
+      "papers": [2],
+      "keywords": ["database", "table", "field", "record", "primary key", "sql", "select", "from", "where", "order by", "data type", "query", "relational"],
+      "subtopics": [
+        {"name": "Database Concepts", "keywords": ["database", "table", "field", "record", "primary key", "data type", "relational database", "define a database", "suitable field", "data type for", "unique identifier", "flat-file"]},
+        {"name": "SQL", "keywords": ["sql", "select", "from", "where", "order by", "asc", "desc", "sum", "count", "and", "or", "query", "write an sql", "complete the sql", "sql statement", "result of this query", "what data is returned"]}
+      ]
+    },
+    {
+      "name": "Boolean Logic",
+      "papers": [2],
+      "keywords": ["logic gate", "truth table", "and gate", "or gate", "not gate", "nand", "nor", "xor", "logic circuit", "boolean expression", "logic expression", "logic diagram", "complement", "output of the gate"],
+      "subtopics": [
+        {"name": "Logic Gates and Circuits", "keywords": ["logic gate", "and gate", "or gate", "not gate", "nand gate", "nor gate", "xor gate", "logic circuit", "draw a logic circuit", "logic diagram", "gate symbol", "output of gate", "complete the circuit"]},
+        {"name": "Truth Tables and Boolean Expressions", "keywords": ["truth table", "complete the truth table", "boolean expression", "logic expression", "derive expression", "write a boolean expression", "simplify", "equivalent", "3-input", "two inputs", "three inputs", "output column"]}
+      ]
+    },
+    {
+      "name": "Scenario Question",
+      "papers": [2],
+      "keywords": ["scenario", "a company", "a school", "a hospital", "a shop", "a system is used", "the following system", "task 1", "task 2", "task 3"],
+      "subtopics": []
+    }
   ]
 }

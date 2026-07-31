@@ -83,6 +83,7 @@ async function loadSubject(syllabus, container, base) {
           onClick: () => selectFile(syllabus, y.year, s, f),
         });
         fRow.dataset.fileId = f.id;
+        fRow.title = f.filename;
         sKids.appendChild(fRow);
       }
     }

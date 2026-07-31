@@ -54,6 +54,12 @@ def table_pages(doc) -> list[int]:
         t = doc[pno].get_text()
         if "Question" in t and "Answer" in t and "Marks" in t:
             pages.append(pno)
+    # Older MS format (pre-2022): header repeats on some but not all pages;
+    # or Section B starts without a header. Extend coverage from the first
+    # detected header page to the end of the document so we don't miss questions.
+    if pages:
+        first = pages[0]
+        pages = list(range(first, doc.page_count))
     return pages
 
 

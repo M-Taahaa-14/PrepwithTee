@@ -52,19 +52,19 @@ The result: **3,800+ classified Cambridge questions** across 12 syllabuses, all 
 
 | Syllabus | Subject | Board | Papers | MCQ? | Status |
 |----------|---------|-------|--------|------|--------|
-| 5054 | Physics | O Level | P1, P2 | P1 | ✅ Complete (2020–2025) |
-| 0625 | Physics | IGCSE | P1, P2, P4 | P1, P2 | ✅ Complete (2020–2025) |
-| 4024 | Mathematics D | O Level | P1, P2 | — | ✅ Complete (2020–2025) |
-| 0580 | Mathematics | IGCSE | P2, P4 | — | ✅ Complete (2020–2025) |
-| 2210 | Computer Science | O Level | P1, P2 | — | ✅ Complete |
-| 0478 | Computer Science | IGCSE | P1, P2 | — | ✅ (same papers as 2210) |
-| 5070 | Chemistry | O Level | P1, P2 | P1 | In progress |
-| 0620 | Chemistry | IGCSE | P1–P4 | P1, P2 | In progress |
-| 9709 | Mathematics | A Level | P1, P3, P4, P5 | — | In progress |
-| 9702 | Physics | A Level | P1, P2, P4, P5 | P1 | ✅ MCQ parsed |
-| 9618 | Computer Science | A Level | P1–P4 | — | In progress |
-| 2058 | Islamiyat | O Level | P1, P2 | — | Manual fetch |
-| 2059 | Pakistan Studies | O Level | P1, P2 | — | Manual fetch |
+| 5054 | Physics | O Level | P1, P2 | P1 | ✅ Live (2020–2025) |
+| 0625 | Physics | IGCSE | P1, P2, P4 | P1, P2 | ✅ Live (2020–2025) |
+| 4024 | Mathematics D | O Level | P1, P2 | — | ✅ Live (2020–2025) |
+| 0580 | Mathematics | IGCSE | P2, P4 | — | ✅ Live (2020–2025) |
+| 2210 | Computer Science | O Level | P1, P2 | — | ✅ Live (2020–2025) |
+| 0478 | Computer Science | IGCSE | P1, P2 | — | ✅ Live (same papers as 2210) |
+| 5070 | Chemistry | O Level | P1, P2 | P1 | ✅ Live (2020–2025) |
+| 0620 | Chemistry | IGCSE | P1–P4 | P1, P2 | ✅ Live (2020–2025) |
+| 9709 | Mathematics | A Level | P1, P3, P4, P5 | — | ✅ Live (2020–2025) |
+| 9702 | Physics | A Level | P1, P2, P4, P5 | P1 | ✅ Live (2020–2025) |
+| 9618 | Computer Science | A Level | P1–P4 | — | ✅ Live (2020–2025) |
+| 2058 | Islamiyat | O Level | P1, P2 | — | ✅ Live (2015–2025) |
+| 2059 | Pakistan Studies | O Level | P1, P2 | — | ✅ Live (2018–2025) |
 
 All sessions covered: **May/Jun (s), Oct/Nov (w), Feb/Mar (m)**, all variants (e.g. 21, 22, 23).
 

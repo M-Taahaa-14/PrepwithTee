@@ -10,7 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260727a">
   <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+</head>
 <body>
 
 <header class="site-header">
@@ -142,6 +144,35 @@
     </div>
   </section>
 
+  <!-- ── Question preview panel (shown after "Preview questions →" in test mode) ── -->
+  <section id="preview-section" hidden>
+    <div class="card preview-card">
+      <div class="preview-head">
+        <div>
+          <h2 id="preview-title">Question preview</h2>
+          <p class="preview-sub">Uncheck any question to remove it from your test. Hit Regenerate for a fresh random pick.</p>
+        </div>
+        <div class="preview-head-btns">
+          <button type="button" class="btn btn-outline" id="preview-regen">↻ Regenerate</button>
+          <button type="button" class="mini" id="preview-back">← Change filters</button>
+        </div>
+      </div>
+      <div id="preview-list" class="preview-list"></div>
+      <div class="preview-foot">
+        <span id="preview-sel-info" class="preview-sel-info"></span>
+        <div class="preview-foot-right">
+          <div class="progress-wrap" id="prev-prog-wrap" hidden>
+            <div class="progress-bar" id="prev-prog-bar"></div>
+          </div>
+          <span class="status" id="prev-status"></span>
+          <button type="button" class="btn btn-dark" id="preview-generate" disabled>
+            Generate test + mark scheme
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="how reveal-stagger">
     <div class="step reveal-scale"><b>01</b><h3>Real questions</h3><p>Original Cambridge paper
       crops — never re-typed, never redrawn. What you practise is what you'll see.</p></div>
@@ -263,6 +294,18 @@
       <span>Past papers &copy; Cambridge Assessment International Education</span>
     </div>
   </footer>
+
+<!-- ── Question crop lightbox ── -->
+<div id="q-lightbox" class="q-lightbox" hidden aria-modal="true" role="dialog" aria-label="Question preview">
+  <div class="q-lightbox-backdrop"></div>
+  <div class="q-lightbox-box">
+    <button type="button" id="q-lightbox-close" class="q-lightbox-close" aria-label="Close preview">✕</button>
+    <div class="q-lightbox-img-wrap">
+      <img id="q-lightbox-img" src="" alt="Question crop" class="q-lightbox-img">
+      <p id="q-lightbox-spinner" class="q-lightbox-spinner">Loading…</p>
+    </div>
+  </div>
+</div>
 
 <script src="main.js?v=20260727a"></script>
 <script src="app.js?v=20260727a"></script>

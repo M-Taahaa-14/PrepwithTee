@@ -14,7 +14,9 @@
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260727a">
   <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script></head>
+  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+</head>
 
 <body>
 
@@ -337,7 +339,7 @@
         <p>Get a personalised demo and straight answers to all your questions —
           no sales pitch.</p>
       </div>
-      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%27d%20like%20to%20know%20more%20about%20your%20tutoring%20pricing%20and%20book%20a%20demo.">Book a demo</a>
+      <a class="btn btn-tint" href="" onclick="openBooking();return false;">Book a demo</a>
     </section>
   </main>
 
@@ -422,19 +424,6 @@
 
       const boardToggle = document.getElementById("pricing-board-toggle");
 
-      function updateWhatsAppLinks(boardName) {
-        const p1Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (1 Subject Plan).`;
-        const p2Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (2 Subjects Plan).`;
-        const p3Msg = `Hi Tee, I'd like to book a free demo lesson for ${boardName} (3 Subjects Plan).`;
-
-        document.getElementById("p1-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p1Msg);
-        document.getElementById("p1-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p1Msg);
-        document.getElementById("p2-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p2Msg);
-        document.getElementById("p2-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p2Msg);
-        document.getElementById("p3-btn-front").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p3Msg);
-        document.getElementById("p3-btn-back").href = "https://wa.me/923204884375?text=" + encodeURIComponent(p3Msg);
-      }
-
       if (boardToggle) {
         boardToggle.querySelectorAll("button").forEach(btn => {
           btn.addEventListener("click", () => {
@@ -453,13 +442,9 @@
             document.getElementById("p3-price").innerHTML = rates.p3.price;
             document.getElementById("p3-per").textContent = rates.p3.per;
 
-            updateWhatsAppLinks(rates.name);
           });
         });
       }
-
-      // Initialize with O Level links on page load
-      updateWhatsAppLinks("O Level");
 
       // 3D Flip Card handlers — Click anywhere on card to flip
       document.querySelectorAll(".flip-card-container").forEach(container => {

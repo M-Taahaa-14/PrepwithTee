@@ -104,10 +104,41 @@ if (parallaxEls.length) {
   }, { passive: true });
 }
 
-// ============ Demo Booking Panel ============
+// ============ Demo Booking — Choice Modal + Form + Calendly ============
+
 document.addEventListener("DOMContentLoaded", () => {
-  (function () {
-    const panelHTML = `
+
+  // ---- Choice modal HTML ----
+  const choiceHTML = `
+<div class="bk-choice" id="bkChoice" aria-hidden="true">
+  <div class="bkc-backdrop" id="bkChoiceBackdrop"></div>
+  <div class="bkc-inner" role="dialog" aria-labelledby="bkcTitle">
+    <button class="bkc-close" id="bkChoiceClose" aria-label="Close">&times;</button>
+    <div class="bkc-head">
+      <h3 id="bkcTitle">Book a Free Demo Lesson</h3>
+      <p>A 30-minute session with Tee &mdash; no commitment, no sales pitch.<br>How would you like to book?</p>
+    </div>
+    <div class="bkc-options">
+      <button class="bkc-opt primary" id="bkcFormBtn">
+        <span class="bkc-badge">Recommended</span>
+        <span class="bkc-icon">📋</span>
+        <b>Fill a quick form</b>
+        <p>Share your student&rsquo;s details, board, and subjects. Tee will reach out within 24 hours to confirm a slot.</p>
+        <span class="bkc-cta">Send request &rarr;</span>
+      </button>
+      <button class="bkc-opt" id="bkcCalBtn">
+        <span class="bkc-icon">📅</span>
+        <b>Pick a time yourself</b>
+        <p>Choose a slot from Tee&rsquo;s live calendar &mdash; confirmed instantly.</p>
+        <span class="bkc-note">Tee will WhatsApp you before the session to learn more about your student.</span>
+        <span class="bkc-cta">Open calendar &rarr;</span>
+      </button>
+    </div>
+  </div>
+</div>`;
+
+  // ---- Booking form panel HTML ----
+  const panelHTML = `
 <div class="bk-panel" id="bkPanel" aria-hidden="true">
   <div id="bkBody">
     <div class="fb-panel-head">
@@ -119,11 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <form id="bkForm" novalidate>
       <div class="bk-field">
-        <label for="bkParent">Parent's name <span class="req">*</span></label>
+        <label for="bkParent">Parent&rsquo;s name <span class="req">*</span></label>
         <input type="text" id="bkParent" placeholder="e.g. Sarah Khan" autocomplete="name">
       </div>
       <div class="bk-field">
-        <label for="bkStudent">Student's name <span class="req">*</span></label>
+        <label for="bkStudent">Student&rsquo;s name <span class="req">*</span></label>
         <input type="text" id="bkStudent" placeholder="e.g. Zain Khan">
       </div>
       <div class="bk-field">
@@ -133,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="bk-field">
         <label for="bkBoard">Board &amp; level <span class="req">*</span></label>
         <select id="bkBoard">
-          <option value="" disabled selected>Select your level…</option>
+          <option value="" disabled selected>Select your level&hellip;</option>
           <option value="O Level">Cambridge O Level</option>
           <option value="IGCSE">Cambridge IGCSE</option>
           <option value="A Level">Cambridge A Level (AS / A2)</option>
@@ -152,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="bk-field">
         <label for="bkMsg">Message <span class="bk-opt">(optional)</span></label>
-        <textarea id="bkMsg" rows="3" placeholder="Any specific topics, learning gaps, or questions about lessons…"></textarea>
+        <textarea id="bkMsg" rows="3" placeholder="Any specific topics, learning gaps, or questions about lessons&hellip;"></textarea>
       </div>
       <div class="bk-err" id="bkErr" hidden></div>
       <button type="submit" class="bk-submit" id="bkSubmit">Request Free Demo &rarr;</button>
@@ -165,96 +196,122 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>`;
 
-    const wrap = document.createElement("div");
-    wrap.innerHTML = panelHTML;
-    document.body.appendChild(wrap.firstElementChild);
+  // ---- Inject both into the DOM ----
+  const cw = document.createElement("div");
+  cw.innerHTML = choiceHTML;
+  document.body.appendChild(cw.firstElementChild);
 
-    const panel    = document.getElementById("bkPanel");
-    const closeBtn = document.getElementById("bkClose");
-    const form     = document.getElementById("bkForm");
-    const body     = document.getElementById("bkBody");
-    const thanks   = document.getElementById("bkThanks");
-    const errEl    = document.getElementById("bkErr");
+  const pw = document.createElement("div");
+  pw.innerHTML = panelHTML;
+  document.body.appendChild(pw.firstElementChild);
 
-    function openPanel() {
-      const fb = document.getElementById("fbPanel");
-      if (fb) { fb.classList.remove("open"); fb.setAttribute("aria-hidden","true"); }
-      panel.classList.add("open");
-      panel.setAttribute("aria-hidden", "false");
-    }
-    function closePanel() {
-      panel.classList.remove("open");
-      panel.setAttribute("aria-hidden", "true");
-      body.hidden = false;
-      thanks.hidden = true;
-      form.reset();
-      errEl.hidden = true;
-      form.querySelectorAll(".bk-input-err").forEach(el => el.classList.remove("bk-input-err"));
-    }
+  // ---- Choice modal logic ----
+  const choice  = document.getElementById("bkChoice");
+  const bkPanel = document.getElementById("bkPanel");
 
-    document.querySelectorAll('a[href="#contact"], a[href="index.html#contact"], .btn-gold, .book-demo-trigger').forEach(btn => {
-      if (btn.getAttribute("href")?.startsWith("mailto:")) return;
-      if (btn.getAttribute("href")?.startsWith("https://wa.me")) return;
-      if (btn.classList.contains("wa-bubble")) return;
-      btn.addEventListener("click", e => { e.preventDefault(); openPanel(); });
+  window.openBooking = function () { openChoice(); };
+
+  function openChoice() {
+    choice.classList.add("open");
+    choice.setAttribute("aria-hidden", "false");
+  }
+  function closeChoice() {
+    choice.classList.remove("open");
+    choice.setAttribute("aria-hidden", "true");
+  }
+  function openPanel() {
+    closeChoice();
+    bkPanel.classList.add("open");
+    bkPanel.setAttribute("aria-hidden", "false");
+  }
+  function closePanel() {
+    bkPanel.classList.remove("open");
+    bkPanel.setAttribute("aria-hidden", "true");
+    document.getElementById("bkBody").hidden = false;
+    document.getElementById("bkThanks").hidden = true;
+    document.getElementById("bkForm").reset();
+    document.getElementById("bkErr").hidden = true;
+    document.getElementById("bkForm").querySelectorAll(".bk-input-err")
+      .forEach(el => el.classList.remove("bk-input-err"));
+  }
+
+  document.getElementById("bkChoiceClose").addEventListener("click", closeChoice);
+  document.getElementById("bkChoiceBackdrop").addEventListener("click", closeChoice);
+  document.getElementById("bkcFormBtn").addEventListener("click", openPanel);
+  document.getElementById("bkcCalBtn").addEventListener("click", () => {
+    closeChoice();
+    if (window.Calendly) Calendly.initPopupWidget({
+      url: 'https://calendly.com/nexgentutors6/30min',
+      pageSettings: { backgroundColor: 'FBF3D9', primaryColor: 'F4A632', textColor: '293554' },
     });
+  });
 
-    closeBtn.addEventListener("click", closePanel);
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
-    });
+  document.getElementById("bkClose").addEventListener("click", closePanel);
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { closeChoice(); closePanel(); }
+  });
 
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-      form.querySelectorAll(".bk-input-err").forEach(el => el.classList.remove("bk-input-err"));
-      errEl.hidden = true;
+  // ---- Form submit ----
+  document.getElementById("bkForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    document.getElementById("bkForm").querySelectorAll(".bk-input-err")
+      .forEach(el => el.classList.remove("bk-input-err"));
+    document.getElementById("bkErr").hidden = true;
 
-      const parent   = document.getElementById("bkParent").value.trim();
-      const student  = document.getElementById("bkStudent").value.trim();
-      const phone    = document.getElementById("bkPhone").value.trim();
-      const board    = document.getElementById("bkBoard").value;
-      const subjects = [...document.querySelectorAll('input[name="bkSubjects"]:checked')].map(c => c.value);
+    const parent   = document.getElementById("bkParent").value.trim();
+    const student  = document.getElementById("bkStudent").value.trim();
+    const phone    = document.getElementById("bkPhone").value.trim();
+    const board    = document.getElementById("bkBoard").value;
+    const subjects = [...document.querySelectorAll('input[name="bkSubjects"]:checked')].map(c => c.value);
 
-      const errs = [];
-      if (!parent)  { errs.push("Parent's name is required."); document.getElementById("bkParent").classList.add("bk-input-err"); }
-      if (!student) { errs.push("Student's name is required."); document.getElementById("bkStudent").classList.add("bk-input-err"); }
-      if (!phone)   { errs.push("WhatsApp / phone number is required."); document.getElementById("bkPhone").classList.add("bk-input-err"); }
-      if (!board)   { errs.push("Please select a board / level."); document.getElementById("bkBoard").classList.add("bk-input-err"); }
-      if (!subjects.length) errs.push("Please pick at least one subject.");
+    const errs = [];
+    if (!parent)  { errs.push("Parent's name is required.");         document.getElementById("bkParent").classList.add("bk-input-err"); }
+    if (!student) { errs.push("Student's name is required.");        document.getElementById("bkStudent").classList.add("bk-input-err"); }
+    if (!phone)   { errs.push("WhatsApp / phone is required.");      document.getElementById("bkPhone").classList.add("bk-input-err"); }
+    if (!board)   { errs.push("Please select a board / level.");     document.getElementById("bkBoard").classList.add("bk-input-err"); }
+    if (!subjects.length) errs.push("Please pick at least one subject.");
 
-      if (errs.length) {
-        errEl.innerHTML = errs.map(m => `<span>${m}</span>`).join("");
-        errEl.hidden = false;
-        return;
-      }
+    if (errs.length) {
+      document.getElementById("bkErr").innerHTML = errs.map(m => `<span>${m}</span>`).join("");
+      document.getElementById("bkErr").hidden = false;
+      return;
+    }
 
-      const submit = document.getElementById("bkSubmit");
-      submit.disabled = true; submit.textContent = "Sending…";
+    const submit = document.getElementById("bkSubmit");
+    submit.disabled = true; submit.textContent = "Sending…";
 
-      try {
-        const res = await fetch("/api/demo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ parent_name: parent, student_name: student,
-            contact: phone, grade: board, subjects,
-            message: document.getElementById("bkMsg").value }),
-        });
-        const data = await res.json();
-        if (res.ok && data.status === "success") {
-          body.hidden = true; thanks.hidden = false;
-          setTimeout(closePanel, 4200);
-        } else {
-          errEl.innerHTML = `<span>${data.message || "Something went wrong. Please try again."}</span>`;
-          errEl.hidden = false;
-          submit.disabled = false; submit.textContent = "Request Free Demo →";
-        }
-      } catch (_) {
-        errEl.innerHTML = "<span>Connection error — please reach out on WhatsApp instead.</span>";
-        errEl.hidden = false;
+    try {
+      const res = await fetch("/api/demo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parent_name: parent, student_name: student,
+          contact: phone, grade: board, subjects,
+          message: document.getElementById("bkMsg").value }),
+      });
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        document.getElementById("bkBody").hidden = true;
+        document.getElementById("bkThanks").hidden = false;
+        setTimeout(closePanel, 4200);
+      } else {
+        document.getElementById("bkErr").innerHTML = `<span>${data.message || "Something went wrong. Please try again."}</span>`;
+        document.getElementById("bkErr").hidden = false;
         submit.disabled = false; submit.textContent = "Request Free Demo →";
       }
-    });
-  })();
+    } catch (_) {
+      document.getElementById("bkErr").innerHTML = "<span>Connection error — please reach out on WhatsApp instead.</span>";
+      document.getElementById("bkErr").hidden = false;
+      submit.disabled = false; submit.textContent = "Request Free Demo →";
+    }
+  });
+
+  // ---- Intercept all booking triggers ----
+  document.querySelectorAll('a[href="#contact"], a[href="index.html#contact"], .btn-gold, .book-demo-trigger').forEach(btn => {
+    if (btn.getAttribute("href")?.startsWith("mailto:")) return;
+    if (btn.getAttribute("href")?.startsWith("https://wa.me")) return;
+    if (btn.classList.contains("wa-bubble")) return;
+    btn.addEventListener("click", e => { e.preventDefault(); openChoice(); });
+  });
 
   // ============ Subjects Horizontal Scroll Buttons Wiring ============
   document.querySelectorAll(".board-section").forEach((section) => {

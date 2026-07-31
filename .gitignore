@@ -7,3 +7,7 @@ __pycache__/
 data/
 *.xlsx
 ~$*
+
+# Claude Code session files
+.claude/
+claude_code_kickoff_prompt.md

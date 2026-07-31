@@ -7,6 +7,7 @@
     sessions: [],  // empty = all sessions
     variants: [],  // empty = all variants
     subtopics: {}, // topic_name -> Set of selected subtopic names
+    preview: null, // {seed, body, questions} — populated by fetchPreview()
   };
 
   const SESSION_LABELS = { s: "May/Jun", w: "Oct/Nov", m: "Feb/Mar", y: "Yearly" };
@@ -466,7 +467,12 @@ document.querySelectorAll(".mode").forEach((b) => {
     $("#topical-opts").classList.toggle("hidden", state.mode !== "topical");
     $("#test-opts").classList.toggle("hidden", state.mode !== "test");
     $("#go").textContent =
-      state.mode === "test" ? "Generate test + mark scheme" : "Generate PDF";
+      state.mode === "test" ? "Preview questions →" : "Generate PDF";
+    // Dismiss any open preview when switching mode
+    if (state.mode !== "test") {
+      $("#preview-section").hidden = true;
+      state.preview = null;
+    }
     updateSummary();
   };
 });
@@ -481,18 +487,18 @@ function status(msg, cls = "") {
 
 // ── Generate ─────────────────────────────────────────────────────────────────
 
-$("#go").onclick = async () => {
-  const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map((i) => i.value);
-  if (!topics.length) return status("Pick at least one topic first.", "err");
+function escHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 
-  // Collect selected subtopics (flat list, only for checked topics)
+function buildBody() {
+  const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map((i) => i.value);
   const subtopics = [];
   for (const [topicName, stSet] of Object.entries(state.subtopics)) {
     if (stSet.size > 0 && topics.includes(topicName)) {
       for (const st of stSet) subtopics.push(st);
     }
   }
-
   const body = {
     mode: state.mode,
     syllabus: state.syllabus,
@@ -510,15 +516,19 @@ $("#go").onclick = async () => {
     if (marks) body.marks = marks;
     else body.count = +$("#count").value || 6;
   }
+  return body;
+}
 
-  const go = $("#go");
-  const pwrap = $("#progress-wrap");
-  const pbar = $("#progress-bar");
+async function doGenerate(body, { goEl, pwrapEl, pbarEl, statusFn } = {}) {
+  const go = goEl || $("#go");
+  const pwrap = pwrapEl || $("#progress-wrap");
+  const pbar = pbarEl || $("#progress-bar");
+  const st = statusFn || status;
   go.disabled = true;
   pwrap.hidden = false;
   pbar.className = "progress-bar indeterminate";
   pbar.style.width = "";
-  status("Building your paper — a few seconds…");
+  st("Building your paper — a few seconds…");
 
   try {
     const r = await fetch("/api/generate", {
@@ -533,11 +543,11 @@ $("#go").onclick = async () => {
 
     const cd = r.headers.get("Content-Disposition") || "";
     const name = (cd.match(/filename="?([^";]+)/) || [])[1] ||
-      (state.mode === "test" ? "test.zip" : "topical.pdf");
+      (body.mode === "test" ? "test.zip" : "topical.pdf");
     const total = +(r.headers.get("Content-Length") || 0);
     pbar.className = "progress-bar";
     pbar.style.width = total ? "0%" : "30%";
-    status("Downloading…");
+    st("Downloading…");
 
     const reader = r.body.getReader();
     const chunks = [];
@@ -562,15 +572,169 @@ $("#go").onclick = async () => {
       pbar.style.width = "0%";
       pbar.className = "progress-bar";
     }, 700);
-    status(`Done — ${name} downloaded.`, "ok");
+    st(`Done — ${name} downloaded.`, "ok");
   } catch (err) {
     pwrap.hidden = true;
     pbar.className = "progress-bar";
-    status(err.message, "err");
+    st(err.message, "err");
   } finally {
     go.disabled = false;
   }
+}
+
+// ── Preview & curate (test mode) ──────────────────────────────────────────────
+
+async function fetchPreview(seed) {
+  const body = buildBody();
+  const useSeed = seed ?? Math.floor(Math.random() * 99999);
+  body.seed = useSeed;
+  state.preview = { seed: useSeed, body };
+
+  const go = $("#go");
+  go.disabled = true;
+  status("Loading question preview…");
+
+  try {
+    const r = await fetch("/api/questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const e = await r.json().catch(() => ({}));
+      throw new Error(e.detail || `server error (${r.status})`);
+    }
+    const data = await r.json();
+    if (!data.questions.length) throw new Error("No questions match these filters.");
+    state.preview.questions = data.questions;
+    renderPreview();
+    status("");
+  } catch (err) {
+    status(err.message, "err");
+    state.preview = null;
+  } finally {
+    go.disabled = false;
+  }
+}
+
+function renderPreview() {
+  const { questions } = state.preview;
+  const list = $("#preview-list");
+  list.innerHTML = "";
+
+  questions.forEach((q) => {
+    const div = document.createElement("div");
+    div.className = "preview-row";
+    div.innerHTML =
+      `<input type="checkbox" class="prev-cb" data-id="${q.id}" data-marks="${q.marks || 0}" checked>` +
+      `<div class="preview-row-main">` +
+        `<div class="preview-row-ref">${escHtml(q.ref)}</div>` +
+        `<div class="preview-row-badges">` +
+          `<span class="prev-badge">${escHtml(q.topic)}</span>` +
+          (q.subtopic ? `<span class="prev-badge subtopic">${escHtml(q.subtopic)}</span>` : "") +
+        `</div>` +
+        (q.text_snippet ? `<div class="preview-row-snippet">${escHtml(q.text_snippet)}</div>` : "") +
+      `</div>` +
+      `<div class="preview-row-marks">${q.marks ?? "—"}<small>marks</small></div>`;
+
+    // Click anywhere on the row (except the checkbox) opens the crop image lightbox
+    div.addEventListener("click", (e) => {
+      if (e.target.closest(".prev-cb")) return;
+      showLightbox(q.id);
+    });
+
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll(".prev-cb").forEach((cb) => {
+    cb.onchange = () => {
+      cb.closest(".preview-row").classList.toggle("unchecked", !cb.checked);
+      updatePreviewFooter();
+    };
+  });
+
+  updatePreviewFooter();
+  $("#preview-title").textContent =
+    `Preview — ${questions.length} question${questions.length !== 1 ? "s" : ""}`;
+  const sec = $("#preview-section");
+  sec.hidden = false;
+  sec.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function updatePreviewFooter() {
+  const checked = [...document.querySelectorAll(".prev-cb:checked")];
+  const total = checked.reduce((s, cb) => s + (+cb.dataset.marks || 0), 0);
+  const n = checked.length;
+  const all = document.querySelectorAll(".prev-cb").length;
+  $("#preview-sel-info").innerHTML = `<b>${n}</b> of ${all} selected · <b>${total}</b> marks`;
+  $("#preview-generate").disabled = n === 0;
+}
+
+$("#preview-back").onclick = () => {
+  $("#preview-section").hidden = true;
+  state.preview = null;
 };
+
+$("#preview-regen").onclick = () => {
+  fetchPreview(Math.floor(Math.random() * 99999));
+};
+
+$("#preview-generate").onclick = async () => {
+  const selectedIds = [...document.querySelectorAll(".prev-cb:checked")].map((cb) => +cb.dataset.id);
+  if (!selectedIds.length) return;
+  const body = { ...state.preview.body, question_ids: selectedIds };
+  const prevSt = (msg, cls = "") => {
+    const el = $("#prev-status");
+    el.textContent = msg;
+    el.className = "status " + cls;
+  };
+  await doGenerate(body, {
+    goEl: $("#preview-generate"),
+    pwrapEl: $("#prev-prog-wrap"),
+    pbarEl: $("#prev-prog-bar"),
+    statusFn: prevSt,
+  });
+};
+
+$("#go").onclick = async () => {
+  const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map((i) => i.value);
+  if (!topics.length) return status("Pick at least one topic first.", "err");
+  if (state.mode === "test") {
+    await fetchPreview();
+    return;
+  }
+  await doGenerate(buildBody());
+};
+
+// ── Question crop lightbox ────────────────────────────────────────────────────
+
+function showLightbox(questionId) {
+  const lb = $("#q-lightbox");
+  const img = $("#q-lightbox-img");
+  const spinner = $("#q-lightbox-spinner");
+  img.style.display = "none";
+  img.src = "";
+  spinner.style.display = "";
+  spinner.textContent = "Loading…";
+  lb.hidden = false;
+  img.onload = () => { spinner.style.display = "none"; img.style.display = ""; };
+  img.onerror = () => { spinner.textContent = "Preview not available for this question."; };
+  img.src = `/api/question/${questionId}/preview`;
+}
+
+function closeLightbox() {
+  const lb = $("#q-lightbox");
+  lb.hidden = true;
+  $("#q-lightbox-img").src = "";
+}
+
+$("#q-lightbox-close").onclick = closeLightbox;
+$("#q-lightbox").addEventListener("click", (e) => {
+  if (e.target.classList.contains("q-lightbox-backdrop")) closeLightbox();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("#q-lightbox").hidden) closeLightbox();
+});
 
 init();
 })();
