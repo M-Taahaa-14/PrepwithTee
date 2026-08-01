@@ -13,21 +13,24 @@ Run:  python -m uvicorn app:app --app-dir website --port 8017   (from repo root)
 """
 
 import json
+import os
 import random
 import re
 import shutil
 import sqlite3
+import smtplib
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import zipfile
-from pathlib import Path
-
-import os
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from pathlib import Path
+
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse
@@ -37,6 +40,14 @@ from starlette.background import BackgroundTask
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / "data" / "index.db"
+
+# ── Dual-mode DB: psycopg2 (Supabase) or SQLite ────────────────────────────
+from . import db as _db
+_USE_PG = _db.USE_PG
+
+def _con():
+    """Open a pipeline DB connection.  Caller must call .close()."""
+    return _db.plain_connect()
 YEAR_MIN, YEAR_MAX = 2020, 2025
 
 # Display names for each paper component. The components actually offered are
@@ -62,6 +73,10 @@ PAPER_LABELS = {
 }
 
 app = FastAPI(title="PrepWithTee")
+
+from . import auth as _auth_mod, users as _users_mod
+app.include_router(_auth_mod.router)
+app.include_router(_users_mod.router)
 
 
 class GenerateReq(BaseModel):
@@ -242,7 +257,7 @@ def list_questions(req: QuestionListReq):
     if not req.topics:
         raise HTTPException(400, "pick at least one topic")
 
-    con = sqlite3.connect(DB)
+    con = _con()
     con.row_factory = sqlite3.Row
     try:
         pool = _question_pool(req, con)
@@ -295,9 +310,38 @@ def health():
     return {"status": "ok", "papers": papers, "archive_present": raw.is_dir()}
 
 
+# /api/meta runs ~6 aggregate queries per syllabus. Against a local SQLite file
+# that was free; against Supabase every one is a network round-trip, which put
+# the endpoint at ~20 s. The answer only changes when the pipeline reclassifies
+# (an offline, manual step), so serve it from an in-process cache and let a
+# restart or the TTL pick up new data.
+_META_CACHE: dict = {"at": 0.0, "data": None}
+_META_TTL_S = 600
+
+
 @app.get("/api/meta")
 def meta():
-    con = sqlite3.connect(DB)
+    now = time.time()
+    if _META_CACHE["data"] is not None and now - _META_CACHE["at"] < _META_TTL_S:
+        return _META_CACHE["data"]
+    data = _build_meta()
+    _META_CACHE.update(at=now, data=data)
+    return data
+
+
+@app.on_event("startup")
+def _warm_meta_cache():
+    """Build the meta cache off-thread so the first visitor never waits on it."""
+    def build():
+        try:
+            _META_CACHE.update(at=time.time(), data=_build_meta())
+        except Exception as exc:            # a cold cache is recoverable
+            print(f"[meta] warm-up failed: {exc}", flush=True)
+    threading.Thread(target=build, daemon=True).start()
+
+
+def _build_meta():
+    con = _con()
     con.row_factory = sqlite3.Row
     subs = [r["syllabus"] for r in con.execute(
         """SELECT DISTINCT p.syllabus FROM classifications c
@@ -530,7 +574,7 @@ def library(syllabus: str | None = None, year: int | None = None):
     ?syllabus&year -> every paper in that year, question paper + mark scheme
                       paired onto one row so the viewer can toggle between them
     """
-    con = sqlite3.connect(DB)
+    con = _con()
     con.row_factory = sqlite3.Row
     try:
         if syllabus is None:
@@ -587,7 +631,7 @@ def library_tree(syllabus: str):
     Files carry the paper/variant they belong to so the viewer can pair a
     question paper with its mark scheme when either one is clicked.
     """
-    con = sqlite3.connect(DB)
+    con = _con()
     con.row_factory = sqlite3.Row
     rows = con.execute(
         """SELECT id, year, session, paper, variant, kind, filename
@@ -617,7 +661,7 @@ def library_tree(syllabus: str):
 @app.get("/api/library/pdf/{paper_id}")
 def library_pdf(paper_id: int):
     """Stream one archived PDF, inline so the browser viewer can render it."""
-    con = sqlite3.connect(DB)
+    con = _con()
     con.row_factory = sqlite3.Row
     row = con.execute("SELECT rel_path, filename FROM papers WHERE id = ?",
                       (paper_id,)).fetchone()
@@ -1569,7 +1613,7 @@ def question_preview(question_id: int):
     crop PDF on demand with PyMuPDF so the endpoint works even when debug PNGs
     were not synced to the server.
     """
-    con = sqlite3.connect(DB)
+    con = _con()
     con.row_factory = sqlite3.Row
     row = con.execute(
         """SELECT q.number, q.sub_part, p.syllabus, p.year, p.session, p.paper, p.variant
