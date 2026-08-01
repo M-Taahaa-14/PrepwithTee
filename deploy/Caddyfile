@@ -6,7 +6,14 @@
 # Replace prepwithtee.com with your domain, then:
 #   sudo cp Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
 
-:80, prepwithtee.com, www.prepwithtee.com {
+# Send www to the apex first. Sign-in cookies are set on whichever host served
+# the OAuth callback, and APP_BASE_URL names exactly one host, so serving both
+# would leave anyone arriving via www logged out on the apex.
+www.prepwithtee.com {
+	redir https://prepwithtee.com{uri} permanent
+}
+
+:80, prepwithtee.com {
 	encode zstd gzip
 
 	# Booklet generation can run for minutes; the default 30s proxy timeout

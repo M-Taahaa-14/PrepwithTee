@@ -14,8 +14,11 @@ EnvironmentFile=/etc/prepwithtee.env
 # Two workers, not three: each booklet build spawns a PyMuPDF subprocess that
 # can hold a few hundred MB, and the /api/solve rate limiter counts per worker
 # (in-process), so every extra worker multiplies the effective limit.
-ExecStart=/srv/prepwithtee/.venv/bin/gunicorn app:app \
-    --chdir /srv/prepwithtee/website \
+# website is a package now (auth/users/db use relative imports), so it must be
+# imported as website.app from the project root - chdir'ing into website/ and
+# loading app:app makes those imports fail at startup.
+ExecStart=/srv/prepwithtee/.venv/bin/gunicorn website.app:app \
+    --chdir /srv/prepwithtee \
     -k uvicorn.workers.UvicornWorker \
     -w 2 \
     -b 127.0.0.1:8017 \
