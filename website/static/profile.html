@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your profile — PrepWithTee</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260801c">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-page auth-page-single">
+    <div class="auth-card auth-card-wide">
+
+      <div class="auth-head">
+        <p class="eyebrow" id="profile-eyebrow">Almost there</p>
+        <h1 id="profile-title">Tell us about you</h1>
+        <p class="auth-sub" id="profile-sub">
+          This tailors your topic lists and question difficulty. It takes about
+          twenty seconds and you can change any of it later.
+        </p>
+      </div>
+
+      <div class="auth-alert" id="profile-alert" hidden role="alert"></div>
+
+      <form class="auth-form" id="profile-form" novalidate>
+
+        <label class="auth-field">
+          <span>Full name</span>
+          <input type="text" name="name" autocomplete="name" required
+                 placeholder="Ayesha Khan">
+        </label>
+
+        <fieldset class="auth-field auth-choice">
+          <legend>Which qualification are you sitting?</legend>
+          <div class="choice-row" id="grade-row">
+            <label class="choice"><input type="radio" name="grade" value="O Level" required><span>O Level</span></label>
+            <label class="choice"><input type="radio" name="grade" value="IGCSE"><span>IGCSE</span></label>
+            <label class="choice"><input type="radio" name="grade" value="A Level"><span>A Level</span></label>
+          </div>
+        </fieldset>
+
+        <div class="auth-row">
+          <label class="auth-field">
+            <span>Date of birth <em>optional</em></span>
+            <input type="date" name="birthday" max="2020-01-01">
+          </label>
+
+          <label class="auth-field">
+            <span>Gender <em>optional</em></span>
+            <select name="gender">
+              <option value="">Prefer not to say</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="auth-field">
+          <span>WhatsApp number <em>optional</em></span>
+          <input type="tel" name="phone" autocomplete="tel" placeholder="+92 3xx xxxxxxx">
+          <small class="field-hint">Only used if you ask about one-on-one tuition. No marketing, ever.</small>
+        </label>
+
+        <button type="submit" class="btn btn-gold auth-submit" id="profile-submit">
+          Save and continue
+        </button>
+      </form>
+
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth, api } from "/auth.js";
+
+    const params   = new URLSearchParams(location.search);
+    const next     = params.get("next") || "/dashboard.html";
+    const form     = document.getElementById("profile-form");
+    const alertBox = document.getElementById("profile-alert");
+    const submit   = document.getElementById("profile-submit");
+
+    const user = await requireAuth();
+    if (user) {
+      // Returning users are editing, not onboarding — say so.
+      if (user.profile_complete) {
+        document.getElementById("profile-eyebrow").textContent = "Your account";
+        document.getElementById("profile-title").textContent = "Edit your profile";
+        document.getElementById("profile-sub").textContent =
+          "Update anything below. Changes apply the next time you open revision mode.";
+        submit.textContent = "Save changes";
+      }
+      form.name.value     = user.name || "";
+      form.birthday.value = user.birthday || "";
+      form.gender.value   = user.gender || "";
+      form.phone.value    = user.phone || "";
+      if (user.grade) {
+        const radio = form.querySelector(`input[name="grade"][value="${user.grade}"]`);
+        if (radio) radio.checked = true;
+      }
+    }
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      alertBox.hidden = true;
+
+      const name  = form.name.value.trim();
+      const grade = form.querySelector('input[name="grade"]:checked')?.value;
+      if (!name)  return fail("We need a name to put on your booklets.");
+      if (!grade) return fail("Pick the qualification you're sitting.");
+
+      submit.disabled = true;
+      submit.textContent = "Saving…";
+      try {
+        await api("/api/profile", {
+          method: "POST",
+          body: {
+            name, grade,
+            birthday: form.birthday.value || null,
+            gender:   form.gender.value || null,
+            phone:    form.phone.value.trim() || null,
+          },
+        });
+        location.href = next;
+      } catch (err) {
+        fail(err.message);
+        submit.disabled = false;
+        submit.textContent = "Save and continue";
+      }
+    });
+
+    function fail(msg) {
+      alertBox.textContent = msg;
+      alertBox.hidden = false;
+      alertBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  </script>
+
+</body>
+
+</html>

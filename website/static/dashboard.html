@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — PrepWithTee</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260801c">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+        <a href="resources.html" class="nav-link">Resources</a>
+        <a href="teachers.html" class="nav-link">Teachers</a>
+        <a href="index.html#contact" class="btn btn-gold">Book a demo lesson</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container dash-page">
+
+    <div class="dash-greeting">
+      <div>
+        <p class="eyebrow" id="dash-date">—</p>
+        <h1 class="section-title" id="dash-hello">Welcome back</h1>
+        <p class="dash-sub" id="dash-sub">Pick up where you left off.</p>
+      </div>
+      <div class="dash-streak" id="dash-streak" hidden>
+        <span class="dash-streak-num">0</span>
+        <span class="dash-streak-label">day streak</span>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- ---- progress ---- -->
+      <section class="dash-card dash-card-wide">
+        <div class="dash-card-head">
+          <h2>Your subjects</h2>
+          <a class="mini" href="revise.html">Open revision mode &rarr;</a>
+        </div>
+        <div class="ring-row" id="ring-row">
+          <p class="dash-loading">Loading…</p>
+        </div>
+      </section>
+
+      <!-- ---- recent quizzes ---- -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <h2>Recent practice</h2>
+        </div>
+        <div id="quiz-history"><p class="dash-loading">Loading…</p></div>
+      </section>
+
+      <!-- ---- quick actions ---- -->
+      <section class="dash-card">
+        <div class="dash-card-head">
+          <h2>Jump back in</h2>
+        </div>
+        <div class="dash-actions">
+          <a class="dash-action tint-lav" href="revise.html">
+            <span class="dash-action-title">Revise a chapter</span>
+            <span class="dash-action-sub">Track progress and get tested</span>
+          </a>
+          <a class="dash-action tint-green" href="papers.html">
+            <span class="dash-action-title">Build a topical paper</span>
+            <span class="dash-action-sub">Real Cambridge questions by chapter</span>
+          </a>
+          <a class="dash-action tint-blue" href="resources.html">
+            <span class="dash-action-title">Notes &amp; resources</span>
+            <span class="dash-action-sub">Everything for your syllabus</span>
+          </a>
+          <a class="dash-action tint-orange"
+             href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20ask%20about%20one-on-one%20tuition.">
+            <span class="dash-action-title">Ask about 1-on-1 tuition</span>
+            <span class="dash-action-sub">Message Tee directly on WhatsApp</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ---- enrol ---- -->
+      <section class="dash-card dash-card-wide">
+        <div class="dash-card-head">
+          <h2>Add a subject</h2>
+          <span class="dash-card-note">Free — unlocks papers, revision and tests</span>
+        </div>
+        <div class="enrol-grid" id="enrol-grid">
+          <p class="dash-loading">Loading…</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="/auth.js"></script>
+  <script type="module" src="/dashboard.js"></script>
+
+</body>
+
+</html>

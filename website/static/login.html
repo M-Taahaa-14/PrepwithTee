@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in — PrepWithTee</title>
+  <meta name="description"
+    content="Sign in to PrepWithTee to track your syllabus progress, generate topical past papers and practise with AI-marked questions.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260801c">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="subjects.html" class="nav-link">Subjects</a>
+        <a href="papers.html" class="nav-link">Past Papers</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-page">
+    <div class="auth-card">
+
+      <div class="auth-head">
+        <h1 id="auth-title">Welcome back</h1>
+        <p class="auth-sub" id="auth-sub">
+          Sign in to pick up your revision where you left off.
+        </p>
+      </div>
+
+      <div class="auth-alert" id="auth-alert" hidden role="alert"></div>
+
+      <a class="btn-google" id="google-btn" href="/auth/google">
+        <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+        </svg>
+        <span>Continue with Google</span>
+      </a>
+
+      <div class="auth-divider"><span>or use your email</span></div>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <label class="auth-field" id="name-field" hidden>
+          <span>Full name</span>
+          <input type="text" name="name" autocomplete="name" placeholder="Ayesha Khan">
+        </label>
+
+        <label class="auth-field">
+          <span>Email</span>
+          <input type="email" name="email" autocomplete="email" required
+                 placeholder="you@example.com">
+        </label>
+
+        <label class="auth-field">
+          <span>Password</span>
+          <input type="password" name="password" required
+                 autocomplete="current-password" placeholder="At least 8 characters">
+        </label>
+
+        <button type="submit" class="btn btn-gold auth-submit" id="submit-btn">Sign in</button>
+      </form>
+
+      <p class="auth-switch">
+        <span id="switch-text">New to PrepWithTee?</span>
+        <button type="button" class="linklike" id="switch-btn">Create an account</button>
+      </p>
+
+    </div>
+
+    <aside class="auth-aside">
+      <p class="eyebrow">What you get</p>
+      <h2>Your syllabus,<br>tracked <em>chapter by chapter.</em></h2>
+      <ul class="auth-perks">
+        <li>
+          <strong>Topical past papers</strong>
+          Every Cambridge question from 2020&ndash;2025, sorted by syllabus chapter,
+          with the mark scheme attached.
+        </li>
+        <li>
+          <strong>Progress you can see</strong>
+          Mark each chapter Not started, Learning or Confident and watch the
+          gaps close before your exam.
+        </li>
+        <li>
+          <strong>Practice that marks itself</strong>
+          Answer an exam-style question and get a score, feedback and the
+          full-mark answer straight back.
+        </li>
+      </ul>
+      <p class="auth-aside-foot">
+        Free to create. No card, no commitment &mdash; one-on-one tuition is
+        booked separately.
+      </p>
+    </aside>
+  </main>
+
+  <script type="module">
+    import { getUser, api } from "/auth.js";
+
+    const params   = new URLSearchParams(location.search);
+    const next     = params.get("next") || "/dashboard.html";
+    const form     = document.getElementById("auth-form");
+    const alertBox = document.getElementById("auth-alert");
+    const submitBtn= document.getElementById("submit-btn");
+    const nameField= document.getElementById("name-field");
+    const googleBtn= document.getElementById("google-btn");
+
+    let mode = params.get("mode") === "register" ? "register" : "login";
+
+    // Google redirects back here with ?error=... when consent fails.
+    const ERRORS = {
+      google_denied: "Google sign-in was cancelled.",
+      missing_code:  "Google sign-in did not complete. Please try again.",
+      oauth_failed:  "We couldn't verify your Google account. Try email instead.",
+    };
+    if (params.get("error")) showError(ERRORS[params.get("error")] || "Sign-in failed.");
+
+    // Already signed in? Don't make them do it twice.
+    getUser().then(u => { if (u) location.replace(next); });
+
+    function showError(msg) {
+      alertBox.textContent = msg;
+      alertBox.hidden = false;
+    }
+
+    function render() {
+      const registering = mode === "register";
+      document.getElementById("auth-title").textContent =
+        registering ? "Create your account" : "Welcome back";
+      document.getElementById("auth-sub").textContent = registering
+        ? "One account for past papers, revision tracking and practice."
+        : "Sign in to pick up your revision where you left off.";
+      nameField.hidden = !registering;
+      nameField.querySelector("input").required = registering;
+      form.password.autocomplete = registering ? "new-password" : "current-password";
+      submitBtn.textContent = registering ? "Create account" : "Sign in";
+      document.getElementById("switch-text").textContent =
+        registering ? "Already have an account?" : "New to PrepWithTee?";
+      document.getElementById("switch-btn").textContent =
+        registering ? "Sign in instead" : "Create an account";
+      googleBtn.querySelector("span").textContent =
+        registering ? "Sign up with Google" : "Continue with Google";
+      alertBox.hidden = true;
+    }
+
+    document.getElementById("switch-btn").addEventListener("click", () => {
+      mode = mode === "register" ? "login" : "register";
+      render();
+    });
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      alertBox.hidden = true;
+
+      const email    = form.email.value.trim();
+      const password = form.password.value;
+      const name     = form.name?.value.trim() || "";
+
+      if (!email || !password) return showError("Enter your email and password.");
+      if (mode === "register") {
+        if (!name) return showError("Tell us your name so we know what to call you.");
+        if (password.length < 8) return showError("Passwords need at least 8 characters.");
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = mode === "register" ? "Creating…" : "Signing in…";
+      try {
+        const path = mode === "register" ? "/auth/register" : "/auth/login";
+        const body = mode === "register" ? { email, password, name } : { email, password };
+        const user = await api(path, { method: "POST", body });
+        location.href = user.profile_complete
+          ? next
+          : `/profile.html?next=${encodeURIComponent(next)}`;
+      } catch (err) {
+        showError(err.message);
+        submitBtn.disabled = false;
+        render();
+      }
+    });
+
+    render();
+  </script>
+
+</body>
+
+</html>
