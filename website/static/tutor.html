@@ -8,7 +8,7 @@
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260801c">
+<link rel="stylesheet" href="styles.css?v=20260801e">
   <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
   <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
   <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
@@ -49,17 +49,7 @@
   </div>
 </div>
 
-<main class="container coming-soon-wrapper" style="padding-top:10px; position: relative;">
-  <!-- Single Dynamic Frosted Glass Overlay -->
-  <div class="coming-soon-overlay" id="ai-tutor-overlay">
-    <div class="cs-card tint-lav" id="ai-tutor-card">
-      <span class="cs-badge" id="ai-tutor-badge">✨ IN ACTIVE DEVELOPMENT</span>
-      <h2 id="ai-tutor-title">AI Tutor Coming Soon</h2>
-      <p id="ai-tutor-desc">Our AI Study Partner is currently undergoing fine-tuning on official Cambridge mark schemes and syllabus question patterns to guarantee 100% accuracy.</p>
-      <a href="https://wa.me/923204884375?text=Hi%20Tee%2C%20notify%20me%20when%20the%20AI%20Tutor%20launches%21" class="btn btn-dark" id="ai-tutor-btn">Get Notified on WhatsApp →</a>
-    </div>
-  </div>
-
+<main class="container" style="padding-top:10px">
   <!-- Tab 1: AI study partner grid -->
   <div class="tutor-grid" id="tutor-chat-container">
     <aside class="tutor-side">
@@ -224,9 +214,9 @@
     </div>
   </footer>
 
-<script src="main.js?v=20260727a"></script>
-<script src="tutor.js?v=20260727a"></script>
-<script src="ask.js?v=20260727a"></script>
+<script src="main.js?v=20260801e"></script>
+<script src="tutor.js?v=20260801e"></script>
+<script src="ask.js?v=20260801e"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("tutor-toggle");
@@ -236,40 +226,11 @@
     const solverContainer = document.getElementById("tutor-solver-container");
 
     function switchTab(tab) {
-      const overlay = document.getElementById("ai-tutor-overlay");
-      const card = document.getElementById("ai-tutor-card");
-      const badge = document.getElementById("ai-tutor-badge");
-      const title = document.getElementById("ai-tutor-title");
-      const desc = document.getElementById("ai-tutor-desc");
-      const btn = document.getElementById("ai-tutor-btn");
-
-      if (tab === "chat") {
-        chatBtn.classList.add("active");
-        solverBtn.classList.remove("active");
-        chatContainer.style.display = "";
-        solverContainer.style.display = "none";
-        
-        // Show AI Tutor contents
-        card.className = "cs-card tint-lav";
-        badge.textContent = "✨ IN ACTIVE DEVELOPMENT";
-        badge.style.background = "";
-        title.textContent = "AI Tutor Coming Soon";
-        desc.textContent = "Our AI Study Partner is currently undergoing fine-tuning on official Cambridge mark schemes and syllabus question patterns to guarantee 100% accuracy.";
-        btn.href = "https://wa.me/923204884375?text=Hi%20Tee%2C%20notify%20me%20when%20the%20AI%20Tutor%20launches%21";
-      } else {
-        solverBtn.classList.add("active");
-        chatBtn.classList.remove("active");
-        solverContainer.style.display = "";
-        chatContainer.style.display = "none";
-
-        // Show Photo Solver contents
-        card.className = "cs-card tint-orange";
-        badge.textContent = "📸 IN ACTIVE DEVELOPMENT";
-        badge.style.background = "var(--orange-ink)";
-        title.textContent = "Photo Solver Coming Soon";
-        desc.textContent = "Our Instant Photo Solver is being trained to parse handwritten working and complex Physics/Maths diagrams into examiner-graded step-by-step solutions.";
-        btn.href = "https://wa.me/923204884375?text=Hi%20Tee%2C%20notify%20me%20when%20the%20Photo%20Solver%20launches%21";
-      }
+      const chat = tab === "chat";
+      chatBtn.classList.toggle("active", chat);
+      solverBtn.classList.toggle("active", !chat);
+      chatContainer.style.display = chat ? "" : "none";
+      solverContainer.style.display = chat ? "none" : "";
     }
 
     chatBtn.addEventListener("click", () => switchTab("chat"));

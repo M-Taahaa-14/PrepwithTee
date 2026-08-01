@@ -11,6 +11,9 @@ gunicorn>=21.2
 
 # auth + database
 psycopg2-binary>=2.9.9
+# users_db.py reaches Supabase over the REST SDK; the direct Postgres host is
+# IPv6-only and unreachable from some networks, so this is not optional.
+supabase>=2.3
 authlib>=1.3
 python-jose[cryptography]>=3.3
 bcrypt>=4.1

@@ -301,7 +301,7 @@ def health():
     """Liveness probe. Also what the keep-alive cron hits so a low-traffic
     box does not look idle to the host's reclamation policy."""
     try:
-        con = sqlite3.connect(DB)
+        con = _con()
         papers = con.execute("SELECT COUNT(*) FROM papers").fetchone()[0]
         con.close()
     except Exception as exc:
@@ -756,11 +756,6 @@ def solve(req: SolveReq, request: Request):
                  f"try again in {wait // 60 + 1} minutes, or message us on "
                  f"WhatsApp for help.")
 
-    key = os.environ.get("ANTHROPIC_API_KEY")
-    if not key:
-        raise HTTPException(
-            503, "The doubt solver is not switched on yet - set ANTHROPIC_API_KEY "
-                 "on the server and restart.")
     m = re.match(r"data:(image/(?:png|jpe?g|webp|gif));base64,(.+)$",
                  req.image or "", re.S)
     if not m:
@@ -769,28 +764,83 @@ def solve(req: SolveReq, request: Request):
     if len(b64) > 8_000_000:
         raise HTTPException(413, "That image is too large - try a photo under 5 MB.")
 
-    try:
-        import anthropic
-    except ImportError:
-        raise HTTPException(503, "The anthropic package is not installed on the server.")
-
     prompt = ("Here is my question. " + (req.note.strip() if req.note else "")).strip()
-    try:
-        client = anthropic.Anthropic(api_key=key)
-        msg = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=2000,
-            system=SOLVER_SYSTEM,
-            messages=[{"role": "user", "content": [
-                {"type": "image", "source": {"type": "base64",
-                                             "media_type": media_type, "data": b64}},
-                {"type": "text", "text": prompt},
-            ]}])
-    except Exception as exc:                       # network, auth, rate limit
-        raise HTTPException(502, f"The solver could not be reached: {exc}")
+    html, provider = _vision_complete(SOLVER_SYSTEM, prompt, media_type, b64)
+    if html is None:
+        print(f"[solve] no vision provider answered: {provider}", flush=True)
+        raise HTTPException(
+            503, "The photo solver is unavailable right now — try again shortly, "
+                 "or send the photo to us on WhatsApp.")
+    return {"html": _clean_html(html), "provider": provider}
 
-    html = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
-    return {"html": html}
+
+# Vision providers, tried in order. Anthropic reads handwriting and diagrams
+# best, so it leads when its key is set. Groq is deliberately absent: it serves
+# text and audio models only, so a photo request there is a guaranteed 404.
+# Free vision model ids churn, so each is overridable without a code change.
+VISION_PROVIDERS = [
+    {"name": "openrouter", "env": "OPENROUTER_API_KEY",
+     "url": "https://openrouter.ai/api/v1/chat/completions",
+     "model": os.environ.get("OPENROUTER_VISION_MODEL",
+                             "meta-llama/llama-3.2-11b-vision-instruct:free")},
+    {"name": "gemini", "env": "GEMINI_API_KEY",
+     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+     "model": os.environ.get("GEMINI_VISION_MODEL", "gemini-2.0-flash")},
+]
+
+
+def _vision_complete(system: str, prompt: str, media_type: str, b64: str):
+    """Image + prompt -> text. Returns (text, provider) or (None, diagnostic)."""
+    import requests
+    errors = []
+
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    if key:
+        try:
+            import anthropic
+            msg = anthropic.Anthropic(api_key=key).messages.create(
+                model="claude-sonnet-4-6", max_tokens=2000, system=system,
+                messages=[{"role": "user", "content": [
+                    {"type": "image", "source": {"type": "base64",
+                                                 "media_type": media_type, "data": b64}},
+                    {"type": "text", "text": prompt},
+                ]}])
+            text = "".join(b.text for b in msg.content
+                           if getattr(b, "type", "") == "text")
+            if text.strip():
+                return text, "anthropic"
+        except Exception as exc:
+            errors.append(f"anthropic: {exc}")
+
+    # OpenAI-compatible providers take the image as a data URL.
+    data_url = f"data:{media_type};base64,{b64}"
+    for p in VISION_PROVIDERS:
+        pkey = os.environ.get(p["env"])
+        if not pkey:
+            continue
+        try:
+            r = requests.post(
+                p["url"], timeout=90,
+                headers={"Authorization": f"Bearer {pkey}",
+                         "Content-Type": "application/json"},
+                json={"model": p["model"], "max_tokens": 2000, "temperature": 0.3,
+                      "messages": [
+                          {"role": "system", "content": system},
+                          {"role": "user", "content": [
+                              {"type": "text", "text": prompt},
+                              {"type": "image_url",
+                               "image_url": {"url": data_url}},
+                          ]},
+                      ]})
+            if r.status_code == 200:
+                text = r.json()["choices"][0]["message"]["content"]
+                if text.strip():
+                    return text, p["name"]
+            errors.append(f'{p["name"]} HTTP {r.status_code}: {r.text[:120]}')
+        except Exception as exc:
+            errors.append(f'{p["name"]}: {exc}')
+
+    return None, ("; ".join(errors) if errors else "no vision provider configured")
 
 
 # ---------------------------------------------------------------------------
@@ -814,6 +864,10 @@ CHAT_PROVIDERS = [
     {"name": "cerebras", "env": "CEREBRAS_API_KEY",
      "url": "https://api.cerebras.ai/v1/chat/completions",
      "model": "llama-3.3-70b"},
+    # Gemini exposes an OpenAI-compatible endpoint, so it drops straight in.
+    {"name": "gemini", "env": "GEMINI_API_KEY",
+     "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+     "model": os.environ.get("GEMINI_CHAT_MODEL", "gemini-2.0-flash")},
 ]
 
 TUTOR_SYSTEM = """You are the study assistant at PrepWithTee, a Cambridge \
@@ -890,15 +944,17 @@ def _topic_samples(syllabus: str | None, topic: str | None, k: int = 4) -> str:
     if not syllabus or not topic:
         return ""
     try:
-        con = sqlite3.connect(DB)
+        con = _con()
         con.row_factory = sqlite3.Row
+        # RANDOM() is SQLite; Postgres spells it random().
+        rnd = "random()" if _USE_PG else "RANDOM()"
         rows = con.execute(
-            """SELECT q.text FROM classifications c
-               JOIN questions q ON q.id = c.question_id
-               JOIN papers p ON p.id = q.paper_id
-               WHERE p.syllabus = ? AND (c.topic = ? OR c.secondary_topic = ?)
-                 AND q.text IS NOT NULL AND length(q.text) > 40
-               ORDER BY RANDOM() LIMIT ?""",
+            f"""SELECT q.text FROM classifications c
+                JOIN questions q ON q.id = c.question_id
+                JOIN papers p ON p.id = q.paper_id
+                WHERE p.syllabus = ? AND (c.topic = ? OR c.secondary_topic = ?)
+                  AND q.text IS NOT NULL AND length(q.text) > 40
+                ORDER BY {rnd} LIMIT ?""",
             (syllabus, topic, topic, k)).fetchall()
         con.close()
     except Exception:
@@ -921,11 +977,80 @@ def _sanitize(html: str) -> str:
     return html
 
 
+_SUPERS = str.maketrans("0123456789+-n", "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿ")
+_SUBS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+_LATEX_WORDS = {
+    r"\pm": "±", r"\mp": "∓", r"\times": "×", r"\div": "÷", r"\cdot": "·",
+    r"\leq": "≤", r"\le": "≤", r"\geq": "≥", r"\ge": "≥", r"\neq": "≠",
+    r"\pi": "π", r"\theta": "θ", r"\alpha": "α", r"\beta": "β", r"\lambda": "λ",
+    r"\mu": "μ", r"\omega": "ω", r"\Delta": "Δ", r"\delta": "δ",
+    r"\circ": "°", r"\degree": "°", r"\infty": "∞", r"\approx": "≈",
+    r"\rightarrow": "→", r"\to": "→", r"\Rightarrow": "⇒",
+    r"\left": "", r"\right": "", r"\,": " ", r"\;": " ", r"\!": "",
+    r"\quad": " ", r"\qquad": "  ", r"\%": "%", r"\$": "$",
+}
+
+
+def _plain_math(s: str | None, collapse_ws: bool = True) -> str:
+    """Rewrite LaTeX / caret notation as the plain Unicode a printed paper uses.
+
+    Free models slip into LaTeX ($x^2$, \\frac{a}{b}) whatever the prompt says,
+    and the raw markup renders as noise like "xA2". Cambridge papers are typeset
+    plainly, so everything the student sees goes through here.
+
+    collapse_ws is off for HTML, where runs of spaces are load-bearing inside
+    <pre> blocks (CS pseudocode).
+    """
+    if not s:
+        return s or ""
+    t = str(s)
+    # A literal currency $ arrives escaped as \$ and must survive the pass that
+    # strips math delimiters, so park it out of reach first.
+    SENTINEL = "\x00CUR\x00"
+    t = t.replace(r"\$", SENTINEL)
+    # \begin{...} ... \end{...} wrappers add nothing once the markup is gone
+    t = re.sub(r"\\(?:begin|end)\s*\{[^{}]*\}", "", t)
+    # Degrees before the word table, or ^\circ leaves a stranded caret.
+    t = re.sub(r"\^\s*(?:\{\s*\\circ\s*\}|\\circ)", "°", t)
+    t = re.sub(r"\\(?:text|mathrm|mathbf|textbf|mbox|operatorname)\s*\{([^{}]*)\}",
+               r"\1", t)
+    # \frac and \sqrt nest, and the brace groups cannot match across an inner
+    # pair, so rewrite innermost-first until the string stops changing.
+    for _ in range(6):
+        before = t
+        t = re.sub(r"\\sqrt\s*\[\s*3\s*\]\s*\{([^{}]*)\}", r"∛(\1)", t)
+        t = re.sub(r"\\sqrt\s*\{([^{}]*)\}", r"√(\1)", t)
+        t = re.sub(r"\\sqrt\s+(\w+)", r"√\1", t)
+        t = re.sub(r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"(\1)/(\2)", t)
+        if t == before:
+            break
+    for k, v in _LATEX_WORDS.items():
+        t = t.replace(k, v)
+    # ^{...} / ^n -> superscript, _{...} / _n -> subscript
+    t = re.sub(r"\^\{([0-9+\-n]+)\}", lambda m: m.group(1).translate(_SUPERS), t)
+    t = re.sub(r"\^([0-9n])", lambda m: m.group(1).translate(_SUPERS), t)
+    t = re.sub(r"_\{([0-9]+)\}", lambda m: m.group(1).translate(_SUBS), t)
+    t = re.sub(r"(?<=[A-Za-z])_([0-9])", lambda m: m.group(1).translate(_SUBS), t)
+    # Inline/display math delimiters, now that their contents are plain
+    t = re.sub(r"\\[\[\]()]", "", t)
+    t = t.replace("$$", "").replace("$", "")
+    # Any stray control sequence left over: drop the backslash, keep the word
+    t = re.sub(r"\\([A-Za-z]+)", r"\1", t)
+    t = t.replace("\\", "").replace(SENTINEL, "$")
+    if collapse_ws:
+        t = re.sub(r"[ \t]{2,}", " ", t)
+        return t.strip()
+    return t
+
+
 def _clean_html(text: str) -> str:
     """Models sometimes wrap output in ```html fences or emit a little markdown.
     Strip the fences; if it clearly isn't HTML, do a minimal markdown pass."""
     t = text.strip()
     t = re.sub(r"^```(?:html)?\s*|\s*```$", "", t).strip()
+    # Every student-facing answer goes through here, so this is the one place
+    # LaTeX has to be normalised for the tutor, the solver and the quiz alike.
+    t = _plain_math(t, collapse_ws=False)
     if re.search(r"<(h3|p|ol|ul|li|div|strong)\b", t, re.I):
         return _sanitize(t)
     # Minimal markdown -> HTML for the rare plain-text reply.
@@ -1649,6 +1774,48 @@ def question_preview(question_id: int):
                         headers={"Cache-Control": "public, max-age=3600"})
     except Exception as exc:
         raise HTTPException(500, f"could not render preview: {exc}")
+
+
+@app.get("/api/question/{question_id}/ms-preview")
+def question_ms_preview(question_id: int):
+    """Serve the official mark scheme crop for a question as a PNG.
+
+    Revision mode reveals this after a student has answered a real past-paper
+    question, so they compare against Cambridge's own marking points rather
+    than something a model invented.
+    """
+    con = _con()
+    con.row_factory = sqlite3.Row
+    row = con.execute(
+        """SELECT m.crop_path
+           FROM questions q
+           JOIN ms_entries m ON m.paper_id = (
+               SELECT p2.id FROM papers p2
+               JOIN papers p1 ON p1.id = q.paper_id
+               WHERE p2.syllabus = p1.syllabus AND p2.year = p1.year
+                 AND p2.session = p1.session AND p2.paper = p1.paper
+                 AND p2.variant = p1.variant AND p2.kind = 'ms')
+             AND m.question_number = q.number
+             AND m.sub_part = q.sub_part
+           WHERE q.id = ?""",
+        (question_id,)).fetchone()
+    con.close()
+    if row is None or not row["crop_path"]:
+        raise HTTPException(404, "no mark scheme linked to this question")
+
+    # crop_path is stored repo-relative with Windows separators.
+    crop = (ROOT / str(row["crop_path"]).replace("\\", "/")).resolve()
+    safe = (ROOT / "data" / "crops").resolve()
+    if not str(crop).startswith(str(safe)) or not crop.exists():
+        raise HTTPException(404, "mark scheme crop not available")
+    try:
+        import fitz
+        with fitz.open(str(crop)) as doc:
+            img = doc[0].get_pixmap(dpi=150).tobytes("png")
+        return Response(content=img, media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+    except Exception as exc:
+        raise HTTPException(500, f"could not render mark scheme: {exc}")
 
 
 app.mount("/", StaticFiles(directory=Path(__file__).parent / "static",

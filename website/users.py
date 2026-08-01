@@ -143,63 +143,189 @@ def _chat(messages, max_tokens=800):
     return text, info
 
 
+# Topics whose questions are meaningless without a figure - a scale drawing, a
+# circuit, a velocity-time graph. A text model cannot draw one, so for these we
+# serve a real past-paper crop instead of inventing a question that references
+# a diagram the student cannot see.
+_NEEDS_FIGURE = re.compile(
+    r"trigonometr|vector|mensuration|geometr|transformation|bearing|loci|"
+    r"construction|graph|circuit|electric|magnet|motor|transformer|wave|"
+    r"ray|lens|optic|force|moment|kinematic|momentum|energy|thermal|"
+    r"logic|flowchart|pseudocode|network|topolog",
+    re.I)
+
+
+def _wants_figure(topic: str, subtopic: str | None) -> bool:
+    return bool(_NEEDS_FIGURE.search(f"{topic} {subtopic or ''}"))
+
+
+def _past_paper_question(syllabus: str, topic: str, subtopic: str | None) -> dict | None:
+    """Pick one real classified question for this topic, newest sessions first.
+
+    Returns the metadata the panel needs to render the original vector crop;
+    the crop itself is served by /api/question/{id}/preview.
+    """
+    from .app import _con, _SESSION_ABBR, _USE_PG
+    con = _con()
+    con.row_factory = __import__("sqlite3").Row
+    rnd = "random()" if _USE_PG else "RANDOM()"
+    sub_clause = "AND c.subtopic = ?" if subtopic else ""
+    params = [syllabus, topic, topic] + ([subtopic] if subtopic else [])
+    try:
+        row = con.execute(
+            f"""SELECT q.id, q.number, q.sub_part, q.marks,
+                       p.syllabus, p.year, p.session, p.paper, p.variant
+                FROM classifications c
+                JOIN questions q ON q.id = c.question_id
+                JOIN papers p ON p.id = q.paper_id
+                WHERE p.syllabus = ? AND (c.topic = ? OR c.secondary_topic = ?)
+                  {sub_clause}
+                  AND q.crop_path IS NOT NULL
+                  AND q.status IS NOT 'excluded'
+                ORDER BY {rnd} LIMIT 1""", params).fetchone()
+    except Exception as exc:
+        print(f"[quiz] past-paper lookup failed: {exc}", flush=True)
+        return None
+    finally:
+        con.close()
+    if row is None:
+        return None
+
+    sa = _SESSION_ABBR.get(row["session"], row["session"].upper())
+    part = f"({row['sub_part']})" if row["sub_part"] else ""
+    return {
+        "question_id": row["id"],
+        "ref": (f"{row['syllabus']}/P{row['paper']}{row['variant']} "
+                f"{sa} {row['year']} Q{row['number']}{part}"),
+        "marks": row["marks"],
+        "image_url": f"/api/question/{row['id']}/preview",
+        "ms_url": f"/api/question/{row['id']}/ms-preview",
+    }
+
+
 class QuizGenReq(BaseModel):
     syllabus: str
     topic: str
     subtopic: str | None = None
+    # auto: past paper when the topic needs a figure, otherwise AI-written
+    mode: str = "auto"
 
 
 @router.post("/api/quiz/generate")
 def quiz_generate(req: QuizGenReq, user: _CurrentUser):
     subject = _SUBJECT_FULL.get(req.syllabus, req.syllabus)
-    topic_label = f"{req.topic}" + (f" — {req.subtopic}" if req.subtopic else "")
+    topic_label = req.topic + (f" — {req.subtopic}" if req.subtopic else "")
+
+    wants_pp = req.mode == "past_paper" or (
+        req.mode == "auto" and _wants_figure(req.topic, req.subtopic))
+    if wants_pp:
+        pp = _past_paper_question(req.syllabus, req.topic, req.subtopic)
+        if pp:
+            return {"mode": "past_paper", "syllabus": req.syllabus,
+                    "topic": req.topic, "subtopic": req.subtopic, **pp}
+        if req.mode == "past_paper":
+            raise HTTPException(
+                404, "No past-paper question is available for this chapter yet.")
+        # auto mode: fall through to an AI question rather than dead-ending
+
+    # Ground the model in genuine Cambridge phrasing for this exact topic.
+    samples = ""
+    try:
+        from .app import _topic_samples
+        samples = _topic_samples(req.syllabus, req.topic, k=3)
+    except Exception:
+        pass
+    sample_block = (
+        "\nReal Cambridge questions on this topic, for style and difficulty "
+        "(do not copy them):\n" + samples + "\n" if samples else "")
 
     system = (
-        f"You are a Cambridge examiner writing exam questions for {subject}.\n"
-        f"Generate ONE structured question on the topic: \"{topic_label}\".\n"
-        "Requirements:\n"
-        "- 4-8 marks total\n"
-        "- Use Cambridge command words: State, Explain, Calculate, Describe, Show that\n"
-        "- Mark allocation shown in brackets, e.g. [3]\n"
-        "- The question must be self-contained (no figure needed if possible)\n"
-        "Output ONLY valid JSON with no extra text:\n"
-        '{"question": "...", "marks": N, "mark_scheme": "..."}\n'
-        "mark_scheme: bullet points of marking points (one per mark)."
+        f"You are a Cambridge examiner writing a question for {subject}.\n"
+        f"Write ONE structured question on: \"{topic_label}\".\n"
+        f"{sample_block}\n"
+        "Follow the real paper's conventions:\n"
+        "- Split it into parts (a), (b), (c); use (i)/(ii) only where a part "
+        "genuinely subdivides.\n"
+        "- Each part carries its own mark allocation, 1-4 marks, 5-9 in total.\n"
+        "- Open every part with a Cambridge command word: State, Describe, "
+        "Explain, Calculate, Determine, Show that, Suggest, Complete.\n"
+        "- Marks must rise with demand: recall parts first, then application.\n"
+        "- Use SI units and the notation the syllabus uses.\n"
+        "- NEVER refer to a figure, diagram, graph, circuit or table - the "
+        "student sees only your text. Give any data in words instead.\n"
+        "- Write maths as plain Unicode exactly as it appears in the printed "
+        "paper: x², x³, √, π, ±, ≤, ≥, ×, ÷, °, ½. NEVER use LaTeX ($...$, "
+        "\\frac, \\sqrt), markdown, or caret notation like x^2. Write "
+        "fractions inline, e.g. (-b ± √(b² - 4ac)) / 2a.\n\n"
+        "Output ONLY valid JSON, no prose, no code fence:\n"
+        '{"stem": "optional scene-setting sentence, may be empty", '
+        '"parts": [{"label": "(a)", "text": "...", "marks": 2, '
+        '"scheme": "the marking points for this part"}], "total_marks": N}'
     )
 
     text, _ = _chat([
         {"role": "system", "content": system},
-        {"role": "user", "content": f"Generate a question on {topic_label}."},
-    ], max_tokens=600)
+        {"role": "user", "content": f"Write the question on {topic_label}."},
+    ], max_tokens=900)
 
     try:
-        # Strip accidental markdown fences
         clean = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
         data = json.loads(clean)
-        if "question" not in data or "marks" not in data:
-            raise ValueError("missing fields")
+        parts = data.get("parts") or []
+        if not parts:
+            raise ValueError("no parts")
+        total = data.get("total_marks") or sum(p.get("marks") or 0 for p in parts)
+        for p in parts:
+            p["text"] = _plain_math(p.get("text"))
+            p["scheme"] = _plain_math(p.get("scheme"))
+        stem = _plain_math(data.get("stem"))
+        scheme = "\n".join(
+            f"{p.get('label','')} {p.get('scheme','')}".strip() for p in parts)
+        return {
+            "mode": "ai",
+            "stem": stem,
+            "parts": [{"label": p.get("label", ""), "text": p.get("text", ""),
+                       "marks": p.get("marks")} for p in parts],
+            "marks": total,
+            "mark_scheme": scheme,
+            "question": _flatten(stem, parts),
+            "syllabus": req.syllabus, "topic": req.topic, "subtopic": req.subtopic,
+        }
     except Exception:
-        # Return raw text so the student still sees something
-        data = {"question": text.strip(), "marks": None, "mark_scheme": None}
+        # Model ignored the schema; show its text rather than an error.
+        return {"mode": "ai", "stem": "", "parts": [],
+                "question": text.strip(), "marks": None, "mark_scheme": None,
+                "syllabus": req.syllabus, "topic": req.topic,
+                "subtopic": req.subtopic}
 
-    return {
-        "question": data.get("question", ""),
-        "marks": data.get("marks"),
-        "mark_scheme": data.get("mark_scheme"),
-        "syllabus": req.syllabus,
-        "topic": req.topic,
-        "subtopic": req.subtopic,
-    }
+
+def _plain_math(s: str | None) -> str:
+    """Printed-paper notation. One shared implementation lives in app.py so the
+    tutor, the solver and the quiz can never drift apart on formatting."""
+    from .app import _plain_math as impl
+    return impl(s)
+
+
+def _flatten(stem: str | None, parts: list) -> str:
+    """Plain-text form of the question, for marking and the history record."""
+    out = [stem.strip()] if stem else []
+    for p in parts:
+        marks = f" [{p.get('marks')}]" if p.get("marks") else ""
+        out.append(f"{p.get('label','')} {p.get('text','')}{marks}".strip())
+    return "\n".join(out)
 
 
 class QuizEvalReq(BaseModel):
     syllabus: str
     topic: str
     subtopic: str | None = None
-    question: str
+    question: str = ""
     mark_scheme: str | None = None
     answer: str
     marks: int | None = None
+    # past-paper mode: the official scheme is an image, so it is revealed
+    # rather than fed to the model
+    question_id: int | None = None
 
 
 @router.post("/api/quiz/evaluate")
@@ -207,13 +333,30 @@ def quiz_evaluate(req: QuizEvalReq, user: _CurrentUser):
     if not (req.answer or "").strip():
         raise HTTPException(400, "Write your answer before submitting")
 
+    question_text = req.question
+    # Past-paper mode sends only an id: the student read the question from the
+    # original crop, so pull its text layer for the examiner prompt.
+    if req.question_id and not question_text.strip():
+        try:
+            from .app import _con
+            con = _con()
+            con.row_factory = __import__("sqlite3").Row
+            row = con.execute("SELECT text FROM questions WHERE id = ?",
+                              (req.question_id,)).fetchone()
+            con.close()
+            question_text = (row["text"] or "") if row else ""
+        except Exception as exc:
+            print(f"[quiz] could not load question {req.question_id}: {exc}", flush=True)
+    if not question_text.strip():
+        raise HTTPException(400, "The question could not be read for marking.")
+
     marks_label = f"{req.marks} marks" if req.marks else "several marks"
     scheme_note = (f"Mark scheme:\n{req.mark_scheme}\n\n" if req.mark_scheme
                    else "Use your knowledge of Cambridge marking to award marks.\n\n")
 
     system = (
         "You are a Cambridge examiner marking a student's answer.\n"
-        f"Question ({marks_label}):\n{req.question}\n\n"
+        f"Question ({marks_label}):\n{question_text}\n\n"
         f"{scheme_note}"
         f"Student's answer:\n{req.answer}\n\n"
         "Award marks generously but fairly. Output ONLY valid JSON:\n"
@@ -238,7 +381,7 @@ def quiz_evaluate(req: QuizEvalReq, user: _CurrentUser):
         syllabus=req.syllabus,
         topic=req.topic,
         subtopic=req.subtopic,
-        question_text=req.question,
+        question_text=question_text,
         student_answer=req.answer,
         score=data.get("score"),
         ideal_answer=data.get("ideal_answer"),
@@ -250,6 +393,9 @@ def quiz_evaluate(req: QuizEvalReq, user: _CurrentUser):
         "max_marks": req.marks,
         "feedback": data.get("feedback"),
         "ideal_answer": data.get("ideal_answer"),
+        # Cambridge's own scheme beats a generated one, so show it when we have it.
+        "ms_url": (f"/api/question/{req.question_id}/ms-preview"
+                   if req.question_id else None),
     }
 
 

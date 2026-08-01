@@ -2383,6 +2383,9 @@ a.res-cat .tag { background: rgba(255,255,255,.55); }
 
 .quiz-body { flex: 1; overflow-y: auto; padding: 24px 26px 34px;
   display: flex; flex-direction: column; gap: 18px; }
+/* Flex children shrink by default, so a long question was squashed and clipped
+   instead of making the panel scroll. Nothing in here may shrink. */
+.quiz-body > * { flex: none; }
 
 .quiz-loading, .quiz-error { text-align: center; padding: 50px 20px; color: var(--grey); }
 .quiz-error p { margin-bottom: 16px; }
@@ -2617,4 +2620,71 @@ a.res-cat .tag { background: rgba(255,255,255,.55); }
 /* Narrow phones: the wordmark is the first thing worth dropping. */
 @media (max-width: 420px) {
   .brand span { display: none; }
+}
+
+/* ============ exam-paper question layout ============
+   Mirrors how the real booklet sets a question: number top-left, parts running
+   down the page, mark allocation hard right, dotted answer rules under each
+   part. Past-paper questions render as their original vector crop instead. */
+
+.paper-sheet { background: #fff; border: 1.5px solid var(--line);
+  border-radius: 14px; padding: 0 0 6px; overflow: hidden; }
+
+.paper-head { display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; background: var(--cream);
+  border-bottom: 1px solid var(--line); }
+.paper-qno { width: 26px; height: 26px; border-radius: 7px; flex: none;
+  display: grid; place-items: center; background: var(--ink); color: #fff;
+  font: 800 .82rem "Archivo", sans-serif; font-variant-numeric: tabular-nums; }
+.paper-source { flex: 1; font-size: .76rem; font-weight: 600; color: var(--grey);
+  letter-spacing: .02em; }
+.paper-total { font-size: .74rem; font-weight: 800; color: var(--lav-ink);
+  background: var(--lav); padding: 4px 10px; border-radius: 999px;
+  white-space: nowrap; }
+
+.paper-stem { padding: 18px 20px 4px; font-size: .97rem; line-height: 1.75;
+  color: var(--ink); }
+
+/* label | text | marks â€” the marks column stays put however long the text is */
+.paper-part { display: grid; grid-template-columns: 34px minmax(0, 1fr) 34px;
+  gap: 8px; padding: 12px 20px 4px; align-items: start; }
+.paper-label { font-weight: 700; font-size: .95rem; color: var(--ink);
+  font-variant-numeric: tabular-nums; }
+.paper-text p { font-size: .96rem; line-height: 1.7; }
+.paper-marks { text-align: right; font-weight: 700; font-size: .9rem;
+  color: var(--grey); font-variant-numeric: tabular-nums; }
+
+/* the dotted rules a student writes on */
+.paper-rules { display: flex; flex-direction: column; gap: 13px;
+  margin: 12px 0 6px; }
+.paper-rule { display: block; height: 0; border-bottom: 1.5px dotted #C9C4D4; }
+
+.paper-figure { margin: 0; padding: 14px 16px; }
+.paper-figure img { display: block; width: 100%; height: auto;
+  border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.paper-figure figcaption { margin-top: 9px; font-size: .76rem; color: var(--grey);
+  text-align: center; }
+.paper-figure-ms { padding: 0; }
+.paper-figure-ms img { border-color: var(--green-line); }
+
+/* Swapping between a real past paper and a generated one is a headline choice,
+   not a footnote, so it reads as a card rather than a small underlined link. */
+.quiz-mode-switch { margin-top: 4px; }
+.quiz-mode-btn { display: flex; align-items: center; gap: 12px; width: 100%;
+  cursor: pointer; text-align: left; padding: 13px 16px; border-radius: 14px;
+  background: var(--blue); border: 1.5px solid var(--blue-line);
+  color: var(--blue-ink); font: 600 .9rem "Hanken Grotesk", sans-serif;
+  transition: transform .18s ease, box-shadow .25s; }
+.quiz-mode-btn:hover { transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(20,86,140,.18); }
+.quiz-mode-btn .qm-icon { font-size: 1.15rem; flex: none; line-height: 1; }
+.quiz-mode-btn .qm-text { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.quiz-mode-btn strong { font-weight: 800; font-size: .92rem; }
+.quiz-mode-btn em { font-style: normal; font-size: .78rem; opacity: .8; }
+.quiz-mode-btn .qm-arrow { flex: none; font-weight: 800; }
+
+@media (max-width: 620px) {
+  .paper-part { grid-template-columns: 28px minmax(0, 1fr) 28px; padding: 12px 14px 4px; }
+  .paper-stem { padding: 16px 14px 4px; }
+  .paper-head { padding: 10px 14px; }
 }
