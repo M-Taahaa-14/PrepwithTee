@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin — PrepWithTee</title>
+  <link rel="stylesheet" href="/admin.css?v=20260802c">
+</head>
+<body>
+
+<!-- Branded loader: covers the dashboard until real data has arrived, so the
+     stat tiles are never seen sitting at zero. -->
+<div id="loader" class="loader">
+  <div class="loader-inner">
+    <img src="/logo.png" alt="" class="loader-logo">
+    <div class="loader-name">PrepWith<span>Tee</span></div>
+    <div class="loader-sub">Admin Dashboard</div>
+    <div class="loader-bar"><i></i></div>
+    <div class="loader-status" id="loader-status">Connecting…</div>
+  </div>
+</div>
+
+<!-- Key gate -->
+<div id="gate" class="gate" hidden>
+  <form class="gate-card" id="gate-form">
+    <img src="/logo.png" alt="" class="gate-logo-img">
+    <div class="gate-logo">PrepWith<span>Tee</span></div>
+    <h1>Admin access</h1>
+    <p>Enter your admin key to open the dashboard.</p>
+    <input type="password" id="gate-key" placeholder="Admin key" autocomplete="current-password" required>
+    <button type="submit">Unlock dashboard</button>
+    <p class="gate-error" id="gate-error" hidden></p>
+  </form>
+</div>
+
+<!-- Dashboard -->
+<div id="app" class="shell" hidden>
+
+  <aside class="sidebar">
+    <div class="side-brand">
+      <img src="/logo.png" alt="">
+      <div>
+        <div class="side-name">PrepWith<span>Tee</span></div>
+        <div class="side-role">Admin</div>
+      </div>
+    </div>
+
+    <nav class="side-nav" id="nav">
+      <button class="nav-item active" data-tab="overview"><span class="ni">▦</span>Overview</button>
+      <div class="nav-label">Enquiries</div>
+      <button class="nav-item" data-tab="leads"><span class="ni">📋</span>Demo Requests<b data-count="leads">0</b></button>
+      <button class="nav-item" data-tab="calendly"><span class="ni">📅</span>Calendly<b data-count="calendly">0</b></button>
+      <button class="nav-item" data-tab="requests"><span class="ni">📚</span>Subject Requests<b data-count="requests">0</b></button>
+      <div class="nav-label">People</div>
+      <button class="nav-item" data-tab="students"><span class="ni">🎓</span>Students<b data-count="students">0</b></button>
+      <button class="nav-item" data-tab="applications"><span class="ni">📨</span>Applications<b data-count="applications">0</b></button>
+      <button class="nav-item" data-tab="teachers"><span class="ni">👥</span>Teachers<b data-count="teachers">0</b></button>
+      <div class="nav-label">Signals</div>
+      <button class="nav-item" data-tab="feedback"><span class="ni">💬</span>Feedback<b data-count="feedback">0</b></button>
+    </nav>
+
+    <div class="side-foot">
+      <button class="side-btn" id="refresh-btn">↻ Refresh data</button>
+      <button class="side-btn danger" id="lock-btn">⌁ Lock</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" aria-label="Menu">☰</button>
+      <div class="topbar-text">
+        <h1 id="page-title">Overview</h1>
+        <p id="page-sub">Everything happening across PrepWithTee.</p>
+      </div>
+      <div class="topbar-tools" id="topbar-tools"></div>
+    </header>
+
+    <div class="views">
+      <section class="view active" id="view-overview"></section>
+      <section class="view" id="view-leads"></section>
+      <section class="view" id="view-calendly"></section>
+      <section class="view" id="view-requests"></section>
+      <section class="view" id="view-students"></section>
+      <section class="view" id="view-applications"></section>
+      <section class="view" id="view-teachers"></section>
+      <section class="view" id="view-feedback"></section>
+      <section class="view" id="view-student"></section>
+    </div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" hidden>
+  <aside class="drawer" id="drawer">
+    <button class="drawer-close" id="drawer-close" aria-label="Close">×</button>
+    <div id="drawer-body"></div>
+  </aside>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="/admin.js?v=20260802c"></script>
+</body>
+</html>
