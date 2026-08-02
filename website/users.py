@@ -384,6 +384,7 @@ def quiz_evaluate(req: QuizEvalReq, user: _CurrentUser):
         question_text=question_text,
         student_answer=req.answer,
         score=data.get("score"),
+        max_marks=req.marks,
         ideal_answer=data.get("ideal_answer"),
         feedback=data.get("feedback"),
     )
@@ -465,6 +466,7 @@ class TeacherAppReq(BaseModel):
     email: str
     phone: str | None = None
     subjects: str | None = None
+    subject_codes: list[str] | None = None   # syllabus codes behind the labels
     qualifications: str | None = None
     experience: str | None = None
     message: str | None = None
@@ -484,6 +486,9 @@ def submit_teacher_application(req: TeacherAppReq):
         "email": email,
         "phone": (req.phone or "").strip() or None,
         "subjects": (req.subjects or "").strip() or None,
+        "subject_codes": ",".join(
+            c for c in (req.subject_codes or []) if re.match(r"^[0-9A-Za-z]{4,6}$", c)
+        ) or None,
         "qualifications": (req.qualifications or "").strip() or None,
         "experience": (req.experience or "").strip() or None,
         "message": (req.message or "").strip() or None,

@@ -95,8 +95,9 @@ function wireForm() {
     if (!name)  return fail("Please tell us your name.");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail("That email doesn't look right.");
 
-    const subjects = [...form.querySelectorAll('input[name="subjects"]:checked')]
-      .map(i => i.nextElementSibling.textContent).join(", ");
+    const picked = [...form.querySelectorAll('input[name="subjects"]:checked')];
+    const subjects = picked.map(i => i.nextElementSibling.textContent).join(", ");
+    const subjectCodes = picked.map(i => i.value);
     if (!subjects) return fail("Pick at least one subject you can teach.");
 
     submit.disabled = true;
@@ -106,6 +107,7 @@ function wireForm() {
         method: "POST",
         body: {
           name, email, subjects,
+          subject_codes:  subjectCodes,
           phone:          form.phone.value.trim() || null,
           qualifications: form.qualifications.value.trim() || null,
           experience:     form.experience.value.trim() || null,
