@@ -11,4 +11,4 @@ data/
 # Claude Code session files
 .claude/
 claude_code_kickoff_prompt.md
-/scratchpad
+/scratchpadwebsite/public/
