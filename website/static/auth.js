@@ -121,30 +121,29 @@ export async function initNavbar() {
   initNavToggle(nav);
 
   const user = await getUser();
-  const cta = nav.querySelector(".btn-gold");
 
   if (!user) {
-    // Signed out: add a Sign in link just before the demo CTA.
+    // Signed out: append a prominent Sign in button.
     if (!nav.querySelector(".nav-signin")) {
       const link = document.createElement("a");
       link.href = "/login.html";
-      link.className = "nav-link nav-signin";
+      link.className = "btn btn-gold nav-signin";
       link.textContent = "Sign in";
-      nav.insertBefore(link, cta);
+      nav.appendChild(link);
     }
     return;
   }
 
-  // Signed in: Revise + Dashboard links, and an avatar menu in place of the CTA.
+  // Signed in: Revise link + avatar menu; remove any lingering sign-in button.
+  nav.querySelector(".nav-signin")?.remove();
+
   if (!nav.querySelector(".nav-revise")) {
     const revise = document.createElement("a");
     revise.href = "/revise.html";
     revise.className = "nav-link nav-revise";
     revise.textContent = "Revise";
-    nav.insertBefore(revise, cta);
+    nav.appendChild(revise);
   }
-
-  if (cta) cta.remove();
   if (nav.querySelector(".account-menu")) return;
 
   const wrap = document.createElement("div");
