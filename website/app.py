@@ -32,8 +32,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
+from urllib.parse import quote
+
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
 from starlette.background import BackgroundTask
@@ -74,9 +76,10 @@ PAPER_LABELS = {
 
 app = FastAPI(title="PrepWithTee")
 
-from . import auth as _auth_mod, users as _users_mod
+from . import admin as _admin_mod, auth as _auth_mod, users as _users_mod
 app.include_router(_auth_mod.router)
 app.include_router(_users_mod.router)
+app.include_router(_admin_mod.router)
 
 
 class GenerateReq(BaseModel):
@@ -1129,37 +1132,15 @@ class DemoBookingReq(BaseModel):
 
 @app.post("/api/demo")
 def book_demo(req: DemoBookingReq):
-    leads_db = ROOT / "data" / "leads.db"
-    leads_db.parent.mkdir(parents=True, exist_ok=True)
-    
-    # Save to SQLite
-    import sqlite3
-    conn = sqlite3.connect(leads_db)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS leads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            parent_name TEXT,
-            student_name TEXT,
-            contact TEXT,
-            grade TEXT,
-            subjects TEXT,
-            message TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    cursor.execute("""
-        INSERT INTO leads (parent_name, student_name, contact, grade, subjects, message)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (req.parent_name, req.student_name, req.contact, req.grade, ",".join(req.subjects), req.message))
-    conn.commit()
-    conn.close()
-
-    # Append to log file (capped at 1 MB to prevent unbounded growth)
-    leads_txt = ROOT / "data" / "leads.txt"
-    if not leads_txt.exists() or leads_txt.stat().st_size < 1_000_000:
-        with open(leads_txt, "a", encoding="utf-8") as f:
-            f.write(f"New Booking: Parent={req.parent_name}, Student={req.student_name}, Contact={req.contact}, Grade={req.grade}, Subjects={req.subjects}, Msg={req.message}\n")
+    from . import users_db as _udb
+    _udb.save_lead({
+        "parent_name": req.parent_name,
+        "student_name": req.student_name,
+        "contact": req.contact,
+        "grade": req.grade,
+        "subjects": ",".join(req.subjects),
+        "message": req.message,
+    })
 
     _notify(
         f"[PrepWithTee] New Demo Request — {req.student_name}",
@@ -1297,8 +1278,6 @@ class FeedbackReq(BaseModel):
     type: str | None = None         # "feedback" or "issue"
 
 
-ADMIN_KEY = os.environ.get("ADMIN_KEY", "prepwithtee-admin-2026")
-
 # ---------------------------------------------------------------------------
 # Shared email helper — fires only when SMTP_USER + SMTP_PASS are configured.
 # Set those env vars on the server to activate; missing vars = silent skip.
@@ -1365,23 +1344,15 @@ def submit_feedback(req: FeedbackReq):
     if req.rating is not None and not (1 <= req.rating <= 5):
         raise HTTPException(400, "Rating must be 1–5")
 
-    fb_db = ROOT / "data" / "feedback.db"
-    fb_db.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(fb_db)
-    conn.execute("""CREATE TABLE IF NOT EXISTS feedback (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        rating INTEGER, message TEXT, name TEXT, page TEXT, type TEXT,
-        ts DATETIME DEFAULT CURRENT_TIMESTAMP)""")
-    try:
-        conn.execute("ALTER TABLE feedback ADD COLUMN type TEXT")
-    except Exception:
-        pass
+    from . import users_db as _udb
     fb_type = req.type or "feedback"
-    conn.execute(
-        "INSERT INTO feedback (rating, message, name, page, type) VALUES (?,?,?,?,?)",
-        (req.rating, msg, (req.name or "").strip() or None, req.page, fb_type))
-    conn.commit()
-    conn.close()
+    _udb.save_feedback({
+        "rating": req.rating,
+        "message": msg,
+        "name": (req.name or "").strip() or None,
+        "page": req.page,
+        "type": fb_type,
+    })
 
     stars = f"{req.rating}/5 ★" if req.rating else "—"
     _notify(
@@ -1412,18 +1383,12 @@ def subject_request(req: SubjectRequestReq):
     if len(subj) > 200:
         raise HTTPException(400, "Subject name too long")
 
-    sr_db = ROOT / "data" / "subject_requests.db"
-    sr_db.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(sr_db)
-    conn.execute("""CREATE TABLE IF NOT EXISTS requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        subject TEXT, board TEXT, message TEXT,
-        ts DATETIME DEFAULT CURRENT_TIMESTAMP)""")
-    conn.execute(
-        "INSERT INTO requests (subject, board, message) VALUES (?,?,?)",
-        (subj, (req.board or "").strip() or None, (req.message or "").strip() or None))
-    conn.commit()
-    conn.close()
+    from . import users_db as _udb
+    _udb.save_subject_request({
+        "subject": subj,
+        "board": (req.board or "").strip() or None,
+        "message": (req.message or "").strip() or None,
+    })
 
     _notify(
         f"[PrepWithTee] Subject Request — {subj}",
@@ -1437,297 +1402,14 @@ def subject_request(req: SubjectRequestReq):
     return {"status": "success"}
 
 
-# ---------------------------------------------------------------------------
-# Admin dashboard  —  /admin?key=<ADMIN_KEY>
-# ---------------------------------------------------------------------------
 def _esc(s: str) -> str:
     return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
-import re as _re
 
-def _wa_href(contact: str) -> str | None:
-    digits = _re.sub(r"\D", "", contact or "")
-    if not (7 <= len(digits) <= 15):
-        return None
-    if digits.startswith("0"):
-        digits = "92" + digits[1:]
-    elif not digits.startswith("92") and len(digits) <= 11:
-        digits = "92" + digits
-    return f"https://wa.me/{digits}"
-
-def _admin_rows(rows, cols: list[tuple[str, str]], today: str) -> str:
-    if not rows:
-        return ""
-    trs = ""
-    for row in rows:
-        keys = row.keys()
-        cells = ""
-        is_today = False
-        for label, key in cols:
-            if key == "__ts__":
-                val = str(row["timestamp"] if "timestamp" in keys else (row["ts"] if "ts" in keys else ""))
-                is_today = val.startswith(today)
-                disp = val[11:16] if is_today else val[:10]
-                badge = '<span class="today-pill">Today</span>' if is_today else ""
-                cells += f'<td class="ts">{_esc(disp)}{badge}</td>'
-            elif key == "__type__":
-                t = str(row["type"] if "type" in keys else "feedback") or "feedback"
-                cls = "badge-issue" if t == "issue" else "badge-ok"
-                icon = "🔧" if t == "issue" else "💬"
-                cells += f'<td><span class="badge {cls}">{icon} {_esc(t)}</span></td>'
-            elif key == "__stars__":
-                r = row["rating"] if "rating" in keys else None
-                stars = ("★" * int(r) + "☆" * (5 - int(r))) if r else "—"
-                cls = "stars-hi" if r and int(r) >= 4 else ("stars-lo" if r and int(r) <= 2 else "")
-                cells += f'<td class="{cls}">{stars}</td>'
-            elif key == "__contact__":
-                val = str(row["contact"] if "contact" in keys else "") or "—"
-                wa = _wa_href(val)
-                wa_btn = f' <a class="wa-btn" href="{wa}" target="_blank" rel="noopener">WhatsApp ↗</a>' if wa else ""
-                cells += f'<td>{_esc(val)}{wa_btn}</td>'
-            else:
-                val = str(row[key] if key in keys else "") or "—"
-                cells += f'<td class="msg-cell">{_esc(val)}</td>'
-        row_cls = "row-today" if is_today else ""
-        trs += f'<tr class="{row_cls}">{cells}</tr>'
-    return trs
-
-
-@app.get("/admin", response_class=HTMLResponse)
-def admin_dashboard(key: str = ""):
-    if key != ADMIN_KEY:
-        return HTMLResponse(
-            "<!DOCTYPE html><html><body style='font-family:sans-serif;padding:48px;background:#f4f0ea'>"
-            "<h2 style='color:#2E1B4A'>Access denied</h2>"
-            "<p style='margin-top:8px;color:#666'>Append <code>?key=YOUR_KEY</code> to the URL.</p>"
-            "</body></html>", status_code=403)
-
-    from datetime import datetime, timezone
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-    def _load(db_path, query):
-        if not db_path.exists():
-            return []
-        c = sqlite3.connect(db_path)
-        c.row_factory = sqlite3.Row
-        rows = c.execute(query).fetchall()
-        c.close()
-        return rows
-
-    leads    = _load(ROOT / "data" / "leads.db",    "SELECT * FROM leads ORDER BY timestamp DESC")
-    feedback = _load(ROOT / "data" / "feedback.db", "SELECT * FROM feedback ORDER BY ts DESC")
-    subj_req = _load(ROOT / "data" / "subject_requests.db", "SELECT * FROM requests ORDER BY ts DESC")
-
-    n_d, n_f, n_s = len(leads), len(feedback), len(subj_req)
-    total = n_d + n_f + n_s
-
-    demo_cols = [("Time","__ts__"),("Parent","parent_name"),("Student","student_name"),
-                 ("Contact","__contact__"),("Grade","grade"),("Subjects","subjects"),("Note","message")]
-    fb_cols   = [("Time","__ts__"),("Type","__type__"),("Stars","__stars__"),
-                 ("Name","name"),("Page","page"),("Message","message")]
-    sr_cols   = [("Time","__ts__"),("Subject","subject"),("Board","board"),("Message","message")]
-
-    def _tbl(rows, cols, empty):
-        if not rows:
-            return f'<div class="empty-state"><span>📭</span><p>{empty}</p></div>'
-        ths = "".join(f"<th>{c[0]}</th>" for c in cols)
-        trs = _admin_rows(rows, cols, today)
-        return f'<div class="tbl-wrap"><table><thead><tr>{ths}</tr></thead><tbody>{trs}</tbody></table></div>'
-
-    demo_tbl = _tbl(leads,    demo_cols, "No demo requests yet — they'll appear here once students book.")
-    fb_tbl   = _tbl(feedback, fb_cols,   "No feedback or issues submitted yet.")
-    sr_tbl   = _tbl(subj_req, sr_cols,   "No subject requests yet.")
-
-    html = f"""<!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin — PrepWithTee</title>
-<style>
-*{{box-sizing:border-box;margin:0;padding:0}}
-body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#F4F0EA;color:#1A1A2E;min-height:100vh}}
-
-/* ── Header ── */
-.adm-header{{
-  background:#2E1B4A;color:#fff;
-  padding:0 28px;height:60px;
-  display:flex;align-items:center;gap:14px;
-  position:sticky;top:0;z-index:10;
-  box-shadow:0 2px 12px rgba(0,0,0,.25);
-}}
-.adm-logo{{font-size:1.05rem;font-weight:800;letter-spacing:-.01em;color:#fff}}
-.adm-logo span{{color:#C9BDF0}}
-.adm-bell{{
-  margin-left:auto;position:relative;cursor:pointer;
-  background:rgba(255,255,255,.12);border:none;color:#fff;
-  width:38px;height:38px;border-radius:50%;font-size:1.1rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s;
-}}
-.adm-bell:hover{{background:rgba(255,255,255,.22)}}
-.bell-badge{{
-  position:absolute;top:-2px;right:-2px;
-  background:#E8913A;color:#fff;font-size:.6rem;font-weight:800;
-  min-width:16px;height:16px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;padding:0 3px;
-  border:2px solid #2E1B4A;
-}}
-.adm-refresh{{
-  background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);
-  padding:6px 14px;border-radius:8px;font-size:.8rem;cursor:pointer;
-  font-family:inherit;transition:background .14s;
-}}
-.adm-refresh:hover{{background:rgba(255,255,255,.18);color:#fff}}
-
-/* ── Stat cards ── */
-.adm-cards{{display:flex;gap:14px;padding:24px 28px 0;flex-wrap:wrap}}
-.adm-card{{
-  flex:1;min-width:160px;border-radius:16px;padding:18px 20px;
-  display:flex;align-items:center;gap:14px;
-}}
-.adm-card.lav{{background:#E4DEF9;}}
-.adm-card.grn{{background:#D4F0E0;}}
-.adm-card.org{{background:#FBE2CC;}}
-.card-icon{{font-size:1.6rem;line-height:1}}
-.card-body b{{display:block;font-size:1.75rem;font-weight:800;line-height:1}}
-.adm-card.lav .card-body b{{color:#4A2E8F}}
-.adm-card.grn .card-body b{{color:#16704A}}
-.adm-card.org .card-body b{{color:#B0541C}}
-.card-body span{{font-size:.75rem;font-weight:600;opacity:.7;text-transform:uppercase;letter-spacing:.04em}}
-
-/* ── Tabs ── */
-.adm-tabs{{
-  display:flex;gap:2px;padding:20px 28px 0;
-}}
-.adm-tab{{
-  padding:10px 20px;cursor:pointer;font-weight:600;font-size:.87rem;
-  color:#888;border-radius:10px 10px 0 0;border:1.5px solid transparent;
-  border-bottom:none;background:transparent;
-  user-select:none;transition:all .15s;position:relative;top:1px;
-}}
-.adm-tab:hover{{color:#2E1B4A;background:rgba(255,255,255,.5)}}
-.adm-tab.active{{
-  color:#2E1B4A;background:#fff;
-  border-color:#E8DFCE;
-}}
-.adm-tab-count{{
-  display:inline-flex;align-items:center;justify-content:center;
-  background:rgba(76,46,114,.12);color:#4A2E8F;
-  font-size:.7rem;font-weight:800;border-radius:10px;
-  padding:1px 6px;margin-left:5px;
-}}
-
-/* ── Content panel ── */
-.adm-panel{{
-  background:#fff;border:1.5px solid #E8DFCE;border-radius:0 12px 12px 12px;
-  margin:0 28px 28px;overflow:hidden;
-}}
-.adm-section{{display:none}}
-.adm-section.active{{display:block}}
-.tbl-wrap{{overflow-x:auto}}
-
-/* ── Table ── */
-table{{width:100%;border-collapse:collapse;font-size:.84rem}}
-th{{
-  background:#FAF7F2;text-align:left;padding:10px 16px;
-  font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#888;
-  white-space:nowrap;border-bottom:1.5px solid #E8DFCE;font-weight:700;
-}}
-td{{
-  padding:10px 16px;border-bottom:1px solid #F0EAE0;
-  vertical-align:top;max-width:260px;word-break:break-word;
-}}
-tr:last-child td{{border-bottom:none}}
-tr:hover td{{background:#FDFAF6}}
-tr.row-today td{{background:#FEFBF4}}
-
-/* ── Cell variants ── */
-.ts{{color:#aaa;font-size:.78rem;white-space:nowrap;padding-right:6px}}
-.today-pill{{
-  display:inline-block;margin-left:6px;
-  background:#FBE2CC;color:#B0541C;
-  font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:8px;
-  vertical-align:middle;text-transform:uppercase;letter-spacing:.03em;
-}}
-.msg-cell{{color:#444;max-width:300px}}
-.badge{{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.74rem;font-weight:700}}
-.badge-ok{{background:#D4F0E0;color:#16704A}}
-.badge-issue{{background:#FBDCE8;color:#B0326E}}
-.stars-hi{{color:#E8913A;font-size:.9rem;letter-spacing:1px}}
-.stars-lo{{color:#aaa;font-size:.9rem;letter-spacing:1px}}
-.wa-btn{{
-  display:inline-flex;align-items:center;gap:4px;
-  margin-left:7px;padding:2px 8px;
-  background:#D4F0E0;color:#16704A;border-radius:8px;
-  font-size:.72rem;font-weight:700;text-decoration:none;
-  transition:background .12s;
-}}
-.wa-btn:hover{{background:#A9E0C3}}
-.wa-btn::before{{content:"💬";font-size:.75rem}}
-
-/* ── Empty state ── */
-.empty-state{{
-  padding:56px 24px;text-align:center;color:#bbb;
-}}
-.empty-state span{{display:block;font-size:2rem;margin-bottom:10px}}
-.empty-state p{{font-size:.9rem}}
-</style>
-</head>
-<body>
-
-<header class="adm-header">
-  <div class="adm-logo">PrepWith<span>Tee</span></div>
-  <span style="color:rgba(255,255,255,.35);font-size:.85rem">Admin</span>
-  <button class="adm-refresh" onclick="location.reload()">↻ Refresh</button>
-  <button class="adm-bell" title="Total submissions">
-    🔔
-    <span class="bell-badge">{total}</span>
-  </button>
-</header>
-
-<div class="adm-cards">
-  <div class="adm-card lav">
-    <span class="card-icon">📋</span>
-    <div class="card-body"><b>{n_d}</b><span>Demo Requests</span></div>
-  </div>
-  <div class="adm-card grn">
-    <span class="card-icon">💬</span>
-    <div class="card-body"><b>{n_f}</b><span>Feedback &amp; Issues</span></div>
-  </div>
-  <div class="adm-card org">
-    <span class="card-icon">📚</span>
-    <div class="card-body"><b>{n_s}</b><span>Subject Requests</span></div>
-  </div>
-</div>
-
-<div class="adm-tabs">
-  <div class="adm-tab active" onclick="show(this,'sec-demo')">
-    Demo Requests<span class="adm-tab-count">{n_d}</span>
-  </div>
-  <div class="adm-tab" onclick="show(this,'sec-fb')">
-    Feedback &amp; Issues<span class="adm-tab-count">{n_f}</span>
-  </div>
-  <div class="adm-tab" onclick="show(this,'sec-sr')">
-    Subject Requests<span class="adm-tab-count">{n_s}</span>
-  </div>
-</div>
-
-<div class="adm-panel">
-  <div class="adm-section active" id="sec-demo">{demo_tbl}</div>
-  <div class="adm-section" id="sec-fb">{fb_tbl}</div>
-  <div class="adm-section" id="sec-sr">{sr_tbl}</div>
-</div>
-
-<script>
-function show(tab, secId) {{
-  document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.adm-section').forEach(s => s.classList.remove('active'));
-  tab.classList.add('active');
-  document.getElementById(secId).classList.add('active');
-}}
-</script>
-</body></html>"""
-    return HTMLResponse(html)
+@app.get("/admin")
+def admin_redirect(key: str = ""):
+    """Legacy entry point — the dashboard is now the static admin.html SPA."""
+    return RedirectResponse(f"/admin.html?key={quote(key)}" if key else "/admin.html")
 
 
 @app.get("/api/question/{question_id}/preview")
