@@ -17,17 +17,25 @@ _USERS_DB = ROOT / "data" / "users.db"
 _USE_SUPABASE = bool(os.environ.get("SUPABASE_URL"))
 
 if _USE_SUPABASE:
+    import threading
     from supabase import create_client as _create_client
-    _sb = None  # lazy init
+
+    # One client per thread. The SDK wraps a single sync httpx client, and
+    # FastAPI runs these sync endpoints in a threadpool — sharing one client
+    # across threads corrupts its HTTP/2 connection state and surfaces as
+    # `httpx.ReadError: [WinError 10035]` whenever two requests overlap.
+    _local_client = threading.local()
+
     def _client():
-        global _sb
-        if _sb is None:
-            _sb = _create_client(
+        sb = getattr(_local_client, "sb", None)
+        if sb is None:
+            sb = _create_client(
                 os.environ["SUPABASE_URL"],
                 os.environ.get("SUPABASE_SERVICE_KEY")
                 or os.environ["SUPABASE_SERVICE_ROLE_KEY"],
             )
-        return _sb
+            _local_client.sb = sb
+        return sb
 else:
     # ── Local SQLite fallback ─────────────────────────────────────────────
     _LOCAL_SCHEMA = """
@@ -74,6 +82,7 @@ else:
         question_text  TEXT NOT NULL,
         student_answer TEXT,
         score          INTEGER,
+        max_marks      INTEGER,
         ideal_answer   TEXT,
         feedback       TEXT,
         created_at     TEXT DEFAULT (datetime('now'))
@@ -88,7 +97,11 @@ else:
         qualifications   TEXT,
         experience_years INTEGER,
         display_order    INTEGER DEFAULT 0,
-        active           INTEGER DEFAULT 1
+        active           INTEGER DEFAULT 1,
+        email            TEXT,
+        phone            TEXT,
+        application_id   INTEGER,
+        created_at       TEXT DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS teacher_applications (
         id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,11 +109,41 @@ else:
         email          TEXT,
         phone          TEXT,
         subjects       TEXT,
+        subject_codes  TEXT,
         qualifications TEXT,
         experience     TEXT,
         message        TEXT,
         status         TEXT DEFAULT 'pending',
+        admin_note     TEXT,
+        reviewed_at    TEXT,
+        teacher_id     INTEGER,
         created_at     TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS leads (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        parent_name  TEXT,
+        student_name TEXT,
+        contact      TEXT,
+        grade        TEXT,
+        subjects     TEXT,
+        message      TEXT,
+        timestamp    TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS feedback (
+        id      INTEGER PRIMARY KEY AUTOINCREMENT,
+        rating  INTEGER,
+        message TEXT,
+        name    TEXT,
+        page    TEXT,
+        type    TEXT,
+        ts      TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS subject_requests (
+        id      INTEGER PRIMARY KEY AUTOINCREMENT,
+        subject TEXT,
+        board   TEXT,
+        message TEXT,
+        ts      TEXT DEFAULT (datetime('now'))
     );
     """
 
@@ -315,11 +358,12 @@ def upsert_progress(user_id: str, syllabus: str, topic: str,
 def save_quiz(user_id: str, syllabus: str, topic: str, subtopic: str | None,
               question_text: str, student_answer: str | None,
               score: int | None, ideal_answer: str | None,
-              feedback: str | None) -> dict:
+              feedback: str | None, max_marks: int | None = None) -> dict:
     payload = {
         "user_id": user_id, "syllabus": syllabus, "topic": topic,
         "subtopic": subtopic, "question_text": question_text,
         "student_answer": student_answer, "score": score,
+        "max_marks": max_marks,
         "ideal_answer": ideal_answer, "feedback": feedback,
         "created_at": _now(),
     }
@@ -329,10 +373,10 @@ def save_quiz(user_id: str, syllabus: str, topic: str, subtopic: str | None,
     with _local() as c:
         c.execute("""INSERT INTO quiz_sessions
             (user_id,syllabus,topic,subtopic,question_text,student_answer,
-             score,ideal_answer,feedback,created_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?)""",
+             score,max_marks,ideal_answer,feedback,created_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
             (user_id, syllabus, topic, subtopic, question_text,
-             student_answer, score, ideal_answer, feedback, _now()))
+             student_answer, score, max_marks, ideal_answer, feedback, _now()))
         c.commit()
     return payload
 
@@ -408,16 +452,256 @@ def get_teachers() -> list[dict]:
 
 def save_teacher_application(payload: dict) -> dict:
     payload["created_at"] = _now()
+    payload.setdefault("status", "pending")
     if _USE_SUPABASE:
         r = _client().table("teacher_applications").insert(payload).execute()
         return r.data[0] if r.data else payload
     with _local() as c:
         c.execute("""INSERT INTO teacher_applications
-            (name,email,phone,subjects,qualifications,experience,message,created_at)
-            VALUES (?,?,?,?,?,?,?,?)""",
+            (name,email,phone,subjects,subject_codes,qualifications,experience,
+             message,status,created_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?)""",
             (payload.get("name"), payload.get("email"), payload.get("phone"),
-             payload.get("subjects"), payload.get("qualifications"),
-             payload.get("experience"), payload.get("message"),
-             payload["created_at"]))
+             payload.get("subjects"), payload.get("subject_codes"),
+             payload.get("qualifications"), payload.get("experience"),
+             payload.get("message"), payload["status"], payload["created_at"]))
         c.commit()
     return payload
+
+
+# ── Generic helpers so the admin reads/writes look the same in both modes ─────
+
+def _insert(table: str, payload: dict, columns: list[str]) -> dict:
+    if _USE_SUPABASE:
+        r = _client().table(table).insert(payload).execute()
+        return r.data[0] if r.data else payload
+    cols = [c for c in columns if c in payload]
+    with _local() as c:
+        cur = c.execute(
+            f"INSERT INTO {table} ({','.join(cols)}) "
+            f"VALUES ({','.join('?' for _ in cols)})",
+            [payload[k] for k in cols])
+        payload["id"] = cur.lastrowid
+        c.commit()
+    return payload
+
+
+def _select_all(table: str, order_col: str, limit: int = 1000) -> list[dict]:
+    if _USE_SUPABASE:
+        r = (_client().table(table).select("*")
+             .order(order_col, desc=True).limit(limit).execute())
+        return r.data or []
+    with _local() as c:
+        rows = c.execute(
+            f"SELECT * FROM {table} ORDER BY {order_col} DESC LIMIT ?",
+            (limit,)).fetchall()
+        return [dict(r) for r in rows]
+
+
+# ── Leads / feedback / subject requests ──────────────────────────────────────
+
+def save_lead(payload: dict) -> dict:
+    payload["timestamp"] = _now()
+    return _insert("leads", payload,
+                   ["parent_name", "student_name", "contact", "grade",
+                    "subjects", "message", "timestamp"])
+
+
+def get_leads(limit: int = 1000) -> list[dict]:
+    return _select_all("leads", "timestamp", limit)
+
+
+def save_feedback(payload: dict) -> dict:
+    payload["ts"] = _now()
+    return _insert("feedback", payload,
+                   ["rating", "message", "name", "page", "type", "ts"])
+
+
+def get_feedback(limit: int = 1000) -> list[dict]:
+    return _select_all("feedback", "ts", limit)
+
+
+def save_subject_request(payload: dict) -> dict:
+    payload["ts"] = _now()
+    return _insert("subject_requests", payload, ["subject", "board", "message", "ts"])
+
+
+def get_subject_requests(limit: int = 1000) -> list[dict]:
+    return _select_all("subject_requests", "ts", limit)
+
+
+# ── Teacher applications (admin) ─────────────────────────────────────────────
+
+def get_teacher_applications(limit: int = 500) -> list[dict]:
+    return _select_all("teacher_applications", "created_at", limit)
+
+
+def get_teacher_application(app_id: int) -> dict | None:
+    if _USE_SUPABASE:
+        r = (_client().table("teacher_applications").select("*")
+             .eq("id", app_id).limit(1).execute())
+        return r.data[0] if r.data else None
+    with _local() as c:
+        row = c.execute("SELECT * FROM teacher_applications WHERE id=?",
+                        (app_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def update_teacher_application(app_id: int, fields: dict) -> dict | None:
+    if _USE_SUPABASE:
+        _client().table("teacher_applications").update(fields).eq("id", app_id).execute()
+    else:
+        with _local() as c:
+            c.execute(
+                f"UPDATE teacher_applications SET {', '.join(f'{k}=?' for k in fields)} "
+                f"WHERE id=?", (*fields.values(), app_id))
+            c.commit()
+    return get_teacher_application(app_id)
+
+
+# ── Teacher CRUD (admin) ─────────────────────────────────────────────────────
+
+_TEACHER_COLS = ["name", "role", "subjects_json", "bio", "picture_url",
+                 "qualifications", "experience_years", "display_order",
+                 "active", "email", "phone", "application_id", "created_at"]
+
+
+def get_all_teachers() -> list[dict]:
+    """Every teacher including deactivated ones — the public route hides those."""
+    if _USE_SUPABASE:
+        r = _client().table("teachers").select("*").order("display_order").execute()
+        return r.data or []
+    with _local() as c:
+        rows = c.execute("SELECT * FROM teachers ORDER BY display_order").fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_teacher(teacher_id: int) -> dict | None:
+    if _USE_SUPABASE:
+        r = _client().table("teachers").select("*").eq("id", teacher_id).limit(1).execute()
+        return r.data[0] if r.data else None
+    with _local() as c:
+        row = c.execute("SELECT * FROM teachers WHERE id=?", (teacher_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def create_teacher(payload: dict) -> dict:
+    payload.setdefault("created_at", _now())
+    payload.setdefault("subjects_json", "[]")
+    payload.setdefault("active", True if _USE_SUPABASE else 1)
+    return _insert("teachers", payload, _TEACHER_COLS)
+
+
+def update_teacher(teacher_id: int, fields: dict) -> dict | None:
+    if _USE_SUPABASE:
+        _client().table("teachers").update(fields).eq("id", teacher_id).execute()
+    else:
+        with _local() as c:
+            c.execute(f"UPDATE teachers SET {', '.join(f'{k}=?' for k in fields)} "
+                      f"WHERE id=?", (*fields.values(), teacher_id))
+            c.commit()
+    return get_teacher(teacher_id)
+
+
+def delete_teacher(teacher_id: int) -> None:
+    if _USE_SUPABASE:
+        _client().table("teachers").delete().eq("id", teacher_id).execute()
+    else:
+        with _local() as c:
+            c.execute("DELETE FROM teachers WHERE id=?", (teacher_id,))
+            c.commit()
+
+
+# ── Students (admin) ─────────────────────────────────────────────────────────
+
+def list_students() -> list[dict]:
+    """Every student profile with the counts the admin list needs.
+
+    Enrollments, progress and quizzes are fetched in three bulk reads rather
+    than per student, so the list stays one round-trip per table however many
+    students there are.
+    """
+    if _USE_SUPABASE:
+        cl = _client()
+        profiles = (cl.table("profiles").select(
+            "id,email,name,picture_url,grade,phone,gender,birthday,"
+            "profile_complete,created_at").order("created_at", desc=True)
+            .execute().data or [])
+        enrolls = cl.table("enrollments").select("user_id,syllabus,status").execute().data or []
+        progress = cl.table("topic_progress").select("user_id,status").execute().data or []
+        quizzes = (cl.table("quiz_sessions")
+                   .select("user_id,score,created_at").execute().data or [])
+    else:
+        with _local() as c:
+            profiles = [dict(r) for r in c.execute(
+                "SELECT id,email,name,picture_url,grade,phone,gender,birthday,"
+                "profile_complete,created_at FROM profiles ORDER BY created_at DESC")]
+            enrolls = [dict(r) for r in c.execute(
+                "SELECT user_id,syllabus,status FROM enrollments")]
+            progress = [dict(r) for r in c.execute(
+                "SELECT user_id,status FROM topic_progress")]
+            quizzes = [dict(r) for r in c.execute(
+                "SELECT user_id,score,created_at FROM quiz_sessions")]
+
+    by_user: dict[str, dict] = {
+        p["id"]: {**p, "subjects": [], "topics_tracked": 0, "topics_confident": 0,
+                  "quiz_count": 0, "avg_score": None, "last_active": None}
+        for p in profiles}
+
+    for e in enrolls:
+        u = by_user.get(e["user_id"])
+        if u is not None and e.get("status") == "active":
+            u["subjects"].append(e["syllabus"])
+    for p in progress:
+        u = by_user.get(p["user_id"])
+        if u is not None:
+            u["topics_tracked"] += 1
+            if p.get("status") == "confident":
+                u["topics_confident"] += 1
+
+    scores: dict[str, list[int]] = {}
+    for q in quizzes:
+        u = by_user.get(q["user_id"])
+        if u is None:
+            continue
+        u["quiz_count"] += 1
+        if q.get("score") is not None:
+            scores.setdefault(q["user_id"], []).append(q["score"])
+        created = q.get("created_at")
+        if created and (u["last_active"] is None or created > u["last_active"]):
+            u["last_active"] = created
+    for uid, vals in scores.items():
+        by_user[uid]["avg_score"] = round(sum(vals) / len(vals), 1)
+
+    return list(by_user.values())
+
+
+def get_student_detail(user_id: str) -> dict | None:
+    """One student's full record: profile, enrollments, every topic, every quiz."""
+    user = get_user(user_id)
+    if not user:
+        return None
+    if _USE_SUPABASE:
+        cl = _client()
+        enrollments = (cl.table("enrollments").select("*")
+                       .eq("user_id", user_id).execute().data or [])
+        progress = (cl.table("topic_progress").select("*")
+                    .eq("user_id", user_id).execute().data or [])
+        quizzes = (cl.table("quiz_sessions").select("*").eq("user_id", user_id)
+                   .order("created_at", desc=True).limit(200).execute().data or [])
+    else:
+        with _local() as c:
+            enrollments = [dict(r) for r in c.execute(
+                "SELECT * FROM enrollments WHERE user_id=?", (user_id,))]
+            progress = [dict(r) for r in c.execute(
+                "SELECT * FROM topic_progress WHERE user_id=?", (user_id,))]
+            quizzes = [dict(r) for r in c.execute(
+                "SELECT * FROM quiz_sessions WHERE user_id=? "
+                "ORDER BY created_at DESC LIMIT 200", (user_id,))]
+
+    return {
+        "profile": {k: v for k, v in user.items() if k != "password_hash"},
+        "enrollments": enrollments,
+        "progress": progress,
+        "quizzes": quizzes,
+    }
