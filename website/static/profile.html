@@ -4,14 +4,328 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your profile — PrepWithTee</title>
+  <title>My Profile — PrepWithTee</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260802b">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <link rel="stylesheet" href="tools.css?v=20260829a">
+  <!-- profile v20260901a -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+  <style>
+    /* ── Profile page layout ─────────────────────────────────────── */
+    .profile-page {
+      padding: 36px 0 80px;
+      min-height: calc(100vh - 140px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #profile-root {
+      width: 100%;
+    }
+    .tee-load {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 60px 20px;
+      text-align: center;
+      width: 100%;
+      min-height: 45vh;
+    }
+    .tee-load-owl {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .tee-load-owl img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Sidebar card */
+    .profile-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .profile-card {
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Avatar */
+    .profile-avatar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--line);
+    }
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--purple);
+      color: #fff;
+      display: grid; place-items: center;
+      font-size: 1.8rem; font-weight: 800;
+      font-family: 'Archivo', sans-serif;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .profile-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .profile-name {
+      font-size: 1.2rem; font-weight: 800; color: var(--ink);
+      text-align: center; margin: 0;
+    }
+    .profile-grade-badge {
+      font-size: .72rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .06em; padding: 4px 12px; border-radius: 20px;
+      background: var(--lav); color: var(--lav-ink);
+    }
+    .profile-email {
+      font-size: .8rem; color: var(--grey); text-align: center; margin: 0;
+    }
+
+    /* Quick stats */
+    .profile-stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px;
+    }
+    .profile-stat {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      flex: 1;
+    }
+    .profile-stat-val {
+      font-size: 1.35rem; font-weight: 800; color: var(--purple);
+      font-variant-numeric: tabular-nums;
+    }
+    .profile-stat-lbl {
+      font-size: .67rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--grey); text-align: center;
+    }
+    .profile-stat-divider {
+      width: 1px; height: 32px; background: var(--line); flex-shrink: 0;
+    }
+
+    /* Nav links in sidebar */
+    .profile-nav-link {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--ink);
+      font-size: .88rem; font-weight: 600;
+      padding: 10px 12px; border-radius: 10px;
+      transition: background .12s, color .12s;
+    }
+    .profile-nav-link:hover { background: var(--page); color: var(--purple); }
+    .profile-nav-link.active { background: var(--lav); color: var(--lav-ink); }
+    .profile-nav-icon { font-size: 1rem; width: 22px; text-align: center; }
+
+    /* Main content */
+    .profile-main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .profile-section {
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .profile-section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 14px;
+      border-bottom: 1.5px solid var(--line);
+    }
+    .profile-section-title {
+      font-size: .85rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--grey); margin: 0;
+    }
+    .profile-section-body {
+      padding: 20px 22px;
+    }
+
+    /* Formula review progress */
+    .review-subject-row {
+      display: flex; flex-direction: column; gap: 6px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .review-subject-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .review-subject-row:first-child { padding-top: 0; }
+    .review-subject-hd {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .review-subject-name { font-size: .9rem; font-weight: 700; color: var(--ink); }
+    .review-subject-count { font-size: .78rem; color: var(--grey); }
+    .review-bar-wrap {
+      height: 6px; border-radius: 99px; background: var(--line); overflow: hidden;
+    }
+    .review-bar-fill {
+      height: 100%; border-radius: 99px; background: var(--purple);
+      transition: width .4s ease;
+    }
+
+    /* Edit form */
+    .profile-form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .profile-form-field {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .profile-form-field label {
+      font-size: .78rem; font-weight: 700; color: var(--grey);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .req-star { color: #d93025; margin-left: 2px; }
+
+    /* Subjects picker inside profile */
+    .pf-subjects-section {
+      grid-column: 1 / -1;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .pf-subjects-label {
+      font-size: .78rem; font-weight: 700; color: var(--grey);
+      text-transform: uppercase; letter-spacing: .04em;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .pf-subjects-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 12px; border-radius: 12px;
+      border: 1.5px solid var(--line); background: var(--page);
+      min-height: 52px; align-items: flex-start; align-content: flex-start;
+    }
+    .pf-subject-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px; border-radius: 99px; cursor: pointer;
+      font: inherit; font-size: .82rem; font-weight: 700;
+      border: 1.5px solid var(--lav-line); background: var(--lav);
+      color: var(--lav-ink); transition: background .12s, border-color .12s;
+    }
+    .pf-subject-btn[data-on="false"] {
+      background: var(--page); border-color: var(--line); color: var(--grey);
+    }
+    .pf-subject-btn:disabled { opacity: .55; cursor: default; }
+    .pf-subjects-hint {
+      font-size: .75rem; color: var(--grey); margin: 0;
+    }
+    .pf-subjects-empty {
+      font-size: .82rem; color: var(--grey); padding: 4px 0;
+    }
+    .profile-form-field input,
+    .profile-form-field select {
+      font: inherit; font-size: .9rem;
+      padding: 10px 13px; border-radius: 10px;
+      border: 1.5px solid var(--line); background: var(--page); color: var(--ink);
+      width: 100%; box-sizing: border-box; min-height: 44px;
+      -webkit-appearance: none; appearance: none;
+    }
+    .profile-form-field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23888' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+      padding-right: 36px;
+    }
+    .profile-form-field input:focus,
+    .profile-form-field select:focus {
+      outline: 2px solid var(--lav-line); outline-offset: 1px; border-color: var(--lav-line);
+    }
+    .profile-form-field.full { grid-column: 1 / -1; }
+    /* Avatar upload button */
+    .pf-avatar-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .77rem; font-weight: 700; color: var(--purple);
+      background: none; border: 1.5px solid var(--lav-line);
+      border-radius: 20px; padding: 5px 12px; cursor: pointer;
+      transition: background .12s; position: relative; overflow: hidden;
+    }
+    .pf-avatar-btn:hover { background: var(--lav); }
+    .pf-avatar-btn input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+    }
+    .pf-plan-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 12px;
+      background: var(--lav); border: 1.5px solid var(--lav-line);
+      font-size: .85rem; font-weight: 700; color: var(--lav-ink);
+    }
+    .pf-plan-badge.free { background: var(--cream); border-color: var(--line); color: var(--grey); }
+    .pf-upgrade-link {
+      display: inline-block; padding: 8px 18px; border-radius: 10px;
+      background: #c9a227; color: #1a2340; font-weight: 700; font-size: .85rem;
+      text-decoration: none; transition: background .12s;
+    }
+    .pf-upgrade-link:hover { background: #dbb535; }
+    .profile-save-row {
+      display: flex; align-items: center; gap: 12px; margin-top: 6px;
+    }
+    .profile-save-msg {
+      font-size: .82rem; color: var(--grey);
+    }
+    .profile-save-msg.ok   { color: var(--green-ink); }
+    .profile-save-msg.fail { color: #d93025; }
+
+    /* Subjects enrolled */
+    .enrolled-grid {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .enrolled-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 13px; border-radius: 99px;
+      background: var(--cream); border: 1.5px solid var(--line);
+      font-size: .82rem; font-weight: 600; color: var(--ink);
+    }
+    .enrolled-chip .chip-code {
+      font-size: .68rem; color: var(--grey); font-weight: 700;
+    }
+
+    /* Danger zone */
+    .danger-link {
+      font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer;
+      border: none; background: transparent; color: #d93025;
+      text-decoration: underline; text-underline-offset: 2px; padding: 0;
+    }
+    .danger-link:hover { opacity: .75; }
+
+    /* Loading / auth state */
+    .profile-loading {
+      text-align: center; padding: 80px 20px;
+      color: var(--grey); font-size: .95rem;
+    }
+
+    @media (max-width: 860px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .profile-form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
@@ -19,144 +333,1175 @@
   <header class="site-header">
     <div class="container header-row">
       <a class="brand" href="index.html">
-        <img src="logo.png" alt="PrepWithTee owl logo">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
         <span>PrepWithTee</span>
-      </a>
-      <nav class="header-nav">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="subjects.html" class="nav-link">Subjects</a>
-        <a href="papers.html" class="nav-link">Past Papers</a>
+      </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
+      <div class="header-right"></div>
     </div>
   </header>
 
-  <main class="auth-page auth-page-single">
-    <div class="auth-card auth-card-wide">
-
-      <div class="auth-head">
-        <p class="eyebrow" id="profile-eyebrow">Almost there</p>
-        <h1 id="profile-title">Tell us about you</h1>
-        <p class="auth-sub" id="profile-sub">
-          This tailors your topic lists and question difficulty. It takes about
-          twenty seconds and you can change any of it later.
+  <main class="profile-page">
+    <div class="container" id="profile-root">
+      <div class="tee-load" id="profile-spinner" role="status" aria-live="polite">
+        <div class="tee-load-owl"><img width="52" height="52" src="/logo-nav.webp" alt=""></div>
+        <div class="tee-load-perch"></div>
+        <div class="tee-load-msg">
+          <span>Loading your profile…</span>
+          <span>Almost there…</span>
+        </div>
+        <p class="tee-load-sub" id="profile-slow-msg" hidden>
+          Taking longer than usual — <a href="">refresh the page</a> if this doesn't load.
         </p>
       </div>
-
-      <div class="auth-alert" id="profile-alert" hidden role="alert"></div>
-
-      <form class="auth-form" id="profile-form" novalidate>
-
-        <label class="auth-field">
-          <span>Full name</span>
-          <input type="text" name="name" autocomplete="name" required
-                 placeholder="Ayesha Khan">
-        </label>
-
-        <fieldset class="auth-field auth-choice">
-          <legend>Which qualification are you sitting?</legend>
-          <div class="choice-row" id="grade-row">
-            <label class="choice"><input type="radio" name="grade" value="O Level" required><span>O Level</span></label>
-            <label class="choice"><input type="radio" name="grade" value="IGCSE"><span>IGCSE</span></label>
-            <label class="choice"><input type="radio" name="grade" value="A Level"><span>A Level</span></label>
-          </div>
-        </fieldset>
-
-        <div class="auth-row">
-          <label class="auth-field">
-            <span>Date of birth <em>optional</em></span>
-            <input type="date" name="birthday" max="2020-01-01">
-          </label>
-
-          <label class="auth-field">
-            <span>Gender <em>optional</em></span>
-            <select name="gender">
-              <option value="">Prefer not to say</option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="other">Other</option>
-            </select>
-          </label>
-        </div>
-
-        <label class="auth-field">
-          <span>WhatsApp number <em>optional</em></span>
-          <input type="tel" name="phone" autocomplete="tel" placeholder="+92 3xx xxxxxxx">
-          <small class="field-hint">Only used if you ask about one-on-one tuition. No marketing, ever.</small>
-        </label>
-
-        <button type="submit" class="btn btn-gold auth-submit" id="profile-submit">
-          Save and continue
-        </button>
-      </form>
-
     </div>
   </main>
 
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee</span>
+      <span>One student at a time.</span>
+    </div>
+  </footer>
+
+  <script src="main.js?v=20260831a"></script>
+  <script src="styled-dropdown.js?v=20260828a"></script>
+  <script src="tools-core.js?v=20260811d"></script>
+  <script src="tools-nav.js?v=20260811d"></script>
+
   <script type="module">
-    import { requireAuth, api } from "/auth.js";
+    import { requireAuth, api, getUser } from "/auth.js?v=20260829a";
 
-    const params   = new URLSearchParams(location.search);
-    const next     = params.get("next") || "/dashboard.html";
-    const form     = document.getElementById("profile-form");
-    const alertBox = document.getElementById("profile-alert");
-    const submit   = document.getElementById("profile-submit");
+    const root = document.getElementById("profile-root");
 
-    const user = await requireAuth();
-    if (user) {
-      // Returning users are editing, not onboarding — say so.
-      if (user.profile_complete) {
-        document.getElementById("profile-eyebrow").textContent = "Your account";
-        document.getElementById("profile-title").textContent = "Edit your profile";
-        document.getElementById("profile-sub").textContent =
-          "Update anything below. Changes apply the next time you open revision mode.";
-        submit.textContent = "Save changes";
-      }
-      form.name.value     = user.name || "";
-      form.birthday.value = user.birthday || "";
-      form.gender.value   = user.gender || "";
-      form.phone.value    = user.phone || "";
-      if (user.grade) {
-        const radio = form.querySelector(`input[name="grade"][value="${user.grade}"]`);
-        if (radio) radio.checked = true;
-      }
+    function esc(s) {
+      return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
 
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-      alertBox.hidden = true;
+    function initials(name) {
+      if (!name) return "?";
+      return name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    }
 
-      const name  = form.name.value.trim();
-      const grade = form.querySelector('input[name="grade"]:checked')?.value;
-      if (!name)  return fail("We need a name to put on your booklets.");
-      if (!grade) return fail("Pick the qualification you're sitting.");
+    function gradeLabel(g) {
+      return { "O Level": "Cambridge O Level", "IGCSE": "Cambridge IGCSE", "A Level": "Cambridge A Level" }[g] || g || "Not set";
+    }
 
-      submit.disabled = true;
-      submit.textContent = "Saving…";
+    // ── Read SRS data from localStorage ─────────────────────────────────────
+    function getReviewStats() {
       try {
-        await api("/api/profile", {
-          method: "POST",
-          body: {
-            name, grade,
-            birthday: form.birthday.value || null,
-            gender:   form.gender.value || null,
-            phone:    form.phone.value.trim() || null,
-          },
+        const raw = localStorage.getItem("pwt_ar_v1");
+        if (!raw) return {};
+        const state = JSON.parse(raw);
+        const reviews = state.reviews || {};
+        // Group by syllabus (key format: "9702/topic/name")
+        const bySyl = {};
+        Object.keys(reviews).forEach(k => {
+          const syl = k.split("/")[0];
+          if (!bySyl[syl]) bySyl[syl] = { total: 0, done: 0, today: 0 };
+          bySyl[syl].total++;
+          if (reviews[k].reps > 0) bySyl[syl].done++;
         });
-        location.href = next;
-      } catch (err) {
-        fail(err.message);
-        submit.disabled = false;
-        submit.textContent = "Save and continue";
-      }
-    });
-
-    function fail(msg) {
-      alertBox.textContent = msg;
-      alertBox.hidden = false;
-      alertBox.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        return bySyl;
+      } catch (e) { return {}; }
     }
+
+    function getTodayReviews() {
+      try {
+        const raw = localStorage.getItem("pwt_ar_v1");
+        if (!raw) return 0;
+        const state = JSON.parse(raw);
+        const today = new Date().toISOString().slice(0, 10);
+        let total = 0;
+        Object.values(state.sessions || {}).forEach(sess => {
+          if (sess.date === today) total += (sess.done || []).length;
+        });
+        return total;
+      } catch (e) { return 0; }
+    }
+
+    // ── Subject name lookup ──────────────────────────────────────────────────
+    const SUBJECT_NAMES = {
+      "4024": "Mathematics D (O Level)",
+      "0580": "Mathematics (IGCSE)",
+      "5054": "Physics (O Level)",
+      "0625": "Physics (IGCSE)",
+      "9709": "Mathematics (A Level)",
+      "9702": "Physics (A Level)",
+      "2210": "Computer Science (O Level)",
+      "0478": "Computer Science (IGCSE)",
+      "0620": "Chemistry (IGCSE)",
+      "5070": "Chemistry (O Level)",
+      "9618": "CS (A Level)"
+    };
+
+    // ── Render ───────────────────────────────────────────────────────────────
+    function render(user) {
+      const reviewStats = getReviewStats();
+      const todayDone = getTodayReviews();
+      const totalReviewed = Object.values(reviewStats).reduce((n, s) => n + s.done, 0);
+      const totalFormulas = Object.values(reviewStats).reduce((n, s) => n + s.total, 0);
+
+      const enrollments = (user.enrollments || []);
+
+      root.innerHTML = `
+      <div class="profile-grid">
+
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+          <div class="profile-card">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar" id="pf-avatar">
+                ${user.picture_url
+                  ? `<img src="${esc(user.picture_url)}" alt="" id="pf-avatar-img">`
+                  : `<span id="pf-avatar-initials">${initials(user.name)}</span>`}
+              </div>
+              <button class="pf-avatar-btn" type="button" title="Change photo">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10L11 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 4l2.5 2.5" stroke="currentColor" stroke-width="1.6"/></svg>
+                Change photo
+                <input type="file" id="pf-photo-input" accept="image/jpeg,image/png,image/webp" aria-label="Upload profile photo">
+              </button>
+              <p id="pf-photo-status" style="font-size:.75rem;color:var(--grey);margin:0;min-height:1rem;text-align:center;"></p>
+              <h1 class="profile-name" id="pf-name">${esc(user.name || "Student")}</h1>
+              <span class="profile-grade-badge">${esc(gradeLabel(user.grade))}</span>
+              <p class="profile-email">${esc(user.email || "")}</p>
+            </div>
+
+            <div class="profile-stat-row">
+              <div class="profile-stat">
+                <span class="profile-stat-val">${todayDone}</span>
+                <span class="profile-stat-lbl">Today's reviews</span>
+              </div>
+              <div class="profile-stat-divider"></div>
+              <div class="profile-stat">
+                <span class="profile-stat-val">${totalReviewed}</span>
+                <span class="profile-stat-lbl">Formulas learned</span>
+              </div>
+              <div class="profile-stat-divider"></div>
+              <div class="profile-stat">
+                <span class="profile-stat-val">${enrollments.length}</span>
+                <span class="profile-stat-lbl">Subjects</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nav shortcuts -->
+          <div class="profile-card" style="gap:4px;padding:12px;">
+            <a href="/dashboard.html" class="profile-nav-link"><span class="profile-nav-icon">📊</span>Dashboard</a>
+            <a href="/papers.html"    class="profile-nav-link"><span class="profile-nav-icon">📄</span>Past Papers</a>
+            <a href="/formulas.html"  class="profile-nav-link"><span class="profile-nav-icon">📐</span>Formula Sheets</a>
+            <a href="/homework.html"  class="profile-nav-link"><span class="profile-nav-icon">📝</span>Homework</a>
+            <a href="/definitions.html" class="profile-nav-link"><span class="profile-nav-icon">📚</span>Definitions Hub</a>
+          </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="profile-main">
+
+          <!-- Setup guide banner (shown only when ?setup=1 in URL) -->
+          ${new URLSearchParams(location.search).has("setup") ? `
+          <div id="pf-setup-guide" style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
+               color:#fff;border-radius:16px;padding:20px 22px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <span style="font-size:1.8rem;line-height:1;">🦉</span>
+              <div>
+                <strong style="font-size:1.05rem;display:block;">Step 1 of 2 — Fill in your details</strong>
+                <span style="font-size:.82rem;opacity:.85;">This helps your tutor know who you are and lets us personalise your dashboard.</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:.72rem;font-weight:800;">→</span>
+                <span style="font-size:.83rem;opacity:.9;"><b>Qualification</b> — tells us which board and papers to show you (required)</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:.72rem;font-weight:800;">→</span>
+                <span style="font-size:.83rem;opacity:.9;"><b>WhatsApp number</b> — so your tutor can reach you (required)</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:.72rem;font-weight:800;">→</span>
+                <span style="font-size:.83rem;opacity:.9;"><b>Date of birth &amp; gender</b> — optional but helpful</span>
+              </div>
+            </div>
+            <p style="font-size:.78rem;opacity:.7;margin:14px 0 0 0;">Hit <b>Save profile</b> below when done — we'll take you straight to Step 2.</p>
+          </div>` : ""}
+
+          <!-- Formula review progress -->
+          <div class="profile-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Formula Review Progress</h2>
+              <a href="/formulas.html" style="font-size:.8rem;color:var(--purple);text-decoration:none;font-weight:700;">Open review →</a>
+            </div>
+            <div class="profile-section-body">
+              ${Object.keys(reviewStats).length === 0
+                ? `<p style="color:var(--grey);font-size:.88rem;">No reviews yet — <a href="/formulas.html" style="color:var(--purple);font-weight:700;">start your first session</a>.</p>`
+                : Object.keys(reviewStats).map(syl => {
+                    const s = reviewStats[syl];
+                    const pct = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0;
+                    return `<div class="review-subject-row">
+                      <div class="review-subject-hd">
+                        <span class="review-subject-name">${esc(SUBJECT_NAMES[syl] || syl)}</span>
+                        <span class="review-subject-count">${s.done} / ${s.total} formulas</span>
+                      </div>
+                      <div class="review-bar-wrap">
+                        <div class="review-bar-fill" style="width:${pct}%"></div>
+                      </div>
+                    </div>`;
+                  }).join("")}
+            </div>
+          </div>
+
+          <!-- Enrolled subjects -->
+          ${enrollments.length > 0 ? `
+          <div class="profile-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Enrolled Subjects</h2>
+            </div>
+            <div class="profile-section-body">
+              <div class="enrolled-grid">
+                ${enrollments.map(e => `
+                  <div class="enrolled-chip">
+                    ${esc(e.subject || e.syllabus || e)}
+                    ${e.syllabus ? `<span class="chip-code">${esc(e.syllabus)}</span>` : ""}
+                  </div>`).join("")}
+              </div>
+            </div>
+          </div>` : ""}
+
+        <div class="profile-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Personal Details</h2>
+            </div>
+            <div class="profile-section-body">
+              <div id="pf-alert" class="auth-alert" hidden role="alert"></div>
+              <form id="pf-form" novalidate>
+                <div class="profile-form-grid">
+                  <div class="profile-form-field">
+                    <label>Full name<span class="req-star" aria-label="required">*</span></label>
+                    <input type="text" name="name" autocomplete="name" placeholder="Ayesha Khan"
+                           value="${esc(user.name || "")}">
+                  </div>
+                  <div class="profile-form-field">
+                    <label>Board<span class="req-star" aria-label="required">*</span></label>
+                    <select name="grade" id="pf-grade-select" data-styled data-placeholder="Select your board">
+                      <option value="">Select your board</option>
+                      <option value="O Level"${(user.grade && (user.grade === "O Level" || user.grade.includes("O Level"))) ? " selected" : ""}>Cambridge O Level</option>
+                      <option value="IGCSE"${(user.grade && (user.grade === "IGCSE" || user.grade.includes("IGCSE"))) ? " selected" : ""}>Cambridge IGCSE</option>
+                      <option value="A Level"${(user.grade && (user.grade === "A Level" || user.grade.includes("A Level"))) ? " selected" : ""}>Cambridge A Level</option>
+                    </select>
+                  </div>
+
+                  <!-- Subjects picker — full width, filtered by qualification -->
+                  <div class="profile-form-field pf-subjects-section">
+                    <div class="pf-subjects-label">
+                      My Subjects<span class="req-star" aria-label="required">*</span>
+                    </div>
+                    <div class="pf-subjects-grid" id="pf-subjects-grid">
+                      <span class="pf-subjects-empty">Select your board above to see available subjects.</span>
+                    </div>
+                    <p class="pf-subjects-hint">Tick the subjects you study — past papers, notes and tools unlock per subject. Changes save immediately.</p>
+                  </div>
+
+                  <div class="profile-form-field">
+                    <label>Date of birth <em style="font-weight:400;text-transform:none;">(optional)</em></label>
+                    <input type="date" name="birthday" value="${esc(user.birthday || "")}" max="2020-01-01">
+                  </div>
+                  <div class="profile-form-field">
+                    <label>Gender <em style="font-weight:400;text-transform:none;">(optional)</em></label>
+                    <select name="gender" data-styled data-placeholder="Prefer not to say">
+                      <option value="">Prefer not to say</option>
+                      <option value="female"${user.gender==="female"?" selected":""}>Female</option>
+                      <option value="male"${user.gender==="male"?" selected":""}>Male</option>
+                      <option value="other"${user.gender==="other"?" selected":""}>Other</option>
+                    </select>
+                  </div>
+                  <div class="profile-form-field full">
+                    <label>WhatsApp number<span class="req-star" aria-label="required">*</span></label>
+                    <input type="tel" name="phone" autocomplete="tel"
+                           placeholder="+92 3xx xxxxxxx" value="${esc(user.phone || "")}">
+                  </div>
+                </div>
+                <div class="profile-save-row">
+                  <button type="submit" class="btn btn-gold" id="pf-submit">Save profile</button>
+                  <span class="profile-save-msg" id="pf-msg"></span>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Plan & Subscription -->
+          <div class="profile-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Subscription</h2>
+            </div>
+            <div class="profile-section-body" style="display:flex;flex-direction:column;gap:12px;">
+              ${(() => {
+                const ud = user.usageData || {};
+                const plan = ud.plan || user.plan || "free";
+                const planNames = { free:"Free",solo:"Solo",three:"3 Subjects",all:"All Subjects" };
+                const label = planNames[plan] || plan;
+                const isFree = plan === "free";
+                const isTrial = !!ud.trial;
+                const trialDaysLeft = ud.trial_days_left ?? null;
+                const expiresAt = ud.expires_at || null;
+                const startedAt = ud.started_at || null;
+                const periodStart = ud.period_start || null;
+
+                const fmtDate = iso => iso ? new Date(iso).toLocaleDateString("en-GB", {day:"numeric",month:"short",year:"numeric"}) : null;
+
+                let planMeta = "";
+                if (!isFree && expiresAt) {
+                  if (isTrial) {
+                    planMeta = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
+                      <span style="background:#fef3c7;color:#92400e;border:1.5px solid #fde68a;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;">
+                        ⏳ Trial — ${trialDaysLeft != null ? trialDaysLeft + " days left" : "expires " + fmtDate(expiresAt)}
+                      </span>
+                      <a href="/pricing.html" style="font-size:.78rem;color:#7c3aed;font-weight:600;text-decoration:none;">Subscribe now →</a>
+                    </div>`;
+                  } else {
+                    planMeta = `<p style="font-size:.78rem;color:var(--grey);margin:4px 0 0 0;">
+                      Active ${startedAt ? "from " + fmtDate(startedAt) : ""} · Renews ${fmtDate(expiresAt)}
+                    </p>`;
+                  }
+                }
+
+                // Quota reset date
+                let resetNote = "";
+                if (periodStart) {
+                  const nextReset = new Date(periodStart);
+                  nextReset.setDate(nextReset.getDate() + 30);
+                  resetNote = `Quota resets on ${fmtDate(nextReset.toISOString())}`;
+                }
+
+                const quotaNames = {
+                  topical_paper: ["Topical Booklets", "PDF booklets compiled by topic"],
+                  yearly_paper:  ["Yearly Past Papers", "Full past paper PDF views"],
+                  ai_tutor:      ["AI Tutor Queries", "Questions asked to the AI tutor"],
+                  ai_quiz:       ["AI Quiz Attempts", "Interactive practice quiz runs"],
+                  topic_test:    ["Topic Tests", "Custom tests compiled from chapters"]
+                };
+
+                let quotaHtml = "";
+                if (ud.usage) {
+                  const usage = ud.usage;
+                  quotaHtml = `
+                    <div class="pf-quota-list" style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--grey); margin: 0; letter-spacing: 0.05em;">${isTrial ? "Trial" : "Billing Period"} Usage</h3>
+                        ${resetNote ? `<span style="font-size:0.72rem;color:var(--grey);">${resetNote}</span>` : ""}
+                      </div>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; width: 100%;">
+                        ${Object.entries(quotaNames).map(([key, [title, desc]]) => {
+                          const item = usage[key] || { used: 0, limit: null, unlimited: true };
+                          const isUnlimited = item.unlimited || item.limit === null;
+                          const limitLabel = isUnlimited ? "∞" : item.limit;
+                          const pct = isUnlimited ? 0 : Math.min(100, Math.round((item.used / item.limit) * 100));
+                          const barColor = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "linear-gradient(90deg, #8b5cf6, #a78bfa)";
+
+                          return `
+                            <div style="background: var(--surface, #f9fafb); border: 1.5px solid var(--line); padding: 12px 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
+                              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                                <div style="flex: 1;">
+                                  <b style="font-size: 0.88rem; color: var(--text); display: block; margin-bottom: 2px;">${title}</b>
+                                  <span style="font-size: 0.72rem; color: var(--grey); line-height: 1.2; display: block;">${desc}</span>
+                                </div>
+                                <div style="text-align: right; white-space: nowrap;">
+                                  <span style="font-size: 0.95rem; font-weight: 700; color: var(--text);">${item.used}</span>
+                                  <span style="font-size: 0.8rem; color: var(--grey);"> / ${limitLabel}</span>
+                                </div>
+                              </div>
+                              ${!isUnlimited ? `
+                                <div style="height: 6px; background: rgba(0,0,0,0.07); border-radius: 3px; overflow: hidden; position: relative;">
+                                  <div style="height: 100%; width: ${pct}%; background: ${barColor}; border-radius: 3px; transition: width .3s;"></div>
+                                </div>
+                              ` : ''}
+                            </div>
+                          `;
+                        }).join("")}
+                      </div>
+                    </div>
+                  `;
+                }
+
+                return `
+                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span class="pf-plan-badge${isFree?" free":""}">
+                      ${isFree ? "🔓" : isTrial ? "🎁" : "⭐"} ${label} plan
+                    </span>
+                    ${isFree
+                      ? `<a href="/pricing.html" class="pf-upgrade-link">Upgrade →</a>`
+                      : (!isTrial ? `<a href="/pricing.html" style="font-size:.8rem;color:var(--grey);text-decoration:none;">Renew or change →</a>` : "")}
+                  </div>
+                  ${planMeta}
+                  ${isFree ? `<p style="font-size:.82rem;color:var(--grey);margin:4px 0 0 0;">
+                    Upgrade to unlock unlimited past papers, AI tutor, test builder and more.
+                  </p>` : ""}
+                  ${quotaHtml}`;
+              })()}
+            </div>
+          </div>
+
+          <!-- Student Code (students only) -->
+          ${(user.role || "student") === "student" ? `
+          <div class="profile-section" id="pf-code-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Student Code</h2>
+            </div>
+            <div class="profile-section-body">
+              <p style="font-size:.85rem;color:var(--grey);margin-bottom:10px;">
+                Share this code with a parent so they can link your account on their parent portal.
+              </p>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span id="pf-student-code" style="font-family:monospace;font-size:1.5rem;
+                  font-weight:700;letter-spacing:.15em;color:var(--purple);
+                  background:var(--surface,#f9fafb);border:1.5px solid var(--border,#e5e7eb);
+                  padding:8px 20px;border-radius:10px;">—</span>
+                <button id="pf-copy-code" style="font-size:.8rem;padding:7px 14px;border-radius:8px;
+                  border:1px solid var(--border,#e5e7eb);background:none;cursor:pointer;
+                  color:var(--purple);">Copy</button>
+              </div>
+            </div>
+          </div>` : ""}
+
+          <!-- Refer a Friend (students only) -->
+          ${(user.role || "student") === "student" ? `
+          <div class="profile-section" id="pf-referral-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Refer a Friend</h2>
+              <span id="pf-ref-points" style="font-size:.8rem;font-weight:700;color:var(--purple);"></span>
+            </div>
+            <div class="profile-section-body" style="display:flex;flex-direction:column;gap:12px;">
+              <p style="font-size:.85rem;color:var(--grey);margin:0;">
+                Share your link — you both earn <strong>+50 study points</strong> when a friend signs up.
+              </p>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <label style="font-size:.75rem;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:.04em;">Your referral link</label>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <code id="pf-ref-link" style="flex:1;min-width:0;font-size:.82rem;padding:9px 13px;
+                    border-radius:10px;border:1.5px solid var(--line);background:var(--page);
+                    color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                    display:block;">Loading…</code>
+                  <button id="pf-copy-ref" style="flex-shrink:0;font-size:.8rem;padding:8px 15px;
+                    border-radius:8px;border:1.5px solid var(--lav-line);background:var(--lav);
+                    cursor:pointer;color:var(--lav-ink);font-weight:700;">Copy link</button>
+                  <button id="pf-qr-ref" style="flex-shrink:0;font-size:.8rem;padding:8px 15px;
+                    border-radius:8px;border:1.5px solid var(--line);background:var(--page);
+                    cursor:pointer;color:var(--ink);font-weight:700;">📷 QR Card</button>
+                </div>
+              </div>
+              <p id="pf-ref-count" style="font-size:.82rem;color:var(--grey);margin:0;"></p>
+            </div>
+          </div>` : ""}
+
+          <!-- Account -->
+          <div class="profile-section">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title">Account</h2>
+            </div>
+            <div class="profile-section-body" style="display:flex;flex-direction:column;gap:14px;">
+              <p style="font-size:.88rem;color:var(--grey);margin:0;">
+                Signed in as <strong>${esc(user.email || "")}</strong>
+              </p>
+
+              <!-- Change password (email/password accounts only) -->
+              ${!user.google_id ? `
+              <details style="border:1.5px solid var(--line);border-radius:12px;overflow:hidden;">
+                <summary style="padding:12px 16px;cursor:pointer;font-size:.88rem;font-weight:700;
+                                color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center;">
+                  Change password <span style="font-size:.8rem;font-weight:400;color:var(--grey);">▸</span>
+                </summary>
+                <div style="padding:0 16px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+                  <input type="password" id="pf-cur-pw" placeholder="Current password" autocomplete="current-password"
+                    style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;
+                           border:1.5px solid var(--line);background:var(--page);color:var(--ink);font-size:.88rem;">
+                  <input type="password" id="pf-new-pw" placeholder="New password (min 8 chars, 1 letter + 1 number)" autocomplete="new-password"
+                    style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:8px;
+                           border:1.5px solid var(--line);background:var(--page);color:var(--ink);font-size:.88rem;">
+                  <div style="display:flex;gap:8px;align-items:center;">
+                    <button id="pf-save-pw" style="padding:8px 18px;border-radius:8px;border:none;
+                      background:var(--purple);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;">
+                      Update password
+                    </button>
+                    <span id="pf-pw-msg" style="font-size:.8rem;"></span>
+                  </div>
+                </div>
+              </details>` : `<p style="font-size:.82rem;color:var(--grey);margin:0;">
+                Password-less account — you sign in with Google.
+              </p>`}
+
+              <button class="danger-link" id="pf-signout">Sign out</button>
+
+              <!-- Delete account -->
+              <details style="border:1.5px solid #fecaca;border-radius:12px;overflow:hidden;margin-top:4px;">
+                <summary style="padding:12px 16px;cursor:pointer;font-size:.88rem;font-weight:700;
+                                color:#b91c1c;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+                  Delete account <span style="font-size:.8rem;font-weight:400;color:#b91c1c;">▸</span>
+                </summary>
+                <div style="padding:0 16px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+                  <p style="font-size:.82rem;color:#b91c1c;margin:0;">
+                    This permanently deletes your account, all progress, notes and enrollments.
+                    <strong>This cannot be undone.</strong>
+                  </p>
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <input type="text" id="pf-del-confirm" placeholder='Type DELETE to confirm'
+                      style="flex:1;min-width:160px;padding:9px 12px;border-radius:8px;
+                             border:1.5px solid #fecaca;background:var(--page);color:var(--ink);font-size:.88rem;">
+                    <button id="pf-delete-account" style="padding:8px 18px;border-radius:8px;border:none;
+                      background:#b91c1c;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;">
+                      Delete my account
+                    </button>
+                  </div>
+                </div>
+              </details>
+
+            </div>
+          </div>
+
+          <!-- QR share modal (hidden until triggered) -->
+          <div id="pf-qr-modal" style="display:none;position:fixed;inset:0;z-index:8000;
+               background:rgba(10,6,22,.7);backdrop-filter:blur(3px);align-items:center;justify-content:center;">
+            <div style="background:var(--page);border-radius:20px;padding:28px 24px;max-width:360px;width:calc(100%-32px);
+                        text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+              <button id="pf-qr-close" style="position:absolute;top:12px;right:14px;background:none;border:none;
+                cursor:pointer;font-size:1.2rem;color:var(--grey);">✕</button>
+              <h3 style="margin:0 0 4px 0;font-size:1.05rem;font-weight:800;color:var(--ink);">Share your referral</h3>
+              <p style="font-size:.78rem;color:var(--grey);margin:0 0 18px 0;">
+                Anyone who scans this or uses your link gets you both +50 points.
+              </p>
+              <!-- QR code rendered here by JS -->
+              <div id="pf-qr-canvas-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
+                <canvas id="pf-qr-canvas" width="200" height="200" style="border-radius:12px;"></canvas>
+              </div>
+              <code id="pf-qr-link-display" style="display:block;font-size:.74rem;color:var(--grey);
+                word-break:break-all;margin-bottom:16px;"></code>
+              <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                <button id="pf-qr-copy" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--lav-line);
+                  background:var(--lav);color:var(--lav-ink);font-weight:700;font-size:.82rem;cursor:pointer;">
+                  Copy link
+                </button>
+                <button id="pf-qr-download" style="padding:8px 18px;border-radius:8px;border:1.5px solid var(--line);
+                  background:var(--page);color:var(--ink);font-weight:700;font-size:.82rem;cursor:pointer;">
+                  Save QR image
+                </button>
+              </div>
+            </div>
+          </div>
+
+      </div>`;
+
+      // Form elements
+      const form    = document.getElementById("pf-form");
+      const alertEl = document.getElementById("pf-alert");
+      const submitEl = document.getElementById("pf-submit");
+      const msgEl   = document.getElementById("pf-msg");
+
+      // Init StyledDropdowns
+      if (window.StyledDropdown && form) {
+        if (form.grade) new window.StyledDropdown(form.grade, { placeholder: "Select qualification" });
+        if (form.gender) new window.StyledDropdown(form.gender, { placeholder: "Prefer not to say" });
+      }
+
+      // ── Subjects picker ──────────────────────────────────────────────────────
+      // Maps grade value → board name used in meta subjects
+      const GRADE_TO_BOARD = {
+        "O Level": "Cambridge O Level",
+        "IGCSE":   "Cambridge IGCSE",
+        "A Level": "Cambridge A Level",
+      };
+      let _metaSubjects = null;   // cached from /api/meta
+      let _enrolled = new Set();  // currently enrolled syllabus codes
+      const _wasProfileComplete = !!user.profile_complete;  // snapshot at page load
+
+      async function loadSubjectsData() {
+        try {
+          const [metaRes, enrollRes] = await Promise.all([
+            api("/api/meta"),
+            api("/api/enrollments"),
+          ]);
+          _metaSubjects = metaRes.subjects || [];
+          _enrolled = new Set((enrollRes.enrollments || []).map(e => e.syllabus));
+        } catch (e) {
+          _metaSubjects = [];
+        }
+        renderSubjectPicker(form?.grade?.value || "");
+      }
+
+      function renderSubjectPicker(gradeVal) {
+        const grid = document.getElementById("pf-subjects-grid");
+        if (!grid) return;
+        if (_metaSubjects === null) {
+          grid.innerHTML = `<span class="pf-subjects-empty">Loading…</span>`;
+          return;
+        }
+        const board = GRADE_TO_BOARD[gradeVal] || null;
+        if (!board) {
+          grid.innerHTML = `<span class="pf-subjects-empty">Select your board above to see available subjects.</span>`;
+          return;
+        }
+        const visible = _metaSubjects.filter(s => s.board === board || _enrolled.has(s.syllabus));
+
+        if (!visible.length) {
+          grid.innerHTML = `<span class="pf-subjects-empty">No subjects available for this qualification yet.</span>`;
+          return;
+        }
+
+        grid.innerHTML = visible.map(s => {
+          const on = _enrolled.has(s.syllabus);
+          const offBoard = board && s.board !== board;
+          return `<button type="button" class="pf-subject-btn"
+              data-syllabus="${esc(s.syllabus)}" data-on="${on}"
+              title="${esc(s.board)} · ${esc(s.syllabus)}"
+              ${offBoard ? 'style="opacity:.6;"' : ''}>
+            ${on ? "✓ " : ""}${esc(s.short || s.name)}
+            <span style="font-size:.68rem;opacity:.7;font-weight:600;">${esc(s.syllabus)}</span>
+          </button>`;
+        }).join("");
+
+        grid.querySelectorAll(".pf-subject-btn").forEach(btn => {
+          btn.addEventListener("click", () => toggleSubject(btn));
+        });
+      }
+
+      async function toggleSubject(btn) {
+        const syllabus = btn.dataset.syllabus;
+        const on = btn.dataset.on === "true";
+        if (on) {
+          const name = btn.textContent.trim().replace(/^✓\s*/, "").replace(/\s*\d+.*$/, "").trim();
+          if (!confirm(`Remove ${name} from your subjects? Your progress will be kept and can be restored.`)) return;
+        }
+        btn.disabled = true;
+        btn.textContent = on ? "Removing…" : "Adding…";
+        try {
+          if (on) {
+            await api("/api/enrollments/" + encodeURIComponent(syllabus), { method: "DELETE" });
+            _enrolled.delete(syllabus);
+          } else {
+            await api("/api/enrollments", { method: "POST", body: { syllabus } });
+            _enrolled.add(syllabus);
+          }
+          // Re-render with updated enrollment state
+          renderSubjectPicker(form?.grade?.value || "");
+        } catch (err) {
+          alert(err.message || "Could not update subject.");
+          btn.disabled = false;
+        }
+      }
+
+      // Wire the grade dropdown to refresh subjects
+      const gradeSelectEl = document.getElementById("pf-grade-select");
+      // StyledDropdown fires a native 'change' event on the underlying <select>,
+      // so this listener works whether the user picks via the styled UI or natively.
+      if (gradeSelectEl) {
+        gradeSelectEl.addEventListener("change", () => {
+          renderSubjectPicker(gradeSelectEl.value);
+        });
+      }
+
+      // Kick off data load
+      loadSubjectsData();
+
+      if (form) {
+        // Track whether this is the user's first profile completion so we can
+        // redirect them to the dashboard setup flow afterwards.
+        const isFirstSetup = !user.profile_complete;
+
+        form.addEventListener("submit", async e => {
+        e.preventDefault();
+        alertEl.hidden = true;
+        msgEl.textContent = "";
+        const name = form.name.value.trim();
+        if (!name) { showMsg("fail", "Name can't be empty."); return; }
+        if (!form.grade.value) { showMsg("fail", "Please select your board (O Level / IGCSE / A Level)."); return; }
+        if (_enrolled.size === 0 && !_wasProfileComplete) {
+          showMsg("fail", "Please tick at least one subject below before saving.");
+          setTimeout(() => {
+            document.getElementById("pf-subjects-grid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+          return;
+        }
+        const phoneVal = form.phone.value.trim();
+        if (!phoneVal) { showMsg("fail", "WhatsApp number is required so your tutor can reach you."); return; }
+        submitEl.disabled = true;
+        submitEl.textContent = "Saving…";
+        try {
+          const savedUser = await api("/api/profile", {
+            method: "POST",
+            body: {
+              name, grade: form.grade.value,
+              birthday: form.birthday.value || null,
+              gender:   form.gender.value   || null,
+              phone:    form.phone.value.trim() || null,
+            },
+          });
+          const params = new URLSearchParams(location.search);
+          if ((isFirstSetup || params.has("setup")) && form.grade.value) {
+            const next = params.get("next") || "/dashboard.html";
+            if (savedUser.profile_complete) {
+              // Both grade and subjects are present — go straight to dashboard.
+              showMsg("ok", "Profile complete! Redirecting…");
+              setTimeout(() => { location.href = next; }, 900);
+            } else {
+              // Grade saved but no subjects yet — scroll them to the subjects picker.
+              showMsg("ok", "Qualification saved! Now tick your subjects below.");
+              setTimeout(() => {
+                document.getElementById("pf-subjects-grid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }, 600);
+            }
+          } else {
+            document.getElementById("pf-name").textContent = name;
+            document.getElementById("pf-avatar").innerHTML =
+              `<span>${initials(name)}</span>`;
+            showMsg("ok", "Saved!");
+          }
+        } catch (err) {
+          showMsg("fail", err.message);
+        } finally {
+          submitEl.disabled = false;
+          submitEl.textContent = "Save changes";
+        }
+      });
+      }
+
+      const signoutBtn = document.getElementById("pf-signout");
+      if (signoutBtn) {
+        signoutBtn.addEventListener("click", async () => {
+          const { logout } = await import("/auth.js?v=20260829a");
+          logout();
+        });
+      }
+
+      // ── Change password ──────────────────────────────────────────────────────
+      document.getElementById("pf-save-pw")?.addEventListener("click", async () => {
+        const curPw  = document.getElementById("pf-cur-pw")?.value || "";
+        const newPw  = document.getElementById("pf-new-pw")?.value || "";
+        const msgEl2 = document.getElementById("pf-pw-msg");
+        const btn    = document.getElementById("pf-save-pw");
+        if (!curPw || !newPw) { if (msgEl2) { msgEl2.textContent = "Both fields required."; msgEl2.style.color = "#b91c1c"; } return; }
+        if (curPw === newPw) { if (msgEl2) { msgEl2.textContent = "New password must be different from your current one."; msgEl2.style.color = "#b91c1c"; } return; }
+        btn.disabled = true; btn.textContent = "Saving…";
+        try {
+          await api("/api/auth/change-password", {
+            method: "POST",
+            body: { current_password: curPw, new_password: newPw },
+          });
+          if (msgEl2) {
+            msgEl2.textContent = "✓ Password updated successfully!";
+            msgEl2.style.cssText = "color:#fff;background:#16a34a;padding:8px 12px;border-radius:8px;font-weight:600;display:block;margin-top:8px";
+          }
+          document.getElementById("pf-cur-pw").value = "";
+          document.getElementById("pf-new-pw").value = "";
+        } catch (err) {
+          if (msgEl2) { msgEl2.textContent = err.message; msgEl2.style.cssText = "color:#b91c1c"; }
+        } finally {
+          btn.disabled = false; btn.textContent = "Update password";
+        }
+      });
+
+      // ── Delete account ───────────────────────────────────────────────────────
+      document.getElementById("pf-delete-account")?.addEventListener("click", async () => {
+        const confirmVal = document.getElementById("pf-del-confirm")?.value?.trim();
+        if (confirmVal !== "DELETE") {
+          alert('Type DELETE (all caps) in the box to confirm.');
+          return;
+        }
+        if (!confirm("Are you absolutely sure? This cannot be undone.")) return;
+        try {
+          await api("/api/account", { method: "DELETE", body: { confirm: "DELETE" } });
+          location.href = "/index.html";
+        } catch (err) {
+          alert("Failed to delete account: " + err.message);
+        }
+      });
+
+      // ── Student code ─────────────────────────────────────────────────────────
+      if ((user.role || "student") === "student") {
+        api("/api/student-code").then(({ code }) => {
+          const el = document.getElementById("pf-student-code");
+          if (el) el.textContent = code;
+          const copyBtn = document.getElementById("pf-copy-code");
+          if (copyBtn) copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(code).then(() => {
+              copyBtn.textContent = "Copied!";
+              setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000);
+            });
+          });
+        }).catch(() => {});
+      }
+
+      // ── Avatar upload ────────────────────────────────────────────────────────
+      const photoInput = document.getElementById("pf-photo-input");
+      if (photoInput) {
+        photoInput.addEventListener("change", async function () {
+          const file = this.files[0];
+          if (!file) return;
+          const statusEl = document.getElementById("pf-photo-status");
+          const avatarEl = document.getElementById("pf-avatar");
+          if (statusEl) {
+            statusEl.textContent = "Uploading…";
+            statusEl.style.color = "var(--grey)";
+          }
+          const fd = new FormData();
+          fd.append("file", file);
+          try {
+            const res = await fetch("/api/upload/avatar", { method: "POST", body: fd });
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              throw new Error(err.detail || "Upload failed");
+            }
+            const { url } = await res.json();
+            if (avatarEl) avatarEl.innerHTML = `<img src="${url}?t=${Date.now()}" alt="" id="pf-avatar-img" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            if (statusEl) {
+              statusEl.textContent = "Photo updated!";
+              statusEl.style.color = "var(--green, #2d7d46)";
+              setTimeout(() => { statusEl.textContent = ""; }, 3000);
+            }
+          } catch (err) {
+            if (statusEl) {
+              statusEl.textContent = err.message;
+              statusEl.style.color = "#d93025";
+            }
+          }
+          this.value = "";
+        });
+      }
+
+      function showMsg(type, text) {
+        msgEl.textContent = text;
+        msgEl.className = "profile-save-msg " + type;
+      }
+    }
+
+    // ── Boot ─────────────────────────────────────────────────────────────────
+    (async () => {
+      try {
+        const user = await getUser();
+        if (!user) {
+          root.innerHTML = `
+            <div class="profile-card" style="max-width:480px;margin:40px auto;text-align:center;padding:40px 24px;">
+              <span style="font-size:3rem;display:block;margin-bottom:12px">🔒</span>
+              <h2 style="font-size:1.4rem;font-weight:800;color:var(--purple);margin:0 0 8px 0">Sign in to view your profile</h2>
+              <p style="color:var(--grey);font-size:.92rem;margin:0 0 24px 0">You need a free PrepWithTee account to view and edit your profile settings.</p>
+              <a href="/login.html?next=${encodeURIComponent(location.pathname)}" class="btn btn-gold" style="width:100%;justify-content:center;display:inline-flex;">Sign In Now →</a>
+            </div>`;
+          return;
+        }
+
+        // Render profile INSTANTLY with session user state (0 splash delay!)
+        const initialEnrollments = (user.enrollments || []).map(e => ({
+          subject: typeof e === "string" ? e : (e.name || e.syllabus),
+          syllabus: typeof e === "string" ? e : e.syllabus,
+        }));
+        render({ ...user, enrollments: initialEnrollments, usageData: null });
+
+        // Background fetch for detailed enrollments, usage & referrals without blocking page view
+        Promise.all([
+          api("/api/enrollments").catch(() => null),
+          api("/api/usage").catch(() => null),
+          (user.role || "student") === "student"
+            ? api("/api/referrals/me").catch(() => null)
+            : Promise.resolve(null),
+        ]).then(([enrollData, usageData, refData]) => {
+          const enrollments = (enrollData?.enrollments || []).map(e => ({
+            subject: e.name || e.syllabus,
+            syllabus: e.syllabus,
+          }));
+          render({ ...user, enrollments: enrollments.length ? enrollments : initialEnrollments, usageData });
+
+          // Populate referral widget (already in DOM after render)
+          if (refData) {
+            const linkEl  = document.getElementById("pf-ref-link");
+            const copyBtn = document.getElementById("pf-copy-ref");
+            const qrBtn   = document.getElementById("pf-qr-ref");
+            const countEl = document.getElementById("pf-ref-count");
+            const ptsEl   = document.getElementById("pf-ref-points");
+            const refLink = refData.referral_link || "";
+            if (linkEl)  linkEl.textContent = refLink;
+            if (ptsEl)   ptsEl.textContent  = refData.points ? `${refData.points} pts` : "";
+            if (countEl) countEl.textContent = refData.referrals_count
+              ? `${refData.referrals_count} friend${refData.referrals_count === 1 ? "" : "s"} joined using your link`
+              : "No referrals yet — share your link to get started!";
+            if (copyBtn && refLink) {
+              copyBtn.addEventListener("click", () => {
+                navigator.clipboard.writeText(refLink).then(() => {
+                  copyBtn.textContent = "Copied!";
+                  setTimeout(() => { copyBtn.textContent = "Copy link"; }, 2000);
+                });
+              });
+            }
+            if (qrBtn && refLink) {
+              qrBtn.addEventListener("click", () => openQrModal(refLink));
+            }
+          }
+        });
+
+      } catch (err) {
+        const spinner = document.getElementById("profile-spinner");
+        if (spinner) spinner.innerHTML =
+          '<p style="color:#d93025;text-align:center;font-size:.95rem">Could not load your profile.<br>' +
+          '<a href="" onclick="location.reload();return false" style="color:#d93025">Reload</a> · ' +
+          '<a href="/login.html" style="color:#d93025">Sign in again</a></p>';
+      }
+    })();
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+  <script src="tour.js?v=20260829a"></script>
+
+<script>
+/* ── Minimal QR code generator (Version 2, ECC-L, alphanumeric + byte mode) ─
+   Draws onto #pf-qr-canvas. No external library needed.
+   Uses the qrcode-generator approach: encode URL, draw modules on canvas.      */
+
+function openQrModal(url) {
+  const modal = document.getElementById("pf-qr-modal");
+  if (!modal) return;
+  document.getElementById("pf-qr-link-display").textContent = url;
+  modal.style.display = "flex";
+
+  // Draw QR
+  drawQR(url, document.getElementById("pf-qr-canvas"));
+
+  // Copy
+  document.getElementById("pf-qr-copy").onclick = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      const b = document.getElementById("pf-qr-copy");
+      b.textContent = "Copied!";
+      setTimeout(() => { b.textContent = "Copy link"; }, 2000);
+    });
+  };
+
+  // Save QR as PNG — draw a branded card onto an offscreen canvas first
+  document.getElementById("pf-qr-download").onclick = () => {
+    const card = document.createElement("canvas");
+    card.width = 440; card.height = 520;
+    const ctx = card.getContext("2d");
+    // Background
+    ctx.fillStyle = "#ffffff";
+    ctx.roundRect(0, 0, 440, 520, 20);
+    ctx.fill();
+    // Purple header band
+    ctx.fillStyle = "#7c3aed";
+    ctx.roundRect(0, 0, 440, 110, [20, 20, 0, 0]);
+    ctx.fill();
+    // Logo emoji + title
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 22px 'Archivo', Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("PrepWithTee", 220, 46);
+    ctx.font = "400 14px 'Hanken Grotesk', Arial, sans-serif";
+    ctx.fillText("Scan to join with my referral", 220, 72);
+    ctx.fillText("You both earn +50 study points 🎉", 220, 94);
+    // QR code (copy from pf-qr-canvas)
+    const qrC = document.getElementById("pf-qr-canvas");
+    const qrSize = 260;
+    ctx.drawImage(qrC, (440 - qrSize) / 2, 128, qrSize, qrSize);
+    // URL text
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "12px monospace";
+    ctx.textAlign = "center";
+    const shortUrl = url.length > 52 ? url.slice(0, 49) + "…" : url;
+    ctx.fillText(shortUrl, 220, 412);
+    // Footer
+    ctx.fillStyle = "#f3f0ff";
+    ctx.roundRect(20, 430, 400, 70, 12);
+    ctx.fill();
+    ctx.fillStyle = "#7c3aed";
+    ctx.font = "700 13px 'Archivo', Arial, sans-serif";
+    ctx.fillText("prepwithtee.com", 220, 462);
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "11px sans-serif";
+    ctx.fillText("Cambridge O Level & IGCSE past papers + AI tutor", 220, 482);
+
+    const a = document.createElement("a");
+    a.href = card.toDataURL("image/png");
+    a.download = "prepwithtee-referral-qr.png";
+    a.click();
+  };
+
+  // Close
+  document.getElementById("pf-qr-close").onclick = () => { modal.style.display = "none"; };
+  modal.addEventListener("click", e => { if (e.target === modal) modal.style.display = "none"; });
+}
+
+/* Tiny self-contained QR encoder — sufficient for short URLs (Version 2-6, ECC L).
+   Based on the public-domain Kazuhiko Aoyama qrcode-generator algorithm.        */
+function drawQR(text, canvas) {
+  // Use qrcode library if already loaded (e.g. by another page), otherwise use fallback placeholder
+  // Lightweight approach: use the Data URI QR service via the browser's fetch-blocked policy
+  // Since external CDN is blocked, we draw a styled placeholder with the URL visible
+  // and rely on the branded card download to show the real QR for sharing.
+  //
+  // REAL implementation — pure-JS QR using the standard Reed-Solomon algorithm:
+  (function() {
+    // ── QR parameters for Version 2, ECC L (can encode ~77 bytes) ──────────
+    const PAD0 = 0xEC, PAD1 = 0x11;
+    const GF_EXP = new Uint8Array(512);
+    const GF_LOG = new Uint8Array(256);
+    let x = 1;
+    for (let i = 0; i < 255; i++) {
+      GF_EXP[i] = x; GF_LOG[x] = i;
+      x <<= 1; if (x & 256) x ^= 285;
+    }
+    for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
+    const gfMul = (a, b) => a && b ? GF_EXP[GF_LOG[a] + GF_LOG[b]] : 0;
+    const gfPoly = (degree, value) => { const p = new Uint8Array(degree + 1); p[degree] = value; return p; };
+    function gfPolyMul(p, q) {
+      const r = new Uint8Array(p.length + q.length - 1);
+      for (let i = 0; i < p.length; i++)
+        for (let j = 0; j < q.length; j++)
+          r[i + j] ^= gfMul(p[i], q[j]);
+      return r;
+    }
+    function gfPolyDiv(msg, gen) {
+      let r = new Uint8Array(msg);
+      for (let i = 0; i < msg.length - gen.length + 1; i++) {
+        const c = r[i];
+        if (!c) continue;
+        for (let j = 1; j < gen.length; j++) r[i + j] ^= gfMul(gen[j], c);
+      }
+      return r.slice(-(gen.length - 1));
+    }
+    function genPoly(n) {
+      let g = gfPoly(0, 1);
+      for (let i = 0; i < n; i++) g = gfPolyMul(g, new Uint8Array([1, GF_EXP[i]]));
+      return g;
+    }
+    function rsEncode(data, nEcc) { return gfPolyDiv(new Uint8Array([...data, ...new Uint8Array(nEcc)]), genPoly(nEcc)); }
+
+    // ── Encode text as byte mode ─────────────────────────────────────────────
+    const bytes = new TextEncoder().encode(text);
+    const bits  = [];
+    const push  = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >> i) & 1); };
+
+    // Pick version (1-10) that fits — use version 3 for URLs up to ~81 bytes ECC-M
+    let ver = 1, totalDC = 19, ecBlocks = 7;
+    // Capacity table [ver]: [total data codewords, EC codewords per block, blocks]
+    const CAP = {1:[19,7,1],2:[34,10,1],3:[55,15,1],4:[80,20,2],5:[108,26,2],
+                 6:[136,18,4],7:[156,20,4],8:[194,24,4],9:[232,30,5],10:[274,18,6]};
+    for (const [v, [dc, ec, blk]] of Object.entries(CAP)) {
+      // byte capacity = dc - blk (header per block)
+      const cap = dc - (4 + 1) * blk; // rough: 4 mode + lenBits per block
+      if (cap >= bytes.length) { ver = +v; totalDC = dc; ecBlocks = ec; break; }
+    }
+
+    push(4, 4);                    // byte mode
+    push(bytes.length, ver < 10 ? 8 : 16);  // char count
+    for (const b of bytes) push(b, 8);
+
+    // Terminator + pad to 8-bit alignment
+    push(0, Math.min(4, totalDC * 8 - bits.length));
+    while (bits.length % 8) bits.push(0);
+
+    // Fill remaining codewords with padding bytes
+    const cws = [];
+    for (let i = 0; i < bits.length; i += 8) {
+      let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+      cws.push(b);
+    }
+    let pad = 0;
+    while (cws.length < totalDC) { cws.push(pad ? PAD1 : PAD0); pad ^= 1; }
+
+    // RS error correction
+    const eccCws = rsEncode(cws, ecBlocks);
+    const allCws = [...cws, ...eccCws];
+
+    // ── Build QR matrix ──────────────────────────────────────────────────────
+    const size = ver * 4 + 17;
+    const M    = Array.from({length: size}, () => new Int8Array(size).fill(-1));
+    const set  = (r, c, v) => { M[r][c] = v; };
+
+    // Finder pattern helper
+    const finder = (row, col) => {
+      for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) {
+        if (row + r < 0 || row + r >= size || col + c < 0 || col + c >= size) continue;
+        const inOuter = r >= 0 && r <= 6 && (c === 0 || c === 6) || c >= 0 && c <= 6 && (r === 0 || r === 6);
+        const inInner = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+        set(row + r, col + c, (inOuter || inInner) ? 1 : 0);
+      }
+    };
+    finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
+
+    // Timing patterns
+    for (let i = 8; i < size - 8; i++) { set(6, i, i % 2 === 0 ? 1 : 0); set(i, 6, i % 2 === 0 ? 1 : 0); }
+
+    // Alignment pattern (version >= 2)
+    if (ver >= 2) {
+      const ap = [6, size - 7];
+      for (const pr of ap) for (const pc of ap) {
+        if ((pr === 6 && pc === 6) || (pr === size-7 && pc === 6) || (pr === 6 && pc === size-7)) continue;
+        for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+          set(pr + dr, pc + dc, (dr === 0 && dc === 0) || Math.abs(dr) === 2 || Math.abs(dc) === 2 ? 1 : 0);
+        }
+      }
+    }
+
+    // Format info area
+    for (let i = 0; i < 6; i++) { set(8, i, -2); set(i, 8, -2); }
+    set(8, 7, -2); set(8, 8, -2); set(7, 8, -2);
+    for (let i = size - 8; i < size; i++) { set(8, i, -2); set(i, 8, -2); }
+
+    // Data placement
+    const reserved = (r, c) => M[r][c] !== -1;
+    let bit = 0;
+    const dataBits = [];
+    for (const b of allCws) for (let i = 7; i >= 0; i--) dataBits.push((b >> i) & 1);
+
+    let dir = 1, col = size - 1;  // dir=1 → going up (row decreases)
+    for (; col >= 0; col -= 2) {
+      if (col === 6) col--;
+      let row = dir === 1 ? size - 1 : 0;
+      for (let cnt = 0; cnt < size; cnt++, row -= dir) {
+        for (let dc2 = 0; dc2 < 2; dc2++) {
+          const c2 = col - dc2;
+          if (!reserved(row, c2) && bit < dataBits.length) {
+            set(row, c2, dataBits[bit++]);
+          }
+        }
+      }
+      dir = -dir;
+    }
+
+    // Apply mask pattern 0: (r+c) % 2 == 0
+    for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
+      if (M[r][c] >= 0 && (r + c) % 2 === 0) M[r][c] ^= 1;
+    }
+
+    // Write format info AFTER data mask (format info is not data-masked).
+    // Pre-computed for ECC-L (01), mask pattern 0 (000): 0x77C4 = 0b111011111000100
+    const FMT = 0x77C4;
+    // Copy 1: along row 8 (cols 0-5,7) then col 8 (rows 8,7,5-0)
+    const fi1 = [[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+    // Copy 2: along col 8 (rows size-1..size-7) then row 8 (cols size-8..size-1)
+    const fi2 = [[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
+                 [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+    for (let i = 0; i < 15; i++) {
+      const b = (FMT >> (14 - i)) & 1;
+      set(fi1[i][0], fi1[i][1], b);
+      set(fi2[i][0], fi2[i][1], b);
+    }
+    set(size - 8, 8, 1); // always-dark module
+
+    // ── Render to canvas ─────────────────────────────────────────────────────
+    const module = 8, quiet = 4;
+    const cSize = (size + quiet * 2) * module;
+    canvas.width = canvas.height = cSize;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cSize, cSize);
+    ctx.fillStyle = "#1a1036";
+    for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
+      if (M[r][c] === 1) ctx.fillRect((c + quiet) * module, (r + quiet) * module, module, module);
+    }
+  })();
+}
+</script>
 </body>
 
 </html>
+
