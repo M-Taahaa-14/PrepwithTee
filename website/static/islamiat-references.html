@@ -1,0 +1,1298 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Islamiat References — PrepWithTee</title>
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+<style>
+/* ── Islamic References Page ── */
+:root {
+  --ir-paper: #F6F3EE;
+  --ir-ink: #1C1A2E;
+  --ir-gold: #B8873A;
+  --ir-green: #1A6B4A;
+  --ir-purple: #5A2D82;
+  --ir-grey: #6B6875;
+  --ir-surface: #FFFFFF;
+  --ir-border: rgba(0,0,0,.1);
+  --ir-quran: #5A2D82;
+  --ir-hadis: #1A6B4A;
+  --ir-hadis-q: #B8873A;
+  --ir-companion: #6B6875;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ir-paper: #0E1210;
+    --ir-ink: #EDE8DF;
+    --ir-surface: #16201A;
+    --ir-border: rgba(255,255,255,.1);
+    --ir-grey: #9B98A8;
+  }
+}
+[data-theme="dark"] {
+  --ir-paper: #0E1210;
+  --ir-ink: #EDE8DF;
+  --ir-surface: #16201A;
+  --ir-border: rgba(255,255,255,.1);
+  --ir-grey: #9B98A8;
+}
+
+body { background: var(--page); color: var(--ink); }
+
+/* override locally so cards still use themed vars */
+:root { --ir-surface: #fff; --ir-border: var(--line); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ir-surface: #1C2820; --ir-border: rgba(255,255,255,.1); } }
+[data-theme="dark"] { --ir-surface: #1C2820; --ir-border: rgba(255,255,255,.1); }
+
+.ir-hero {
+  background: linear-gradient(135deg, #2A1A4A 0%, #1A3A2A 100%);
+  color: #EDE8DF;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+.ir-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 .4rem;
+  color: #F0E6C8;
+}
+.ir-hero p { font-size: .95rem; opacity: .8; margin: 0; max-width: 480px; margin: 0 auto; }
+.ir-bismillah {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: #E8C97A;
+  margin-bottom: .6rem;
+  letter-spacing: .04em;
+}
+
+/* ── Mode tabs ── */
+.ir-tabs {
+  display: flex; gap: 0; background: var(--page);
+  border-bottom: 2px solid var(--line);
+  position: sticky; top: 60px; z-index: 80;
+  overflow-x: auto; scrollbar-width: none;
+}
+.ir-tabs::-webkit-scrollbar { display: none; }
+.ir-tab {
+  flex: 1; min-width: 110px;
+  padding: .85rem 1.2rem;
+  font-size: .85rem; font-weight: 700; text-align: center;
+  border: none; background: none; cursor: pointer;
+  color: var(--grey);
+  border-bottom: 3px solid transparent;
+  transition: all .18s; white-space: nowrap;
+  font-family: 'Hanken Grotesk', sans-serif;
+}
+.ir-tab:hover { color: var(--ink); }
+.ir-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── Filter bar ── */
+.ir-filter {
+  display: flex; gap: .6rem; padding: 1rem 1.5rem;
+  flex-wrap: wrap; align-items: center;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+.ir-filter select, .ir-filter input {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: .82rem; font-weight: 600;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: .45rem .75rem;
+  background: var(--page);
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+  transition: border-color .15s;
+}
+.ir-filter select:focus, .ir-filter input:focus { border-color: var(--gold); }
+.ir-filter input { flex: 1; min-width: 180px; }
+.ir-filter-label { font-size: .78rem; font-weight: 700; color: var(--grey); white-space: nowrap; }
+
+/* ── Type badge ── */
+.ir-badge {
+  display: inline-block; font-size: .65rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: .18rem .5rem; border-radius: 4px; margin-bottom: .5rem;
+}
+.badge-q  { background: rgba(90,45,130,.12); color: var(--ir-quran); }
+.badge-h  { background: rgba(26,107,74,.12);  color: var(--ir-hadis); }
+.badge-hq { background: rgba(184,135,58,.15); color: var(--ir-hadis-q); }
+.badge-c  { background: rgba(107,104,117,.12);color: var(--ir-companion); }
+
+/* ── Browse cards ── */
+.ir-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem; padding: 1.25rem 1.5rem;
+}
+.ir-card {
+  background: var(--white);
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--ir-quran);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+}
+.ir-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+.ir-card[data-tp="h"]  { border-left-color: var(--ir-hadis); }
+.ir-card[data-tp="hq"] { border-left-color: var(--ir-hadis-q); }
+.ir-card[data-tp="c"]  { border-left-color: var(--ir-companion); }
+
+.ir-card-text {
+  font-family: 'Playfair Display', serif;
+  font-size: .9rem; font-style: italic;
+  line-height: 1.6; margin: 0 0 .5rem;
+  color: var(--ink);
+}
+.ir-card-src { font-size: .72rem; font-weight: 700; color: var(--grey); }
+.ir-card-click { font-size: .7rem; color: var(--gold); font-weight: 700; margin-top: .5rem; }
+
+.ir-section-head {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700;
+  padding: 1.2rem 1.5rem .3rem;
+  color: var(--ink); border-bottom: 1px solid var(--line);
+  margin: 0;
+}
+.ir-chapter-label {
+  font-size: .7rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--gold);
+  padding: .8rem 1.5rem .1rem; display: block;
+}
+
+/* ── Recall mode ── */
+#panel-recall { padding: 1.5rem; }
+.recall-wrap { max-width: 640px; margin: 0 auto; }
+.recall-progress { text-align: center; font-size: .8rem; color: var(--grey); margin-bottom: 1rem; }
+.recall-card {
+  perspective: 1000px;
+  height: 220px; cursor: pointer; margin-bottom: 1.5rem;
+}
+.recall-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .5s;
+}
+.recall-card.flipped .recall-inner { transform: rotateY(180deg); }
+.recall-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1.5rem; text-align: center;
+  border: 1.5px solid var(--line);
+}
+.recall-front {
+  background: linear-gradient(135deg, #2A1A4A, #1A3A2A);
+  color: #EDE8DF;
+}
+.recall-front .recall-prompt {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; line-height: 1.55;
+}
+.recall-front .recall-hint { font-size: .75rem; opacity: .6; margin-top: .7rem; }
+.recall-back { background: var(--page); transform: rotateY(180deg); }
+.recall-back .recall-answer {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: .95rem; line-height: 1.65;
+  color: var(--ink);
+}
+.recall-back .recall-src { font-size: .75rem; color: var(--grey); margin-top: .5rem; font-weight: 700; }
+.recall-nav { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+.recall-btn {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: .82rem; font-weight: 700;
+  padding: .55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer;
+  transition: opacity .15s;
+}
+.recall-btn:hover { opacity: .8; }
+.recall-btn-prev { background: var(--page); color: var(--ink); border: 1.5px solid var(--line); }
+.recall-btn-reveal { background: var(--gold); color: #fff; }
+.recall-btn-next { background: var(--ir-green); color: #fff; }
+
+/* ── Quiz mode ── */
+#panel-quiz { padding: 1.5rem; }
+.quiz-wrap { max-width: 640px; margin: 0 auto; }
+.quiz-prompt-box {
+  background: linear-gradient(135deg, #2A1A4A, #1A3A2A);
+  color: #EDE8DF; border-radius: 14px;
+  padding: 1.5rem; margin-bottom: 1.2rem; text-align: center;
+}
+.quiz-prompt-label { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; opacity: .6; }
+.quiz-prompt-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; line-height: 1.6; margin-top: .5rem;
+}
+.quiz-prompt-chapter { font-size: .75rem; opacity: .65; margin-top: .4rem; }
+.quiz-input {
+  width: 100%; box-sizing: border-box;
+  font-family: 'Hanken Grotesk', sans-serif; font-size: .9rem;
+  border: 2px solid var(--line); border-radius: 10px;
+  padding: .8rem 1rem; background: var(--page); color: var(--ink);
+  resize: vertical; min-height: 80px; outline: none;
+  transition: border-color .15s;
+}
+.quiz-input:focus { border-color: var(--gold); }
+.quiz-actions { display: flex; gap: .6rem; margin-top: .75rem; flex-wrap: wrap; }
+.quiz-btn {
+  font-family: 'Hanken Grotesk', sans-serif; font-size: .83rem; font-weight: 700;
+  padding: .55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer;
+}
+.quiz-btn-check { background: var(--gold); color: #fff; }
+.quiz-btn-skip  { background: var(--page); color: var(--ink); border: 1.5px solid var(--line); }
+.quiz-btn-next  { background: var(--ir-green); color: #fff; }
+.quiz-result {
+  margin-top: 1rem; padding: 1rem 1.2rem;
+  border-radius: 10px; display: none;
+}
+.quiz-result.show { display: block; }
+.quiz-result-score { font-size: 1.3rem; font-weight: 800; margin-bottom: .3rem; }
+.quiz-result-label { font-size: .8rem; font-weight: 700; margin-bottom: .6rem; }
+.quiz-result-correct {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: .88rem; line-height: 1.6;
+  border-top: 1px solid rgba(0,0,0,.1); padding-top: .6rem; margin-top: .4rem;
+}
+.result-excellent { background: rgba(26,107,74,.12); color: #0F5335; }
+.result-good      { background: rgba(26,107,74,.07); color: #1A6B4A; }
+.result-getting   { background: rgba(184,135,58,.12); color: #7A5020; }
+.result-keep      { background: rgba(200,30,30,.08);  color: #8B1A1A; }
+
+/* ── Battles mode ── */
+#panel-battles { padding: 1.25rem 1.5rem; }
+.battle-filter { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.battle-chip {
+  font-size: .75rem; font-weight: 700; padding: .35rem .8rem;
+  border-radius: 20px; border: 1.5px solid var(--line);
+  background: var(--page); color: var(--grey); cursor: pointer;
+  transition: all .15s;
+}
+.battle-chip:hover, .battle-chip.active {
+  background: var(--gold); color: #fff; border-color: var(--gold);
+}
+.battle-paper-label {
+  font-size: .7rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--gold); margin: 1rem 0 .4rem;
+}
+.battle-card {
+  background: var(--white); border: 1.5px solid var(--line);
+  border-radius: 14px; margin-bottom: 1rem; overflow: hidden;
+}
+.battle-head {
+  display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+  padding: 1rem 1.2rem; cursor: pointer;
+  border-left: 4px solid var(--gold);
+}
+.battle-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 700; flex: 1; color: var(--ink);
+}
+.battle-meta { font-size: .75rem; color: var(--grey); }
+.battle-arrow { font-size: .8rem; color: var(--grey); transition: transform .25s; }
+.battle-card.open .battle-arrow { transform: rotate(180deg); }
+.battle-body { display: none; padding: 0 1.2rem 1.2rem; }
+.battle-card.open .battle-body { display: block; }
+.battle-stats {
+  display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: .8rem; margin-top: .4rem;
+}
+.battle-stat {
+  background: rgba(0,0,0,.04); border-radius: 8px; padding: .4rem .75rem;
+  font-size: .75rem;
+}
+.battle-stat strong { display: block; font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; color: var(--grey); }
+.battle-section { margin-bottom: .8rem; }
+.battle-section h4 { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--gold); margin: 0 0 .3rem; }
+.battle-section ul { margin: 0; padding-left: 1.2rem; }
+.battle-section li { font-size: .82rem; line-height: 1.6; margin-bottom: .15rem; }
+.battle-refs { font-size: .75rem; color: var(--ir-purple); font-weight: 600; margin-top: .5rem; }
+
+/* ── Detail Modal ── */
+.ir-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1rem;
+}
+.ir-modal-overlay.open { display: flex; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.ir-modal {
+  background: var(--page); border-radius: 18px;
+  max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+  padding: 1.75rem; position: relative;
+  border: 1.5px solid var(--line);
+  box-shadow: 0 8px 40px rgba(0,0,0,.18);
+}
+.ir-modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: none; border: none; font-size: 1.4rem; cursor: pointer;
+  color: var(--grey); line-height: 1;
+}
+.ir-modal-badge { margin-bottom: .75rem; }
+.ir-modal-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1.05rem; line-height: 1.7; color: var(--ink);
+  border-left: 4px solid var(--gold); padding-left: 1rem; margin: .5rem 0 1rem;
+}
+.ir-modal-src { font-size: .75rem; font-weight: 700; color: var(--grey); margin-bottom: 1.2rem; }
+.ir-hint-block { margin-bottom: 1rem; }
+.ir-hint-label {
+  font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--gold); margin-bottom: .3rem;
+}
+.ir-hint-text { font-size: .85rem; line-height: 1.65; color: var(--ink); }
+
+/* ── Count chip ── */
+.ir-count { font-size: .72rem; color: var(--grey); padding: 1rem 1.5rem .2rem; }
+.ir-empty { text-align: center; padding: 3rem 1rem; color: var(--grey); font-size: .9rem; }
+</style>
+</head>
+
+<body>
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" href="index.html">
+      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+      <span>PrepWithTee</span>
+    </a>
+    <nav class="header-nav" id="site-nav">
+      <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="islamiat-references.html" class="nav-drop-item active"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+      <a href="teacher-apply.html" class="nav-link">Teach</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+    </nav>
+    <div class="header-right"></div>
+  </div>
+</header>
+
+<div class="ir-hero">
+  <div class="ir-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+  <h1>Islamiat References</h1>
+  <p>Browse, memorise, and test your Quranic verses, Hadis, and companion quotes for O-Level / IGCSE 2058</p>
+</div>
+
+<!-- Mode tabs -->
+<div class="ir-tabs" role="tablist">
+  <button class="ir-tab active" data-panel="browse"  role="tab">📖 Browse</button>
+  <button class="ir-tab"        data-panel="recall"  role="tab">🔄 Recall</button>
+  <button class="ir-tab"        data-panel="quiz"    role="tab">✏️ Quiz</button>
+  <button class="ir-tab"        data-panel="battles" role="tab">⚔️ Battles</button>
+</div>
+
+<!-- ── BROWSE PANEL ── -->
+<div id="panel-browse">
+  <div class="ir-filter">
+    <span class="ir-filter-label">Paper:</span>
+    <select id="f-paper">
+      <option value="">Both Papers</option>
+      <option value="1">Paper 1</option>
+      <option value="2">Paper 2</option>
+    </select>
+    <select id="f-chapter">
+      <option value="">All Chapters</option>
+    </select>
+    <select id="f-type">
+      <option value="">All Types</option>
+      <option value="q">Quranic Verse</option>
+      <option value="h">Hadis</option>
+      <option value="hq">Hadis-e-Qudsi</option>
+      <option value="c">Companion Quote</option>
+    </select>
+    <input id="f-search" type="search" placeholder="Search references…">
+  </div>
+  <div class="ir-count" id="browse-count"></div>
+  <div id="browse-grid" class="ir-grid"></div>
+</div>
+
+<!-- ── RECALL PANEL ── -->
+<div id="panel-recall" hidden>
+  <div class="recall-wrap">
+    <div class="ir-filter" style="margin-bottom:1rem">
+      <span class="ir-filter-label">Chapter:</span>
+      <select id="r-chapter"><option value="">All Chapters</option></select>
+      <select id="r-paper">
+        <option value="">Both Papers</option>
+        <option value="1">Paper 1</option>
+        <option value="2">Paper 2</option>
+      </select>
+    </div>
+    <div class="recall-progress" id="recall-progress"></div>
+    <div class="recall-card" id="recall-card">
+      <div class="recall-inner">
+        <div class="recall-face recall-front">
+          <div class="recall-prompt" id="recall-prompt"></div>
+          <div class="recall-hint">Tap to reveal the reference</div>
+        </div>
+        <div class="recall-face recall-back">
+          <div class="recall-answer" id="recall-answer"></div>
+          <div class="recall-src" id="recall-src"></div>
+        </div>
+      </div>
+    </div>
+    <div class="recall-nav">
+      <button class="recall-btn recall-btn-prev" id="recall-prev">← Prev</button>
+      <button class="recall-btn recall-btn-reveal" id="recall-reveal">Reveal</button>
+      <button class="recall-btn recall-btn-next" id="recall-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUIZ PANEL ── -->
+<div id="panel-quiz" hidden>
+  <div class="quiz-wrap">
+    <div class="ir-filter" style="margin-bottom:1rem">
+      <select id="q-chapter"><option value="">All Chapters</option></select>
+      <select id="q-paper">
+        <option value="">Both Papers</option>
+        <option value="1">Paper 1</option>
+        <option value="2">Paper 2</option>
+      </select>
+    </div>
+    <div class="quiz-prompt-box">
+      <div class="quiz-prompt-label">Reference Quiz</div>
+      <div class="quiz-prompt-text" id="quiz-prompt-text">Loading…</div>
+      <div class="quiz-prompt-chapter" id="quiz-prompt-chapter"></div>
+    </div>
+    <textarea class="quiz-input" id="quiz-input" placeholder="Type the reference from memory…" rows="3"></textarea>
+    <div class="quiz-actions">
+      <button class="quiz-btn quiz-btn-check" id="quiz-check">Check Answer</button>
+      <button class="quiz-btn quiz-btn-skip"  id="quiz-skip">Skip</button>
+      <button class="quiz-btn quiz-btn-next"  id="quiz-next" style="display:none">Next Question →</button>
+    </div>
+    <div class="quiz-result" id="quiz-result">
+      <div class="quiz-result-score" id="quiz-score"></div>
+      <div class="quiz-result-label" id="quiz-label"></div>
+      <div class="quiz-result-correct" id="quiz-correct"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BATTLES PANEL ── -->
+<div id="panel-battles" hidden>
+  <div class="battle-filter" id="battle-filter">
+    <button class="battle-chip active" data-battle="">All Battles</button>
+    <button class="battle-chip" data-battle="p1">Paper 1 only</button>
+    <button class="battle-chip" data-battle="p2">Paper 2 only</button>
+  </div>
+  <div id="battles-list"></div>
+</div>
+
+<!-- ── Detail Modal ── -->
+<div class="ir-modal-overlay" id="modal-overlay">
+  <div class="ir-modal" role="dialog" aria-modal="true">
+    <button class="ir-modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div class="ir-modal-badge" id="modal-badge"></div>
+    <div class="ir-modal-quote" id="modal-quote"></div>
+    <div class="ir-modal-src"   id="modal-src"></div>
+    <div class="ir-hint-block">
+      <div class="ir-hint-label">When to use this reference</div>
+      <div class="ir-hint-text" id="modal-when"></div>
+    </div>
+    <div class="ir-hint-block">
+      <div class="ir-hint-label">How to introduce it</div>
+      <div class="ir-hint-text" id="modal-how"></div>
+    </div>
+    <div class="ir-hint-block">
+      <div class="ir-hint-label">What else to write alongside</div>
+      <div class="ir-hint-text" id="modal-alongside"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+// tp: q=Quran, h=Hadis, hq=Hadis-e-Qudsi, c=Companion
+// p: 1 or 2 (paper)
+const REFS = [
+// ── Paper 1: Quranic Passages ──
+// Theme 1: Allah in Himself
+{id:1,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"There is no god but He, the Living, the Self-Subsisting, the Eternal.",s:"2:255",tp:"q"},
+{id:2,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"There is none like him.",s:"112:4",tp:"q"},
+{id:3,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Say He is Allah the One the Only. The eternal, the absolute. He begets not, nor is He begotten. And there is none like unto Him.",s:"112:1-4",tp:"q"},
+{id:4,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"To Him belongs the dominion of the heavens and the earth; it is He who gives life and death; and He has Power over all things.",s:"57:2",tp:"q"},
+{id:5,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Behold! In the creation of the heavens and the earth and in the alternation of Night and Day there are indeed signs for men of understanding.",s:"3:190",tp:"q"},
+{id:6,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"But My Mercy extendeth to all things.",s:"7:156",tp:"q"},
+{id:7,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Allah forgives not that partners be set up with Him; but He forgives anything else, to whom He pleases.",s:"4:48",tp:"q"},
+{id:8,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"My mercy overpowers my wrath.",s:"Hadis-e-Qudsi",tp:"hq"},
+{id:9,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Glory to You, of knowledge we have none save that You have taught us.",s:"2:32",tp:"q"},
+{id:10,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Your Lord has decreed that you worship none but Him.",s:"17:23",tp:"q"},
+{id:11,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"To Allah belongs all that is in the heavens and on earth.",s:"3:109",tp:"q"},
+{id:12,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"No son did Allah beget, nor is there any god along with Him.",s:"23:91",tp:"q"},
+{id:13,p:1,ch:"Quranic Passages",th:"Allah in Himself",t:"Surah Ikhlas is equal to one third of the Quran.",s:"Bukhari",tp:"h"},
+
+// Theme 2: Allah and His Created World
+{id:14,p:1,ch:"Quranic Passages",th:"Allah and His Created World",t:"He is Allah, the Creator, the Inventor.",s:"59:24",tp:"q"},
+{id:15,p:1,ch:"Quranic Passages",th:"Allah and His Created World",t:"You we worship and You we ask for help.",s:"1:6",tp:"q"},
+{id:16,p:1,ch:"Quranic Passages",th:"Allah and His Created World",t:"This world is nothing but the enjoyment of deception.",s:"3:185",tp:"q"},
+{id:17,p:1,ch:"Quranic Passages",th:"Allah and His Created World",t:"Every soul will be paid in full the fruit of its deeds and Allah knows best all they do.",s:"39:70",tp:"q"},
+{id:18,p:1,ch:"Quranic Passages",th:"Allah and His Created World",t:"Hold tight to the rope of Allah and be not divided.",s:"3:103",tp:"q"},
+
+// Theme 3: Allah and His Messengers
+{id:19,p:1,ch:"Quranic Passages",th:"Allah and His Messengers",t:"Ibrahim was indeed a model devoutly obedient to Allah and true in faith and he joined not gods with Allah.",s:"16:120",tp:"q"},
+{id:20,p:1,ch:"Quranic Passages",th:"Allah and His Messengers",t:"But they killed him not, nor crucified him.",s:"4:157",tp:"q"},
+{id:21,p:1,ch:"Quranic Passages",th:"Allah and His Messengers",t:"Shirk is the greatest of all sins.",s:"Hadis",tp:"h"},
+{id:22,p:1,ch:"Quranic Passages",th:"Allah and His Messengers",t:"Successful indeed are the believers.",s:"23:1",tp:"q"},
+{id:23,p:1,ch:"Quranic Passages",th:"Allah and His Messengers",t:"Verily with every hardship there is relief.",s:"94:6",tp:"q"},
+
+// ── History & Importance of Quran ──
+{id:24,p:1,ch:"History & Importance of Quran",th:"Revelation of Quran",t:"He (Jibrael) seized me and squeezed me to such extent that I was exhausted.",s:"Bukhari",tp:"h"},
+{id:25,p:1,ch:"History & Importance of Quran",th:"Revelation of Quran",t:"Proclaim in the name of thy Lord and Cherisher who created. Created man out of a clot of congealed blood.",s:"96:1-2",tp:"q"},
+{id:26,p:1,ch:"History & Importance of Quran",th:"Revelation of Quran",t:"It comes to me sometimes as the ringing of a bell and this is hardest on me, then he leaves me and I remember from him what he says.",s:"Bukhari",tp:"h"},
+{id:27,p:1,ch:"History & Importance of Quran",th:"Revelation of Quran",t:"This day I have perfected your religion, completed my favour upon you, and chosen for you Islam as your religion.",s:"5:3",tp:"q"},
+{id:28,p:1,ch:"History & Importance of Quran",th:"Compilation of Quran",t:"The Holy Prophet was taken whilst the Quran had not yet been gathered into a book.",s:"Zaid bin Thabit",tp:"c"},
+{id:29,p:1,ch:"History & Importance of Quran",th:"Compilation of Quran",t:"Why should I start a task which was not done by the Prophet?",s:"Hazrat Abu Bakr",tp:"c"},
+{id:30,p:1,ch:"History & Importance of Quran",th:"Compilation of Quran",t:"By Allah, if I had been asked to uproot a mountain it would have been an easier task than the compilation of the Quran.",s:"Zaid bin Thabit",tp:"c"},
+{id:31,p:1,ch:"History & Importance of Quran",th:"Quran as Legal Source",t:"We have, without doubt, sent down the message and it is We who shall guard it.",s:"15:9",tp:"q"},
+{id:32,p:1,ch:"History & Importance of Quran",th:"Quran as Legal Source",t:"Let there be no compulsion in religion.",s:"2:256",tp:"q"},
+{id:33,p:1,ch:"History & Importance of Quran",th:"Quran as Legal Source",t:"We have sent down to you the Book in truth so that you may judge between men, as guided by God.",s:"4:105",tp:"q"},
+{id:34,p:1,ch:"History & Importance of Quran",th:"Quran as Legal Source",t:"We have neglected nothing in the Book.",s:"6:38",tp:"q"},
+{id:35,p:1,ch:"History & Importance of Quran",th:"Quran as Legal Source",t:"This is the Book, in it is sure guidance without doubt, for those who fear God.",s:"2:2",tp:"q"},
+{id:36,p:1,ch:"History & Importance of Quran",th:"Sunnah as Legal Source",t:"Verily, in the Messenger of Allah you have the best model to follow.",s:"33:21",tp:"q"},
+{id:37,p:1,ch:"History & Importance of Quran",th:"Sunnah as Legal Source",t:"He who obeys the Apostle, obeys Allah.",s:"4:80",tp:"q"},
+{id:38,p:1,ch:"History & Importance of Quran",th:"Sunnah as Legal Source",t:"And you stand on an exalted standard of character.",s:"68:4",tp:"q"},
+{id:39,p:1,ch:"History & Importance of Quran",th:"Sunnah as Legal Source",t:"Pray as you see me praying.",s:"Agreed upon",tp:"h"},
+{id:40,p:1,ch:"History & Importance of Quran",th:"Ijma as Legal Source",t:"My community will never agree upon an error.",s:"Hadis",tp:"h"},
+{id:41,p:1,ch:"History & Importance of Quran",th:"Ijma as Legal Source",t:"Who conduct affairs by mutual consultation.",s:"42:38",tp:"q"},
+{id:42,p:1,ch:"History & Importance of Quran",th:"Qiyas as Legal Source",t:"Every intoxicant is Khamr so every intoxicant is haram.",s:"Hadis",tp:"h"},
+
+// ── Life of the Prophet ──
+{id:43,p:1,ch:"Life of the Prophet",th:"Life before Prophethood",t:"Did He not find you an orphan and give you shelter and care.",s:"93:6",tp:"q"},
+{id:44,p:1,ch:"Life of the Prophet",th:"Call to Prophethood",t:"O you who wrapped up in the mantle arise and warn!",s:"74:1-2",tp:"q"},
+{id:45,p:1,ch:"Life of the Prophet",th:"Call to Prophethood",t:"O Uncle! Even if they place the sun in my right hand and the moon on my left to force me to renounce my mission, I would not stop until Allah fulfils my mission.",s:"Hadis",tp:"h"},
+{id:46,p:1,ch:"Life of the Prophet",th:"Call to Prophethood",t:"You have your religion and I have my religion.",s:"109:6",tp:"q"},
+{id:47,p:1,ch:"Life of the Prophet",th:"Isra wa Mairaj",t:"Glory to Him who carried His servant by night from the Sacred Mosque to the distant Mosque.",s:"17:1",tp:"q"},
+{id:48,p:1,ch:"Life of the Prophet",th:"Isra wa Mairaj",t:"He was given five prayers, he was given the concluding verses of Surah al-Baqarah, and remission of serious sins for those who associate not anything with Allah.",s:"Muslim",tp:"h"},
+{id:49,p:1,ch:"Life of the Prophet",th:"Visit to Taif",t:"Why should I pray for the destruction of these people? I hope that their posterity will certainly be among the believers in One Allah.",s:"Muslim",tp:"h"},
+{id:50,p:1,ch:"Life of the Prophet",th:"Migration",t:"For Allah did indeed help him when the unbelievers drove him out; he had no more than one companion. They were two in the cave and he said to his companion, have no fear for Allah is with us.",s:"9:40",tp:"q"},
+{id:51,p:1,ch:"Life of the Prophet",th:"Battle of Badr",t:"Permission is given against those whom war is made because they are wronged; verily Allah is able to help them.",s:"22:39",tp:"q"},
+{id:52,p:1,ch:"Life of the Prophet",th:"Battle of Badr",t:"Allah had helped you at Badr when you were a contemptible little force.",s:"3:123",tp:"q"},
+{id:53,p:1,ch:"Life of the Prophet",th:"Battle of Uhad",t:"Allah did indeed fulfil His promise to you when you, with His permission, were about to annihilate your enemy, until you flinched and fell to disputing about the order and you disobeyed.",s:"3:152",tp:"q"},
+{id:54,p:1,ch:"Life of the Prophet",th:"Treaty of Hudaibiya",t:"Verily we have given you a glorious victory, so that Allah may forgive your past faults and those to follow.",s:"48:1",tp:"q"},
+{id:55,p:1,ch:"Life of the Prophet",th:"Battle of Khyber",t:"Tomorrow I will give the banner to a man who loves God and His messenger and God and His messenger love him.",s:"Hadis",tp:"h"},
+{id:56,p:1,ch:"Life of the Prophet",th:"Conquest of Makkah",t:"And say the truth has come and falsehood has banished. Surely falsehood is bound to perish.",s:"17:81",tp:"q"},
+{id:57,p:1,ch:"Life of the Prophet",th:"Conquest of Makkah",t:"There shall be no reproach against you this day, go, you are free!",s:"Hadis",tp:"h"},
+{id:58,p:1,ch:"Life of the Prophet",th:"Battle of Hunain",t:"On the day of Hunain, when you rejoiced your numbers, but it availed you naught… then Allah did send His calmness on the Messenger.",s:"9:25-26",tp:"q"},
+{id:59,p:1,ch:"Life of the Prophet",th:"Farewell Sermon",t:"I leave behind me two things, the Quran and my example, the Sunnah, and if you follow these you will never go astray.",s:"Hadis",tp:"h"},
+{id:60,p:1,ch:"Life of the Prophet",th:"Farewell Sermon",t:"You know that every Muslim is the brother of another Muslim. You are all equal. Nobody has superiority over others except by piety and good actions.",s:"Farewell Sermon",tp:"h"},
+{id:61,p:1,ch:"Life of the Prophet",th:"Farewell Sermon",t:"O people, no prophet or apostle will come after me and no new faith will be born.",s:"Hadis",tp:"h"},
+{id:62,p:1,ch:"Life of the Prophet",th:"Character of the Prophet",t:"Certainly, you have in the messenger of Allah a beautiful pattern of conduct for anyone whose hope is in Allah and the Final day.",s:"33:21",tp:"q"},
+{id:63,p:1,ch:"Life of the Prophet",th:"Character of the Prophet",t:"We only sent you as a mercy for all the worlds.",s:"21:107",tp:"q"},
+{id:64,p:1,ch:"Life of the Prophet",th:"Character of the Prophet",t:"His habits were in accordance with the teachings of the Quran.",s:"Hazrat Aisha — Muslim",tp:"c"},
+{id:65,p:1,ch:"Life of the Prophet",th:"Character of the Prophet",t:"Allah has sent me to complete the excellent virtues and to perfect the good manners.",s:"Mishkat",tp:"h"},
+{id:66,p:1,ch:"Life of the Prophet",th:"Character of the Prophet",t:"Allah is not kind to him who does not show kindness to others.",s:"Bukhari",tp:"h"},
+{id:67,p:1,ch:"Life of the Prophet",th:"Women in Islam",t:"Paradise lies under the feet of mothers.",s:"Hadis",tp:"h"},
+{id:68,p:1,ch:"Life of the Prophet",th:"Women in Islam",t:"The better among you is the one who is better for his wife.",s:"Ibn-e-Majah",tp:"h"},
+{id:69,p:1,ch:"Life of the Prophet",th:"Women in Islam",t:"Men are the protectors and maintainers of women.",s:"4:34",tp:"q"},
+{id:70,p:1,ch:"Life of the Prophet",th:"Behaviour Towards Children",t:"No father can give his child anything better than good manners.",s:"Tirmizi",tp:"h"},
+{id:71,p:1,ch:"Life of the Prophet",th:"Slaves, Poor & Orphans",t:"They are your brothers; give them to eat what you eat; give them to wear what you wear.",s:"Bukhari, Muslim",tp:"h"},
+{id:72,p:1,ch:"Life of the Prophet",th:"Slaves, Poor & Orphans",t:"One who tries to help the widow and the poor is like a warrior in the path of Allah.",s:"Bukhari",tp:"h"},
+{id:73,p:1,ch:"Life of the Prophet",th:"Prophet as Last Messenger",t:"Muhammad is the Messenger of Allah and the seal of the Prophets.",s:"33:40",tp:"q"},
+{id:74,p:1,ch:"Life of the Prophet",th:"Prophet as Last Messenger",t:"Whenever a prophet perished, another prophet followed him, but surely there will be no prophet after me.",s:"Bukhari",tp:"h"},
+{id:75,p:1,ch:"Life of the Prophet",th:"Prophet as Last Messenger",t:"Every prophet who preceded me was sent especially to his own people, but I have been sent as a prophet to all mankind.",s:"Bukhari",tp:"h"},
+
+// ── First Islamic Community ──
+{id:76,p:1,ch:"First Islamic Community",th:"Hazrat Fatima",t:"Fatimah is a part of me; whoever hurts her hurts me, whoever holds malice against her holds malice against me.",s:"Agreed upon",tp:"h"},
+{id:77,p:1,ch:"First Islamic Community",th:"Hazrat Hassan & Hussain",t:"Hassan and Hussain are the leaders of youth in Paradise.",s:"Hadis",tp:"h"},
+{id:78,p:1,ch:"First Islamic Community",th:"Hazrat Hassan & Hussain",t:"Hussain is from me and I am from him. Allah loves him who loves Hussain.",s:"Tirmizi",tp:"h"},
+{id:79,p:1,ch:"First Islamic Community",th:"Mothers of the Faithful",t:"O consorts of the Prophet! You are not like any of the other women.",s:"33:32",tp:"q"},
+{id:80,p:1,ch:"First Islamic Community",th:"Hazrat Khadija",t:"She believed in me when others disbelieved, and confirmed my truthfulness when others called me a liar.",s:"Hadis",tp:"h"},
+{id:81,p:1,ch:"First Islamic Community",th:"Hazrat Aisha",t:"Abu Musa reported that when a tradition appeared doubtful to us and we asked Hazrat Aisha about it, we found exposition of it from her.",s:"Tirmizi",tp:"c"},
+{id:82,p:1,ch:"First Islamic Community",th:"Hazrat Abu Bakr",t:"Verily, Abu Bakr is the best of the human beings except the prophets.",s:"Hadis",tp:"h"},
+{id:83,p:1,ch:"First Islamic Community",th:"Hazrat Abu Bakr",t:"If I were to take any one as my best friend, I would take Abu Bakr, but he is my brother and successor.",s:"Bukhari",tp:"h"},
+{id:84,p:1,ch:"First Islamic Community",th:"Hazrat Umar",t:"If there were to be a prophet after me, he would be Umar bin Al-Khattab.",s:"Hadis",tp:"h"},
+{id:85,p:1,ch:"First Islamic Community",th:"Hazrat Umar",t:"He who hates Umar, hates me and he who loves Umar, loves me.",s:"Hadis",tp:"h"},
+{id:86,p:1,ch:"First Islamic Community",th:"Hazrat Usman",t:"The angels are modest before Hazrat Usman.",s:"Hadis",tp:"h"},
+{id:87,p:1,ch:"First Islamic Community",th:"Hazrat Usman",t:"For every apostle of Allah there was a constant companion and my companion in Paradise will be Usman.",s:"Tirmizi",tp:"h"},
+{id:88,p:1,ch:"First Islamic Community",th:"Hazrat Ali",t:"Every nation has an extremely trustworthy man, and the trustworthy man of this nation is Abu Ubaidah bin Jarrah.",s:"Bukhari, Muslim",tp:"h"},
+{id:89,p:1,ch:"First Islamic Community",th:"Zaid bin Thabit",t:"Zaid is the best expert of Ilm-ul-Faraiz (knowledge of laws of inheritance) from among my followers.",s:"Hadis",tp:"h"},
+{id:90,p:1,ch:"First Islamic Community",th:"Hazrat Bilal",t:"Get up, Bilal, and give us comfort by the prayer.",s:"Abu Daud",tp:"h"},
+{id:91,p:1,ch:"First Islamic Community",th:"Hazrat Hamza",t:"Hamza is my brother by reason of fosterage.",s:"Muslim",tp:"h"},
+{id:92,p:1,ch:"First Islamic Community",th:"Khalid bin Walid",t:"He is the best slave of Allah, a sword of Allah that he has unsheathed for the disbelievers, the hypocrites and polytheists.",s:"Ahmad",tp:"c"},
+
+// ── Paper 2: 20 Set Hadis ──
+{id:93,p:2,ch:"20 Set Hadis",th:"Hadis 1 — Obedience",t:"Obey Allah and obey the Messenger and those charged with authority among you.",s:"4:59",tp:"q"},
+{id:94,p:2,ch:"20 Set Hadis",th:"Hadis 1 — Obedience",t:"Actions are judged by intentions.",s:"Bukhari",tp:"h"},
+{id:95,p:2,ch:"20 Set Hadis",th:"Hadis 2 — Brotherhood",t:"The one who is kind to the dwellers of earth, the dweller of heaven is kind to them.",s:"Hadis",tp:"h"},
+{id:96,p:2,ch:"20 Set Hadis",th:"Hadis 2 — Brotherhood",t:"The Muslims are like a body; if one part feels pain, other parts also feel the pain.",s:"Bukhari",tp:"h"},
+{id:97,p:2,ch:"20 Set Hadis",th:"Hadis 2 — Brotherhood",t:"Every Muslim is the brother of a Muslim; he should neither harm him nor leave him alone when others treat him unjustly.",s:"Agreed upon",tp:"h"},
+{id:98,p:2,ch:"20 Set Hadis",th:"Hadis 3 — Tongue & Neighbour",t:"Believer is he from whose tongue and hands other Muslims are safe.",s:"Hadis",tp:"h"},
+{id:99,p:2,ch:"20 Set Hadis",th:"Hadis 3 — Tongue & Neighbour",t:"He will not enter Paradise whose neighbour is not secure from his wrongful conduct.",s:"Muslim",tp:"h"},
+{id:100,p:2,ch:"20 Set Hadis",th:"Hadis 3 — Tongue & Neighbour",t:"It is also charity to utter a good word.",s:"Agreed upon",tp:"h"},
+{id:101,p:2,ch:"20 Set Hadis",th:"Hadis 4 — Halal & Haram",t:"He allows them as lawful what is good and pure and prohibits them from what is bad and impure.",s:"7:157",tp:"q"},
+{id:102,p:2,ch:"20 Set Hadis",th:"Hadis 4 — Halal & Haram",t:"Between a man and disbelief is discarding prayer.",s:"Muslim",tp:"h"},
+{id:103,p:2,ch:"20 Set Hadis",th:"Hadis 5 — Charity",t:"Actions are judged by intentions.",s:"Bukhari",tp:"h"},
+{id:104,p:2,ch:"20 Set Hadis",th:"Hadis 5 — Charity",t:"Even a smile is charity.",s:"Hadis",tp:"h"},
+{id:105,p:2,ch:"20 Set Hadis",th:"Hadis 5 — Charity",t:"Every good deed is a charity.",s:"Bukhari",tp:"h"},
+{id:106,p:2,ch:"20 Set Hadis",th:"Hadis 6 — Forbidding Wrong",t:"The best type of Jihad is speaking a true word in front of a tyrant ruler.",s:"Abu Daud",tp:"h"},
+{id:107,p:2,ch:"20 Set Hadis",th:"Hadis 7 — Jihad & Sacrifice",t:"Fire will not touch a foot which trod in the path of Allah.",s:"Bukhari",tp:"h"},
+{id:108,p:2,ch:"20 Set Hadis",th:"Hadis 7 — Jihad & Sacrifice",t:"Spending a day on the frontier in Allah's way is better than one thousand days in any other place.",s:"Tirmizi",tp:"h"},
+{id:109,p:2,ch:"20 Set Hadis",th:"Hadis 7 — Jihad & Sacrifice",t:"Fight in the cause of Allah those who fight you but do not transgress limits.",s:"2:190",tp:"q"},
+{id:110,p:2,ch:"20 Set Hadis",th:"Hadis 8 — Martyrdom",t:"The martyrs are of five kinds: one who dies of plague, disease, drowning, debris, or fighting in the cause of Allah.",s:"Agreed upon",tp:"h"},
+{id:111,p:2,ch:"20 Set Hadis",th:"Hadis 8 — Martyrdom",t:"Nobody who enters Paradise likes to go back to the world except a Mujahid who wishes to return so that he may be martyred ten times.",s:"Bukhari",tp:"h"},
+{id:112,p:2,ch:"20 Set Hadis",th:"Hadis 9 — Lawful Earning",t:"He who works with his hand is a friend of Allah.",s:"Hadis",tp:"h"},
+{id:113,p:2,ch:"20 Set Hadis",th:"Hadis 9 — Lawful Earning",t:"To search for lawful earning is compulsory after the obligatory acts.",s:"Baihaqi",tp:"h"},
+{id:114,p:2,ch:"20 Set Hadis",th:"Hadis 10 — Helping Others",t:"The best among mankind is the one who is a source of benefit for others.",s:"Bukhari",tp:"h"},
+{id:115,p:2,ch:"20 Set Hadis",th:"Hadis 10 — Helping Others",t:"Treat with kindness your parents and kindred and orphans and those in need.",s:"2:83",tp:"q"},
+{id:116,p:2,ch:"20 Set Hadis",th:"Hadis 11 — Orphans",t:"The best Muslim house is that in which an orphan is well treated and the worst Muslim house is that in which an orphan is ill-treated.",s:"Ibn-e-Majah",tp:"h"},
+{id:117,p:2,ch:"20 Set Hadis",th:"Hadis 11 — Orphans",t:"Those who unjustly eat up the property of the orphans eat up a fire into their own bodies.",s:"4:10",tp:"q"},
+{id:118,p:2,ch:"20 Set Hadis",th:"Hadis 12 — Just Ruler",t:"Make things easy and do not make them hard and cheer up people and do not repel them.",s:"Agreed upon",tp:"h"},
+{id:119,p:2,ch:"20 Set Hadis",th:"Hadis 13 — Quran Recitation",t:"The best among you is the one who learns the Quran and teaches it.",s:"Hadis",tp:"h"},
+{id:120,p:2,ch:"20 Set Hadis",th:"Hadis 14 — Honesty in Trade",t:"Give full measure when you measure, and weigh with a balance that is straight.",s:"17:35",tp:"q"},
+{id:121,p:2,ch:"20 Set Hadis",th:"Hadis 14 — Honesty in Trade",t:"The one who cheats is not from among us.",s:"Hadis",tp:"h"},
+{id:122,p:2,ch:"20 Set Hadis",th:"Hadis 15 — Kindness & Mercy",t:"I was sent only as a mercy.",s:"Muslim",tp:"h"},
+{id:123,p:2,ch:"20 Set Hadis",th:"Hadis 15 — Kindness & Mercy",t:"He who is devoid of kindness is devoid of all good.",s:"Hadis",tp:"h"},
+{id:124,p:2,ch:"20 Set Hadis",th:"Hadis 16 — Brotherhood",t:"Believers are but a single brotherhood.",s:"49:10",tp:"q"},
+{id:125,p:2,ch:"20 Set Hadis",th:"Hadis 16 — Brotherhood",t:"One Muslim is like a building brick to the other; one part strengthens the other.",s:"Bukhari",tp:"h"},
+{id:126,p:2,ch:"20 Set Hadis",th:"Hadis 17 — Modesty",t:"Modesty and faith are companions; when one of them is absent the other follows it.",s:"Hadis",tp:"h"},
+{id:127,p:2,ch:"20 Set Hadis",th:"Hadis 17 — Modesty",t:"Every religion has a distinctive quality and the distinctive quality of Islam is modesty.",s:"Hadis",tp:"h"},
+{id:128,p:2,ch:"20 Set Hadis",th:"Hadis 18 — Humility",t:"Allah has revealed to me that you must be humble, so that no one oppresses another and boasts over another.",s:"Abu Daud",tp:"h"},
+{id:129,p:2,ch:"20 Set Hadis",th:"Hadis 19 — This World",t:"Live in this world as a stranger or a traveller.",s:"Bukhari",tp:"h"},
+{id:130,p:2,ch:"20 Set Hadis",th:"Hadis 19 — This World",t:"This world is the cultivating ground for the hereafter.",s:"Bukhari",tp:"h"},
+{id:131,p:2,ch:"20 Set Hadis",th:"Hadis 20 — Intentions",t:"Every action is based on the intention behind it and everyone shall have what he intended.",s:"Hadis",tp:"h"},
+{id:132,p:2,ch:"20 Set Hadis",th:"Hadis 20 — Intentions",t:"Verily the most honoured of you in the sight of Allah is he who is the most righteous of you.",s:"49:13",tp:"q"},
+
+// ── History of Hadis ──
+{id:133,p:2,ch:"History & Importance of Hadis",th:"Collection of Hadis",t:"Pass on knowledge from me even if it only be one sentence.",s:"Hadis",tp:"h"},
+{id:134,p:2,ch:"History & Importance of Hadis",th:"Collection of Hadis",t:"He who attributes a lie to me should prepare his seat in the Hellfire.",s:"Hadis",tp:"h"},
+{id:135,p:2,ch:"History & Importance of Hadis",th:"Hadis as Legal Source",t:"So take what the Messenger gives you, and refrain from what he prohibits you.",s:"59:7",tp:"q"},
+{id:136,p:2,ch:"History & Importance of Hadis",th:"Hadis as Legal Source",t:"There is no prayer without Fatihah.",s:"Hadis",tp:"h"},
+{id:137,p:2,ch:"History & Importance of Hadis",th:"Hadis as Legal Source",t:"No zakat is payable on a property until a year passes on it.",s:"Hadis",tp:"h"},
+
+// ── Pillars of Islam ──
+{id:138,p:2,ch:"Pillars of Islam",th:"Shahadah",t:"Islam is based on five principles: testimony, prayer, zakat, fasting and Hajj.",s:"Bukhari",tp:"h"},
+{id:139,p:2,ch:"Pillars of Islam",th:"Salah",t:"And establish prayer and pay the charity tax.",s:"73:20",tp:"q"},
+{id:140,p:2,ch:"Pillars of Islam",th:"Salah",t:"Pray as you see me praying.",s:"Agreed upon",tp:"h"},
+{id:141,p:2,ch:"Pillars of Islam",th:"Salah",t:"There is no prayer without Al-Fatiha.",s:"Tirmizi",tp:"h"},
+{id:142,p:2,ch:"Pillars of Islam",th:"Salah",t:"Prayer is the pillar of religion. He who establishes it has established the religion.",s:"Hadis",tp:"h"},
+{id:143,p:2,ch:"Pillars of Islam",th:"Fasting",t:"The month of Ramadan in which the Quran was revealed… whosoever of you is present, let him fast the month.",s:"2:185",tp:"q"},
+{id:144,p:2,ch:"Pillars of Islam",th:"Fasting",t:"Allah wishes ease for you. He does not wish hardship for you.",s:"2:185",tp:"q"},
+{id:145,p:2,ch:"Pillars of Islam",th:"Fasting",t:"Fasting is a shield; it shields from Hell fire.",s:"Bukhari",tp:"h"},
+{id:146,p:2,ch:"Pillars of Islam",th:"Zakat",t:"And establish prayer and pay the charity tax.",s:"2:110",tp:"q"},
+{id:147,p:2,ch:"Pillars of Islam",th:"Zakat",t:"There is no zakat due on less than five awsaq of dates, no zakat due on less than five awsaq of silver and no zakat due on less than five camels.",s:"Muslim",tp:"h"},
+{id:148,p:2,ch:"Pillars of Islam",th:"Hajj",t:"Pilgrimage thereto is a duty men owe to God — those who can afford the journey.",s:"3:97",tp:"q"},
+{id:149,p:2,ch:"Pillars of Islam",th:"Hajj",t:"Whoever performs Hajj and does not commit any obscenity or transgression shall return as free of sins as the day his mother bore him.",s:"Bukhari",tp:"h"},
+
+// ── Articles of Faith ──
+{id:150,p:2,ch:"Articles of Faith",th:"Oneness of Allah / Tawhid",t:"Say: He is Allah, the One and Only. Allah the Eternal, Absolute. He begets not nor is He begotten. And there is none like unto Him.",s:"112",tp:"q"},
+{id:151,p:2,ch:"Articles of Faith",th:"Oneness of Allah / Tawhid",t:"Your Lord has decreed that you worship none but Him.",s:"17:23",tp:"q"},
+{id:152,p:2,ch:"Articles of Faith",th:"Oneness of Allah / Tawhid",t:"Shirk is the greatest sin that Allah will never forgive.",s:"4:48",tp:"q"},
+{id:153,p:2,ch:"Articles of Faith",th:"Angels",t:"He doth send down His angels with inspiration of His command to such of His servants as He pleases.",s:"16:2",tp:"q"},
+{id:154,p:2,ch:"Articles of Faith",th:"Angels",t:"But verily, over you are appointed angels to protect you — kind and honourable, writing down your deeds.",s:"82:10-11",tp:"q"},
+{id:155,p:2,ch:"Articles of Faith",th:"Revealed Books",t:"This is the Book in it is guidance sure, without doubt, to those who fear Allah.",s:"2:2",tp:"q"},
+{id:156,p:2,ch:"Articles of Faith",th:"Revealed Books",t:"We have, without doubt, sent down the message and We will assuredly guard it from corruption.",s:"15:9",tp:"q"},
+{id:157,p:2,ch:"Articles of Faith",th:"Revealed Books",t:"We sent Jesus the son of Mary, confirming the law that had come before him: We sent him the gospel, therein was guidance and light.",s:"5:46",tp:"q"},
+{id:158,p:2,ch:"Articles of Faith",th:"Prophets & Prophethood",t:"We make no distinction between one and another of His messengers.",s:"2:285",tp:"q"},
+{id:159,p:2,ch:"Articles of Faith",th:"Prophets & Prophethood",t:"Muhammad is the messenger of Allah and the Seal of the Prophets.",s:"33:40",tp:"q"},
+{id:160,p:2,ch:"Articles of Faith",th:"Prophets & Prophethood",t:"We have not sent thee but as a universal Messenger to men, giving glad tidings and warning them against sin.",s:"34:28",tp:"q"},
+{id:161,p:2,ch:"Articles of Faith",th:"Life After Death",t:"Any who believe in Allah and the Last Day and work righteousness, shall have their reward with their Lord.",s:"2:62",tp:"q"},
+{id:162,p:2,ch:"Articles of Faith",th:"Life After Death",t:"Every soul will be paid in full the fruit of its deeds and Allah knows best all they do.",s:"39:70",tp:"q"},
+{id:163,p:2,ch:"Articles of Faith",th:"Life After Death",t:"Then he who is given his record in his right hand, soon will his account be taken by an easy reckoning.",s:"84:7-8",tp:"q"},
+{id:164,p:2,ch:"Articles of Faith",th:"Predestination",t:"Whether you hide whatever is in your hearts or reveal it, God knows it all.",s:"3:29",tp:"q"},
+{id:165,p:2,ch:"Articles of Faith",th:"Predestination",t:"Allah does not burden a soul beyond its capacity.",s:"2:286",tp:"q"},
+
+// ── Jihad ──
+{id:166,p:2,ch:"Jihad",th:"Meaning & Types",t:"Fight in the cause of Allah those who fight you but do not transgress limits; for Allah loves not transgressors.",s:"2:190",tp:"q"},
+{id:167,p:2,ch:"Jihad",th:"Meaning & Types",t:"The best type of Jihad is speaking a true word in front of a tyrant ruler.",s:"Abu Daud",tp:"h"},
+{id:168,p:2,ch:"Jihad",th:"Meaning & Types",t:"Permission is given against those whom war is made because they are wronged.",s:"22:39",tp:"q"},
+{id:169,p:2,ch:"Jihad",th:"Meaning & Types",t:"To him who fought in the cause of Allah — whether he is slain or gets victory, soon shall We give him a reward of great value.",s:"4:74",tp:"q"},
+{id:170,p:2,ch:"Jihad",th:"Meaning & Types",t:"A single endeavour of fighting in Allah's cause is better than the world and whatever is in it.",s:"Hadis",tp:"h"},
+{id:171,p:2,ch:"Jihad",th:"Relations with Non-Muslims",t:"There is no compulsion in religion.",s:"2:256",tp:"q"},
+{id:172,p:2,ch:"Jihad",th:"Relations with Non-Muslims",t:"God does not forbid you from being kind and just to those who have not fought you in your religion nor expelled you from your homes.",s:"60:8",tp:"q"},
+];
+
+// ── Battle data ──
+const BATTLES = [
+{id:"badr",name:"Battle of Badr",year:"2 AH (624 CE)",paper:1,
+ rival:"Quraish",sm:"313",se:"1,000",cm:"Holy Prophet ﷺ",ce:"Abu Jahl",
+ causes:["Makkans became hostile and raided Muslim land","Incident of Nakhlah","Abu Sufyan's 50,000 dinar caravan"],
+ events:["Muhammad threw a handful of dust which miraculously disturbed the enemy","Rain, Sleep, Number Illusion miracles; Angels participated physically","Abu Jahl was beheaded by a young Muslim shepherd","Hazrat Bilal killed his old master Umayyah bin Khalf"],
+ outcomes:["Abu Jahl killed","14 Muslims martyred; 70 Makkans killed; 70 taken prisoner","Muslims won their first-ever battle"],
+ refs:["22:39","3:123","8:11","8:17"]},
+
+{id:"uhad",name:"Battle of Uhad",year:"3 AH (625 CE)",paper:1,
+ rival:"Quraish",sm:"700",se:"3,000",cm:"Holy Prophet ﷺ",ce:"Abu Sufyan / Khalid bin Walid",
+ causes:["Defeat at Badr greatly angered the Quraish who prepared for revenge"],
+ events:["Ibn Ubayy — a traitor — left with 300 men, reducing Muslims to 700","50 archers placed at mountain pass with strict orders not to leave","Archers disobeyed when they saw Makkans retreating; Khalid attacked from the rear","Hazrat Hamza killed by Wahshi bin Harb; Hinda chewed on his liver"],
+ outcomes:["70 Muslims martyred; 40 Makkans killed","Muslims lost this battle"],
+ refs:["3:152","3:155","3:166"]},
+
+{id:"trench",name:"Battle of Trench (Khandaq)",year:"5 AH (627 CE)",paper:1,
+ rival:"Quraish + Allies (Ahzab)",sm:"5,000",se:"10,000",cm:"Holy Prophet ﷺ",ce:"Abu Sufyan",
+ causes:["Banu Nadir allied with the Quraish to avenge their exile"],
+ events:["Salman Al-Farsi suggested digging a trench — every man including the Prophet dug","Quraish were shocked to see the trench and could not cross","Amr bin Abdul Wud tried to cross; Hazrat Ali killed him","A storm blew flattening tents of both sides after two weeks"],
+ outcomes:["Makkans' morale collapsed; they withdrew","Muslims won without any actual fighting"],
+ refs:["33:9","33:21"]},
+
+{id:"khyber",name:"Battle of Khyber",year:"7 AH (629 CE)",paper:1,
+ rival:"Jews of Khyber",sm:"1,400",se:"10,000",cm:"Holy Prophet ﷺ & Hazrat Ali",ce:"Jewish chiefs",
+ causes:["Jews had conspired against Muslims from their forts at Khyber"],
+ events:["Muslims attacked the nearest fort; a captured spy revealed weaknesses","Weaker forts taken first; then the stronghold of Qamus","Hazrat Ali killed Jewish warrior Marhab on the first encounter"],
+ outcomes:["93 Jews killed; 18 Muslims martyred","Prophet married Safiyyah (RA)"],
+ refs:["48:18","48:20"]},
+
+{id:"hunain",name:"Battle of Hunain",year:"8 AH (630 CE)",paper:1,
+ rival:"Hawazin tribe",sm:"12,000",se:"20,000",cm:"Holy Prophet ﷺ",ce:"Malik bin Awf (Hawazin)",
+ causes:["Hawazin strictly opposed Islam and gathered after the Conquest of Makkah"],
+ events:["Hawazin ambushed Muslims in the valley; initial panic","Prophet stood his ground and rallied troops","Hazrat Abbas reorganised the army; counter-attack succeeded","Hawazin retreated behind the walls of Taif"],
+ outcomes:["6,000 prisoners captured; 24,000 camels, 40,000 goats and silver taken","All freed when a Hawazin member requested their return"],
+ refs:["9:25-26"]},
+
+{id:"yamama",name:"Battle of Yamama",year:"11 AH (632 CE)",paper:2,
+ rival:"Musailma the False Prophet",sm:"13,000",se:"40,000",cm:"Ikrimah, Shurabil, Khalid bin Walid",ce:"Musailma",
+ causes:["Apostasy movement — Musailma claimed prophethood"],
+ events:["Ikrimah and Shurabil initially defeated","Khalid bin Walid sent; used strategic positioning","Musailma's army ran into a fortified garden; Muslims broke in and killed him"],
+ outcomes:["Musailma killed","Led directly to the compilation of the Quran"],
+ refs:[]},
+
+{id:"chains",name:"Battle of Chains",year:"12 AH (633 CE)",paper:2,
+ rival:"Persians",sm:"18,000",se:"20,000–40,000",cm:"Khalid bin Walid",ce:"Hormuz",
+ causes:["Persians insulted the Prophet's envoy"],
+ events:["Hazrat Abu Bakr sent Khalid with 4 more squadrons to reinforce the army","Hormuz had linked each soldier with a chain; movement was restricted","Persians were defeated because the chains restricted their mobility"],
+ outcomes:["Hormuz killed","Whole of Central Iraq came under Muslim control"],
+ refs:[]},
+
+{id:"bostra",name:"Battle of Bostra",year:"13 AH (634 CE)",paper:2,
+ rival:"Byzantines",sm:"4,000",se:"12,000",cm:"Amr bin Aas / Khalid bin Walid",ce:"Theodore",
+ causes:["Dates back to Tabuk expedition; Abu Bakr called for Jihad"],
+ events:["Muslims dispatched to Syrian border","Heraclius sent his brother Theodore to reinforce","Khalid sent with 9,000 men; invited Romans to accept Islam — they accepted and Muslims won without a fight"],
+ outcomes:["Byzantines defeated","First Muslim victory in Syria"],
+ refs:[]},
+
+{id:"jasr",name:"Battle of Jasr (Bridge)",year:"13 AH (634 CE)",paper:2,
+ rival:"Persians",sm:"9,000",se:"10,000",cm:"Muthana ibn Haris / Abu Ubaidah",ce:"Bahman",
+ causes:["Defeat at Namrak"],
+ events:["Abu Ubaidah crossed the river first","Muslims were crushed by Persian war elephants","Abu Ubaidah martyred; Muslims forced to retreat"],
+ outcomes:["Muslims defeated: 2,000 killed, 2,000 drowned, 2,000 fled"],
+ refs:[]},
+
+{id:"buwayb",name:"Battle of Buwayb",year:"13 AH (634 CE)",paper:2,
+ rival:"Persians",sm:"20,000",se:"200,000",cm:"Muthana ibn Haris",ce:"Mehran Hamdani",
+ causes:["To avenge the defeat at Jasr (Battle of Bridge)"],
+ events:["Umar called for Jihad; Muthana led the force","Archers set to attack as soon as Mehran crossed the river","Muslims cut off the bridge to hinder the Persians","A man from the Taglib tribe killed Mehran"],
+ outcomes:["Southern Iraq under Muslim control"],
+ refs:[]},
+
+{id:"qadisiyah",name:"Battle of Qadisiyah",year:"14 AH (635 CE)",paper:2,
+ rival:"Persians",sm:"28,000",se:"120,000",cm:"Saad abi Waqas",ce:"Rustam",
+ causes:["Persians sought revenge for earlier defeats"],
+ events:["Saad was ill in his sickbed but directed battle strategy from there","A Muslim delegation offered 3 options before battle; Rustam chose fighting","Almost 40,000 Persians killed using Saad's strategy"],
+ outcomes:["Area between Euphrates and Tigris came under Muslim control"],
+ refs:[]},
+
+{id:"nahawand",name:"Battle of Nahawand",year:"16 AH (637 CE)",paper:2,
+ rival:"Persians",sm:"30,000",se:"150,000",cm:"Nouman ibn Muqarrin",ce:"Yazdigerd",
+ causes:["Persians broke the peace treaty to reclaim Mesopotamia"],
+ events:["Yazdigerd gathered forces to recapture Muslim-held areas","Umar sent forces under Nouman ibn Muqarrin","First two strategies failed; third brought victory"],
+ outcomes:["Chief Priest offered gems for safety of lives — granted","All of Persia under Muslim rule; Emperor fled to Isfahan"],
+ refs:[]},
+
+{id:"yarmuk",name:"Battle of Yarmuk",year:"14 AH (635 CE)",paper:2,
+ rival:"Byzantines",sm:"40,000",se:"200,000",cm:"Khalid ibn Walid / Abu Ubaidah",ce:"Heraclius (through commanders)",
+ causes:["Fall of Fahl and Damascus alarmed Heraclius who wanted to recover Palestine"],
+ events:["Heraclius promised huge rewards to whoever joined the fight","Muslims assembled near Golan; Romans chose battle","Battle lasted 6 days; cavalry divisions made Muslims appear vast in number"],
+ outcomes:["Byzantines defeated; Syria under Muslim control","Heraclius moved capital to Constantinople","Muslims lost 9,000"],
+ refs:[]},
+
+{id:"jamal",name:"Battle of Jamal",year:"36 AH (657 CE)",paper:2,
+ rival:"Forces of Hazrat Ayesha RA",sm:"20,000 (Ali RA)",se:"15,000 (Ayesha RA)",cm:"Hazrat Ali RA",ce:"Hazrat Ayesha RA / Talha RA / Zubair RA",
+ causes:["Hazrat Ali delaying revenge for Usman's assassination","Talha and Zubair backed Ayesha's pressure for swift justice"],
+ events:["Negotiations between two forces when extremists attacked both sides","Ayesha RA was on her camel with 40 men guarding her","Talha and Zubair remembered Prophet's words and were killed retreating"],
+ outcomes:["Ayesha RA refrained from politics thereafter","First civil war in Islamic history","Talha and Zubair martyred"],
+ refs:[]},
+
+{id:"siffin",name:"Battle of Siffin",year:"36 AH (657 CE)",paper:2,
+ rival:"Muawiya RA",sm:"90,000 (Ali RA)",se:"120,000 (Muawiya RA)",cm:"Hazrat Ali RA",ce:"Muawiya RA / Amr ibn Aas",
+ causes:["Muawiya was deposed from governorship of Syria","Ali was seen as delaying revenge for Usman's murder"],
+ events:["Battle began 8th Safar","On the 4th day, Muawiya's army was losing; raised the Quran on lances to cease war"],
+ outcomes:["Ali agreed to arbitration under pressure from his own men","Kharijites arose as a result","Ali RA later assassinated; Muawiya assumed power"],
+ refs:[]},
+
+{id:"nahrawan",name:"Battle of Nahrawan",year:"37 AH (658 CE)",paper:2,
+ rival:"Kharijites",sm:"14,000 (Ali RA)",se:"4,000 (Kharijites)",cm:"Hazrat Ali RA",ce:"Kharijite leaders",
+ causes:["Kharijites collected at Nahrawan and began creating problems while Ali prepared to attack Muawiya"],
+ events:["Ali had to divert forces to fight the Kharijites","Kharijites were badly defeated; only a few dozen escaped out of 4,000"],
+ outcomes:["Ali was assassinated by a Kharijite two years later as a consequence"],
+ refs:[]}
+];
+
+// ── Usage hints per chapter|theme ──
+const HINTS = {
+"Quranic Passages|Allah in Himself":{
+  when:"Questions asking for evidence of Tawhid (Oneness of Allah), Allah's attributes, or His power and mercy.",
+  how:"'The Holy Quran beautifully describes Allah's oneness in Surah Ikhlas: …' OR 'As Allah Himself states in the Quran: …'",
+  alongside:"Explain the attribute demonstrated, then connect to why Muslims worship Allah alone (Tawhid in practice). Mention that Shirk is unforgivable to contrast."},
+"Quranic Passages|Allah and His Created World":{
+  when:"Questions on creation, Allah's relationship with the universe, or the purpose of life.",
+  how:"'The Quran draws attention to the created world as evidence: …' OR 'Allah reminds mankind in the Quran: …'",
+  alongside:"Explain what this verse tells us about Allah's creative power or wisdom, and how it should inspire gratitude or worship."},
+"Quranic Passages|Allah and His Messengers":{
+  when:"Questions on prophethood, messengers, or the relationship between Allah and His chosen prophets.",
+  how:"'The Quran describes the role of messengers clearly: …'",
+  alongside:"Name the prophet referenced, state their mission, and connect to the broader theme of guidance."},
+"History & Importance of Quran|Revelation of Quran":{
+  when:"Questions on how the Quran was revealed, its mode of revelation, or Jibrael's role.",
+  how:"'Hazrat Aisha described the physical effect of revelation: …' OR 'The Prophet himself described it: …'",
+  alongside:"Explain the two modes of revelation (like a bell, or angel in human form), and what this tells us about the weight of divine guidance."},
+"History & Importance of Quran|Compilation of Quran":{
+  when:"Questions on how the Quran was compiled under Abu Bakr or Usman, or Zaid bin Thabit's role.",
+  how:"'Zaid bin Thabit described the enormity of the task: …'",
+  alongside:"Explain the stages of compilation, the scribes used, the challenge faced, and why standardisation under Usman was necessary."},
+"History & Importance of Quran|Quran as Legal Source":{
+  when:"Questions on the Quran as a source of Islamic law (Sharia), covering marriage, inheritance, trade, or criminal law.",
+  how:"'The Quran provides direct legal guidance, for example: …'",
+  alongside:"Give a specific legal ruling from the Quran (e.g. marriage laws, inheritance, prohibition of interest), then explain how jurists derive rules from it."},
+"History & Importance of Quran|Sunnah as Legal Source":{
+  when:"Questions on the role of Sunnah/Hadis in Islamic law, the Prophet as a role model, or obedience to the Prophet.",
+  how:"'The Quran itself commands following the Prophet: …'",
+  alongside:"Give an example of how the Prophet's practice clarified a Quranic rule (e.g. 'pray as you see me praying' clarifies the Quran's command to pray)."},
+"History & Importance of Quran|Ijma as Legal Source":{
+  when:"Questions on Ijma (consensus of scholars) as a source of law.",
+  how:"'The Prophet encouraged collective agreement: …'",
+  alongside:"Explain what Ijma means, give an example of its use (e.g. addition of second Adhan for Jumu'ah prayer), and state its limits."},
+"Life of the Prophet|Call to Prophethood":{
+  when:"Questions on the early years of prophethood, opposition from Quraish, or the Prophet's determination.",
+  how:"'The Holy Prophet showed unshakeable resolve, saying to his uncle: …'",
+  alongside:"Describe the nature of the opposition (mockery, torture of companions, social boycott) and the Prophet's response of patience and steadfastness."},
+"Life of the Prophet|Isra wa Mairaj":{
+  when:"Questions on the Night Journey and Ascension, its significance, or the gift of the five daily prayers.",
+  how:"'Allah mentions the Night Journey in the Quran: …'",
+  alongside:"Explain both legs of the journey (Isra: Makkah to Jerusalem; Mairaj: ascension to heavens), what the Prophet witnessed, and the significance of the five prayers being prescribed."},
+"Life of the Prophet|Battle of Badr":{
+  when:"Questions on the Battle of Badr, its causes, miraculous nature, or outcomes.",
+  how:"'The Quran itself acknowledges the miraculous help at Badr: …'",
+  alongside:"State the date, opposing numbers (313 vs 1,000), key events (angels, rain, Abu Jahl killed), and outcomes (first Muslim victory, prisoners of war policy)."},
+"Life of the Prophet|Conquest of Makkah":{
+  when:"Questions on the Conquest of Makkah, the Prophet's forgiveness, or the spread of Islam.",
+  how:"'The Prophet ﷺ declared as he entered Makkah: …'",
+  alongside:"State that the Prophet declared a general amnesty, that idols were removed from the Ka'bah, and that this was the turning point for mass conversion to Islam."},
+"Life of the Prophet|Character of the Prophet":{
+  when:"Questions on the Prophet's moral character, kindness, justice, humility, or mercy.",
+  how:"'Hazrat Aisha described his character: …' OR 'The Quran praises his character: …'",
+  alongside:"Give a specific example of the quality (e.g. forgiveness at Conquest of Makkah for kindness; treating the poor equally for justice), then connect to the Quranic verse about him being a mercy to the worlds."},
+"Life of the Prophet|Women in Islam":{
+  when:"Questions on the status of women in Islam, their rights, or the Prophet's treatment of women.",
+  how:"'The Prophet ﷺ emphasised the honour of women: …'",
+  alongside:"Mention specific rights Islam gave women (inheritance, dower, right to divorce through Khul'), contrast with pre-Islamic Arabia where girls were buried alive."},
+"Life of the Prophet|Farewell Sermon":{
+  when:"Questions on the Farewell Sermon, its key messages, or the Prophet as the last messenger.",
+  how:"'In his last address to the Ummah, the Prophet declared: …'",
+  alongside:"Mention key themes: brotherhood of all Muslims, women's rights, abolition of riba, finality of prophethood, and the two things left behind (Quran and Sunnah)."},
+"First Islamic Community|Hazrat Abu Bakr":{
+  when:"Questions on Abu Bakr's faith, role in early Islam, or his caliphate.",
+  how:"'The Prophet praised Abu Bakr's faith: …'",
+  alongside:"Mention his being the first adult male convert, his companionship in the cave, financial sacrifices (freeing Bilal), and his role in compiling the Quran."},
+"First Islamic Community|Hazrat Umar":{
+  when:"Questions on Umar's conversion, strength, or caliphate.",
+  how:"'The Prophet's prayer for Umar's conversion showed his importance: …'",
+  alongside:"Describe his famous conversion story, his strength in declaring Islam publicly at the Ka'bah, and his role in expanding the Islamic state."},
+"20 Set Hadis|Hadis 2 — Brotherhood":{
+  when:"Questions on Islamic brotherhood, unity, or the Muslim community.",
+  how:"'The Prophet described the unity of Muslims beautifully: …'",
+  alongside:"Explain that Islamic brotherhood transcends tribe, race, and nationality. Give examples: the Prophet's bond between Muhajirin and Ansar in Madinah."},
+"20 Set Hadis|Hadis 5 — Charity":{
+  when:"Questions on charity, sadaqah, or acts of goodness in Islam.",
+  how:"'The Prophet reminded us that even small deeds count: …'",
+  alongside:"Distinguish between Zakat (obligatory) and Sadaqah (voluntary). Give examples of what counts as charity (a smile, removing harm from the road, a kind word)."},
+"20 Set Hadis|Hadis 7 — Jihad & Sacrifice":{
+  when:"Questions on Jihad, fighting in Allah's cause, or sacrifice for Islam.",
+  how:"'The Quran lays down the condition for Jihad: …'",
+  alongside:"Explain greater Jihad (against the self) vs lesser Jihad (physical combat). State that fighting is only permitted in self-defence, to protect religion, or to remove oppression."},
+"20 Set Hadis|Hadis 15 — Kindness & Mercy":{
+  when:"Questions on kindness, mercy, and the Islamic attitude towards others.",
+  how:"'The Prophet described his mission as one of mercy: …'",
+  alongside:"Give examples: the Prophet's mercy at Conquest of Makkah, his kindness to non-Muslims, treatment of animals. Connect to 21:107 — 'We only sent you as a mercy for all the worlds.'"},
+"Pillars of Islam|Salah":{
+  when:"Questions on Salah (prayer) — its importance, method, conditions, or benefits.",
+  how:"'The Prophet commanded: …' OR 'The Quran ordains prayer: …'",
+  alongside:"State five daily prayers, their times, the conditions (wudu, facing Qiblah, intention), and the benefits (discipline, remembrance of Allah, equality before Allah in rows)."},
+"Pillars of Islam|Fasting":{
+  when:"Questions on fasting in Ramadan — its purpose, rules, or spiritual benefits.",
+  how:"'Allah commands fasting in the Quran: …'",
+  alongside:"State the month (Ramadan), exemptions (travellers, the ill), significance (revelation of Quran, Laylat al-Qadr), and the spiritual benefits (taqwa, empathy with the poor)."},
+"Pillars of Islam|Hajj":{
+  when:"Questions on Hajj — its obligation, rituals, or spiritual significance.",
+  how:"'The Quran declares Hajj obligatory: …'",
+  alongside:"Name the main rituals (Tawaf, Sa'i, Wuquf at Arafat, Rami al-Jamarat, sacrifice), the significance of Eid al-Adha, and Hajj as a demonstration of Muslim unity."},
+"Articles of Faith|Oneness of Allah / Tawhid":{
+  when:"Questions on Tawhid, its meaning, types (Rububiyyah, Uluhiyyah, Asma wa Sifat), or evidence.",
+  how:"'The Quran states the essence of Tawhid in Surah Ikhlas: …'",
+  alongside:"Explain all three types of Tawhid, why Shirk is unforgivable, and the practical implications of Tawhid on daily life."},
+"Articles of Faith|Life After Death":{
+  when:"Questions on Akhirah — resurrection, judgment, heaven, or hell.",
+  how:"'The Quran describes the Day of Judgment: …'",
+  alongside:"List the stages after death: Barzakh, Israfil blowing the trumpet, resurrection, presentation of deeds, the Sirat, and entry into Jannah or Jahannum. Connect to moral accountability in this life."},
+"Articles of Faith|Angels":{
+  when:"Questions on belief in angels — their nature, types, or roles.",
+  how:"'The Quran mentions the angels' functions: …'",
+  alongside:"Name key angels (Jibrael, Israfil, Munkar and Nakir, Kiraman Katibin) and their roles. Mention that angels are made of light, have no free will, and are always obedient to Allah."},
+"Jihad|Meaning & Types":{
+  when:"Questions on Jihad — its definition, types (greater/lesser), conditions, or conduct.",
+  how:"'The Quran permits fighting only under strict conditions: …'",
+  alongside:"Distinguish greater Jihad (nafs) from lesser Jihad (qital). State rules of conduct in battle: no killing of women/children/elderly, no destruction of crops, offer of peace first."},
+};
+
+const TYPE_LABELS = {q:"Quranic Verse",h:"Hadis",hq:"Hadis-e-Qudsi",c:"Companion Quote"};
+
+// ── Auto-generate prompts from chapter|theme ──
+const QUIZ_PROMPTS = {
+"Quranic Passages|Allah in Himself":"Give a Quranic reference proving the Oneness of Allah (Tawhid).",
+"Quranic Passages|Allah and His Created World":"Quote a verse showing Allah's relationship with His creation.",
+"Quranic Passages|Allah and His Messengers":"Give a reference about Allah's messengers or their mission.",
+"History & Importance of Quran|Revelation of Quran":"Quote a companion's description of how revelation felt.",
+"History & Importance of Quran|Compilation of Quran":"Quote a statement about the compilation of the Quran.",
+"History & Importance of Quran|Quran as Legal Source":"Give a Quranic verse used as a source of Islamic law.",
+"History & Importance of Quran|Sunnah as Legal Source":"Give a reference showing the Sunnah's authority alongside the Quran.",
+"History & Importance of Quran|Ijma as Legal Source":"Quote a reference supporting Ijma (scholarly consensus).",
+"Life of the Prophet|Call to Prophethood":"Quote the Prophet's response to persecution in Makkah.",
+"Life of the Prophet|Isra wa Mairaj":"Give a Quranic reference to the Night Journey.",
+"Life of the Prophet|Battle of Badr":"Give a reference about the Battle of Badr.",
+"Life of the Prophet|Conquest of Makkah":"Quote the Prophet at the Conquest of Makkah.",
+"Life of the Prophet|Character of the Prophet":"Give a reference about the Prophet's moral character.",
+"Life of the Prophet|Farewell Sermon":"Quote a key statement from the Farewell Sermon.",
+"Life of the Prophet|Women in Islam":"Give a reference about the status of women in Islam.",
+"First Islamic Community|Hazrat Abu Bakr":"Give a reference about Hazrat Abu Bakr's status.",
+"First Islamic Community|Hazrat Umar":"Give a reference about Hazrat Umar.",
+"First Islamic Community|Hazrat Usman":"Give a reference about Hazrat Usman's character.",
+"First Islamic Community|Hazrat Khadija":"Give a reference about Hazrat Khadija.",
+"20 Set Hadis|Hadis 2 — Brotherhood":"Quote a Hadis about Muslim brotherhood.",
+"20 Set Hadis|Hadis 5 — Charity":"Give a Hadis about the importance of charity.",
+"20 Set Hadis|Hadis 7 — Jihad & Sacrifice":"Give a Hadis or Quranic verse about Jihad.",
+"20 Set Hadis|Hadis 15 — Kindness & Mercy":"Give a reference about kindness and mercy in Islam.",
+"20 Set Hadis|Hadis 17 — Modesty":"Give a Hadis about modesty (Haya) in Islam.",
+"Pillars of Islam|Salah":"Give a reference about the importance of Salah.",
+"Pillars of Islam|Fasting":"Give a reference about fasting in Ramadan.",
+"Pillars of Islam|Hajj":"Give a reference about the obligation of Hajj.",
+"Pillars of Islam|Zakat":"Give a reference about Zakat.",
+"Articles of Faith|Oneness of Allah / Tawhid":"Quote Surah Ikhlas or another verse about Tawhid.",
+"Articles of Faith|Angels":"Give a Quranic reference about angels and their role.",
+"Articles of Faith|Revealed Books":"Give a reference about the revealed books of Allah.",
+"Articles of Faith|Prophets & Prophethood":"Give a reference about prophethood or the seal of prophets.",
+"Articles of Faith|Life After Death":"Give a reference about the Day of Judgment or Akhirah.",
+"Articles of Faith|Predestination":"Give a reference about Qadr (predestination).",
+"Jihad|Meaning & Types":"Give a reference defining or describing Jihad.",
+"Jihad|Relations with Non-Muslims":"Give a reference about Islamic treatment of non-Muslims.",
+"History & Importance of Hadis|Collection of Hadis":"Give a Hadis about the importance of spreading knowledge.",
+"History & Importance of Hadis|Hadis as Legal Source":"Give a reference showing Hadis as a source of law.",
+};
+
+// ════════════════════════════════════════════════════
+// UI LOGIC
+// ════════════════════════════════════════════════════
+const chapters = [...new Set(REFS.map(r=>r.ch))];
+
+// Populate dropdowns
+function populateSel(id, includeAll="All Chapters"){
+  const sel = document.getElementById(id);
+  if(!sel) return;
+  chapters.forEach(ch=>{
+    const o=document.createElement("option");
+    o.value=ch; o.textContent=ch;
+    sel.appendChild(o);
+  });
+}
+populateSel("f-chapter");
+populateSel("r-chapter");
+populateSel("q-chapter");
+
+// ── Tab switching ──
+document.querySelectorAll(".ir-tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".ir-tab").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const p = btn.dataset.panel;
+    ["browse","recall","quiz","battles"].forEach(n=>{
+      const el = document.getElementById("panel-"+n);
+      if(el) el.hidden = (n!==p);
+    });
+    if(p==="recall") recallRender();
+    if(p==="quiz") quizNext();
+  });
+});
+
+// ── BROWSE ──
+function getFiltered(){
+  const paper = document.getElementById("f-paper").value;
+  const ch    = document.getElementById("f-chapter").value;
+  const tp    = document.getElementById("f-type").value;
+  const q     = document.getElementById("f-search").value.toLowerCase();
+  return REFS.filter(r=>{
+    if(paper && String(r.p)!==paper) return false;
+    if(ch && r.ch!==ch) return false;
+    if(tp && r.tp!==tp) return false;
+    if(q && !(r.t.toLowerCase().includes(q)||r.s.toLowerCase().includes(q)||r.ch.toLowerCase().includes(q)||r.th.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function badge(tp){
+  const labels={q:"Quran",h:"Hadis",hq:"Hadis-e-Qudsi",c:"Companion"};
+  return `<span class="ir-badge badge-${tp}">${labels[tp]||tp}</span>`;
+}
+
+function renderBrowse(){
+  const list = getFiltered();
+  const grid = document.getElementById("browse-grid");
+  const count = document.getElementById("browse-count");
+  count.textContent = `Showing ${list.length} reference${list.length!==1?"s":""}`;
+
+  // Group by chapter
+  const byChapter = {};
+  list.forEach(r=>{
+    if(!byChapter[r.ch]) byChapter[r.ch]={};
+    if(!byChapter[r.ch][r.th]) byChapter[r.ch][r.th]=[];
+    byChapter[r.ch][r.th].push(r);
+  });
+
+  let html="";
+  if(list.length===0){
+    html=`<div class="ir-empty">No references match your filters.</div>`;
+    grid.innerHTML=html; return;
+  }
+
+  Object.entries(byChapter).forEach(([ch, themes])=>{
+    html+=`<div style="grid-column:1/-1"><span class="ir-chapter-label">Chapter: ${ch}</span></div>`;
+    Object.entries(themes).forEach(([th, refs])=>{
+      html+=`<div style="grid-column:1/-1"><p class="ir-section-head">${th}</p></div>`;
+      refs.forEach(r=>{
+        html+=`<div class="ir-card" data-tp="${r.tp}" data-id="${r.id}" tabindex="0" role="button" aria-label="Reference card: ${r.t}">
+          ${badge(r.tp)}
+          <p class="ir-card-text">"${r.t}"</p>
+          <div class="ir-card-src">${r.s}</div>
+          <div class="ir-card-click">Tap for usage tips →</div>
+        </div>`;
+      });
+    });
+  });
+  grid.innerHTML=html;
+
+  grid.querySelectorAll(".ir-card").forEach(card=>{
+    card.addEventListener("click",()=>openModal(Number(card.dataset.id)));
+    card.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openModal(Number(card.dataset.id));});
+  });
+}
+renderBrowse();
+["f-paper","f-chapter","f-type"].forEach(id=>document.getElementById(id)?.addEventListener("change",renderBrowse));
+document.getElementById("f-search")?.addEventListener("input",renderBrowse);
+
+// ── MODAL ──
+function openModal(id){
+  const r = REFS.find(x=>x.id===id);
+  if(!r) return;
+  const key = `${r.ch}|${r.th}`;
+  const hint = HINTS[key] || {when:"Use this reference when answering questions on "+r.th+".",how:"Quote it directly and explain its significance.",alongside:"Provide context about the chapter or topic."};
+  document.getElementById("modal-badge").innerHTML = badge(r.tp)+` <span style="font-size:.75rem;color:var(--grey);font-weight:700">${r.ch} — ${r.th}</span>`;
+  document.getElementById("modal-quote").textContent = `"${r.t}"`;
+  document.getElementById("modal-src").textContent = `Source: ${r.s}`;
+  document.getElementById("modal-when").textContent = hint.when;
+  document.getElementById("modal-how").textContent = hint.how;
+  document.getElementById("modal-alongside").textContent = hint.alongside;
+  document.getElementById("modal-overlay").classList.add("open");
+  document.getElementById("modal-overlay").focus();
+}
+document.getElementById("modal-close").addEventListener("click",()=>document.getElementById("modal-overlay").classList.remove("open"));
+document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open");});
+
+// ── RECALL ──
+let recallIdx = 0;
+let recallList = [];
+
+function getRecallList(){
+  const ch = document.getElementById("r-chapter")?.value;
+  const p  = document.getElementById("r-paper")?.value;
+  return REFS.filter(r=>{
+    if(ch && r.ch!==ch) return false;
+    if(p && String(r.p)!==p) return false;
+    return true;
+  });
+}
+
+function recallRender(){
+  recallList = getRecallList();
+  if(recallIdx>=recallList.length) recallIdx=0;
+  document.getElementById("recall-card").classList.remove("flipped");
+  const r = recallList[recallIdx];
+  if(!r){document.getElementById("recall-prompt").textContent="No references found."; return;}
+  const key=`${r.ch}|${r.th}`;
+  const prompt = QUIZ_PROMPTS[key] || `Give a reference about: ${r.th}`;
+  document.getElementById("recall-prompt").textContent = prompt;
+  document.getElementById("recall-answer").textContent = `"${r.t}"`;
+  document.getElementById("recall-src").textContent = `${r.s} — ${r.ch}`;
+  document.getElementById("recall-progress").textContent = `${recallIdx+1} of ${recallList.length}`;
+}
+
+document.getElementById("recall-card").addEventListener("click",()=>document.getElementById("recall-card").classList.toggle("flipped"));
+document.getElementById("recall-reveal").addEventListener("click",()=>document.getElementById("recall-card").classList.add("flipped"));
+document.getElementById("recall-prev").addEventListener("click",()=>{recallIdx=Math.max(0,recallIdx-1);recallRender();});
+document.getElementById("recall-next").addEventListener("click",()=>{recallIdx=Math.min(recallList.length-1,recallIdx+1);recallRender();});
+["r-chapter","r-paper"].forEach(id=>document.getElementById(id)?.addEventListener("change",()=>{recallIdx=0;recallRender();}));
+
+// ── QUIZ ──
+let quizList = [];
+let quizIdx  = 0;
+
+function getQuizList(){
+  const ch = document.getElementById("q-chapter")?.value;
+  const p  = document.getElementById("q-paper")?.value;
+  const list = REFS.filter(r=>{
+    if(ch && r.ch!==ch) return false;
+    if(p && String(r.p)!==p) return false;
+    return true;
+  });
+  // shuffle
+  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}
+  return list;
+}
+
+function quizNext(){
+  if(!quizList.length||quizIdx>=quizList.length){
+    quizList=getQuizList(); quizIdx=0;
+  }
+  const r=quizList[quizIdx];
+  if(!r) return;
+  const key=`${r.ch}|${r.th}`;
+  const prompt=QUIZ_PROMPTS[key]||`Give a reference about: ${r.th}`;
+  document.getElementById("quiz-prompt-text").textContent=prompt;
+  document.getElementById("quiz-prompt-chapter").textContent=`${r.ch} — ${r.th}`;
+  document.getElementById("quiz-input").value="";
+  document.getElementById("quiz-result").className="quiz-result";
+  document.getElementById("quiz-result").style.display="none";
+  document.getElementById("quiz-check").style.display="";
+  document.getElementById("quiz-skip").style.display="";
+  document.getElementById("quiz-next").style.display="none";
+  document.getElementById("quiz-input").focus();
+}
+
+["q-chapter","q-paper"].forEach(id=>document.getElementById(id)?.addEventListener("change",()=>{quizList=[];quizIdx=0;quizNext();}));
+
+function tokenise(s){
+  const stopWords=new Set(["a","an","the","and","or","but","in","on","of","to","is","it","he","his","they","you","we","i","for","be","as","at","from","with","that","this","not","no","all","if","so","up","do","by","your","our","my","their","us","him","her","its","was","are","were","had","has","have","will","who","what","when","where","which","how","about","into","out","after","before","over","under","then","also","only","such","those","these","any","each","nor","yet","both","whether","said"]);
+  return s.toLowerCase().replace(/[^\w\s]/g," ").split(/\s+/).filter(w=>w.length>2&&!stopWords.has(w));
+}
+
+function similarity(typed, correct){
+  const a=new Set(tokenise(typed));
+  const b=new Set(tokenise(correct));
+  if(!b.size) return 0;
+  const intersection=[...a].filter(w=>b.has(w)).length;
+  const union=new Set([...a,...b]).size;
+  const jaccard=union?intersection/union:0;
+  const recall=intersection/b.size;
+  return 0.4*jaccard + 0.6*recall;
+}
+
+document.getElementById("quiz-check").addEventListener("click",()=>{
+  const typed=document.getElementById("quiz-input").value.trim();
+  if(!typed) return;
+  const r=quizList[quizIdx];
+
+  // Check typed answer against ALL refs in the same chapter+theme, take best score
+  const siblings=REFS.filter(x=>x.ch===r.ch&&x.th===r.th);
+  let bestSc=0, bestRef=r;
+  siblings.forEach(sibling=>{
+    const sc=similarity(typed,sibling.t);
+    if(sc>bestSc){bestSc=sc;bestRef=sibling;}
+  });
+  const pct=Math.round(bestSc*100);
+  let cls,label;
+  if(bestSc>=0.7){cls="result-excellent";label="Excellent! 🌟";}
+  else if(bestSc>=0.5){cls="result-good";label="Good! Keep going.";}
+  else if(bestSc>=0.3){cls="result-getting";label="Getting there — review and try again.";}
+  else{cls="result-keep";label="Keep practising — read the reference carefully.";}
+
+  const result=document.getElementById("quiz-result");
+  result.className=`quiz-result ${cls} show`;
+  result.style.display="block";
+  document.getElementById("quiz-score").textContent=`${pct}% match`;
+  document.getElementById("quiz-label").textContent=label;
+  const allCorrect=siblings.map(s=>`"${s.t}" — ${s.s}`).join("<br><br>");
+  document.getElementById("quiz-correct").innerHTML=`<strong>Best match:</strong><br>"${bestRef.t}" — ${bestRef.s}`+(siblings.length>1?`<br><br><details style="margin-top:.5rem"><summary style="font-size:.75rem;cursor:pointer;color:var(--grey)">All ${siblings.length} references for this topic</summary><div style="margin-top:.4rem;font-size:.8rem;line-height:1.7">${allCorrect}</div></details>`:"");
+  document.getElementById("quiz-check").style.display="none";
+  document.getElementById("quiz-next").style.display="";
+});
+
+document.getElementById("quiz-skip").addEventListener("click",()=>{quizIdx++;quizNext();});
+document.getElementById("quiz-next").addEventListener("click",()=>{quizIdx++;quizNext();});
+document.getElementById("quiz-input").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();document.getElementById("quiz-check").click();}
+});
+
+// ── BATTLES ──
+function renderBattles(filter){
+  const list = document.getElementById("battles-list");
+  let html="";
+  const p1=BATTLES.filter(b=>b.paper===1&&(!filter||filter==="p1"));
+  const p2=BATTLES.filter(b=>b.paper===2&&(!filter||filter==="p2"));
+  const show1=!filter||filter==="p1";
+  const show2=!filter||filter==="p2";
+  if(show1&&p1.length){
+    html+=`<p class="battle-paper-label">Paper 1 Battles</p>`;
+    p1.forEach(b=>html+=battleCard(b));
+  }
+  if(show2&&p2.length){
+    html+=`<p class="battle-paper-label">Paper 2 Battles</p>`;
+    p2.forEach(b=>html+=battleCard(b));
+  }
+  list.innerHTML=html;
+  list.querySelectorAll(".battle-head").forEach(h=>{
+    h.addEventListener("click",()=>h.closest(".battle-card").classList.toggle("open"));
+  });
+}
+
+function battleCard(b){
+  const refs=b.refs.length?`<div class="battle-refs">Quranic refs: ${b.refs.join(", ")}</div>`:"";
+  return `<div class="battle-card" id="battle-${b.id}">
+    <div class="battle-head">
+      <div>
+        <div class="battle-name">${b.name}</div>
+        <div class="battle-meta">${b.year} · vs ${b.rival}</div>
+      </div>
+      <span class="battle-arrow">▼</span>
+    </div>
+    <div class="battle-body">
+      <div class="battle-stats">
+        <div class="battle-stat"><strong>Muslim strength</strong>${b.sm}</div>
+        <div class="battle-stat"><strong>Enemy strength</strong>${b.se}</div>
+        <div class="battle-stat"><strong>Muslim commander</strong>${b.cm}</div>
+        <div class="battle-stat"><strong>Enemy commander</strong>${b.ce}</div>
+      </div>
+      <div class="battle-section"><h4>Causes</h4><ul>${b.causes.map(c=>`<li>${c}</li>`).join("")}</ul></div>
+      <div class="battle-section"><h4>Key Events</h4><ul>${b.events.map(e=>`<li>${e}</li>`).join("")}</ul></div>
+      <div class="battle-section"><h4>Outcomes</h4><ul>${b.outcomes.map(o=>`<li>${o}</li>`).join("")}</ul></div>
+      ${refs}
+    </div>
+  </div>`;
+}
+
+renderBattles("");
+document.getElementById("battle-filter").addEventListener("click",e=>{
+  const chip=e.target.closest(".battle-chip");
+  if(!chip) return;
+  document.querySelectorAll(".battle-chip").forEach(c=>c.classList.remove("active"));
+  chip.classList.add("active");
+  const f=chip.dataset.battle;
+  renderBattles(f);
+});
+</script>
+
+<footer style="text-align:center;padding:2rem 1rem;font-size:.75rem;color:var(--grey);border-top:1px solid var(--line);margin-top:2rem">
+  <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+</footer>
+
+<script src="main.js?v=20260831a"></script>
+<script src="tools-nav.js?v=20260811d"></script>
+<script type="module" src="/auth.js?v=20260829a"></script>
+</body>
+</html>
