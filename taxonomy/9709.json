@@ -3,32 +3,1835 @@
   "subject": "Mathematics A Level",
   "note": "Cambridge International AS & A Level Mathematics 9709, 2026-2027 syllabus. Topic names and the `papers` scoping follow the official Content overview (syllabus p9): section 1 Pure Mathematics 1 = Paper 1, 3 Pure Mathematics 3 = Paper 3, 4 Mechanics = Paper 4, 5 Probability & Statistics 1 = Paper 5. Paper 2 (Pure 2, a subset of Pure 3) and Paper 6 (Probability & Statistics 2) are out of scope. Trigonometry, Differentiation and Integration appear in both Pure 1 and Pure 3 with different content, so they carry a paper suffix. Keywords use plain text as it appears in extracted Cambridge PDF text, not LaTeX: note that theta often extracts as the digit 1 or the letter i, so complex-number keywords avoid bare numeric-plus-i patterns.",
   "topics": [
-    {"name": "Quadratics", "papers": [1], "keywords": ["quadratic", "discriminant", "completing the square", "roots of the equation", "b squared minus 4ac", "b2 - 4ac", "parabola", "vertex", "minimum value", "maximum value", "quadratic formula", "factorising", "turning point", "real and distinct roots", "equal roots", "no real roots", "ax2 + bx + c"]},
-    {"name": "Functions", "papers": [1], "keywords": ["domain", "range", "function f", "composite function", "inverse function", "one-to-one", "many-to-one", "mapping", "f(x)", "gf(x)", "fg(x)", "modulus function", "piecewise", "even function", "odd function", "f is a function", "state the range", "state the domain"]},
-    {"name": "Coordinate geometry", "papers": [1], "keywords": ["gradient", "equation of the line", "midpoint", "perpendicular bisector", "y = mx + c", "distance between", "point of intersection", "equation of the circle", "centre and radius", "tangent to the circle", "chord", "normal to the circle", "x2 + y2", "passes through the point", "perpendicular to"]},
-    {"name": "Circular measure", "papers": [1], "keywords": ["radian", "arc length", "sector area", "angle subtended", "minor arc", "major sector", "perimeter of sector", "area of segment", "angle in radians", "convert degrees to radians", "sector of a circle", "shaded region", "area of triangle OAB"]},
-    {"name": "Trigonometry (P1)", "papers": [1], "keywords": ["trigonometric equation", "sine rule", "cosine rule", "exact value", "trigonometric identity", "sin squared", "cos squared", "sketch the graph of", "period", "amplitude", "principal value", "solving sin", "solving cos", "angle between 0 and 360", "sin theta", "cos theta", "tan theta", "show that sin", "prove that tan", "sin 1", "cos 1", "tan 1", "sin1", "cos1", "tan1", "solve the equation sin", "solve the equation cos", "solve the equation tan", "for 0", "for -180", "for 0 360"]},
-    {"name": "Series", "papers": [1], "keywords": ["arithmetic progression", "common difference", "geometric progression", "common ratio", "sum to infinity", "convergent", "binomial expansion", "binomial theorem", "nCr", "sigma notation", "nth term", "sum of the series", "arithmetic series", "geometric series", "term of the expansion", "coefficient of x", "find the sum of the first", "last term"]},
-    {"name": "Differentiation (P1)", "papers": [1], "keywords": ["dy/dx", "differentiate", "gradient of the curve", "stationary point", "maximum point", "minimum point", "point of inflection", "rate of change", "normal to the curve", "tangent to the curve", "second derivative", "d2y/dx2", "chain rule", "increasing function", "decreasing function", "find the value of x for which", "nature of the stationary point"]},
-    {"name": "Integration (P1)", "papers": [1], "keywords": ["integrate", "indefinite integral", "definite integral", "area under the curve", "constant of integration", "trapezium rule", "area between curves", "area bounded by", "evaluate the integral", "find the exact value of the area", "find the area of the region", "with respect to x"]},
-    {"name": "Algebra", "papers": [3], "keywords": ["partial fractions", "polynomial division", "remainder theorem", "factor theorem", "improper fraction", "long division of polynomials", "repeated factor", "decompose into partial fractions", "(ax + b)(cx + d)", "express in partial fractions", "remainder when divided", "is a factor of", "find the quotient", "quotient when", "when divided by", "|ax + b|", "solve the equation |", "solve the inequality |", "sketch the graph of y = |", "modulus of the expression", "expansion of (1 + x)", "ascending powers of x", "for which the expansion is valid", "set of values of x for which", "where n is rational"]},
-    {"name": "Logarithmic and exponential functions", "papers": [3], "keywords": ["logarithm", "ln x", "natural logarithm", "exponential function", "log base", "laws of logarithms", "exponential growth", "exponential decay", "graph of y = e", "graph of y = ln", "solve the equation giving your answer in terms of", "express as a single logarithm", "a^x", "e^x", "modulus graph", "y = ln("]},
-    {"name": "Trigonometry (P3)", "papers": [3], "keywords": ["addition formula", "compound angle", "double angle formula", "sin(A+B)", "cos(A+B)", "tan(A+B)", "sin 2A", "cos 2A", "R sin", "R cos", "harmonic form", "auxiliary angle", "sec", "cosec", "cot", "reciprocal trigonometric", "solve the equation for all values", "prove the identity", "express in the form R sin", "secant", "cosecant", "cotangent"]},
-    {"name": "Differentiation (P3)", "papers": [3], "keywords": ["implicit differentiation", "parametric differentiation", "product rule", "quotient rule", "d/dx of ln", "d/dx of sin", "related rates", "dy/dx in terms of t", "find dy/dx given", "curve is defined parametrically", "find the equation of the tangent at the point where t", "implicit equation", "differentiate with respect to x"]},
-    {"name": "Integration (P3)", "papers": [3], "keywords": ["integration by parts", "integration by substitution", "let u =", "du/dx", "trapezium rule", "integrate sin squared", "integrate cos squared", "integrate using partial fractions", "volume of revolution", "rotate about the x-axis", "volume generated", "integrate by substitution", "use the substitution", "find the exact value of the integral"]},
-    {"name": "Numerical solution of equations", "papers": [3], "keywords": ["iteration", "iterative formula", "change of sign", "root in the interval", "Newton-Raphson", "convergence", "find a root correct to", "show there is a root between", "interval bisection", "decimal search", "show that the equation has a root", "starting value", "successive iterations"]},
-    {"name": "Vectors", "papers": [3], "keywords": ["position vector", "scalar product", "dot product", "angle between vectors", "unit vector", "direction vector", "vector equation of the line", "point on the line", "parallel vectors", "perpendicular vectors", "magnitude of vector", "column vector", "skew lines", "normal to the plane", "i + j + k", "OA", "AB", "find a vector parallel to"]},
-    {"name": "Differential equations", "papers": [3], "keywords": ["differential equation", "separable variables", "rate of increase", "rate of decrease", "proportional to", "solve the differential equation", "particular solution", "general solution of the differential", "integrating factor", "formulate a differential equation", "population grows", "dN/dt", "dP/dt", "dV/dt", "given that when x = 0"]},
-    {"name": "Complex numbers", "papers": [3], "keywords": ["complex number", "Argand diagram", "imaginary part", "real part", "Im(z)", "Re(z)", "modulus of z", "argument of z", "arg z", "arg(z", "x + iy", "a + bi", "conjugate", "z*", "square roots of", "locus of z", "z1z2", "modulus-argument", "exponential form", "geometric effect", "z satisfies", "complex numbers z", "Cartesian form", "polar form", "non-real roots", "conjugate pairs", "purely imaginary", "roots occur in conjugate pairs", "in the form x + iy"]},
-    {"name": "Forces and equilibrium", "papers": [4], "keywords": ["resultant force", "equilibrium", "resolve", "friction", "coefficient of friction", "tension", "normal reaction", "inclined plane", "angle of inclination", "limiting equilibrium", "smooth surface", "rough surface", "horizontal component", "vertical component", "particle is in equilibrium", "find the magnitude of the force", "three forces", "coplanar forces"]},
-    {"name": "Kinematics of motion in a straight line", "papers": [4], "keywords": ["velocity", "acceleration", "displacement", "v = u + at", "s = ut", "v2 = u2 + 2as", "velocity-time graph", "distance-time graph", "constant acceleration", "uniform acceleration", "deceleration", "particle moves in a straight line", "speed at time t", "find the distance", "projectile", "time of flight", "maximum height", "horizontal motion", "particle is projected"]},
-    {"name": "Momentum", "papers": [4], "keywords": ["momentum", "impulse", "conservation of momentum", "collision", "coalesce", "coefficient of restitution", "rebound", "impact", "change in momentum", "mv - mu", "total momentum", "elastic collision", "inelastic collision", "particle collides", "speed after collision", "two particles collide"]},
-    {"name": "Newton's laws of motion", "papers": [4], "keywords": ["Newton's second law", "F = ma", "net force", "connected particles", "pulley", "string", "acceleration of the system", "tension in the string", "block on a table", "particle on a slope", "magnitude of the force on", "two particles", "light inextensible string", "passes over a smooth pulley"]},
-    {"name": "Energy, work and power", "papers": [4], "keywords": ["kinetic energy", "potential energy", "work done", "power", "efficiency", "work-energy principle", "conservation of energy", "gravitational potential energy", "1/2 mv", "mgh", "joule", "watt", "energy transferred", "driving force", "resistance to motion", "work done against friction", "speed at the bottom"]},
-    {"name": "Representation of data", "papers": [5], "keywords": ["histogram", "frequency density", "stem-and-leaf", "box-and-whisker", "cumulative frequency", "median", "quartile", "interquartile range", "mean", "variance", "standard deviation", "outlier", "skewness", "mode", "class width", "frequency polygon", "grouped data", "discrete data", "continuous data", "calculate the mean"]},
-    {"name": "Permutations and combinations", "papers": [5], "keywords": ["permutation", "combination", "factorial", "arrangements", "selections", "choose", "in how many ways", "distinct arrangements", "identical items", "circular arrangement", "at least one", "restriction", "number of ways of arranging", "selected from", "if repetition is not allowed"]},
-    {"name": "Probability", "papers": [5], "keywords": ["probability", "P(A)", "conditional probability", "independent events", "mutually exclusive", "tree diagram", "Venn diagram", "addition rule", "multiplication rule", "sample space", "exhaustive", "P(A and B)", "P(A or B)", "P(B | A)", "given that the event", "the probability that", "find P("]},
-    {"name": "Discrete random variables", "papers": [5], "keywords": ["random variable X", "probability distribution", "E(X)", "Var(X)", "expected value", "binomial distribution", "B(n, p)", "P(X = r)", "binomial probability", "mean of binomial", "variance of binomial", "geometric distribution", "probability mass function", "X has the distribution", "find E(X)", "find Var(X)"]},
-    {"name": "The normal distribution", "papers": [5], "keywords": ["normal distribution", "standard normal", "Z-score", "symmetry of normal", "standardise", "inverse normal", "area under normal curve", "normal approximation to binomial", "continuity correction", "percentage point", "P(X < a)", "P(X >", "find the value of mu", "find the value of sigma", "N(mu", "N(sigma", "the weights are normally distributed"]}
+    {
+      "name": "Coordinate geometry",
+      "display": "Coordinate Geometry",
+      "keywords": [
+        "gradient",
+        "equation of the line",
+        "midpoint",
+        "perpendicular bisector",
+        "y = mx + c",
+        "distance between",
+        "point of intersection",
+        "equation of the circle",
+        "centre and radius",
+        "tangent to the circle",
+        "chord",
+        "normal to the circle",
+        "x2 + y2",
+        "passes through the point",
+        "perpendicular to"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Formulas and Gradient",
+          "links": []
+        },
+        {
+          "name": "Equation of a Line",
+          "links": []
+        },
+        {
+          "name": "Equation of a Perpendicular Bisector",
+          "links": []
+        },
+        {
+          "name": "Points of Intersection of Graph",
+          "links": []
+        },
+        {
+          "name": "Example Questions",
+          "links": []
+        },
+        {
+          "name": "Angle Between Two Lines",
+          "links": []
+        },
+        {
+          "name": "Special Shapes",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Binomial (P1)",
+      "display": "Binomial",
+      "keywords": [],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Formula and Basic Application",
+          "links": []
+        },
+        {
+          "name": "Type One",
+          "links": []
+        },
+        {
+          "name": "Particular Term",
+          "links": []
+        },
+        {
+          "name": "Type Two",
+          "links": []
+        },
+        {
+          "name": "Substitution",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Quadratics",
+      "display": "Quadratics",
+      "keywords": [
+        "quadratic",
+        "discriminant",
+        "completing the square",
+        "roots of the equation",
+        "b squared minus 4ac",
+        "b2 - 4ac",
+        "parabola",
+        "vertex",
+        "minimum value",
+        "maximum value",
+        "quadratic formula",
+        "factorising",
+        "turning point",
+        "real and distinct roots",
+        "equal roots",
+        "no real roots",
+        "ax2 + bx + c"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Forms of Equation",
+          "links": []
+        },
+        {
+          "name": "Standard Form to Completed Square Form",
+          "links": []
+        },
+        {
+          "name": "Standard Form to Root Form",
+          "links": []
+        },
+        {
+          "name": "Sketch of a Quadratic Curve",
+          "links": []
+        },
+        {
+          "name": "Maximum/Minimum Point",
+          "links": []
+        },
+        {
+          "name": "Roots",
+          "links": []
+        },
+        {
+          "name": "Intersection of a Line and a Curve",
+          "links": []
+        },
+        {
+          "name": "Inequalities",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Series",
+      "display": "Sequences",
+      "keywords": [
+        "arithmetic progression",
+        "common difference",
+        "geometric progression",
+        "common ratio",
+        "sum to infinity",
+        "convergent",
+        "binomial expansion",
+        "binomial theorem",
+        "nCr",
+        "sigma notation",
+        "nth term",
+        "sum of the series",
+        "arithmetic series",
+        "geometric series",
+        "term of the expansion",
+        "coefficient of x",
+        "find the sum of the first",
+        "last term"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Arithmetic Progression (AP)",
+          "links": []
+        },
+        {
+          "name": "Geometric Progression (GP)",
+          "links": []
+        },
+        {
+          "name": "Exam Tips and Values of d and r",
+          "links": []
+        },
+        {
+          "name": "Type 1: Formula-Based Questions",
+          "links": []
+        },
+        {
+          "name": "Type 2: AP to GP Conversion",
+          "links": []
+        },
+        {
+          "name": "Type 3: Given Formula Questions",
+          "links": []
+        },
+        {
+          "name": "Type 4: Scenario-Based Questions",
+          "links": []
+        },
+        {
+          "name": "Type 5: Sum of First n Terms",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Circular measure",
+      "display": "Circular Measure",
+      "keywords": [
+        "radian",
+        "arc length",
+        "sector area",
+        "angle subtended",
+        "minor arc",
+        "major sector",
+        "perimeter of sector",
+        "area of segment",
+        "angle in radians",
+        "convert degrees to radians",
+        "sector of a circle",
+        "shaded region",
+        "area of triangle OAB"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Angle Units and Conversion Rate",
+          "links": []
+        },
+        {
+          "name": "Famous Angles and Values to Memorize",
+          "links": []
+        },
+        {
+          "name": "Formulas",
+          "links": []
+        },
+        {
+          "name": "Practice Questions (Basic)",
+          "links": []
+        },
+        {
+          "name": "Practice Questions (Advanced)",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Trigonometry (P1)",
+      "display": "Trigonometry",
+      "keywords": [
+        "trigonometric equation",
+        "sine rule",
+        "cosine rule",
+        "exact value",
+        "trigonometric identity",
+        "sin squared",
+        "cos squared",
+        "sketch the graph of",
+        "period",
+        "amplitude",
+        "principal value",
+        "solving sin",
+        "solving cos",
+        "angle between 0 and 360",
+        "sin theta",
+        "cos theta",
+        "tan theta",
+        "show that sin",
+        "prove that tan",
+        "sin 1",
+        "cos 1",
+        "tan 1",
+        "sin1",
+        "cos1",
+        "tan1",
+        "solve the equation sin",
+        "solve the equation cos",
+        "solve the equation tan",
+        "for 0",
+        "for -180",
+        "for 0 360"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Quadrants and Values",
+          "links": []
+        },
+        {
+          "name": "Basic Angles and Finding Exact Values (Without Calculator)",
+          "links": []
+        },
+        {
+          "name": "Equation Solving",
+          "links": []
+        },
+        {
+          "name": "Range Change",
+          "links": []
+        },
+        {
+          "name": "Introduction to Identities",
+          "links": []
+        },
+        {
+          "name": "Type 1: Solving Simple Equations",
+          "links": []
+        },
+        {
+          "name": "Type 2: Solving Quadratic Equations",
+          "links": []
+        },
+        {
+          "name": "Type 3: Identity Proving",
+          "links": []
+        },
+        {
+          "name": "Type 4: Identity Proving (Part 2)",
+          "links": []
+        },
+        {
+          "name": "Type 5: Questions with Diagrams",
+          "links": []
+        },
+        {
+          "name": "Type 6: Given Trigonometric Ratios",
+          "links": []
+        },
+        {
+          "name": "Type 7: Questions with Graphs",
+          "links": []
+        },
+        {
+          "name": "Basic Trigonometric Graphs",
+          "links": []
+        },
+        {
+          "name": "Amplitude and Baseline Variation",
+          "links": []
+        },
+        {
+          "name": "Frequency Variation",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Differentiation (P1)",
+      "display": "Differentiation",
+      "keywords": [
+        "dy/dx",
+        "differentiate",
+        "gradient of the curve",
+        "stationary point",
+        "maximum point",
+        "minimum point",
+        "point of inflection",
+        "rate of change",
+        "normal to the curve",
+        "tangent to the curve",
+        "second derivative",
+        "d2y/dx2",
+        "chain rule",
+        "increasing function",
+        "decreasing function",
+        "find the value of x for which",
+        "nature of the stationary point"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction and Symbology",
+          "links": []
+        },
+        {
+          "name": "How to Differentiate",
+          "links": []
+        },
+        {
+          "name": "Equation of Tangent and Normal",
+          "links": []
+        },
+        {
+          "name": "Stationary Points",
+          "links": []
+        },
+        {
+          "name": "Type 1: Tangent and Normal Questions",
+          "links": []
+        },
+        {
+          "name": "Type 2: Stationary Points and Nature",
+          "links": []
+        },
+        {
+          "name": "Type 3: Rate of Change",
+          "links": []
+        },
+        {
+          "name": "Type 4: Proof Questions",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Integration (P1)",
+      "display": "Integration",
+      "keywords": [
+        "integrate",
+        "indefinite integral",
+        "definite integral",
+        "area under the curve",
+        "constant of integration",
+        "trapezium rule",
+        "area between curves",
+        "area bounded by",
+        "evaluate the integral",
+        "find the exact value of the area",
+        "find the area of the region",
+        "with respect to x"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction",
+          "links": []
+        },
+        {
+          "name": "How to Integrate",
+          "links": []
+        },
+        {
+          "name": "Two Types of Integration",
+          "links": []
+        },
+        {
+          "name": "Area Under a Graph and Area Between Graphs",
+          "links": []
+        },
+        {
+          "name": "Volume of Rotation",
+          "links": []
+        },
+        {
+          "name": "Reverse Working",
+          "links": []
+        },
+        {
+          "name": "Type 1: Area Under Graph Practice",
+          "links": []
+        },
+        {
+          "name": "Type 2: Volume of Rotation Practice",
+          "links": []
+        },
+        {
+          "name": "Type 3: Reverse Working",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Functions",
+      "display": "Functions",
+      "keywords": [
+        "domain",
+        "range",
+        "function f",
+        "composite function",
+        "inverse function",
+        "one-to-one",
+        "many-to-one",
+        "mapping",
+        "f(x)",
+        "gf(x)",
+        "fg(x)",
+        "modulus function",
+        "piecewise",
+        "even function",
+        "odd function",
+        "f is a function",
+        "state the range",
+        "state the domain"
+      ],
+      "papers": [
+        1
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction",
+          "links": []
+        },
+        {
+          "name": "Inverse of a Function",
+          "links": []
+        },
+        {
+          "name": "Vertical and Horizontal Tests",
+          "links": []
+        },
+        {
+          "name": "Composite Functions",
+          "links": []
+        },
+        {
+          "name": "Sketch of a Function and Its Inverse",
+          "links": []
+        },
+        {
+          "name": "Domain",
+          "links": []
+        },
+        {
+          "name": "Range",
+          "links": []
+        },
+        {
+          "name": "Main Question to Memorize",
+          "links": []
+        },
+        {
+          "name": "Equation of a Circle",
+          "links": []
+        },
+        {
+          "name": "Transformation of Functions",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Binomial (P3)",
+      "display": "Binomial",
+      "keywords": [],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Formula and Conditions",
+          "links": []
+        },
+        {
+          "name": "Basic Application",
+          "links": []
+        },
+        {
+          "name": "Advanced Application",
+          "links": []
+        },
+        {
+          "name": "Five Mark Parts",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Partial Fractions",
+      "display": "Partial Fractions",
+      "keywords": [],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Forms",
+          "links": []
+        },
+        {
+          "name": "Proper vs Improper",
+          "links": []
+        },
+        {
+          "name": "Type 1: Proper and Linear",
+          "links": []
+        },
+        {
+          "name": "Type 2: Proper and Repeated",
+          "links": []
+        },
+        {
+          "name": "Type 3: Proper and Quadratic",
+          "links": []
+        },
+        {
+          "name": "Improper Fractions",
+          "links": []
+        },
+        {
+          "name": "Full Question with Partial Fractions and Binomial",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Logarithmic and exponential functions",
+      "display": "Indices, Surds and Logs",
+      "keywords": [
+        "logarithm",
+        "ln x",
+        "natural logarithm",
+        "exponential function",
+        "log base",
+        "laws of logarithms",
+        "exponential growth",
+        "exponential decay",
+        "graph of y = e",
+        "graph of y = ln",
+        "solve the equation giving your answer in terms of",
+        "express as a single logarithm",
+        "a^x",
+        "e^x",
+        "modulus graph",
+        "y = ln("
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Indices",
+          "links": []
+        },
+        {
+          "name": "Surds",
+          "links": []
+        },
+        {
+          "name": "Logarithms: Basic Properties",
+          "links": []
+        },
+        {
+          "name": "Bases",
+          "links": []
+        },
+        {
+          "name": "Type 1",
+          "links": []
+        },
+        {
+          "name": "Type 2",
+          "links": []
+        },
+        {
+          "name": "Type 3",
+          "links": []
+        },
+        {
+          "name": "Type 4",
+          "links": []
+        },
+        {
+          "name": "Advanced Substitution Techniques",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Algebra",
+      "display": "Polynomials",
+      "keywords": [
+        "partial fractions",
+        "polynomial division",
+        "remainder theorem",
+        "factor theorem",
+        "improper fraction",
+        "long division of polynomials",
+        "repeated factor",
+        "decompose into partial fractions",
+        "(ax + b)(cx + d)",
+        "express in partial fractions",
+        "remainder when divided",
+        "is a factor of",
+        "find the quotient",
+        "quotient when",
+        "when divided by",
+        "|ax + b|",
+        "solve the equation |",
+        "solve the inequality |",
+        "sketch the graph of y = |",
+        "modulus of the expression",
+        "expansion of (1 + x)",
+        "ascending powers of x",
+        "for which the expansion is valid",
+        "set of values of x for which",
+        "where n is rational"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Long Division",
+          "links": []
+        },
+        {
+          "name": "Remainder Theorem",
+          "links": []
+        },
+        {
+          "name": "Factor Theorem",
+          "links": []
+        },
+        {
+          "name": "Factorize an Expression Completely",
+          "links": []
+        },
+        {
+          "name": "Basic Practice",
+          "links": []
+        },
+        {
+          "name": "Advanced Practice",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Trigonometry (P3)",
+      "display": "Trigonometry",
+      "keywords": [
+        "addition formula",
+        "compound angle",
+        "double angle formula",
+        "sin(A+B)",
+        "cos(A+B)",
+        "tan(A+B)",
+        "sin 2A",
+        "cos 2A",
+        "R sin",
+        "R cos",
+        "harmonic form",
+        "auxiliary angle",
+        "sec",
+        "cosec",
+        "cot",
+        "reciprocal trigonometric",
+        "solve the equation for all values",
+        "prove the identity",
+        "express in the form R sin",
+        "secant",
+        "cosecant",
+        "cotangent"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Identities",
+          "links": []
+        },
+        {
+          "name": "Type 1: R sin θ and R cos θ Forms",
+          "links": []
+        },
+        {
+          "name": "Type 2",
+          "links": []
+        },
+        {
+          "name": "Identity Proving",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Differentiation (P3)",
+      "display": "Differentiation",
+      "keywords": [
+        "implicit differentiation",
+        "parametric differentiation",
+        "product rule",
+        "quotient rule",
+        "d/dx of ln",
+        "d/dx of sin",
+        "related rates",
+        "dy/dx in terms of t",
+        "find dy/dx given",
+        "curve is defined parametrically",
+        "find the equation of the tangent at the point where t",
+        "implicit equation",
+        "differentiate with respect to x"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Operators",
+          "links": []
+        },
+        {
+          "name": "Single Operators",
+          "links": []
+        },
+        {
+          "name": "Multiple Operators",
+          "links": []
+        },
+        {
+          "name": "Product and Quotient Rule",
+          "links": []
+        },
+        {
+          "name": "Basic Outcomes",
+          "links": []
+        },
+        {
+          "name": "Nature of Stationary Points",
+          "links": []
+        },
+        {
+          "name": "Type 1 Questions",
+          "links": []
+        },
+        {
+          "name": "Parametric Equations",
+          "links": []
+        },
+        {
+          "name": "Type 2 Questions",
+          "links": []
+        },
+        {
+          "name": "Implicit Differentiation",
+          "links": []
+        },
+        {
+          "name": "Type 3 Practice",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Integration (P3)",
+      "display": "Integration",
+      "keywords": [
+        "integration by parts",
+        "integration by substitution",
+        "let u =",
+        "du/dx",
+        "trapezium rule",
+        "integrate sin squared",
+        "integrate cos squared",
+        "integrate using partial fractions",
+        "volume of revolution",
+        "rotate about the x-axis",
+        "volume generated",
+        "integrate by substitution",
+        "use the substitution",
+        "find the exact value of the integral"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Operators and Rules",
+          "links": []
+        },
+        {
+          "name": "Basic Practice of Rules",
+          "links": []
+        },
+        {
+          "name": "How to Choose an Operator",
+          "links": []
+        },
+        {
+          "name": "Integration Chart",
+          "links": []
+        },
+        {
+          "name": "Odd/Even Powers of sin, cos and tan",
+          "links": []
+        },
+        {
+          "name": "ln Operator",
+          "links": []
+        },
+        {
+          "name": "tan⁻¹ Operator",
+          "links": []
+        },
+        {
+          "name": "Integration by Parts: Formula and Basic Example",
+          "links": []
+        },
+        {
+          "name": "Integration by Parts with Double Integration",
+          "links": []
+        },
+        {
+          "name": "Integration by Parts with Loop Variation",
+          "links": []
+        },
+        {
+          "name": "How to Decide u and v for Integration by Parts",
+          "links": []
+        },
+        {
+          "name": "How to Integrate ln x",
+          "links": []
+        },
+        {
+          "name": "Integration by Substitution: Basics",
+          "links": []
+        },
+        {
+          "name": "Type 1: With Differentiation",
+          "links": []
+        },
+        {
+          "name": "Type 2: With Partial Fractions",
+          "links": []
+        },
+        {
+          "name": "Type 3: With R cos",
+          "links": []
+        },
+        {
+          "name": "Type 4: With Trigonometric Identity",
+          "links": []
+        },
+        {
+          "name": "Type 5: Single Part",
+          "links": []
+        },
+        {
+          "name": "Type 6: With Substitution",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Differential equations",
+      "display": "Differential Equations",
+      "keywords": [
+        "differential equation",
+        "separable variables",
+        "rate of increase",
+        "rate of decrease",
+        "proportional to",
+        "solve the differential equation",
+        "particular solution",
+        "general solution of the differential",
+        "integrating factor",
+        "formulate a differential equation",
+        "population grows",
+        "dN/dt",
+        "dP/dt",
+        "dV/dt",
+        "given that when x = 0"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction",
+          "links": []
+        },
+        {
+          "name": "Without Proof",
+          "links": []
+        },
+        {
+          "name": "Proof: Basic",
+          "links": []
+        },
+        {
+          "name": "Proof with In and Out",
+          "links": []
+        },
+        {
+          "name": "Proof with Chain Rule",
+          "links": []
+        },
+        {
+          "name": "What Happens to the Value of y as x Becomes Large",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Vectors",
+      "display": "Vectors",
+      "keywords": [
+        "position vector",
+        "scalar product",
+        "dot product",
+        "angle between vectors",
+        "unit vector",
+        "direction vector",
+        "vector equation of the line",
+        "point on the line",
+        "parallel vectors",
+        "perpendicular vectors",
+        "magnitude of vector",
+        "column vector",
+        "skew lines",
+        "normal to the plane",
+        "i + j + k",
+        "OA",
+        "AB",
+        "find a vector parallel to"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction",
+          "links": []
+        },
+        {
+          "name": "Magnitude and Unit Vector",
+          "links": []
+        },
+        {
+          "name": "Parallel and Collinear",
+          "links": []
+        },
+        {
+          "name": "Dot Product",
+          "links": []
+        },
+        {
+          "name": "Equation of a Line",
+          "links": []
+        },
+        {
+          "name": "Two Lines",
+          "links": []
+        },
+        {
+          "name": "Skew Lines and Point of Intersection",
+          "links": []
+        },
+        {
+          "name": "Angle of Intersection",
+          "links": []
+        },
+        {
+          "name": "Foot of the Perpendicular",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Graphs",
+      "display": "Graphs",
+      "keywords": [],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Linear, Quadratic and Cubic Graphs",
+          "links": []
+        },
+        {
+          "name": "Reciprocal Graphs",
+          "links": []
+        },
+        {
+          "name": "Exponential Graphs",
+          "links": []
+        },
+        {
+          "name": "Logarithmic Graphs",
+          "links": []
+        },
+        {
+          "name": "Absolute Value Function",
+          "links": []
+        },
+        {
+          "name": "Transformations",
+          "links": []
+        },
+        {
+          "name": "Inverse Functions",
+          "links": []
+        },
+        {
+          "name": "Trigonometric Graphs",
+          "links": []
+        },
+        {
+          "name": "Examples",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Numerical solution of equations",
+      "display": "Iteration",
+      "keywords": [
+        "iteration",
+        "iterative formula",
+        "change of sign",
+        "root in the interval",
+        "Newton-Raphson",
+        "convergence",
+        "find a root correct to",
+        "show there is a root between",
+        "interval bisection",
+        "decimal search",
+        "show that the equation has a root",
+        "starting value",
+        "successive iterations"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Basic Questions and Concepts",
+          "links": []
+        },
+        {
+          "name": "Practice",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Complex numbers",
+      "display": "Complex Numbers",
+      "keywords": [
+        "complex number",
+        "Argand diagram",
+        "imaginary part",
+        "real part",
+        "Im(z)",
+        "Re(z)",
+        "modulus of z",
+        "argument of z",
+        "arg z",
+        "arg(z",
+        "x + iy",
+        "a + bi",
+        "conjugate",
+        "z*",
+        "square roots of",
+        "locus of z",
+        "z1z2",
+        "modulus-argument",
+        "exponential form",
+        "geometric effect",
+        "z satisfies",
+        "complex numbers z",
+        "Cartesian form",
+        "polar form",
+        "non-real roots",
+        "conjugate pairs",
+        "purely imaginary",
+        "roots occur in conjugate pairs",
+        "in the form x + iy"
+      ],
+      "papers": [
+        3
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction and Symbols",
+          "links": []
+        },
+        {
+          "name": "DMAS",
+          "links": []
+        },
+        {
+          "name": "Square Root of a Complex Number",
+          "links": []
+        },
+        {
+          "name": "Argand Diagram, Modulus and Argument",
+          "links": []
+        },
+        {
+          "name": "Multiplication and Division of Complex Numbers (with Practice)",
+          "links": []
+        },
+        {
+          "name": "Forms of a Complex Number",
+          "links": []
+        },
+        {
+          "name": "Exponential Form for Higher Powers and Square Roots",
+          "links": []
+        },
+        {
+          "name": "Locus and Correct Forms",
+          "links": []
+        },
+        {
+          "name": "Shading and Basic Examples",
+          "links": []
+        },
+        {
+          "name": "Advanced Questions with Diagrams",
+          "links": []
+        },
+        {
+          "name": "Practice Without Diagram (Hard Questions)",
+          "links": []
+        },
+        {
+          "name": "Practice With Diagram (Hard Questions)",
+          "links": []
+        },
+        {
+          "name": "Practice: Complex Numbers with Polynomials",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Linear Law",
+      "display": "Linear Law",
+      "keywords": [],
+      "papers": [
+        3
+      ],
+      "subtopics": []
+    },
+    {
+      "name": "Inequalities and Modulus",
+      "display": "Inequalities and Modulus",
+      "keywords": [],
+      "papers": [
+        3
+      ],
+      "subtopics": []
+    },
+    {
+      "name": "Forces and equilibrium",
+      "display": "Forces",
+      "keywords": [
+        "resultant force",
+        "equilibrium",
+        "resolve",
+        "friction",
+        "coefficient of friction",
+        "tension",
+        "normal reaction",
+        "inclined plane",
+        "angle of inclination",
+        "limiting equilibrium",
+        "smooth surface",
+        "rough surface",
+        "horizontal component",
+        "vertical component",
+        "particle is in equilibrium",
+        "find the magnitude of the force",
+        "three forces",
+        "coplanar forces"
+      ],
+      "papers": [
+        4
+      ],
+      "subtopics": [
+        {
+          "name": "Basics, Weight and Friction (Basics)",
+          "links": []
+        },
+        {
+          "name": "Components of a Force, Horizontal and Inclined Plane, Positioning of m and M",
+          "links": []
+        },
+        {
+          "name": "Tension in Strings, Pulleys and Pegs",
+          "links": []
+        },
+        {
+          "name": "Equilibrium (Basic)",
+          "links": []
+        },
+        {
+          "name": "Equilibrium with Vertical Ring",
+          "links": []
+        },
+        {
+          "name": "Equilibrium with Two Separate Diagrams (Distances and Forces)",
+          "links": []
+        },
+        {
+          "name": "Friction: Concept, Formula and Direction of Normal Force",
+          "links": []
+        },
+        {
+          "name": "Limiting Equilibrium: Basics, Formula and One Example",
+          "links": []
+        },
+        {
+          "name": "Basic Applications of Limiting Equilibrium",
+          "links": []
+        },
+        {
+          "name": "Advanced Limiting Equilibrium with Changed Point of Observation",
+          "links": []
+        },
+        {
+          "name": "Inequalities of Rest and Motion with Examples",
+          "links": []
+        },
+        {
+          "name": "Resultant of a Force (Basic)",
+          "links": []
+        },
+        {
+          "name": "Resultant of a Force (Advanced)",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Kinematics of motion in a straight line",
+      "display": "Kinematics",
+      "keywords": [
+        "velocity",
+        "acceleration",
+        "displacement",
+        "v = u + at",
+        "s = ut",
+        "v2 = u2 + 2as",
+        "velocity-time graph",
+        "distance-time graph",
+        "constant acceleration",
+        "uniform acceleration",
+        "deceleration",
+        "particle moves in a straight line",
+        "speed at time t",
+        "find the distance",
+        "projectile",
+        "time of flight",
+        "maximum height",
+        "horizontal motion",
+        "particle is projected"
+      ],
+      "papers": [
+        4
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction and Basics",
+          "links": []
+        },
+        {
+          "name": "Equations of Motion with One Basic and One Advanced Example",
+          "links": []
+        },
+        {
+          "name": "Time Delay: Concept and Examples",
+          "links": []
+        },
+        {
+          "name": "Equations of Motion on Horizontal, Inclined and Vertical Planes (Including Forces)",
+          "links": []
+        },
+        {
+          "name": "Non-Constant Acceleration: Basics, Differentiation and Integration Rules, Maximum/Minimum Values",
+          "links": []
+        },
+        {
+          "name": "Applications of Non-Constant Acceleration Rules (Basic Questions)",
+          "links": []
+        },
+        {
+          "name": "Split Journey Rules",
+          "links": []
+        },
+        {
+          "name": "Split Journey Examples",
+          "links": []
+        },
+        {
+          "name": "Kinematics Graphs and Exam Rules",
+          "links": []
+        },
+        {
+          "name": "Applications of Kinematics Graph Rules (Exam Questions)",
+          "links": []
+        },
+        {
+          "name": "Pulley Systems: Basic Rules",
+          "links": []
+        },
+        {
+          "name": "Main Pulley Question with All Variations",
+          "links": []
+        },
+        {
+          "name": "Pulley Questions with String Broken Mid-Air (Vertical Plane)",
+          "links": []
+        },
+        {
+          "name": "Pulley Questions with Inclined Plane on One End and Vertical on the Other",
+          "links": []
+        },
+        {
+          "name": "Pulley Questions with Inclined Planes on Both Ends",
+          "links": []
+        },
+        {
+          "name": "Pulley Questions with Horizontal Surface on One End and Vertical on the Other",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Energy, work and power",
+      "display": "Work, Power and Energy",
+      "keywords": [
+        "kinetic energy",
+        "potential energy",
+        "work done",
+        "power",
+        "efficiency",
+        "work-energy principle",
+        "conservation of energy",
+        "gravitational potential energy",
+        "1/2 mv",
+        "mgh",
+        "joule",
+        "watt",
+        "energy transferred",
+        "driving force",
+        "resistance to motion",
+        "work done against friction",
+        "speed at the bottom"
+      ],
+      "papers": [
+        4
+      ],
+      "subtopics": [
+        {
+          "name": "Introduction, Basics and Formulae",
+          "links": []
+        },
+        {
+          "name": "Difference Between Forward Force and Driving Force",
+          "links": []
+        },
+        {
+          "name": "Type 1: Concept with Basic Questions",
+          "links": []
+        },
+        {
+          "name": "Type 1: Concept with Advanced Questions (Including Two Variables)",
+          "links": []
+        },
+        {
+          "name": "Type 2: Concept with Basic Questions",
+          "links": []
+        },
+        {
+          "name": "Type 2: Concept with Advanced Questions (Higher Weightage)",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Momentum",
+      "display": "Momentum",
+      "keywords": [
+        "momentum",
+        "impulse",
+        "conservation of momentum",
+        "collision",
+        "coalesce",
+        "coefficient of restitution",
+        "rebound",
+        "impact",
+        "change in momentum",
+        "mv - mu",
+        "total momentum",
+        "elastic collision",
+        "inelastic collision",
+        "particle collides",
+        "speed after collision",
+        "two particles collide"
+      ],
+      "papers": [
+        4
+      ],
+      "subtopics": [
+        {
+          "name": "Concept and Formula",
+          "links": []
+        },
+        {
+          "name": "Principle of Conservation of Momentum (Basics)",
+          "links": []
+        },
+        {
+          "name": "Examples of Exam Questions",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Newton's laws of motion",
+      "display": "Newton's Laws of Motion",
+      "keywords": [
+        "Newton's second law",
+        "F = ma",
+        "net force",
+        "connected particles",
+        "pulley",
+        "string",
+        "acceleration of the system",
+        "tension in the string",
+        "block on a table",
+        "particle on a slope",
+        "magnitude of the force on",
+        "two particles",
+        "light inextensible string",
+        "passes over a smooth pulley"
+      ],
+      "papers": [
+        4
+      ],
+      "subtopics": []
+    },
+    {
+      "name": "Probability",
+      "display": "Probability",
+      "keywords": [
+        "probability",
+        "P(A)",
+        "conditional probability",
+        "independent events",
+        "mutually exclusive",
+        "tree diagram",
+        "Venn diagram",
+        "addition rule",
+        "multiplication rule",
+        "sample space",
+        "exhaustive",
+        "P(A and B)",
+        "P(A or B)",
+        "P(B | A)",
+        "given that the event",
+        "the probability that",
+        "find P("
+      ],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Basics and Sample Spaces with Tree Diagram Rules",
+          "links": []
+        },
+        {
+          "name": "Conditional Probability: Formula and Example",
+          "links": []
+        },
+        {
+          "name": "Conditional Probability Exam Questions (Listing, Tree Diagrams and Data Tables)",
+          "links": []
+        },
+        {
+          "name": "Mutually Exclusive and Independent Events",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Binomial Distribution",
+      "display": "Binomial Distribution",
+      "keywords": [],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Binomial Distribution: Conditions, Notation and Comprehensive Example",
+          "links": []
+        },
+        {
+          "name": "Binomial Distribution Questions with Logarithms and Inequalities",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Geometric Distribution",
+      "display": "Geometric Distribution",
+      "keywords": [],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Concept, Formulae and Notation",
+          "links": []
+        },
+        {
+          "name": "Exam Questions and Practice",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Discrete random variables",
+      "display": "Random Variables",
+      "keywords": [
+        "random variable X",
+        "probability distribution",
+        "E(X)",
+        "Var(X)",
+        "expected value",
+        "binomial distribution",
+        "B(n, p)",
+        "P(X = r)",
+        "binomial probability",
+        "mean of binomial",
+        "variance of binomial",
+        "geometric distribution",
+        "probability mass function",
+        "X has the distribution",
+        "find E(X)",
+        "find Var(X)"
+      ],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Mean, Standard Deviation and Variance (Raw Data and Frequency Tables)",
+          "links": []
+        },
+        {
+          "name": "Random Variables: Basics, Expected Value, Standard Deviation and Variance",
+          "links": []
+        },
+        {
+          "name": "Basic Questions with Tables",
+          "links": []
+        },
+        {
+          "name": "Advanced Scenario-Based Questions",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "The normal distribution",
+      "display": "Normal Distribution",
+      "keywords": [
+        "normal distribution",
+        "standard normal",
+        "Z-score",
+        "symmetry of normal",
+        "standardise",
+        "inverse normal",
+        "area under normal curve",
+        "normal approximation to binomial",
+        "continuity correction",
+        "percentage point",
+        "P(X < a)",
+        "P(X >",
+        "find the value of mu",
+        "find the value of sigma",
+        "N(mu",
+        "N(sigma",
+        "the weights are normally distributed"
+      ],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Conditions, Notation and Understanding the Z-Table",
+          "links": []
+        },
+        {
+          "name": "Using the Z-Table to Find Probabilities (7 Variations)",
+          "links": []
+        },
+        {
+          "name": "Type 1: Forward Working Rules and One Basic Example",
+          "links": []
+        },
+        {
+          "name": "Type 1: Exam Questions",
+          "links": []
+        },
+        {
+          "name": "Type 2: Reverse Working Rules and Positioning on the x-Axis",
+          "links": []
+        },
+        {
+          "name": "Type 2: Reading Z-Values from the Table (All Decimal Variations)",
+          "links": []
+        },
+        {
+          "name": "Type 2: Full Worked Examples",
+          "links": []
+        },
+        {
+          "name": "Type 2: Reverse Working Exam Questions (Basic and Advanced)",
+          "links": []
+        },
+        {
+          "name": "Type 3: Binomial to Normal Approximation (Basics and Continuity Correction)",
+          "links": []
+        },
+        {
+          "name": "Type 3: Binomial to Normal Approximation (Conditions and Justification)",
+          "links": []
+        },
+        {
+          "name": "Type 3: Binomial to Normal Approximation Exam Questions",
+          "links": []
+        },
+        {
+          "name": "Exam Questions Relating Binomial and Normal Distributions (Both Directions)",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Linear Transformation of Data",
+      "display": "Linear Transformation of Data",
+      "keywords": [],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Basics and Concepts with Small Examples",
+          "links": []
+        },
+        {
+          "name": "Exam Questions and Practice (Including Questions Where a Student is Added to the Data)",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Representation of data",
+      "display": "Representation of Data",
+      "keywords": [
+        "histogram",
+        "frequency density",
+        "stem-and-leaf",
+        "box-and-whisker",
+        "cumulative frequency",
+        "median",
+        "quartile",
+        "interquartile range",
+        "mean",
+        "variance",
+        "standard deviation",
+        "outlier",
+        "skewness",
+        "mode",
+        "class width",
+        "frequency polygon",
+        "grouped data",
+        "discrete data",
+        "continuous data",
+        "calculate the mean"
+      ],
+      "papers": [
+        5
+      ],
+      "subtopics": [
+        {
+          "name": "Mean, Median, Mode, Standard Deviation and Variance (Raw Data, Frequency Tables and Probability Tables)",
+          "links": []
+        },
+        {
+          "name": "Histograms",
+          "links": []
+        },
+        {
+          "name": "Cumulative Frequency",
+          "links": []
+        },
+        {
+          "name": "Stem-and-Leaf Diagrams",
+          "links": []
+        },
+        {
+          "name": "Box-and-Whisker Plots",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "Permutations and combinations",
+      "display": "Permutations and Combinations",
+      "keywords": [
+        "permutation",
+        "combination",
+        "factorial",
+        "arrangements",
+        "selections",
+        "choose",
+        "in how many ways",
+        "distinct arrangements",
+        "identical items",
+        "circular arrangement",
+        "at least one",
+        "restriction",
+        "number of ways of arranging",
+        "selected from",
+        "if repetition is not allowed"
+      ],
+      "papers": [
+        5
+      ],
+      "subtopics": []
+    }
   ]
 }

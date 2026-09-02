@@ -3,30 +3,2379 @@
   "subject": "Physics (O Level)",
   "note": "Verified 2026-07-17 against 5054-2026-2028-syllabus.pdf: names and order follow its subject content 1.1-6.2 exactly. NOTE 5054 and 0625 diverge - 5054 has 'Simple magnetism and magnetic fields', 'Practical electricity' and 'Uses of an oscilloscope'; 0625 has 'Simple phenomena of magnetism' and 'Electrical safety' and no oscilloscope topic. Keep 0625.json separate. Keywords drive the heuristic classifier; refine freely - lowercase, phrases allowed.",
   "topics": [
-    {"name": "Physical quantities & measurement", "keywords": ["measuring cylinder", "micrometer", "vernier", "stopwatch", "pendulum", "scalar", "vector quantity", "si unit", "parallax", "precision", "measure the volume"]},
-    {"name": "Motion", "keywords": ["velocity", "acceleration", "speed-time", "distance-time", "free fall", "air resistance", "terminal velocity", "deceleration", "uniform speed", "acceleration of free fall"]},
-    {"name": "Mass & weight", "keywords": ["gravitational field strength", "mass and weight", "newton per kilogram", "beam balance", "weight of the object"]},
-    {"name": "Density", "keywords": ["density", "displacement can", "float", "sink", "volume of the liquid", "kg / m3", "g / cm3"]},
-    {"name": "Forces", "keywords": ["resultant force", "friction", "spring", "extension", "load-extension", "moment", "pivot", "centre of gravity", "equilibrium", "stability", "circular motion", "hooke", "limit of proportionality", "turning effect"]},
-    {"name": "Momentum", "keywords": ["momentum", "impulse", "collision", "conservation of momentum", "resultant force acting for a time"]},
-    {"name": "Energy, work & power", "keywords": ["kinetic energy", "potential energy", "work done", "power", "efficiency", "joule", "energy transfer", "renewable", "fossil fuel", "chemical energy", "energy resource", "sankey"]},
-    {"name": "Pressure", "keywords": ["pressure", "barometer", "manometer", "hydraulic", "atmospheric pressure", "liquid column", "force per unit area"]},
-    {"name": "Kinetic particle model of matter", "keywords": ["particle", "molecule", "brownian", "evaporation", "boiling", "melting", "states of matter", "gas pressure", "diffusion", "kinetic model", "random motion"]},
-    {"name": "Thermal properties & temperature", "keywords": ["thermometer", "specific heat capacity", "latent heat", "thermal expansion", "fixed points", "temperature rise", "heating curve", "cooling curve"]},
-    {"name": "Transfer of thermal energy", "keywords": ["conduction", "convection", "radiation", "infrared radiation", "insulator", "vacuum flask", "emitter", "absorber", "thermal energy transfer", "shiny surface", "dull black"]},
-    {"name": "General wave properties", "keywords": ["wavelength", "frequency", "amplitude", "wavefront", "diffraction", "transverse", "longitudinal", "ripple tank", "wave speed", "period of the wave"]},
-    {"name": "Light", "keywords": ["mirror", "lens", "focal length", "image", "refraction", "refractive index", "total internal reflection", "critical angle", "optical fibre", "ray diagram", "converging lens", "magnifying glass", "angle of incidence"]},
-    {"name": "Electromagnetic spectrum", "keywords": ["electromagnetic spectrum", "radio wave", "microwave", "ultraviolet", "x-ray", "gamma ray", "visible light", "electromagnetic wave", "speed of light in a vacuum"]},
-    {"name": "Sound", "keywords": ["sound wave", "echo", "ultrasound", "pitch", "loudness", "compression", "rarefaction", "speed of sound", "vibrat", "oscilloscope"]},
-    {"name": "Simple magnetism and magnetic fields", "keywords": ["magnet", "magnetic field", "north pole", "south pole", "plotting compass", "magnetise", "soft iron", "induced magnetism", "magnetic material", "field line"]},
-    {"name": "Electrical quantities", "keywords": ["electric charge", "current", "potential difference", "e.m.f.", "resistance", "ohm", "coulomb", "electron", "static electricity", "charged rod", "electric field", "conductor and insulator", "i = q"]},
-    {"name": "Electric circuits", "keywords": ["circuit diagram", "series", "parallel", "resistor", "variable resistor", "thermistor", "light-dependent resistor", "ldr", "diode", "ammeter", "voltmeter", "potential divider", "combined resistance", "lamp", "switch"]},
-    {"name": "Practical electricity", "keywords": ["fuse", "earth wire", "circuit breaker", "live wire", "neutral wire", "double insulat", "electrical hazard", "damaged insulation", "trip switch", "kilowatt-hour", "mains"]},
-    {"name": "Electromagnetic effects", "keywords": ["electromagnetic induction", "generator", "transformer", "motor", "relay", "solenoid", "induced e.m.f.", "magnetic effect of a current", "turns ratio", "split-ring commutator", "slip ring", "left-hand rule", "force on a current-carrying"]},
-    {"name": "Uses of an oscilloscope", "keywords": ["oscilloscope", "y-gain", "timebase", "trace on the screen", "cathode-ray"]},
-    {"name": "Nuclear model of the atom", "keywords": ["nucleus", "proton", "neutron", "nuclide", "isotope", "alpha-particle scattering", "atomic number", "mass number", "proton number", "nucleon number"]},
-    {"name": "Radioactivity", "keywords": ["radioactive", "alpha-particle", "beta-particle", "gamma radiation", "half-life", "decay", "ionising", "background radiation", "count rate", "fission", "fusion", "radiation detector"]},
-    {"name": "Earth & the Solar System", "keywords": ["orbit", "planet", "satellite", "solar system", "the moon", "comet", "asteroid", "orbital period", "gravitational attraction of the sun", "phases of the moon"]},
-    {"name": "Stars & the Universe", "keywords": ["star", "galaxy", "universe", "big bang", "redshift", "milky way", "supernova", "nebula", "light-year", "white dwarf", "main sequence", "cosmic microwave background"]}
+    {
+      "name": "Physical quantities & measurement",
+      "keywords": [
+        "measuring cylinder",
+        "micrometer",
+        "vernier",
+        "stopwatch",
+        "pendulum",
+        "scalar",
+        "vector quantity",
+        "si unit",
+        "parallax",
+        "precision",
+        "measure the volume"
+      ],
+      "subtopics": [
+        {
+          "name": "Measure a variety of lengths with appropriate precision using",
+          "links": [],
+          "detail": "Describe how to measure a variety of lengths with appropriate precision using tapes, rulers and micrometers (including reading the scale on an analogue micrometer)"
+        },
+        {
+          "name": "Use a measuring cylinder to measure the volume of",
+          "links": [],
+          "detail": "Describe how to use a measuring cylinder to measure the volume of a liquid and to determine the volume of a solid by displacement"
+        },
+        {
+          "name": "Measure a variety of time intervals using clocks and",
+          "links": [],
+          "detail": "Describe how to measure a variety of time intervals using clocks and digital timers"
+        },
+        {
+          "name": "Average value for a small distance and for a",
+          "links": [],
+          "detail": "Determine an average value for a small distance and for a short interval of time by measuring multiples (including the period of oscillation of a pendulum)"
+        },
+        {
+          "name": "Scalar quantity has magnitude",
+          "links": [],
+          "detail": "Understand that a scalar quantity has magnitude (size) only and that a vector quantity has magnitude and direction"
+        },
+        {
+          "name": "Following quantities are scalars",
+          "links": [],
+          "detail": "Know that the following quantities are scalars: distance, speed, time, mass, energy and temperature"
+        },
+        {
+          "name": "Following quantities are vectors",
+          "links": [],
+          "detail": "Know that the following quantities are vectors: displacement, force, weight, velocity, acceleration, momentum, electric field strength and gravitational field strength"
+        },
+        {
+          "name": "Resultant of two vectors at right angles Back to",
+          "links": [],
+          "detail": "Determine, by calculation or graphically, the resultant of two vectors at right angles Back to contents page Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. www.cambridgeinternational.org/olevel 12 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Motion",
+      "keywords": [
+        "velocity",
+        "acceleration",
+        "speed-time",
+        "distance-time",
+        "free fall",
+        "air resistance",
+        "terminal velocity",
+        "deceleration",
+        "uniform speed",
+        "acceleration of free fall"
+      ],
+      "subtopics": [
+        {
+          "name": "Speed as distance travelled per unit time and define",
+          "links": [],
+          "detail": "Define speed as distance travelled per unit time and define velocity as change in displacement per unit time"
+        },
+        {
+          "name": "Equation distance speed = time v =",
+          "links": [],
+          "detail": "Recall and use the equation distance speed = time v ="
+        },
+        {
+          "name": "Equation total distance travelled average speed = total time",
+          "links": [],
+          "detail": "Recall and use the equation total distance travelled average speed = total time taken"
+        },
+        {
+          "name": "Acceleration as change in velocity per unit time",
+          "links": [],
+          "detail": "Define acceleration as change in velocity per unit time; recall and use the equation change in velocity acceleration = time taken"
+        },
+        {
+          "name": "What is meant by",
+          "links": [],
+          "detail": "State what is meant by, and describe examples of, uniform acceleration and non-uniform acceleration"
+        },
+        {
+          "name": "Deceleration is a negative acceleration and use this in",
+          "links": [],
+          "detail": "Know that a deceleration is a negative acceleration and use this in calculations"
+        },
+        {
+          "name": "Distance-time and speed-time graphs",
+          "links": [],
+          "detail": "Sketch, plot and interpret distance-time and speed-time graphs"
+        },
+        {
+          "name": "From the shape of a distance-time graph when an",
+          "links": [],
+          "detail": "Determine from the shape of a distance-time graph when an object is: (a) at rest (b) moving with constant speed (c) accelerating (d) decelerating"
+        },
+        {
+          "name": "From the shape of a speed-time graph when an",
+          "links": [],
+          "detail": "Determine from the shape of a speed-time graph when an object is: (a) at rest (b) moving with constant speed (c) moving with constant acceleration (d) moving with changing acceleration"
+        },
+        {
+          "name": "The acceleration of free fall g for an object",
+          "links": [],
+          "detail": "State that the acceleration of free fall g for an object near to the surface of the Earth is approximately"
+        },
+        {
+          "name": "Constant and is approximately 9.8 m / s",
+          "links": [],
+          "detail": "constant and is approximately 9.8 m / s"
+        },
+        {
+          "name": "Speed from the gradient of a distance-time graph",
+          "links": [],
+          "detail": "Calculate speed from the gradient of a distance-time graph"
+        },
+        {
+          "name": "Area under a speed-time graph to determine the distance",
+          "links": [],
+          "detail": "Calculate the area under a speed-time graph to determine the distance travelled for motion with constant speed or constant acceleration"
+        },
+        {
+          "name": "Acceleration from the gradient of a speed-time graph Back",
+          "links": [],
+          "detail": "Calculate acceleration from the gradient of a speed-time graph Back to contents page Subject content www.cambridgeinternational.org/olevel 13 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Mass & weight",
+      "keywords": [
+        "gravitational field strength",
+        "mass and weight",
+        "newton per kilogram",
+        "beam balance",
+        "weight of the object"
+      ],
+      "subtopics": [
+        {
+          "name": "Mass is a measure of the quantity of matter",
+          "links": [],
+          "detail": "State that mass is a measure of the quantity of matter in an object at rest relative to the observer"
+        },
+        {
+          "name": "The mass of an object resists change from its",
+          "links": [],
+          "detail": "State that the mass of an object resists change from its state of rest or motion (inertia)"
+        },
+        {
+          "name": "Weights",
+          "links": [],
+          "detail": "Know that weights, and therefore masses, may be compared using a beam balance or equal-arm balance"
+        },
+        {
+          "name": "Determine mass using an electronic balance",
+          "links": [],
+          "detail": "Describe how to determine mass using an electronic balance"
+        },
+        {
+          "name": "Measure weight using a force meter",
+          "links": [],
+          "detail": "Describe how to measure weight using a force meter"
+        },
+        {
+          "name": "Gravitational field strength as force per unit mass",
+          "links": [],
+          "detail": "Define gravitational field strength as force per unit mass; recall and use the equation weight gravitational field strength = mass g = and know that this is equivalent to the acceleration of free fall"
+        },
+        {
+          "name": "A gravitational field is a region in which a",
+          "links": [],
+          "detail": "State that a gravitational field is a region in which a mass experiences a force due to gravitational attraction"
+        }
+      ]
+    },
+    {
+      "name": "Density",
+      "keywords": [
+        "density",
+        "displacement can",
+        "float",
+        "sink",
+        "volume of the liquid",
+        "kg / m3",
+        "g / cm3"
+      ],
+      "subtopics": [
+        {
+          "name": "Density as mass per unit volume",
+          "links": [],
+          "detail": "Define density as mass per unit volume; recall and use the equation mass density = volume ρ ="
+        },
+        {
+          "name": "Determine the density of a liquid",
+          "links": [],
+          "detail": "Describe how to determine the density of a liquid, of a regularly shaped solid and of an irregularly shaped solid which sinks in a liquid (volume by displacement), including appropriate calculations"
+        }
+      ]
+    },
+    {
+      "name": "Forces",
+      "keywords": [
+        "resultant force",
+        "friction",
+        "spring",
+        "extension",
+        "load-extension",
+        "moment",
+        "pivot",
+        "centre of gravity",
+        "equilibrium",
+        "stability",
+        "circular motion",
+        "hooke",
+        "limit of proportionality",
+        "turning effect"
+      ],
+      "subtopics": [
+        {
+          "name": "And use different types of force",
+          "links": [],
+          "detail": "Identify and use different types of force, including weight (gravitational force), friction, drag, air resistance, tension (elastic force), electrostatic force, magnetic force, thrust (driving force) and contact force"
+        },
+        {
+          "name": "Forces acting on an object and draw free-body diagram",
+          "links": [],
+          "detail": "Identify forces acting on an object and draw free-body diagram(s) representing the forces"
+        },
+        {
+          "name": "Newton's first law as ‘an object either remains at",
+          "links": [],
+          "detail": "State Newton's first law as ‘an object either remains at rest or continues to move in a straight line at constant speed unless acted on by a resultant force'"
+        },
+        {
+          "name": "A force may change the velocity of an object",
+          "links": [],
+          "detail": "State that a force may change the velocity of an object by changing its direction of motion or its speed"
+        },
+        {
+          "name": "Resultant of two or more forces acting along the",
+          "links": [],
+          "detail": "Determine the resultant of two or more forces acting along the same straight line"
+        },
+        {
+          "name": "Equation resultant force = mass × acceleration F =",
+          "links": [],
+          "detail": "Recall and use the equation resultant force = mass × acceleration F = ma"
+        },
+        {
+          "name": "Newton's third law as ‘when object A exerts a",
+          "links": [],
+          "detail": "State Newton's third law as ‘when object A exerts a force on object B, then object B exerts an equal and opposite force on object A'"
+        },
+        {
+          "name": "Newton's third law describes pairs of forces of the",
+          "links": [],
+          "detail": "Know that Newton's third law describes pairs of forces of the same type acting on different objects Back to contents page Subject content www.cambridgeinternational.org/olevel 14 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 1.5.2 Friction"
+        },
+        {
+          "name": "Friction as a force that may impede motion and",
+          "links": [],
+          "detail": "Describe friction as a force that may impede motion and produce heating"
+        },
+        {
+          "name": "Motion of objects acted on by a constant weight",
+          "links": [],
+          "detail": "Understand the motion of objects acted on by a constant weight or driving force, with and without drag (including air resistance or resistance in a liquid)"
+        },
+        {
+          "name": "An object reaches terminal velocity",
+          "links": [],
+          "detail": "Explain how an object reaches terminal velocity"
+        },
+        {
+          "name": "Thinking distance",
+          "links": [],
+          "detail": "Define the thinking distance, braking distance and stopping distance of a moving vehicle"
+        },
+        {
+          "name": "Factors that affect thinking and braking distance",
+          "links": [],
+          "detail": "Explain the factors that affect thinking and braking distance including speed, tiredness, alcohol, drugs, load, tyre surface and road conditions 1.5.3 Elastic deformation"
+        },
+        {
+          "name": "Forces may produce a change in size and shape",
+          "links": [],
+          "detail": "Know that forces may produce a change in size and shape of an object"
+        },
+        {
+          "name": "Spring constant as force per unit extension",
+          "links": [],
+          "detail": "Define the spring constant as force per unit extension; recall and use the equation force spring constant = extension k ="
+        },
+        {
+          "name": "Load-extension graphs for an elastic solid and describe the",
+          "links": [],
+          "detail": "Sketch, plot and interpret load-extension graphs for an elastic solid and describe the associated experimental procedures"
+        },
+        {
+          "name": "Term ‘limit of proportionality' for a load-extension graph and",
+          "links": [],
+          "detail": "Define and use the term ‘limit of proportionality' for a load-extension graph and identify this point on the graph (an understanding of the elastic limit is not 1.5.4 Circular motion"
+        },
+        {
+          "name": "( F = is not required) 1.5.5 Turning effect of forces",
+          "links": [],
+          "detail": "( F = is not required) 1.5.5 Turning effect of forces"
+        },
+        {
+          "name": "Moment of a force as a measure of its",
+          "links": [],
+          "detail": "Describe the moment of a force as a measure of its turning effect and give everyday examples"
+        },
+        {
+          "name": "Moment of a force as moment = force ×",
+          "links": [],
+          "detail": "Define the moment of a force as moment = force × perpendicular distance from the pivot; recall and use this equation"
+        },
+        {
+          "name": "Principle of moments for an object in equilibrium",
+          "links": [],
+          "detail": "State and use the principle of moments for an object in equilibrium"
+        },
+        {
+          "name": "Experiment to verify the principle of moments 1.5.6 Centre",
+          "links": [],
+          "detail": "Describe an experiment to verify the principle of moments 1.5.6 Centre of gravity"
+        },
+        {
+          "name": "What is meant by centre of gravity",
+          "links": [],
+          "detail": "State what is meant by centre of gravity"
+        },
+        {
+          "name": "Determine the position of the centre of gravity of",
+          "links": [],
+          "detail": "Describe how to determine the position of the centre of gravity of a plane lamina using a plumb line"
+        }
+      ]
+    },
+    {
+      "name": "Momentum",
+      "keywords": [
+        "momentum",
+        "impulse",
+        "collision",
+        "conservation of momentum",
+        "resultant force acting for a time"
+      ],
+      "subtopics": [
+        {
+          "name": "Momentum as mass × velocity",
+          "links": [],
+          "detail": "Define momentum as mass × velocity; recall and use the equation p = mv"
+        },
+        {
+          "name": "Impulse as force × time for which force acts",
+          "links": [],
+          "detail": "Define impulse as force × time for which force acts; recall and use the equation impulse = F Δ t = ( mv )"
+        },
+        {
+          "name": "Principle of the conservation of momentum to solve simple",
+          "links": [],
+          "detail": "Apply the principle of the conservation of momentum to solve simple problems in one dimension"
+        },
+        {
+          "name": "Resultant force as the change in momentum per unit",
+          "links": [],
+          "detail": "Define resultant force as the change in momentum per unit time; recall and use the equation change in momentum resultant force = time taken"
+        }
+      ]
+    },
+    {
+      "name": "Energy, work & power",
+      "keywords": [
+        "kinetic energy",
+        "potential energy",
+        "work done",
+        "power",
+        "efficiency",
+        "joule",
+        "energy transfer",
+        "renewable",
+        "fossil fuel",
+        "chemical energy",
+        "energy resource",
+        "sankey"
+      ],
+      "subtopics": [
+        {
+          "name": "Energy may be stored as kinetic",
+          "links": [],
+          "detail": "State that energy may be stored as kinetic, gravitational potential, chemical, elastic (strain), nuclear, electrostatic and internal (thermal)"
+        },
+        {
+          "name": "Energy is transferred between stores during events and processes",
+          "links": [],
+          "detail": "Describe how energy is transferred between stores during events and processes, including examples of transfer by forces (mechanical work done), electrical currents (electrical work done), heating, and by electromagnetic, sound and other waves"
+        },
+        {
+          "name": "Principle of the conservation of energy and apply this",
+          "links": [],
+          "detail": "Know the principle of the conservation of energy and apply this principle to the transfer of energy between stores during events and processes"
+        },
+        {
+          "name": "Equation for kinetic energy",
+          "links": [],
+          "detail": "Recall and use the equation for kinetic energy"
+        },
+        {
+          "name": "E = mv k 2",
+          "links": [],
+          "detail": "E = mv k 2"
+        },
+        {
+          "name": "Equation for the change in gravitational potential energy Δ",
+          "links": [],
+          "detail": "Recall and use the equation for the change in gravitational potential energy Δ Δ E = mg h 1.7.2 Work"
+        },
+        {
+          "name": "Equation work done = force × distance moved in",
+          "links": [],
+          "detail": "Recall and use the equation work done = force × distance moved in the direction of the force W = Fd Back to contents page Subject content www.cambridgeinternational.org/olevel 16 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 1.7.3 Energy resources"
+        },
+        {
+          "name": "List renewable and non-renewable energy sources",
+          "links": [],
+          "detail": "List renewable and non-renewable energy sources"
+        },
+        {
+          "name": "Useful energy may be obtained",
+          "links": [],
+          "detail": "Describe how useful energy may be obtained, or electrical power generated, from: (a) chemical energy stored in fossil fuels (b) chemical energy stored in biofuels (c) hydroelectric resources (d) solar radiation (e) nuclear fuel (f) geothermal resources (g) wind (h) tides (i) waves in the sea including references to a boiler, turbine and generator where they are used"
+        },
+        {
+          "name": "Advantages and disadvantages of each method",
+          "links": [],
+          "detail": "Describe advantages and disadvantages of each method limited to whether it is renewable, when and whether it is available, and its impact on the environment 1.7.4 Efficiency"
+        },
+        {
+          "name": "Efficiency as",
+          "links": [],
+          "detail": "Define efficiency as: (useful energy output) (a) (%) efficiency = ( × 100%) (total energy input) (useful power output) (b) (%) efficiency = ( × 100%) (total power input) and recall and use these equations 1.7.5 Power"
+        },
+        {
+          "name": "Power as work done per unit time and also",
+          "links": [],
+          "detail": "Define power as work done per unit time and also as energy transferred per unit time; recall and use the equations work done (a) power = time taken P = energy transferred (b) power = time taken"
+        },
+        {
+          "name": "E P = Back to contents page Subject content",
+          "links": [],
+          "detail": "E P = Back to contents page Subject content www.cambridgeinternational.org/olevel 17 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Pressure",
+      "keywords": [
+        "pressure",
+        "barometer",
+        "manometer",
+        "hydraulic",
+        "atmospheric pressure",
+        "liquid column",
+        "force per unit area"
+      ],
+      "subtopics": [
+        {
+          "name": "Pressure as force per unit area",
+          "links": [],
+          "detail": "Define pressure as force per unit area; recall and use the equation force pressure = are a p ="
+        },
+        {
+          "name": "Pressure varies with force and area in the context",
+          "links": [],
+          "detail": "Describe how pressure varies with force and area in the context of everyday examples"
+        },
+        {
+          "name": "The pressure at a surface produces a force in",
+          "links": [],
+          "detail": "State that the pressure at a surface produces a force in a direction at right angles to the surface and describe an experiment to show this"
+        },
+        {
+          "name": "The height of a liquid column in a liquid",
+          "links": [],
+          "detail": "Describe how the height of a liquid column in a liquid barometer may be used to determine the atmospheric pressure"
+        },
+        {
+          "name": "Equation for the change in pressure beneath the surface",
+          "links": [],
+          "detail": "Recall and use the equation for the change in pressure beneath the surface of a liquid change in pressure = density × gravitational field strength × change in height ∆p = ρg∆h"
+        }
+      ]
+    },
+    {
+      "name": "Kinetic particle model of matter",
+      "keywords": [
+        "particle",
+        "molecule",
+        "brownian",
+        "evaporation",
+        "boiling",
+        "melting",
+        "states of matter",
+        "gas pressure",
+        "diffusion",
+        "kinetic model",
+        "random motion"
+      ],
+      "subtopics": [
+        {
+          "name": "Distinguishing properties of solids",
+          "links": [],
+          "detail": "Know the distinguishing properties of solids, liquids and gases"
+        },
+        {
+          "name": "Terms for the changes in state between solids",
+          "links": [],
+          "detail": "Know the terms for the changes in state between solids, liquids and gases (gas to solid and solid to gas transfers are not required) 2.1.2 Particle model"
+        },
+        {
+          "name": "Relationship between the motion of particles and temperature",
+          "links": [],
+          "detail": "Describe the relationship between the motion of particles and temperature, including the idea that there is a lowest possible temperature (−273 °C), known as absolute zero, where the particles have least kinetic energy"
+        },
+        {
+          "name": "Pressure and the changes in pressure of a gas",
+          "links": [],
+          "detail": "Describe the pressure and the changes in pressure of a gas in terms of the forces exerted by particles colliding with surfaces, creating a force per unit area"
+        },
+        {
+          "name": "Qualitatively",
+          "links": [],
+          "detail": "Explain qualitatively, in terms of particles, the relationship between: (a) pressure and temperature at constant volume (b) volume and temperature at constant pressure (c) pressure and volume at constant temperature"
+        },
+        {
+          "name": "Equation p V = p V",
+          "links": [],
+          "detail": "Recall and use the equation p V = p V , including a graphical representation of the relationship"
+        },
+        {
+          "name": "1 2 2 between pressure and volume for a",
+          "links": [],
+          "detail": "1 2 2 between pressure and volume for a gas at constant temperature Back to contents page Subject content www.cambridgeinternational.org/olevel 18 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Thermal properties & temperature",
+      "keywords": [
+        "thermometer",
+        "specific heat capacity",
+        "latent heat",
+        "thermal expansion",
+        "fixed points",
+        "temperature rise",
+        "heating curve",
+        "cooling curve"
+      ],
+      "subtopics": [
+        {
+          "name": "Applications and consequences of thermal expansion in the context",
+          "links": [],
+          "detail": "Explain applications and consequences of thermal expansion in the context of common examples, including the liquid-in-glass thermometer"
+        },
+        {
+          "name": "Convert temperatures between kelvin and degrees Celsius",
+          "links": [],
+          "detail": "Convert temperatures between kelvin and degrees Celsius; recall and use the equation T (in K) = (in °C) + 273 2.2.2 Specific heat capacity"
+        },
+        {
+          "name": "Increase in the temperature of an object increases its",
+          "links": [],
+          "detail": "Know that an increase in the temperature of an object increases its internal energy"
+        },
+        {
+          "name": "Increase in temperature of an object",
+          "links": [],
+          "detail": "Describe an increase in temperature of an object in terms of an increase in the average kinetic energies of all of the particles in the object"
+        },
+        {
+          "name": "Specific heat capacity as the energy required per unit",
+          "links": [],
+          "detail": "Define specific heat capacity as the energy required per unit mass per unit temperature increase; recall and use the equation change in energy specific heat capacity = mass × change in temperature"
+        },
+        {
+          "name": "Experiments to measure the specific heat capacity of a",
+          "links": [],
+          "detail": "Describe experiments to measure the specific heat capacity of a solid and of a liquid 2.2.3 Melting, boiling and evaporation"
+        },
+        {
+          "name": "Melting",
+          "links": [],
+          "detail": "Describe melting, solidification, boiling and condensation in terms of energy transfer without a change in temperature"
+        },
+        {
+          "name": "Melting and boiling temperatures for water at standard atmospheric",
+          "links": [],
+          "detail": "Know the melting and boiling temperatures for water at standard atmospheric pressure"
+        },
+        {
+          "name": "Differences between boiling and evaporation",
+          "links": [],
+          "detail": "Describe the differences between boiling and evaporation"
+        },
+        {
+          "name": "Evaporation",
+          "links": [],
+          "detail": "Describe evaporation in terms of the escape of more energetic particles from the surface of a liquid"
+        },
+        {
+          "name": "Temperature",
+          "links": [],
+          "detail": "Describe how temperature, surface area and air movement over a surface affect evaporation"
+        },
+        {
+          "name": "Evaporation causes cooling",
+          "links": [],
+          "detail": "Explain how evaporation causes cooling"
+        },
+        {
+          "name": "Latent heat as the energy required to change the",
+          "links": [],
+          "detail": "Describe latent heat as the energy required to change the state of a substance and explain it in terms of particle behaviour and the forces between particles Back to contents page Subject content www.cambridgeinternational.org/olevel 19 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Transfer of thermal energy",
+      "keywords": [
+        "conduction",
+        "convection",
+        "radiation",
+        "infrared radiation",
+        "insulator",
+        "vacuum flask",
+        "emitter",
+        "absorber",
+        "thermal energy transfer",
+        "shiny surface",
+        "dull black"
+      ],
+      "subtopics": [
+        {
+          "name": "Experiments to distinguish between good and bad thermal conductors",
+          "links": [],
+          "detail": "Describe experiments to distinguish between good and bad thermal conductors"
+        },
+        {
+          "name": "Thermal conduction in all solids",
+          "links": [],
+          "detail": "Describe thermal conduction in all solids in terms of atomic or molecular lattice vibrations and also in terms of the movement of free (delocalised) electrons in metallic conductors 2.3.2 Convection"
+        },
+        {
+          "name": "Convection in liquids and gases",
+          "links": [],
+          "detail": "Explain convection in liquids and gases in terms of density changes and describe experiments to illustrate convection 2.3.3 Radiation"
+        },
+        {
+          "name": "Process of thermal energy transfer by infrared radiation and",
+          "links": [],
+          "detail": "Describe the process of thermal energy transfer by infrared radiation and know that it does not require a medium"
+        },
+        {
+          "name": "Effect of surface colour",
+          "links": [],
+          "detail": "Describe the effect of surface colour (black or white) and texture (dull or shiny) on the emission, absorption and reflection of infrared radiation"
+        },
+        {
+          "name": "The rate of emission of radiation depends on the",
+          "links": [],
+          "detail": "Describe how the rate of emission of radiation depends on the surface temperature and surface area of an object"
+        },
+        {
+          "name": "Experiments to distinguish between good and bad emitters of",
+          "links": [],
+          "detail": "Describe experiments to distinguish between good and bad emitters of infrared radiation"
+        },
+        {
+          "name": "Experiments to distinguish between good and bad absorbers of",
+          "links": [],
+          "detail": "Describe experiments to distinguish between good and bad absorbers of infrared radiation 2.3.4 Consequences of thermal energy transfer"
+        },
+        {
+          "name": "Everyday applications using ideas about conduction",
+          "links": [],
+          "detail": "Explain everyday applications using ideas about conduction, convection and radiation, including: (a) heating objects such as kitchen pans (b) heating a room by convection (c) measuring temperature using an infrared thermometer (d) using thermal insulation to maintain the temperature of a liquid and to reduce thermal energy transfer in buildings Back to contents page Subject content www.cambridgeinternational.org/olevel 20 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "General wave properties",
+      "keywords": [
+        "wavelength",
+        "frequency",
+        "amplitude",
+        "wavefront",
+        "diffraction",
+        "transverse",
+        "longitudinal",
+        "ripple tank",
+        "wave speed",
+        "period of the wave"
+      ],
+      "subtopics": [
+        {
+          "name": "Waves transfer energy without transferring matter",
+          "links": [],
+          "detail": "Know that waves transfer energy without transferring matter"
+        },
+        {
+          "name": "What is meant by wave motion as illustrated by",
+          "links": [],
+          "detail": "Describe what is meant by wave motion as illustrated by vibrations in ropes and springs and by experiments using water waves"
+        },
+        {
+          "name": "Features of a wave",
+          "links": [],
+          "detail": "Describe the features of a wave in terms of wavefront, wavelength, frequency, crest (peak), trough, amplitude and wave speed"
+        },
+        {
+          "name": "Equation wave speed = frequency × wavelength f λ",
+          "links": [],
+          "detail": "Recall and use the equation wave speed = frequency × wavelength f λ v ="
+        },
+        {
+          "name": "For a transverse wave",
+          "links": [],
+          "detail": "Know that for a transverse wave, the direction of vibration is at right angles to the direction of the energy transfer, and give examples such as electromagnetic radiation, waves on the surface of water, and seismic S-waves (secondary)"
+        },
+        {
+          "name": "For a longitudinal wave",
+          "links": [],
+          "detail": "Know that for a longitudinal wave, the direction of vibration is parallel to the direction of the energy transfer, and give examples such as sound waves and seismic P-waves (primary)"
+        },
+        {
+          "name": "Waves can undergo",
+          "links": [],
+          "detail": "Describe how waves can undergo: (a) reflection at a plane surface (b) refraction due to a change of speed (c) diffraction through a gap"
+        },
+        {
+          "name": "Wavelength and gap size affects diffraction through a gap",
+          "links": [],
+          "detail": "Describe how wavelength and gap size affects diffraction through a gap"
+        },
+        {
+          "name": "Ripple tank to show",
+          "links": [],
+          "detail": "Describe the use of a ripple tank to show: (a) reflection at a plane surface (b) refraction due to a change in speed caused by a change in depth (c) diffraction due to a gap (d) diffraction due to an edge"
+        },
+        {
+          "name": "Wavelength affects diffraction at an edge",
+          "links": [],
+          "detail": "Describe how wavelength affects diffraction at an edge"
+        }
+      ]
+    },
+    {
+      "name": "Light",
+      "keywords": [
+        "mirror",
+        "lens",
+        "focal length",
+        "image",
+        "refraction",
+        "refractive index",
+        "total internal reflection",
+        "critical angle",
+        "optical fibre",
+        "ray diagram",
+        "converging lens",
+        "magnifying glass",
+        "angle of incidence"
+      ],
+      "subtopics": [
+        {
+          "name": "Terms normal",
+          "links": [],
+          "detail": "Define and use the terms normal, angle of incidence and angle of reflection"
+        },
+        {
+          "name": "Experiment to illustrate the law of reflection",
+          "links": [],
+          "detail": "Describe an experiment to illustrate the law of reflection"
+        },
+        {
+          "name": "Experiment to find the position and characteristics of an",
+          "links": [],
+          "detail": "Describe an experiment to find the position and characteristics of an optical image formed by a plane mirror (same size, same distance from mirror as object and virtual)"
+        },
+        {
+          "name": "For reflection",
+          "links": [],
+          "detail": "State that for reflection, the angle of incidence is equal to the angle of reflection and use this in constructions, measurements and calculations Back to contents page Subject content www.cambridgeinternational.org/olevel 21 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 3.2.2 Refraction of light"
+        },
+        {
+          "name": "Refractive index n as n =",
+          "links": [],
+          "detail": "Define refractive index n as n = ; recall and use this equation sin r"
+        },
+        {
+          "name": "Experiment to show refraction of light by transparent blocks",
+          "links": [],
+          "detail": "Describe an experiment to show refraction of light by transparent blocks of different shapes"
+        },
+        {
+          "name": "Terms critical angle and total internal reflection",
+          "links": [],
+          "detail": "Define the terms critical angle and total internal reflection; recall and use the equation"
+        },
+        {
+          "name": "N = sin c",
+          "links": [],
+          "detail": "n = sin c"
+        },
+        {
+          "name": "Experiments to show internal reflection and total internal reflection",
+          "links": [],
+          "detail": "Describe experiments to show internal reflection and total internal reflection"
+        },
+        {
+          "name": "Optical fibres",
+          "links": [],
+          "detail": "Describe the use of optical fibres, particularly in telecommunications, stating the advantages of their use in each context 3.2.3 Thin lenses"
+        },
+        {
+          "name": "Action of thin converging and thin diverging lenses on",
+          "links": [],
+          "detail": "Describe the action of thin converging and thin diverging lenses on a parallel beam of light"
+        },
+        {
+          "name": "Terms focal length",
+          "links": [],
+          "detail": "Define and use the terms focal length, principal axis and principal focus (focal point)"
+        },
+        {
+          "name": "Ray diagrams to illustrate the formation of real and",
+          "links": [],
+          "detail": "Draw ray diagrams to illustrate the formation of real and virtual images of an object by a converging lens and know that a real image is formed by converging rays and a virtual image is formed by diverging rays"
+        },
+        {
+          "name": "Linear magnification as the ratio of image length to",
+          "links": [],
+          "detail": "Define linear magnification as the ratio of image length to object length; recall and use the equation image length linear magnification = object length"
+        },
+        {
+          "name": "Single lens as a magnifying glass",
+          "links": [],
+          "detail": "Describe the use of a single lens as a magnifying glass"
+        },
+        {
+          "name": "Ray diagrams to show the formation of images in",
+          "links": [],
+          "detail": "Draw ray diagrams to show the formation of images in the normal eye, a short-sighted eye and a long-sighted eye"
+        },
+        {
+          "name": "Converging and diverging lenses to correct long-sightedness and short-sightedness",
+          "links": [],
+          "detail": "Describe the use of converging and diverging lenses to correct long-sightedness and short-sightedness 3.2.4 Dispersion of light"
+        },
+        {
+          "name": "Dispersion of light as illustrated by the refraction of",
+          "links": [],
+          "detail": "Describe the dispersion of light as illustrated by the refraction of white light by a glass prism"
+        },
+        {
+          "name": "Traditional seven colours of the visible spectrum in order",
+          "links": [],
+          "detail": "Know the traditional seven colours of the visible spectrum in order of frequency and in order of wavelength Back to contents page Subject content www.cambridgeinternational.org/olevel 22 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Electromagnetic spectrum",
+      "keywords": [
+        "electromagnetic spectrum",
+        "radio wave",
+        "microwave",
+        "ultraviolet",
+        "x-ray",
+        "gamma ray",
+        "visible light",
+        "electromagnetic wave",
+        "speed of light in a vacuum"
+      ],
+      "subtopics": [
+        {
+          "name": "Main regions of the electromagnetic spectrum in order of",
+          "links": [],
+          "detail": "Know the main regions of the electromagnetic spectrum in order of frequency and in order of wavelength"
+        },
+        {
+          "name": "Speed of all electromagnetic waves in",
+          "links": [],
+          "detail": "Know that the speed of all electromagnetic waves in:"
+        },
+        {
+          "name": "(a) a vacuum is 3.0 10 m / s (b) air is approximately the sa",
+          "links": [],
+          "detail": "(a) a vacuum is 3.0 10 m / s (b) air is approximately the same as in a vacuum"
+        },
+        {
+          "name": "Role of the following components in the stated applications",
+          "links": [],
+          "detail": "Describe the role of the following components in the stated applications: (a) radio waves - radio and television communications, astronomy (b) microwaves - satellite television, mobile (cell) phone, Bluetooth, microwave ovens (c) infrared - household electrical appliances, remote controllers, intruder alarms, thermal imaging, optical fibres (d) visible light - photography, vision (e) ultraviolet - security marking, detecting counterfeit bank notes, sterilising water (f) X-rays - hospital use in medical imaging, security scanners, killing cancerous cells, engineering applications such as detecting cracks in metal (g) gamma rays - medical treatment in detecting and killing cancerous cells, sterilising food and medical equipment, engineering applications such as detecting cracks in metal"
+        },
+        {
+          "name": "Damage caused by electromagnetic radiation",
+          "links": [],
+          "detail": "Describe the damage caused by electromagnetic radiation, including: (a) excessive exposure causing heating of soft tissues and burns (b) ionising effects caused by ultraviolet (skin cancer and cataracts), X-rays and gamma rays (cell mutation and cancer)"
+        }
+      ]
+    },
+    {
+      "name": "Sound",
+      "keywords": [
+        "sound wave",
+        "echo",
+        "ultrasound",
+        "pitch",
+        "loudness",
+        "compression",
+        "rarefaction",
+        "speed of sound",
+        "vibrat",
+        "oscilloscope"
+      ],
+      "subtopics": [
+        {
+          "name": "Production of sound by vibrating sources",
+          "links": [],
+          "detail": "Describe the production of sound by vibrating sources"
+        },
+        {
+          "name": "Longitudinal nature of sound waves and describe compressions and",
+          "links": [],
+          "detail": "Describe the longitudinal nature of sound waves and describe compressions and rarefactions"
+        },
+        {
+          "name": "Approximate range of frequencies audible to humans as 20",
+          "links": [],
+          "detail": "State the approximate range of frequencies audible to humans as 20 Hz to 20 000 Hz"
+        },
+        {
+          "name": "Sound waves cannot travel in a vacuum and describe",
+          "links": [],
+          "detail": "Explain why sound waves cannot travel in a vacuum and describe an experiment to demonstrate this"
+        },
+        {
+          "name": "Changes in amplitude and frequency affect the loudness and",
+          "links": [],
+          "detail": "Describe how changes in amplitude and frequency affect the loudness and pitch of sound waves"
+        },
+        {
+          "name": "Different sound sources produce sound waves with different qualities",
+          "links": [],
+          "detail": "Describe how different sound sources produce sound waves with different qualities (timbres), as shown by the shape of the traces on an oscilloscope"
+        },
+        {
+          "name": "Echo as the reflection of sound waves",
+          "links": [],
+          "detail": "Describe an echo as the reflection of sound waves"
+        },
+        {
+          "name": "Simple experiments to show the reflection of sound waves",
+          "links": [],
+          "detail": "Describe simple experiments to show the reflection of sound waves"
+        },
+        {
+          "name": "Method involving a measurement of distance and time for",
+          "links": [],
+          "detail": "Describe a method involving a measurement of distance and time for determining the speed of sound in air"
+        },
+        {
+          "name": "Speed of sound in air is approximately 330-350 m",
+          "links": [],
+          "detail": "Know that the speed of sound in air is approximately 330-350 m / s"
+        },
+        {
+          "name": "Ultrasound as sound with a frequency higher than 20",
+          "links": [],
+          "detail": "Define ultrasound as sound with a frequency higher than 20 kHz"
+        },
+        {
+          "name": "Uses of ultrasound in cleaning",
+          "links": [],
+          "detail": "Describe the uses of ultrasound in cleaning, prenatal and other medical scanning, and in sonar (including calculation of depth or distance from time and wave speed) Back to contents page Subject content www.cambridgeinternational.org/olevel 23 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Simple magnetism and magnetic fields",
+      "keywords": [
+        "magnet",
+        "magnetic field",
+        "north pole",
+        "south pole",
+        "plotting compass",
+        "magnetise",
+        "soft iron",
+        "induced magnetism",
+        "magnetic material",
+        "field line"
+      ],
+      "subtopics": [
+        {
+          "name": "Forces between magnetic poles and between magnets and magnetic",
+          "links": [],
+          "detail": "Describe the forces between magnetic poles and between magnets and magnetic materials, including the use of the terms north pole (N pole), south pole (S pole), attraction and repulsion, magnetised and unmagnetised"
+        },
+        {
+          "name": "Induced magnetism",
+          "links": [],
+          "detail": "Describe induced magnetism"
+        },
+        {
+          "name": "Difference between magnetic and non-magnetic materials",
+          "links": [],
+          "detail": "State the difference between magnetic and non-magnetic materials"
+        },
+        {
+          "name": "Differences between the properties of temporary magnets",
+          "links": [],
+          "detail": "State the differences between the properties of temporary magnets (made of soft iron) and the properties of permanent magnets (made of steel)"
+        },
+        {
+          "name": "Magnetic field as a region in which a magnetic",
+          "links": [],
+          "detail": "Describe a magnetic field as a region in which a magnetic pole experiences a force"
+        },
+        {
+          "name": "Plotting of magnetic field lines with a compass or",
+          "links": [],
+          "detail": "Describe the plotting of magnetic field lines with a compass or iron filings and the use of a compass to determine the direction of the magnetic field"
+        },
+        {
+          "name": "Pattern and direction of the magnetic field lines around",
+          "links": [],
+          "detail": "Draw the pattern and direction of the magnetic field lines around a bar magnet"
+        },
+        {
+          "name": "The direction of the magnetic field at a point",
+          "links": [],
+          "detail": "State that the direction of the magnetic field at a point is the direction of the force on the N pole of a magnet at that point"
+        },
+        {
+          "name": "Relative strength of a magnetic field is represented by",
+          "links": [],
+          "detail": "Know that the relative strength of a magnetic field is represented by the spacing of the magnetic field lines"
+        },
+        {
+          "name": "Uses of permanent magnets and electromagnets",
+          "links": [],
+          "detail": "Describe uses of permanent magnets and electromagnets"
+        }
+      ]
+    },
+    {
+      "name": "Electrical quantities",
+      "keywords": [
+        "electric charge",
+        "current",
+        "potential difference",
+        "e.m.f.",
+        "resistance",
+        "ohm",
+        "coulomb",
+        "electron",
+        "static electricity",
+        "charged rod",
+        "electric field",
+        "conductor and insulator",
+        "i = q"
+      ],
+      "subtopics": [
+        {
+          "name": "There are positive and negative charges and that charge",
+          "links": [],
+          "detail": "State that there are positive and negative charges and that charge is measured in coulombs"
+        },
+        {
+          "name": "Unlike charges attract and like charges repel",
+          "links": [],
+          "detail": "State that unlike charges attract and like charges repel"
+        },
+        {
+          "name": "Experiments to show electrostatic charging by friction",
+          "links": [],
+          "detail": "Describe experiments to show electrostatic charging by friction"
+        },
+        {
+          "name": "Charging of solids by friction involves only a transfer",
+          "links": [],
+          "detail": "Explain that charging of solids by friction involves only a transfer of negative charge (electrons)"
+        },
+        {
+          "name": "Electric field as a region in which an electric",
+          "links": [],
+          "detail": "Describe an electric field as a region in which an electric charge experiences a force"
+        },
+        {
+          "name": "The direction of an electric field line at a",
+          "links": [],
+          "detail": "State that the direction of an electric field line at a point is the direction of the force on a positive charge at that point"
+        },
+        {
+          "name": "Simple electric field patterns",
+          "links": [],
+          "detail": "Describe simple electric field patterns, including the direction of the field: (a) around a point charge (b) around a charged conducting sphere (c) between two oppositely charged parallel conducting plates (end effects will"
+        },
+        {
+          "name": "Examples of electrical conductors and insulators",
+          "links": [],
+          "detail": "State examples of electrical conductors and insulators"
+        },
+        {
+          "name": "Experiment to distinguish between electrical conductors and insulators",
+          "links": [],
+          "detail": "Describe an experiment to distinguish between electrical conductors and insulators"
+        },
+        {
+          "name": "Simple electron model to explain the difference between electrical",
+          "links": [],
+          "detail": "Recall and use a simple electron model to explain the difference between electrical conductors and insulators Back to contents page Subject content not be examined) www.cambridgeinternational.org/olevel 24 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 4.2.2 Electrical current"
+        },
+        {
+          "name": "Electric current as the charge passing a point per",
+          "links": [],
+          "detail": "Define electric current as the charge passing a point per unit time; recall and use the equation charge electric current = time I ="
+        },
+        {
+          "name": "Electrical conduction in metals",
+          "links": [],
+          "detail": "Describe electrical conduction in metals in terms of the movement of free electrons"
+        },
+        {
+          "name": "Current is measured in amps",
+          "links": [],
+          "detail": "Know that current is measured in amps (amperes) and that the amp is given by coulomb per second (C / s)"
+        },
+        {
+          "name": "Difference between direct current",
+          "links": [],
+          "detail": "Know the difference between direct current (d.c.) and alternating current (a.c.)"
+        },
+        {
+          "name": "Conventional current is from positive to negative and that",
+          "links": [],
+          "detail": "State that conventional current is from positive to negative and that the flow of free electrons is from negative to positive"
+        },
+        {
+          "name": "Ammeters",
+          "links": [],
+          "detail": "Describe the use of ammeters (analogue and digital) with different ranges 4.2.3 Electromotive force and potential difference"
+        },
+        {
+          "name": "E.m.f. and p.d. are measured in volts and that",
+          "links": [],
+          "detail": "Know that e.m.f. and p.d. are measured in volts and that the volt is given by joule per coulomb ( J / C)"
+        },
+        {
+          "name": "Voltmeters",
+          "links": [],
+          "detail": "Describe the use of voltmeters (analogue and digital) with different ranges"
+        },
+        {
+          "name": "Total e.m.f. where several sources are arranged in series",
+          "links": [],
+          "detail": "Calculate the total e.m.f. where several sources are arranged in series"
+        },
+        {
+          "name": "The e.m.f of identical sources connected in parallel is",
+          "links": [],
+          "detail": "State that the e.m.f of identical sources connected in parallel is equal to the e.m.f. of one of the sources Back to contents page Subject content www.cambridgeinternational.org/olevel 25 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 4.2.4 Resistance"
+        },
+        {
+          "name": "Equation p.d. resistance = current R =",
+          "links": [],
+          "detail": "Recall and use the equation p.d. resistance = current R ="
+        },
+        {
+          "name": "Experiment to determine resistance using a voltmeter and an",
+          "links": [],
+          "detail": "Describe an experiment to determine resistance using a voltmeter and an ammeter and do the appropriate calculations"
+        },
+        {
+          "name": "And use",
+          "links": [],
+          "detail": "Recall and use, for a wire, the direct proportionality between resistance and length, and the inverse proportionality between resistance and cross-sectional area"
+        },
+        {
+          "name": "Ohm's law",
+          "links": [],
+          "detail": "State Ohm's law, including reference to constant temperature"
+        },
+        {
+          "name": "And explain the current-voltage graphs for a resistor of",
+          "links": [],
+          "detail": "Sketch and explain the current-voltage graphs for a resistor of constant resistance, a filament lamp and a diode"
+        },
+        {
+          "name": "Effect of temperature increase on the resistance of a",
+          "links": [],
+          "detail": "Describe the effect of temperature increase on the resistance of a resistor, such as the filament in a filament lamp"
+        }
+      ]
+    },
+    {
+      "name": "Electric circuits",
+      "keywords": [
+        "circuit diagram",
+        "series",
+        "parallel",
+        "resistor",
+        "variable resistor",
+        "thermistor",
+        "light-dependent resistor",
+        "ldr",
+        "diode",
+        "ammeter",
+        "voltmeter",
+        "potential divider",
+        "combined resistance",
+        "lamp",
+        "switch"
+      ],
+      "subtopics": [
+        {
+          "name": "And interpret circuit diagrams with cells",
+          "links": [],
+          "detail": "Draw and interpret circuit diagrams with cells, batteries, power supplies, generators, oscilloscopes, potential dividers, switches, resistors (fixed and variable), heaters, thermistors (NTC only), light- dependent resistors (LDRs), lamps, motors, ammeters, voltmeters, magnetising coils, transformers, fuses, relays, diodes and light-emitting diodes (LEDs), and know how these components behave in the circuit 4.3.2 Series and parallel circuits"
+        },
+        {
+          "name": "In calculations",
+          "links": [],
+          "detail": "Recall and use in calculations, the fact that: (a) the current at every point in a series circuit is the same (b) the sum of the currents entering a junction in a parallel circuit is equal to the sum of the currents that leave the junction (c) the total p.d. across the components in a series circuit is equal to the sum of the individual p.d.s across each component (d) the p.d. across an arrangement of parallel resistances is the same as the p.d. across one branch in the arrangement of the parallel resistances"
+        },
+        {
+          "name": "Combined resistance of two or more resistors in series",
+          "links": [],
+          "detail": "Calculate the combined resistance of two or more resistors in series"
+        },
+        {
+          "name": "Combined resistance of two resistors in parallel",
+          "links": [],
+          "detail": "Calculate the combined resistance of two resistors in parallel"
+        },
+        {
+          "name": "Current",
+          "links": [],
+          "detail": "Calculate current, voltage and resistance in parts of a circuit or in the whole circuit Back to contents page Subject content www.cambridgeinternational.org/olevel 26 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 4.3.3 Action and use of circuit components"
+        },
+        {
+          "name": "Action of negative temperature coefficient",
+          "links": [],
+          "detail": "Describe the action of negative temperature coefficient (NTC) thermistors and light-dependent resistors and explain their use as input sensors"
+        },
+        {
+          "name": "Action of a variable potential divider",
+          "links": [],
+          "detail": "Describe the action of a variable potential divider"
+        },
+        {
+          "name": "Equation for two resistors used as a potential divider",
+          "links": [],
+          "detail": "Recall and use the equation for two resistors used as a potential divider R V"
+        }
+      ]
+    },
+    {
+      "name": "Practical electricity",
+      "keywords": [
+        "fuse",
+        "earth wire",
+        "circuit breaker",
+        "live wire",
+        "neutral wire",
+        "double insulat",
+        "electrical hazard",
+        "damaged insulation",
+        "trip switch",
+        "kilowatt-hour",
+        "mains"
+      ],
+      "subtopics": [
+        {
+          "name": "Common uses of electricity",
+          "links": [],
+          "detail": "State common uses of electricity, including heating, lighting, battery charging and powering motors and electronic systems"
+        },
+        {
+          "name": "Advantages of connecting lamps in parallel in a lighting",
+          "links": [],
+          "detail": "State the advantages of connecting lamps in parallel in a lighting circuit"
+        },
+        {
+          "name": "Equation power = current × voltage P = V",
+          "links": [],
+          "detail": "Recall and use the equation power = current × voltage P = V"
+        },
+        {
+          "name": "Equation energy = current × voltage × time E",
+          "links": [],
+          "detail": "Recall and use the equation energy = current × voltage × time E = Vt"
+        },
+        {
+          "name": "Kilowatt-hour",
+          "links": [],
+          "detail": "Define the kilowatt-hour (kW h) and calculate the cost of using electrical appliances where the energy unit is the kW h 4.4.2 Electrical safety"
+        },
+        {
+          "name": "Hazards of",
+          "links": [],
+          "detail": "State the hazards of: (a) damaged insulation (b) overheating cables (c) damp conditions (d) excess current from overloading of plugs, extension leads, single and multiple sockets when using a mains supply"
+        },
+        {
+          "name": "Use and operation of trip switches and fuses and",
+          "links": [],
+          "detail": "Explain the use and operation of trip switches and fuses and choose appropriate fuse ratings and trip switch settings"
+        },
+        {
+          "name": "What happens when a live wire touches a metal",
+          "links": [],
+          "detail": "Explain what happens when a live wire touches a metal case that is earthed"
+        },
+        {
+          "name": "The outer casing of an electrical appliance must be",
+          "links": [],
+          "detail": "Explain why the outer casing of an electrical appliance must be either non-conducting (double- insulated) or earthed"
+        },
+        {
+          "name": "Mains circuit consists of a live wire",
+          "links": [],
+          "detail": "Know that a mains circuit consists of a live wire (line wire), a neutral wire and an earth wire and explain why a switch must be connected into the live wire for the circuit to be switched off safely"
+        },
+        {
+          "name": "Fuses and circuit breakers are connected into the live",
+          "links": [],
+          "detail": "Explain why fuses and circuit breakers are connected into the live wire Back to contents page Subject content www.cambridgeinternational.org/olevel 27 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Electromagnetic effects",
+      "keywords": [
+        "electromagnetic induction",
+        "generator",
+        "transformer",
+        "motor",
+        "relay",
+        "solenoid",
+        "induced e.m.f.",
+        "magnetic effect of a current",
+        "turns ratio",
+        "split-ring commutator",
+        "slip ring",
+        "left-hand rule",
+        "force on a current-carrying"
+      ],
+      "subtopics": [
+        {
+          "name": "Experiment to demonstrate electromagnetic induction",
+          "links": [],
+          "detail": "Describe an experiment to demonstrate electromagnetic induction"
+        },
+        {
+          "name": "The magnitude of an induced e.m.f. is affected by",
+          "links": [],
+          "detail": "State that the magnitude of an induced e.m.f. is affected by: (a) the rate of change of the magnetic field or the rate of cutting of magnetic field lines (b) the number of turns in a coil"
+        },
+        {
+          "name": "Fact that the effect of the current produced by",
+          "links": [],
+          "detail": "State and use the fact that the effect of the current produced by an induced e.m.f. is to oppose the change producing it (Lenz's law) and describe how this law may be demonstrated 4.5.2 The a.c. generator"
+        },
+        {
+          "name": "Simple form of a.c. generator",
+          "links": [],
+          "detail": "Describe a simple form of a.c. generator (rotating coil or rotating magnet) and the use of slip rings and brushes where needed"
+        },
+        {
+          "name": "Graphs of e.m.f. against time for simple a.c. generators",
+          "links": [],
+          "detail": "Sketch and interpret graphs of e.m.f. against time for simple a.c. generators and relate the position of the generator coil to the peaks, troughs and zeros of the e.m.f. 4.5.3 Magnetic effect of a current"
+        },
+        {
+          "name": "Pattern and direction of the magnetic field due to",
+          "links": [],
+          "detail": "Describe the pattern and direction of the magnetic field due to currents in straight wires and in solenoids and state the effect on the magnetic field of changing the magnitude and direction of the current"
+        },
+        {
+          "name": "The magnetic effect of a current is used in",
+          "links": [],
+          "detail": "Describe how the magnetic effect of a current is used in relays and loudspeakers and give examples of their application 4.5.4 Forces on a current-carrying conductor"
+        },
+        {
+          "name": "Experiment to show that a force acts on a",
+          "links": [],
+          "detail": "Describe an experiment to show that a force acts on a current-carrying conductor in a magnetic field, including the effect of reversing: (a) the current (b) the direction of the field"
+        },
+        {
+          "name": "Relative directions of force",
+          "links": [],
+          "detail": "Recall and use the relative directions of force, magnetic field and current"
+        },
+        {
+          "name": "Magnetic field patterns between currents in parallel conductors and",
+          "links": [],
+          "detail": "Describe the magnetic field patterns between currents in parallel conductors and relate these to the forces on the conductors (excluding the Earth's field) 4.5.5 The d.c. motor"
+        },
+        {
+          "name": "Current-carrying coil in a magnetic field may experience a",
+          "links": [],
+          "detail": "Know that a current-carrying coil in a magnetic field may experience a turning effect and that the turning effect is increased by increasing: (a) the number of turns on the coil (b) the current (c) the strength of the magnetic field"
+        },
+        {
+          "name": "Operation of an electric motor",
+          "links": [],
+          "detail": "Describe the operation of an electric motor, including the action of a split-ring commutator and brushes Back to contents page Subject content www.cambridgeinternational.org/olevel 28 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 4.5.6 The transformer"
+        },
+        {
+          "name": "Structure and explain the principle of operation of a",
+          "links": [],
+          "detail": "Describe the structure and explain the principle of operation of a simple iron-cored transformer"
+        },
+        {
+          "name": "Terms primary",
+          "links": [],
+          "detail": "Use the terms primary, secondary, step-up and step-down"
+        },
+        {
+          "name": "Equation V N p p V N s s",
+          "links": [],
+          "detail": "Recall and use the equation V N p p V N s s where P and S refer to primary and secondary"
+        },
+        {
+          "name": "Advantages of high-voltage transmission and explain why power losses",
+          "links": [],
+          "detail": "State the advantages of high-voltage transmission and explain why power losses in cables are smaller when the voltage is greater"
+        }
+      ]
+    },
+    {
+      "name": "Uses of an oscilloscope",
+      "keywords": [
+        "oscilloscope",
+        "y-gain",
+        "timebase",
+        "trace on the screen",
+        "cathode-ray"
+      ],
+      "subtopics": [
+        {
+          "name": "Oscilloscope to display waveforms",
+          "links": [],
+          "detail": "Describe the use of an oscilloscope to display waveforms (the structure of an oscilloscope is required)"
+        },
+        {
+          "name": "Measure p.d. and short intervals of time with an",
+          "links": [],
+          "detail": "Describe how to measure p.d. and short intervals of time with an oscilloscope using the Y-gain and timebase not"
+        }
+      ]
+    },
+    {
+      "name": "Nuclear model of the atom",
+      "keywords": [
+        "nucleus",
+        "proton",
+        "neutron",
+        "nuclide",
+        "isotope",
+        "alpha-particle scattering",
+        "atomic number",
+        "mass number",
+        "proton number",
+        "nucleon number"
+      ],
+      "subtopics": [
+        {
+          "name": "Structure of the atom",
+          "links": [],
+          "detail": "Describe the structure of the atom in terms of a positively charged nucleus and negatively charged electrons in orbit around the nucleus"
+        },
+        {
+          "name": "Alpha-particle scattering experiments provide evidence for",
+          "links": [],
+          "detail": "Describe how alpha-particle scattering experiments provide evidence for: (a) a very small nucleus surrounded by mostly empty space (b) a nucleus containing most of the mass of the atom (c) a nucleus that is positively charged 5.1.2 The nucleus"
+        },
+        {
+          "name": "Composition of the nucleus",
+          "links": [],
+          "detail": "Describe the composition of the nucleus in terms of protons and neutrons"
+        },
+        {
+          "name": "Atoms form positive ions by losing electrons or negative",
+          "links": [],
+          "detail": "Describe how atoms form positive ions by losing electrons or negative ions by gaining electrons"
+        },
+        {
+          "name": "Terms proton number",
+          "links": [],
+          "detail": "Define the terms proton number (atomic number) to calculate the number of neutrons in a nucleus"
+        },
+        {
+          "name": "Term nuclide and use the nuclide notation",
+          "links": [],
+          "detail": "Explain the term nuclide and use the nuclide notation"
+        },
+        {
+          "name": "What is meant by an isotope and state that",
+          "links": [],
+          "detail": "Explain what is meant by an isotope and state that an element may have more than one isotope Back to contents page Subject content Z and nucleon number (mass number) A and be able www.cambridgeinternational.org/olevel 29 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        }
+      ]
+    },
+    {
+      "name": "Radioactivity",
+      "keywords": [
+        "radioactive",
+        "alpha-particle",
+        "beta-particle",
+        "gamma radiation",
+        "half-life",
+        "decay",
+        "ionising",
+        "background radiation",
+        "count rate",
+        "fission",
+        "fusion",
+        "radiation detector"
+      ],
+      "subtopics": [
+        {
+          "name": "Detection of alpha particles",
+          "links": [],
+          "detail": "Describe the detection of alpha particles ( -particles) using a cloud chamber or spark counter and the β β detection of beta particles ( -particles) ( -particles will be taken to refer to ( -radiation) by using a Geiger-Müller tube and counter"
+        },
+        {
+          "name": "Count rate measured in counts / s or counts",
+          "links": [],
+          "detail": "Use count rate measured in counts / s or counts / minute"
+        },
+        {
+          "name": "What is meant by background radiation",
+          "links": [],
+          "detail": "Know what is meant by background radiation"
+        },
+        {
+          "name": "Sources that make a significant contribution to background radiation",
+          "links": [],
+          "detail": "Know the sources that make a significant contribution to background radiation including: (a) radon gas (in the air) (b) rocks and buildings (c) food and drink (d) cosmic rays"
+        },
+        {
+          "name": "Measurements of background radiation to determine a corrected count",
+          "links": [],
+          "detail": "Use measurements of background radiation to determine a corrected count rate 5.2.2 The three types of emission"
+        },
+        {
+          "name": "Emission of radiation from a nucleus as spontaneous and",
+          "links": [],
+          "detail": "Describe the emission of radiation from a nucleus as spontaneous and random in direction"
+        },
+        {
+          "name": "Particles as two protons and two neutrons",
+          "links": [],
+          "detail": "Describe -particles as two protons and two neutrons (helium nuclei), electrons from the nucleus and -radiation as high-frequency electromagnetic waves α β γ"
+        },
+        {
+          "name": "Deflection of -particles",
+          "links": [],
+          "detail": "Describe the deflection of -particles, -particles and 5.2.3 Radioactive decay"
+        },
+        {
+          "name": "Radioactive decay is a change in an unstable nucleus",
+          "links": [],
+          "detail": "Know that radioactive decay is a change in an unstable nucleus that can result in the emission of α β γ -particles or -particles and/or -radiation and know that these changes are spontaneous and random"
+        },
+        {
+          "name": "Decay equations",
+          "links": [],
+          "detail": "Use decay equations, using nuclide notation, to show the emission of -radiation 5.2.4 Fission and fusion"
+        },
+        {
+          "name": "Process of fusion as the formation of a larger",
+          "links": [],
+          "detail": "Describe the process of fusion as the formation of a larger nucleus by combining two smaller nuclei with the release of energy, and recognise fusion as the energy source for stars"
+        },
+        {
+          "name": "Process of fission when a nucleus",
+          "links": [],
+          "detail": "Describe the process of fission when a nucleus, such as uranium-235 (U-235), absorbs a neutron and produces daughter nuclei and two or more neutrons with the release of energy"
+        },
+        {
+          "name": "The neutrons produced in fission create a chain reaction",
+          "links": [],
+          "detail": "Explain how the neutrons produced in fission create a chain reaction and that this is controlled in a nuclear reactor, including the action of coolant, moderators and control rods Back to contents page Subject content −) and gamma radiation -particles as high-speed -radiation in electric fields and magnetic fields α β -particles, -particles and www.cambridgeinternational.org/olevel 30 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 5.2.5 Half-life"
+        },
+        {
+          "name": "Half-life of a particular isotope as the time taken",
+          "links": [],
+          "detail": "Define the half-life of a particular isotope as the time taken for half the nuclei of that isotope in any sample to decay; recall and use this definition in calculations, which may involve information in tables or decay curves"
+        },
+        {
+          "name": "Dating of objects by the use of 14C",
+          "links": [],
+          "detail": "Describe the dating of objects by the use of 14C"
+        },
+        {
+          "name": "The type of radiation emitted and the half-life of",
+          "links": [],
+          "detail": "Explain how the type of radiation emitted and the half-life of the isotope determine which isotope is used for applications including: (a) household fire (smoke) alarms (b) irradiating food to kill bacteria (c) sterilisation of equipment using gamma rays (d) measuring and controlling thicknesses of materials with the choice of radiations used linked to penetration and absorption (e) diagnosis and treatment of cancer using gamma rays 5.2.6 Safety precautions"
+        },
+        {
+          "name": "Effects of ionising nuclear radiations on living things",
+          "links": [],
+          "detail": "State the effects of ionising nuclear radiations on living things, including cell death, mutations and cancer"
+        },
+        {
+          "name": "Radioactive materials are moved",
+          "links": [],
+          "detail": "Explain how radioactive materials are moved, used and stored in a safe way, with reference to: (a) reducing exposure time (b) increasing distance between source and living tissue (c) use of shielding to absorb radiation"
+        }
+      ]
+    },
+    {
+      "name": "Earth & the Solar System",
+      "keywords": [
+        "orbit",
+        "planet",
+        "satellite",
+        "solar system",
+        "the moon",
+        "comet",
+        "asteroid",
+        "orbital period",
+        "gravitational attraction of the sun",
+        "phases of the moon"
+      ],
+      "subtopics": [
+        {
+          "name": "Average orbital speed from the equation",
+          "links": [],
+          "detail": "Define average orbital speed from the equation"
+        },
+        {
+          "name": "R v = where r is the average radius",
+          "links": [],
+          "detail": "r v = where r is the average radius of the orbit and T is the orbital period; recall and use this equation Back to contents page Subject content www.cambridgeinternational.org/olevel 31 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 6.1.2 The Solar System"
+        },
+        {
+          "name": "Solar System as containing",
+          "links": [],
+          "detail": "Describe the Solar System as containing: (a) one star, the Sun (b) the eight named planets and know their order from the Sun (c) minor planets that orbit the Sun, including dwarf planets such as Pluto and asteroids in the asteroid belt (d) moons, that orbit the planets (e) smaller Solar System bodies, including comets and natural satellites"
+        },
+        {
+          "name": "And interpret planetary data about orbital distance",
+          "links": [],
+          "detail": "Analyse and interpret planetary data about orbital distance, orbital period, density, surface temperature and uniform gravitational field strength at the planet's surface"
+        },
+        {
+          "name": "Strength of the gravitational field",
+          "links": [],
+          "detail": "Know that the strength of the gravitational field: (a) at the surface of a planet depends on the mass of the planet (b) around a planet decreases as the distance from the planet increases"
+        },
+        {
+          "name": "Sun contains most of the mass of the Solar",
+          "links": [],
+          "detail": "Know that the Sun contains most of the mass of the Solar System and that the strength of the gravitational field at the surface of the Sun is greater than the strength of the gravitational field at the surface of the planets"
+        },
+        {
+          "name": "Force that keeps an object in orbit around the",
+          "links": [],
+          "detail": "Know that the force that keeps an object in orbit around the Sun is the gravitational attraction of the Sun"
+        },
+        {
+          "name": "Strength of the Sun's gravitational field decreases and that",
+          "links": [],
+          "detail": "Know that the strength of the Sun's gravitational field decreases and that the orbital speeds of the planets decrease as the distance from the Sun increases"
+        }
+      ]
+    },
+    {
+      "name": "Stars & the Universe",
+      "keywords": [
+        "star",
+        "galaxy",
+        "universe",
+        "big bang",
+        "redshift",
+        "milky way",
+        "supernova",
+        "nebula",
+        "light-year",
+        "white dwarf",
+        "main sequence",
+        "cosmic microwave background"
+      ],
+      "subtopics": [
+        {
+          "name": "Sun is a star of medium size",
+          "links": [],
+          "detail": "Know that the Sun is a star of medium size, consisting mostly of hydrogen and helium, and that it radiates most of its energy in the infrared, visible and ultraviolet regions of the electromagnetic spectrum"
+        },
+        {
+          "name": "Stars are powered by nuclear reactions that release energy",
+          "links": [],
+          "detail": "Know that stars are powered by nuclear reactions that release energy and that in stable stars the nuclear reactions involve the fusion of hydrogen into helium Back to contents page Subject content www.cambridgeinternational.org/olevel 32 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. 6.2.2 Stars"
+        },
+        {
+          "name": "Life cycle of a star",
+          "links": [],
+          "detail": "Describe the life cycle of a star: (a) a star is formed from interstellar clouds of gas and dust that contain hydrogen (b) a protostar is an interstellar cloud collapsing and increasing in temperature as a result of its internal gravitational attraction (c) a protostar becomes a stable star when the inward force of gravitational attraction is balanced by an outward force due to the high temperature in the centre of the star (d) all stars eventually run out of hydrogen as fuel for the nuclear reaction (e) most stars expand to form red giants and more massive stars expand to form red supergiants when most of the hydrogen in the centre of the star has been converted to helium (f) a red giant from a less massive star forms a planetary nebula with a white dwarf at its centre (g) a red supergiant explodes as a supernova, forming a nebula containing hydrogen and new heavier elements, leaving behind a neutron star or a black hole at its centre (h) the nebula from a supernova may form new stars with orbiting planets 6.2.3 The Universe"
+        },
+        {
+          "name": "Milky Way is one of many billions of galaxies",
+          "links": [],
+          "detail": "Know that the Milky Way is one of many billions of galaxies making up the Universe and that the diameter of the Milky Way is approximately 100 000 light-years"
+        },
+        {
+          "name": "Redshift as an increase in the observed wavelength of",
+          "links": [],
+          "detail": "Describe redshift as an increase in the observed wavelength of electromagnetic radiation emitted from receding stars and galaxies"
+        },
+        {
+          "name": "Light from distant galaxies shows redshift and that the",
+          "links": [],
+          "detail": "Know that the light from distant galaxies shows redshift and that the further away the galaxy, the greater the observed redshift and the faster the galaxy's speed away from the Earth"
+        },
+        {
+          "name": "Require the same experimental skills to be developed and",
+          "links": [],
+          "detail": "require the same experimental skills to be developed and learned"
+        },
+        {
+          "name": "Require an understanding of the same experimental contexts",
+          "links": [],
+          "detail": "require an understanding of the same experimental contexts"
+        },
+        {
+          "name": "Test the same assessment objective",
+          "links": [],
+          "detail": "test the same assessment objective, AO3. Back to contents page Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Paper 2: Theory 1 hour 45 minutes 80 marks Compulsory short-answer and structured questions This paper tests assessment objectives AO1 and AO2 Externally assessed Paper 4: Alternative to Practical 1 hour 40 marks All items are compulsory This paper tests assessment objective AO3 Candidates will not be required to do experiments as part of this test Externally assessed www.cambridgeinternational.org/olevel 34 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Candidates are expected to be familiar with and may be asked questions using the following experimental contexts:"
+        },
+        {
+          "name": "Measurement of physical quantities",
+          "links": [],
+          "detail": "measurement of physical quantities such as length, volume or force"
+        },
+        {
+          "name": "Measurement of small distances or short intervals of time",
+          "links": [],
+          "detail": "measurement of small distances or short intervals of time determining a derived quantity such as the extension per unit load for a spring, the value of a known resistance or the acceleration of an object testing and identifying the relationship between two variables such as between the potential difference across a wire and its length"
+        },
+        {
+          "name": "Comparing measured quantities",
+          "links": [],
+          "detail": "comparing measured quantities such as angles of reflection"
+        },
+        {
+          "name": "Comparing derived quantities",
+          "links": [],
+          "detail": "comparing derived quantities such as density"
+        },
+        {
+          "name": "Cooling and heating",
+          "links": [],
+          "detail": "cooling and heating, including measurement of temperature"
+        },
+        {
+          "name": "Experiments using springs and balances timing motion or oscillations",
+          "links": [],
+          "detail": "experiments using springs and balances timing motion or oscillations electric circuits, including the connection and reconnection of these circuits, and the measurement of current and potential difference"
+        },
+        {
+          "name": "Optics experiments using equipment",
+          "links": [],
+          "detail": "optics experiments using equipment such as optics pins, mirrors, prisms, lenses, glass or Perspex blocks (both rectangular and semi-circular), including the use of transparent, translucent and opaque substances to investigate the transmission of light"
+        },
+        {
+          "name": "Procedures using simple apparatus",
+          "links": [],
+          "detail": "procedures using simple apparatus, in situations where the method may not be familiar to the candidate. Candidates may be required to do the following:"
+        },
+        {
+          "name": "Knowledge of how to select and safely use techniques",
+          "links": [],
+          "detail": "demonstrate knowledge of how to select and safely use techniques, apparatus and materials (including following a sequence of instructions where appropriate):"
+        },
+        {
+          "name": "Apparatus from diagrams or descriptions",
+          "links": [],
+          "detail": "identify apparatus from diagrams or descriptions"
+        },
+        {
+          "name": "Select the most appropriate apparatus or method for the",
+          "links": [],
+          "detail": "select the most appropriate apparatus or method for the task and justify the choice made"
+        },
+        {
+          "name": "Hazards and identify safety precautions",
+          "links": [],
+          "detail": "describe and explain hazards and identify safety precautions"
+        },
+        {
+          "name": "Techniques used to ensure the accuracy of observations and",
+          "links": [],
+          "detail": "describe and explain techniques used to ensure the accuracy of observations and data plan experiments and investigations:"
+        },
+        {
+          "name": "Independent variable and dependent variable",
+          "links": [],
+          "detail": "identify the independent variable and dependent variable"
+        },
+        {
+          "name": "And explain why variables should be controlled",
+          "links": [],
+          "detail": "describe how and explain why variables should be controlled"
+        },
+        {
+          "name": "Suggest an appropriate number and range of values for",
+          "links": [],
+          "detail": "suggest an appropriate number and range of values for the independent variable"
+        },
+        {
+          "name": "Suggest the most appropriate apparatus or technique and justify",
+          "links": [],
+          "detail": "suggest the most appropriate apparatus or technique and justify the choice made"
+        },
+        {
+          "name": "Experimental procedures",
+          "links": [],
+          "detail": "describe experimental procedures"
+        },
+        {
+          "name": "Risks and suggest appropriate safety precautions",
+          "links": [],
+          "detail": "identify risks and suggest appropriate safety precautions"
+        },
+        {
+          "name": "Record the results of an experiment",
+          "links": [],
+          "detail": "describe how to record the results of an experiment"
+        },
+        {
+          "name": "Process the results of an experiment to form a",
+          "links": [],
+          "detail": "describe how to process the results of an experiment to form a conclusion or to evaluate a prediction"
+        },
+        {
+          "name": "Make reasoned predictions of expected results Back to contents",
+          "links": [],
+          "detail": "make reasoned predictions of expected results Back to contents page Details of the assessment www.cambridgeinternational.org/olevel 35 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028."
+        },
+        {
+          "name": "Make and record observations",
+          "links": [],
+          "detail": "make and record observations, measurements and estimates:"
+        },
+        {
+          "name": "Take readings from apparatus",
+          "links": [],
+          "detail": "take readings from apparatus (analogue and digital) or from diagrams of apparatus"
+        },
+        {
+          "name": "Take readings with appropriate precision",
+          "links": [],
+          "detail": "take readings with appropriate precision, reading to the nearest half-scale division where required"
+        },
+        {
+          "name": "Correct for zero errors where required",
+          "links": [],
+          "detail": "correct for zero errors where required"
+        },
+        {
+          "name": "Make observations",
+          "links": [],
+          "detail": "make observations, measurements or estimates that are in agreement with expected results or values"
+        },
+        {
+          "name": "Take sufficient observations or measurements",
+          "links": [],
+          "detail": "take sufficient observations or measurements"
+        },
+        {
+          "name": "Repeat observations or measurements where appropriate",
+          "links": [],
+          "detail": "repeat observations or measurements where appropriate"
+        },
+        {
+          "name": "Record qualitative observations from tests",
+          "links": [],
+          "detail": "record qualitative observations from tests"
+        },
+        {
+          "name": "Record observations and measurements systematically",
+          "links": [],
+          "detail": "record observations and measurements systematically, for example in a suitable table, to an appropriate degree of precision and using appropriate units"
+        },
+        {
+          "name": "And evaluate experimental observations and data",
+          "links": [],
+          "detail": "interpret and evaluate experimental observations and data:"
+        },
+        {
+          "name": "Process data",
+          "links": [],
+          "detail": "process data, including for use in further calculations or for graph plotting, using a calculator as appropriate"
+        },
+        {
+          "name": "Present data graphically",
+          "links": [],
+          "detail": "present data graphically, including the use of best-fit lines where appropriate"
+        },
+        {
+          "name": "And interpret observations and data",
+          "links": [],
+          "detail": "analyse and interpret observations and data, including data presented graphically"
+        },
+        {
+          "name": "Interpolation and extrapolation graphically to determine a gradient or",
+          "links": [],
+          "detail": "use interpolation and extrapolation graphically to determine a gradient or intercept"
+        },
+        {
+          "name": "Form conclusions justified by reference to observations and data",
+          "links": [],
+          "detail": "form conclusions justified by reference to observations and data and with appropriate explanation"
+        },
+        {
+          "name": "Evaluate the quality of observations and data",
+          "links": [],
+          "detail": "evaluate the quality of observations and data, identifying any anomalous results and taking appropriate action"
+        },
+        {
+          "name": "Comment on and explain whether results are equal within",
+          "links": [],
+          "detail": "comment on and explain whether results are equal within the limits of experimental accuracy (assumed to be ± 10% at this level of study) evaluate methods and suggest possible improvements:"
+        },
+        {
+          "name": "Evaluate experimental arrangements",
+          "links": [],
+          "detail": "evaluate experimental arrangements, methods and techniques, including the control of variables"
+        },
+        {
+          "name": "Sources of error",
+          "links": [],
+          "detail": "identify sources of error, including measurement error, random error and systematic error"
+        },
+        {
+          "name": "Possible causes of uncertainty in data or in a",
+          "links": [],
+          "detail": "identify possible causes of uncertainty in data or in a conclusion"
+        },
+        {
+          "name": "Suggest possible improvements to the apparatus",
+          "links": [],
+          "detail": "suggest possible improvements to the apparatus, experimental arrangements, methods or techniques Back to contents page Details of the assessment www.cambridgeinternational.org/olevel 36 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Language of measurement The following definitions have been taken or adapted from the Association for Science Education (ASE). www.ase.org.uk The definitions in the table below should be used by teachers during the course to encourage students to use the terminology correctly and consistently. Candidates will not be required to recall the specific definition of these terms in the examinations. true value the value that would be obtained in an ideal measurement measurement error the difference between a measured value and the true value of a quantity accuracy a measurement result is described as accurate if it is close to the true value precision how close the measured values of a quantity are to each other repeatability a measurement is repeatable if the same or similar result is obtained when the measurement is repeated under the same conditions, using the same method, within the same experiment reproducibility a measurement is reproducible if the same or similar result is obtained when the measurement is made under either different conditions or by a different method or in a different experiment validity of experimental design an experiment is valid if the experiment tests what it says it will test. The experiment must be a fair test where only the independent variable and dependent variable may change, and controlled variables are kept constant range the maximum and minimum value of the independent or dependent variables anomaly an anomaly is a value in a set of results that appears to be outside the general pattern of the results, i.e. an extreme value that is either very high or very low in comparison to others independent variable independent variables are the variables that are changed in a scientific experiment by the scientist. Changing an independent variable may cause a change in the dependent variable dependent variable dependent variables are the variables that are observed or measured in a scientific experiment. Dependent variables may change based on changes made to the independent variables Back to contents page Details of the assessment The Language of Measurement (2010), a guide from www.cambridgeinternational.org/olevel 37 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Apparatus These lists give items that candidates should be familiar with using, whether they are taking the Practical Test or the Alternative to Practical. These items should be available for use in the Practical Test. These lists are not exhaustive and we may also require other items to be sourced for specific examinations. The Confidential Instructions we send before the Practical Test will give the detailed requirements for the examination. Every effort is made to minimise the cost to and resources required by centres. Experiments will be designed around basic apparatus and materials which should be available in most school laboratories or are easily obtainable. Appropriate safety equipment must be provided to students and should at least include eye protection. The following suggested equipment has been categorised, but equipment can be used in any topic. General"
+        },
+        {
+          "name": "Adhesive putty",
+          "links": [],
+          "detail": "adhesive putty (e.g. Patafix, Blu Tack ) adhesive tape (e.g. Sellotape ) card"
+        },
+        {
+          "name": "Dropping pipette",
+          "links": [],
+          "detail": "dropping pipette (2.5 cm ) or small plastic syringe (e.g. 5 cm"
+        },
+        {
+          "name": "Pair of compasses",
+          "links": [],
+          "detail": "pair of compasses"
+        },
+        {
+          "name": "S-hook scissors set square",
+          "links": [],
+          "detail": "S-hook scissors set square"
+        },
+        {
+          "name": "String",
+          "links": [],
+          "detail": "string"
+        },
+        {
+          "name": "Thread",
+          "links": [],
+          "detail": "thread"
+        },
+        {
+          "name": "Top pan",
+          "links": [],
+          "detail": "top pan (electronic) balance to measure up to 500 g, with precision of at least 0.1 g"
+        },
+        {
+          "name": "Tracing paper wooden board",
+          "links": [],
+          "detail": "tracing paper wooden board, rigid, 150 cm × 20 cm × 1.5 cm Mechanics"
+        },
+        {
+          "name": "Expendable steel springs",
+          "links": [],
+          "detail": "expendable steel springs, with spring constant of approx. 0.25 N / cm"
+        },
+        {
+          "name": "Force meter",
+          "links": [],
+          "detail": "force meter, with maximum reading or full scale deflection of between 1.0 N and 10.0 N"
+        },
+        {
+          "name": "G-clamp glass ball",
+          "links": [],
+          "detail": "G-clamp glass ball (marble), ball bearing (approx. 10 mm in diameter) and table tennis ball half-metre rule, graduated in mm"
+        },
+        {
+          "name": "Masses",
+          "links": [],
+          "detail": "masses, 10 × 10 g, 10 × 100 g, including holders"
+        },
+        {
+          "name": "Metre rule",
+          "links": [],
+          "detail": "metre rule, graduated in mm"
+        },
+        {
+          "name": "Modelling clay",
+          "links": [],
+          "detail": "modelling clay (e.g. Plasticine )"
+        },
+        {
+          "name": "Pendulum bob pivots",
+          "links": [],
+          "detail": "pendulum bob pivots (e.g. 15 cm nails, triangular wooden blocks) retort stand, boss and clamp"
+        },
+        {
+          "name": "Single-wheel pulley",
+          "links": [],
+          "detail": "single-wheel pulley, with facilities for attaching to a bench or to a clamp stand"
+        },
+        {
+          "name": "Stop-watch",
+          "links": [],
+          "detail": "stop-watch, reading to 0.1 s or better Back to contents page Details of the assessment"
+        },
+        {
+          "name": "Www.cambridgeinternational.org/olevel 38 Cambridge O Level Physics 5054 syllabus for",
+          "links": [],
+          "detail": "www.cambridgeinternational.org/olevel 38 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Thermal physics"
+        },
+        {
+          "name": "Beakers",
+          "links": [],
+          "detail": "beakers, glass (borosilicate), 100 cm , 250 cm , 400 cm"
+        },
+        {
+          "name": "Boiling tube",
+          "links": [],
+          "detail": "boiling tube, approx. 150 mm × 25 mm"
+        },
+        {
+          "name": "Measuring cylinders",
+          "links": [],
+          "detail": "measuring cylinders, constant diameter, 50 cm , 100 cm"
+        },
+        {
+          "name": "Plastic or polystyrene cup",
+          "links": [],
+          "detail": "plastic or polystyrene cup, approx. 200 cm"
+        },
+        {
+          "name": "Thermometer",
+          "links": [],
+          "detail": "thermometer, -10 °C to +110 °C, with 1 °C graduations Optics"
+        },
+        {
+          "name": "Converging lens",
+          "links": [],
+          "detail": "converging lens, spherical, +10D ( = 10 cm) converging lens, spherical, +6.7D ( = 15 cm) diverging lens, spherical, -6.7D ( = -15 cm)"
+        },
+        {
+          "name": "Glass or Perspex 60° prism",
+          "links": [],
+          "detail": "glass or Perspex 60° prism"
+        },
+        {
+          "name": "Glass or Perspex blocks",
+          "links": [],
+          "detail": "glass or Perspex blocks, rectangular and semi-circular"
+        },
+        {
+          "name": "Optics pins",
+          "links": [],
+          "detail": "optics pins, minimum length 75 mm"
+        },
+        {
+          "name": "Plane mirror",
+          "links": [],
+          "detail": "plane mirror, approx. 75 mm × 25 mm pin board protractor Electricity Candidates or centres may need to join components, meters and cells together to make circuits. Connectors used will be 3.5 mm or 4 mm in diameter."
+        },
+        {
+          "name": "Ammeter",
+          "links": [],
+          "detail": "ammeter, with full scale deflection 1 A or 1.5 A and precision of at least 0.05 A (analogue, dedicated digital or multimeter) voltmeter, with full scale deflection 5 V and precision of at least 0.1 V (analogue, dedicated digital or multimeter) cells, 1.5 V and holders to enable several cells to be joined connecting leads, 3.5 mm or 4 mm connectors"
+        },
+        {
+          "name": "Crocodile clips",
+          "links": [],
+          "detail": "crocodile clips"
+        },
+        {
+          "name": "D.c. power supply",
+          "links": [],
+          "detail": "d.c. power supply, variable to 12 V"
+        },
+        {
+          "name": "Diodes",
+          "links": [],
+          "detail": "diodes, including LEDs filament lamps, low voltage (e.g. 2.5 V) and holders filament lamp, 12 V, 24 W and holder"
+        },
+        {
+          "name": "Switches",
+          "links": [],
+          "detail": "switches, including push switches"
+        },
+        {
+          "name": "Selection of resistors",
+          "links": [],
+          "detail": "selection of resistors, values within range 5-50 , power rating of 1-2 W"
+        },
+        {
+          "name": "Thermistors",
+          "links": [],
+          "detail": "thermistors (NTC only) wire, constantan (eureka), 0.38 mm diameter (28 swg), 0.32 mm diameter (30 swg) wire, nichrome, 0.38 mm diameter (28 swg), 0.32 mm diameter (30 swg) Back to contents page Details of the assessment"
+        },
+        {
+          "name": "M / s N / kg N / m",
+          "links": [],
+          "detail": "m / s N / kg N / m, N / cm kg m / s N s N m , , J kJ MJ J , kJ , MJ, kW h W , kW , MW"
+        },
+        {
+          "name": "Symbols",
+          "links": [],
+          "detail": "understand and use the symbols: =, <, >"
+        },
+        {
+          "name": "Meaning of sum",
+          "links": [],
+          "detail": "understand the meaning of sum, difference and product"
+        },
+        {
+          "name": "Standard form",
+          "links": [],
+          "detail": "use standard form (scientific notation)"
+        },
+        {
+          "name": "Only the final answer in a calculation should be",
+          "links": [],
+          "detail": "understand that only the final answer in a calculation should be rounded use decimal places and significant figures appropriately make approximations and estimates to obtain reasonable answers Algebra"
+        },
+        {
+          "name": "Positive",
+          "links": [],
+          "detail": "use positive, whole number indices in algebraic expressions"
+        },
+        {
+          "name": "Substitute values of quantities into equations",
+          "links": [],
+          "detail": "substitute values of quantities into equations, using consistent units solve simple algebraic equations for any one term when the other terms are known recognise and use direct and inverse proportion"
+        },
+        {
+          "name": "Set up simple algebraic equations as mathematical models of",
+          "links": [],
+          "detail": "set up simple algebraic equations as mathematical models of physical situations and to represent information given in words"
+        },
+        {
+          "name": "Equations for the area of a rectangle",
+          "links": [],
+          "detail": "recall and use the equations for the area of a rectangle, area of a triangle and area of a circle"
+        },
+        {
+          "name": "Equations for the volume of a rectangular block and",
+          "links": [],
+          "detail": "recall and use the equations for the volume of a rectangular block and volume of a cylinder"
+        },
+        {
+          "name": "Scale diagrams",
+          "links": [],
+          "detail": "use scale diagrams"
+        },
+        {
+          "name": "Pythagoras' theorem to the calculation of a side of",
+          "links": [],
+          "detail": "apply Pythagoras' theorem to the calculation of a side of a right-angled triangle understand that a right angle is 90° and that the sum of the angles on a straight line is 180° use trigonometric functions (sine, cosine, tangent and their inverses)"
+        },
+        {
+          "name": "Mathematical instruments",
+          "links": [],
+          "detail": "use mathematical instruments (ruler, pair of compasses, protractor, set square)"
+        },
+        {
+          "name": "Recognise and use the points of the compass",
+          "links": [],
+          "detail": "recognise and use the points of the compass (N, S, E, W) and clockwise and anticlockwise directions"
+        },
+        {
+          "name": "Convert between metric units",
+          "links": [],
+          "detail": "convert between metric units, e.g. cm3 and m3; mg, g and kg Back to contents page Details of the assessment www.cambridgeinternational.org/olevel 44 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Graphs, charts and statistics"
+        },
+        {
+          "name": "Graphs and charts from data",
+          "links": [],
+          "detail": "draw graphs and charts from data"
+        },
+        {
+          "name": "Graphs and charts",
+          "links": [],
+          "detail": "interpret graphs and charts, including interpolation and extrapolation of data determine the gradient (slope) of a line on a graph, including by drawing a tangent to a curved line determine the intercept of the line on a graph, extending the line graphically (extrapolating) where appropriate"
+        },
+        {
+          "name": "Select suitable scales and axes for graphs",
+          "links": [],
+          "detail": "select suitable scales and axes for graphs"
+        },
+        {
+          "name": "Y = mx + c represents a linear relationship",
+          "links": [],
+          "detail": "understand that y = mx + c represents a linear relationship"
+        },
+        {
+          "name": "Recognise direct proportionality from a graph",
+          "links": [],
+          "detail": "recognise direct proportionality from a graph"
+        },
+        {
+          "name": "And use the average",
+          "links": [],
+          "detail": "calculate and use the average (mean) for a set of data Presentation of data Taking readings"
+        },
+        {
+          "name": "Data values should be read from an instrument to",
+          "links": [],
+          "detail": "Data values should be read from an instrument to an accuracy of one half of one of the smallest divisions on the scale."
+        },
+        {
+          "name": "Interpolation between scale divisions should be to an accuracy",
+          "links": [],
+          "detail": "Interpolation between scale divisions should be to an accuracy of one half of a division. That is, where a reading lies between two scale marks, it should be interpolated to the nearest half division. Recording readings Data should be recorded so as to reflect the precision of the measuring instrument, i.e. the smallest difference that can reliably be detected on the measuring instrument scale should be reflected by the number of decimal places and unit given in the measurement. A measurement or calculated quantity must be accompanied by a correct unit, where appropriate."
+        },
+        {
+          "name": "Each column of a table should be headed with",
+          "links": [],
+          "detail": "Each column of a table should be headed with the name or symbol of the measured or calculated quantity and the appropriate unit, e.g. time / s. The solidus (/) is to be used for separating the quantity and the unit in tables, graphs and charts."
+        },
+        {
+          "name": "Units should not be included with data in the",
+          "links": [],
+          "detail": "Units should not be included with data in the body of a table."
+        },
+        {
+          "name": "Each reading should be repeated",
+          "links": [],
+          "detail": "Each reading should be repeated, where appropriate, and recorded. The number of significant figures given for measured quantities should be appropriate to the measuring instrument used. The number of significant figures given for calculated quantities should be the same as the least number of significant figures in the raw data used in that specific calculation."
+        },
+        {
+          "name": "Ratio should be expressed as x",
+          "links": [],
+          "detail": "A ratio should be expressed as x : y . Drawing and analysing graphs"
+        },
+        {
+          "name": "Column headings of a table can be directly transferred",
+          "links": [],
+          "detail": "The column headings of a table can be directly transferred to the axes of a constructed graph. A graph should be drawn with a sharp pencil. The axes should be labelled with the name or symbol of the measured or calculated quantity and the appropriate unit, e.g. time / s. Unless instructed otherwise, the scales for the axes should allow more than half of the graph grid to be used in both directions, and be based on sensible ratios, e.g. 2 cm on the graph grid representing 1, 2 or 5 units of the variable (or 10, 20 or 50, etc.)"
+        },
+        {
+          "name": "Points on the graph should be clearly marked as",
+          "links": [],
+          "detail": "Points on the graph should be clearly marked as plus signs (+), crosses (×) or encircled dots () of appropriate size. Back to contents page Details of the assessment www.cambridgeinternational.org/olevel 45 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Each data point should be plotted to an accuracy of one half of one of the smallest squares on the grid."
+        },
+        {
+          "name": "Best-fit line",
+          "links": [],
+          "detail": "A best-fit line (trend line) should be a single, thin, smooth straight-line or curve, drawn by inspection. The line does not need to coincide exactly with any of the points; where there is scatter evident in the data, examiners would expect a roughly even distribution of points either side of the line over its entire length. Points that are clearly anomalous and identified by the candidate should be ignored when drawing the best- fit line."
+        },
+        {
+          "name": "Candidates should be able to take readings from the",
+          "links": [],
+          "detail": "Candidates should be able to take readings from the graph by extrapolation or interpolation."
+        },
+        {
+          "name": "Data values should be read from a line on",
+          "links": [],
+          "detail": "Data values should be read from a line on a graph to an accuracy of one half of one of the smallest squares on the grid. The same accuracy should be used in reading off an intercept. The gradient of a straight line should be taken using a triangle whose hypotenuse extends over at least half the length of the candidate's best-fit line, and this triangle should be marked on the graph. Calculation of the gradient should be to two or three significant figures."
+        },
+        {
+          "name": "The gradient or intercept of a graph is used",
+          "links": [],
+          "detail": "When the gradient or intercept of a graph is used in subsequent calculations, it will be assumed to have units consistent with the graph axes. Further guidance can be found in the following publications: ASE, The Language of Mathematics in Science: A Guide for Teachers of 11-16 Science ASE, The Language of Mathematics in Science: Teaching Approaches www.ase.org.uk/mathsinscience Conventions (e.g. signs, symbols, terminology and nomenclature) Candidates are expected to be familiar with the nomenclature used in the syllabus. The syllabus and question papers conform with accepted international practice. In particular, the following document, produced by the Association for Science Education (ASE), should be used as a guideline. Signs, Symbols and Systematics: The ASE Companion to 16-19 Science Decimal markers In accordance with current ASE convention, decimal markers in examination papers will be a single dot on the line. Candidates are expected to follow this convention in their answers. Numbers Numbers from 1000 to 9999 will be printed without commas or spaces. Numbers greater than or equal to 10 000 will be printed without commas. A space will be left between each group of three digits, e.g. 4 256 789. Units To avoid any confusion concerning the symbol for litre, the equivalent quantity, the cubic decimetre (dm used in place of l or litre. Similarly, the cubic centimetre (cm3) will be used in place of ml or millilitre. In practical work, candidates will be expected to use SI units or, where appropriate, units approved by the BIPM for use with the SI (e.g. minute). A list of SI units and units approved for use with the SI may be found at www.bipm.org . The use of imperial/customary units such as the inch and degree Fahrenheit are not acceptable and should be discouraged. In all examinations, where data is supplied for use in questions, candidates will be expected to use units that are consistent with the units supplied and should not attempt conversion to other systems of units unless this is a requirement of the question. Back to contents page Details of the assessment (2016). (2016). (2000)."
+        },
+        {
+          "name": ") will be www.cambridgeinternational.org/olevel 46 Cambridge O Level Physics",
+          "links": [],
+          "detail": ") will be www.cambridgeinternational.org/olevel 46 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Command words Command words and their meanings help candidates know what is expected from them in the exams. The table below includes command words used in the assessment for this syllabus. The use of the command word will relate to the subject context. Command word What it means Calculate work out from given facts, figures or information Comment give an informed opinion Compare identify/comment on similarities and/or differences Deduce conclude from available information Define give precise meaning Describe state the points of a topic / give characteristics and main features Determine establish an answer using the information available Explain set out purposes or reasons / make the relationships between things clear / say why and/or how and support with relevant evidence Give produce an answer from a given source or recall/memory Identify name/select/recognise Justify support a case with evidence/argument Predict suggest what may happen based on available information Sketch make a simple freehand drawing showing the key features, taking care over proportions State express in clear terms Suggest apply knowledge and understanding to situations where there are a range of valid responses in order to make proposals / put forward considerations Back to contents page Details of the assessment www.cambridgeinternational.org/olevel 47 5 What else you need to know This section is an overview of other information you need to know about this syllabus. It will help to share the administrative information with your exams officer so they know when you will need their support. Find more information about our administrative processes at www.cambridgeinternational.org/eoguide Before you start Previous study We recommend that learners starting this course should have studied a broad curriculum such as the Cambridge Lower Secondary programme or equivalent national educational framework. Guided learning hours We design Cambridge O Level syllabuses to require about 130 guided learning hours for each subject. This is for guidance only. The number of hours a learner needs to achieve the qualification may vary according to each school and the learners' previous experience of the subject. Availability and timetables All Cambridge schools are allocated to one of six administrative zones. Each zone has a specific timetable. Find your administrative zone at www.cambridgeinternational.org/adminzone to centres in administrative zones 3, 4 and 5. You can enter candidates in the June and November exam series. You can view the timetable for your administrative zone at www.cambridgeinternational.org/timetables Check you are using the syllabus for the year the candidate is taking the exam. Private candidates can enter for this syllabus. For more information, please refer to the Making Entries . Combining with other syllabuses Candidates can take this syllabus alongside other Cambridge International syllabuses in a single exam series. The only exceptions are: Cambridge IGCSE Physics (0625) Cambridge IGCSE (9-1) Physics (0972)"
+        },
+        {
+          "name": "Cambridge IGCSE Physical Science",
+          "links": [],
+          "detail": "Cambridge IGCSE Physical Science (0652)"
+        },
+        {
+          "name": "Cambridge IGCSE Combined Science",
+          "links": [],
+          "detail": "Cambridge IGCSE Combined Science (0653)"
+        },
+        {
+          "name": "Cambridge IGCSE Co-ordinated Sciences",
+          "links": [],
+          "detail": "Cambridge IGCSE Co-ordinated Sciences (Double Award) (0654)"
+        },
+        {
+          "name": "Cambridge IGCSE",
+          "links": [],
+          "detail": "Cambridge IGCSE (9-1) Co-ordinated Sciences (Double Award) (0973) Cambridge O Level Combined Science (5129) syllabuses with the same title at the same level. Cambridge O Level, Cambridge IGCSE and Cambridge IGCSE (9-1) syllabuses are at the same level. Back to contents page Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. . Cambridge O Levels are available Cambridge Guide to www.cambridgeinternational.org/olevel 48 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Making entries Exams officers are responsible for submitting entries to Cambridge International. We encourage them to work closely with you to make sure they enter the right number of candidates for the right combination of syllabus components. Entry option codes and instructions for submitting entries are in the Entries . Your exams officer has access to this guide. Exam administration To keep our exams secure, we produce question papers for different areas of the world, known as administrative zones. We allocate all Cambridge schools to an administrative zone determined by their location. Each zone has a specific timetable. Some of our syllabuses offer candidates different assessment options. An entry option code is used to identify the components the candidate will take relevant to the administrative zone and the available assessment options. Support for exams officers We know how important exams officers are to the successful running of exams. We provide them with the support they need to make entries on time. Your exams officer will find this support, and guidance for all other phases of the Cambridge Exams Cycle, at www.cambridgeinternational.org/eoguide Retakes Candidates can retake the whole qualification as many times as they want to. Information on retake entries is at www.cambridgeinternational.org/retakes Language This syllabus and the related assessment materials are available in English only. Accessibility and equality Syllabus and assessment design At Cambridge International, we work to avoid direct or indirect discrimination in our syllabuses and assessment materials. We aim to maximise inclusivity for candidates of all national, cultural or social backgrounds and candidates with protected characteristics, which include special educational needs and disability, religion and belief, and characteristics related to gender and identity. We also aim to make our materials as accessible as possible by using accessible language and applying accessible design principles. This gives all candidates the fairest possible opportunity to demonstrate their knowledge, skills and understanding and helps to minimise the requirement to make reasonable adjustments during the assessment process. Back to contents page What else you need to know Cambridge Guide to Making www.cambridgeinternational.org/olevel 49 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Access arrangements Access arrangements (including modified papers) are the principal way in which Cambridge International complies with our duty, as guided by the UK Equality Act (2010), to make ‘reasonable adjustments' for candidates with special educational needs (SEN), disability, illness or injury. Where a candidate would otherwise be at a substantial disadvantage in comparison to a candidate with no SEN, disability, illness or injury, we may be able to agree pre-examination access arrangements. These arrangements help a candidate by minimising accessibility barriers and maximising their opportunity to demonstrate their knowledge, skills and understanding in an assessment. Important: Requested access arrangements should be based on evidence of the candidate's barrier to assessment and should also reflect their normal way of working at school. This is explained in the www.cambridgeinternational.org/eoguide"
+        },
+        {
+          "name": "For Cambridge International to approve an access arrangement",
+          "links": [],
+          "detail": "For Cambridge International to approve an access arrangement, we will need to agree that it constitutes a reasonable adjustment, involves reasonable cost and timeframe and does not affect the security and integrity of the assessment."
+        },
+        {
+          "name": "Availability of access arrangements should be checked by centres",
+          "links": [],
+          "detail": "Availability of access arrangements should be checked by centres at the start of the course. Details of our standard access arrangements and modified question papers are available in www.cambridgeinternational.org/eoguide"
+        },
+        {
+          "name": "Please contact us at the start of the course",
+          "links": [],
+          "detail": "Please contact us at the start of the course to find out if we are able to approve an arrangement that is not included in the list of standard access arrangements."
+        },
+        {
+          "name": "Candidates who cannot access parts of the assessment may",
+          "links": [],
+          "detail": "Candidates who cannot access parts of the assessment may be able to receive an award based on the parts they have completed. After the exam Grading and reporting Grades A*, A, B, C, D or E indicate the standard a candidate achieved at Cambridge O Level. A* is the highest and E is the lowest. ‘Ungraded' means that the candidate's performance did not meet the standard required for grade E. ‘Ungraded' is reported on the statement of results but not on the certificate. In specific circumstances your candidates may see one of the following letters on their statement of results:"
+        },
+        {
+          "name": "To measure learning and achievement The assessment confirms achievement",
+          "links": [],
+          "detail": "to measure learning and achievement The assessment confirms achievement and performance in relation to the knowledge, understanding and skills specified in the syllabus."
+        },
+        {
+          "name": "To show likely future success The outcomes help predict",
+          "links": [],
+          "detail": "to show likely future success The outcomes help predict which students are well prepared for a particular course or career and/or which students are more likely to be successful. The outcomes help students choose the most suitable course or career. Back to contents page What else you need to know www.cambridgeinternational.org/olevel 51 Cambridge O Level Physics 5054 syllabus for 2026, 2027 and 2028. Changes to this syllabus for 2026, 2027 and 2028 The syllabus has been updated. This is version 2, published December 2025. You must read the whole syllabus before planning your teaching programme. syllabuses regularly to make sure they continue to meet the needs of our schools. In updating this syllabus, we have made it easier for teachers and students to understand, keeping the familiar features that teachers and schools value. Changes to version 2 of the syllabus, published December 2025 Other changes The weblink on page 48 has been updated. Significant changes to the syllabus are indicated by black vertical lines either side of the text. Any textbooks endorsed to support the syllabus for examination from 2023 use with this syllabus. Back to contents page What else you need to know We review our are still suitable for www.cambridgeinternational.org/olevel 52 We are committed to making our documents accessible in accordance with the WCAG 2.1 Standard. We are always looking to improve the accessibility of our documents. If you find any problems or you think we are not meeting accessibility requirements, contact us at info@cambridgeinternational.org with the subject heading: Digital accessibility. If you need this document in a different format, contact us and supply your name, email address and requirements and we will respond within 15 working days. Cambridge Assessment International Education, The Triangle Building, Shaftesbury Road, Cambridge, CB2 8EA, United Kingdom t : +44 (0)1223 553554 email : info@cambridgeinternational.org © Cambridge University Press & Assessment September 2023 www.cambridgeinternational.org"
+        }
+      ]
+    }
   ]
 }
