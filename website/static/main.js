@@ -2,11 +2,55 @@
    staggered animations, count-up numbers, and parallax effects.
    Uses rect checks rather than IntersectionObserver for broad compatibility. */
 
+// ── One-time notice toasts (set via ?pwt_notice= from server redirects) ───────
+(function () {
+  const NOTICES = {
+    google_linked: "✅ Google account linked — you can now sign in with either Google or your password.",
+    google_new:    "👋 Welcome! Your account has been created via Google.",
+  };
+  const p = new URLSearchParams(location.search);
+  const notice = p.get("pwt_notice");
+  if (!notice || !NOTICES[notice]) return;
+
+  // Strip the param from the URL without a reload
+  p.delete("pwt_notice");
+  const clean = location.pathname + (p.toString() ? "?" + p.toString() : "") + location.hash;
+  history.replaceState(null, "", clean);
+
+  const toast = document.createElement("div");
+  toast.textContent = NOTICES[notice];
+  Object.assign(toast.style, {
+    position: "fixed", bottom: "24px", left: "50%", transform: "translateX(-50%) translateY(20px)",
+    background: "var(--navy, #1a2e5a)", color: "#fff",
+    padding: "12px 22px", borderRadius: "10px", fontSize: ".9rem",
+    fontFamily: "inherit", zIndex: "9999", opacity: "0",
+    boxShadow: "0 4px 20px rgba(0,0,0,.22)", maxWidth: "92vw", textAlign: "center",
+    transition: "opacity .3s, transform .3s",
+  });
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateX(-50%) translateY(0)";
+  });
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(20px)";
+    setTimeout(() => toast.remove(), 400);
+  }, 5000);
+})();
+
 // Mark the current page's nav link
 const here = location.pathname.split("/").pop() || "index.html";
-document.querySelectorAll(".nav-link").forEach((a) => {
-  if (a.getAttribute("href").split("#")[0] === here) a.classList.add("active");
+document.querySelectorAll(".nav-link, .nav-drop-item").forEach((a) => {
+  const href = a.getAttribute("href");
+  if (href && href.split("#")[0] === here) {
+    a.classList.add("active");
+    // Also highlight the parent group button
+    a.closest(".nav-group")?.querySelector(".nav-group-btn")?.classList.add("active");
+  }
 });
+
+// Nav-group dropdown behaviour is handled by tools-nav.js (present on all pages).
 
 // Collect all revealable elements (all variants)
 const revealSelectors = ".reveal, .reveal-left, .reveal-right, .reveal-scale";
@@ -240,10 +284,25 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("bkcFormBtn").addEventListener("click", openPanel);
   document.getElementById("bkcCalBtn").addEventListener("click", () => {
     closeChoice();
-    if (window.Calendly) Calendly.initPopupWidget({
-      url: 'https://calendly.com/nexgentutors6/30min',
-      pageSettings: { backgroundColor: 'FBF3D9', primaryColor: 'F4A632', textColor: '293554' },
-    });
+    function _openCal() {
+      Calendly.initPopupWidget({
+        url: 'https://calendly.com/nexgentutors6/30min',
+        pageSettings: { backgroundColor: 'FBF3D9', primaryColor: 'F4A632', textColor: '293554' },
+      });
+    }
+    if (window.Calendly) {
+      _openCal();
+    } else {
+      // Lazy-load Calendly only when the user actually clicks the button
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://assets.calendly.com/assets/external/widget.css';
+      document.head.appendChild(css);
+      const js = document.createElement('script');
+      js.src = 'https://assets.calendly.com/assets/external/widget.js';
+      js.onload = _openCal;
+      document.head.appendChild(js);
+    }
   });
 
   document.getElementById("bkClose").addEventListener("click", closePanel);
@@ -506,3 +565,248 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   })();
 });
+
+// ── Global "＋ Note" FAB ───────────────────────────────────────────────────────
+// Injected on every authenticated page except /notes.html (which has its own).
+// Other pages can set window.NoteContext = { linked_type, linked_id, linked_label }
+// to have the modal pre-filled with a source reference.
+(function initGlobalNoteFab() {
+  const page = location.pathname.split('/').pop() || 'index.html';
+  // Skip on pages that already have their own note UI or don't need it
+  const SKIP = new Set(['notes.html', 'login.html', 'index.html', 'pricing.html',
+                         'teachers.html', 'contact.html', 'terms.html', 'privacy.html',
+                         'teacher-apply.html']);
+  if (SKIP.has(page)) return;
+
+  // Inject FAB button
+  const fab = document.createElement('button');
+  fab.id = 'global-note-fab';
+  fab.type = 'button';
+  fab.title = 'Quick note (N)';
+  fab.setAttribute('aria-label', 'Add a note');
+  fab.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+  </svg>`;
+  fab.style.cssText = `
+    position:fixed; bottom:1.6rem; right:1.5rem; z-index:8000;
+    width:46px; height:46px; border-radius:50%;
+    background:var(--navy,#2d1b69); color:#fff;
+    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 20px rgba(45,27,105,.35);
+    transition:transform .18s, box-shadow .18s, background .15s;
+  `;
+  fab.addEventListener('mouseenter', () => {
+    fab.style.transform = 'scale(1.1) translateY(-2px)';
+    fab.style.boxShadow = '0 8px 28px rgba(45,27,105,.45)';
+  });
+  fab.addEventListener('mouseleave', () => {
+    fab.style.transform = '';
+    fab.style.boxShadow = '0 4px 20px rgba(45,27,105,.35)';
+  });
+  document.body.appendChild(fab);
+
+  // Inject modal overlay (lightweight, separate from notes.html modal)
+  const HTML = `
+  <div id="gnf-overlay" style="
+    position:fixed;inset:0;z-index:9100;pointer-events:none;
+  ">
+    <div id="gnf-backdrop" style="
+      position:absolute;inset:0;background:rgba(10,6,26,.38);
+      backdrop-filter:blur(2px);opacity:0;transition:opacity .22s;cursor:pointer;
+    "></div>
+    <div id="gnf-modal" style="
+      position:absolute;top:0;right:0;bottom:0;width:min(460px,100vw);
+      background:#fff;overflow:hidden;box-shadow:-6px 0 40px rgba(10,6,26,.18);
+      display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .28s cubic-bezier(.34,1.0,.64,1);
+    ">
+      <div style="padding:.9rem 1.1rem .8rem;border-bottom:1px solid var(--line,#e0ddf0);
+                  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <b style="font-size:.92rem;color:var(--navy,#2d1b69)">Quick Note</b>
+        <button id="gnf-close" type="button" style="
+          width:28px;height:28px;border:none;background:var(--cream,#f4f2fb);
+          border-radius:8px;cursor:pointer;color:var(--grey,#6b6b85);font-size:.95rem;
+          display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div style="padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.6rem;overflow-y:auto;flex:1;">
+        <div id="gnf-type-row" style="display:flex;gap:.4rem;">
+          <button class="gnf-type" data-type="text" type="button" style="
+            padding:.32rem .8rem;border-radius:20px;border:1.5px solid var(--navy,#2d1b69);
+            font-size:.78rem;font-weight:700;cursor:pointer;
+            background:var(--navy,#2d1b69);color:#fff;">📄 Text</button>
+          <button class="gnf-type" data-type="sticky" type="button" style="
+            padding:.32rem .8rem;border-radius:20px;border:1.5px solid var(--line,#e0ddf0);
+            font-size:.78rem;font-weight:600;cursor:pointer;
+            background:#fff;color:var(--grey,#6b6b85);">📌 Sticky</button>
+        </div>
+        <div id="gnf-colors" style="display:none;gap:.4rem;flex-wrap:wrap;">
+          <button style="width:22px;height:22px;border-radius:50%;border:2px solid var(--navy);background:#FFF176;cursor:pointer" data-color="yellow"></button>
+          <button style="width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:#FFB3C8;cursor:pointer" data-color="pink"></button>
+          <button style="width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:#90CAF9;cursor:pointer" data-color="blue"></button>
+          <button style="width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:#A5D6A7;cursor:pointer" data-color="green"></button>
+          <button style="width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:#CE93D8;cursor:pointer" data-color="purple"></button>
+        </div>
+        <input id="gnf-title" type="text" placeholder="Title (optional)" maxlength="140" style="
+          width:100%;padding:.5rem .7rem;border:1.5px solid var(--line,#e0ddf0);
+          border-radius:10px;font-size:.86rem;font-family:inherit;
+          background:#fff;color:var(--ink,#1a1a2e);box-sizing:border-box;">
+        <textarea id="gnf-content" placeholder="• Key point&#10;• Something to remember…"
+          maxlength="4000" style="
+          width:100%;padding:.5rem .7rem;border:1.5px solid var(--line,#e0ddf0);
+          border-radius:10px;font-size:.86rem;font-family:inherit;resize:vertical;
+          min-height:110px;background:#fff;color:var(--ink,#1a1a2e);box-sizing:border-box;"></textarea>
+        <span id="gnf-ctx-tag" style="display:none;font-size:.72rem;font-weight:600;
+          padding:.2rem .6rem;border-radius:20px;background:var(--lav,#ede8ff);
+          color:var(--navy,#2d1b69);width:fit-content;"></span>
+      </div>
+      <div style="padding:.75rem 1.1rem;border-top:1px solid var(--line,#e0ddf0);
+                  display:flex;gap:.5rem;justify-content:flex-end;flex-shrink:0;">
+        <button id="gnf-cancel" type="button" style="
+          padding:.46rem 1rem;border-radius:10px;
+          background:var(--cream,#f4f2fb);color:var(--ink,#1a1a2e);
+          font-weight:600;font-size:.84rem;border:1.5px solid var(--line,#e0ddf0);cursor:pointer;">
+          Cancel</button>
+        <button id="gnf-save" type="button" style="
+          padding:.46rem 1.2rem;border-radius:10px;
+          background:var(--navy,#2d1b69);color:#fff;
+          font-weight:700;font-size:.84rem;border:none;cursor:pointer;">
+          Save Note</button>
+      </div>
+    </div>
+  </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', HTML);
+
+  const gnfOverlay = document.getElementById('gnf-overlay');
+  const gnfModal   = document.getElementById('gnf-modal');
+  const gnfClose   = document.getElementById('gnf-close');
+  const gnfCancel  = document.getElementById('gnf-cancel');
+  const gnfSave    = document.getElementById('gnf-save');
+  const gnfTitle   = document.getElementById('gnf-title');
+  const gnfContent = document.getElementById('gnf-content');
+  const gnfColors   = document.getElementById('gnf-colors');
+  const gnfCtxTag   = document.getElementById('gnf-ctx-tag');
+  const gnfBackdrop = document.getElementById('gnf-backdrop');
+
+  let gnfType = 'text', gnfColor = 'yellow';
+
+  function setGnfType(t) {
+    gnfType = t;
+    document.querySelectorAll('.gnf-type').forEach(b => {
+      const active = b.dataset.type === t;
+      b.style.background = active ? 'var(--navy,#2d1b69)' : '#fff';
+      b.style.color = active ? '#fff' : 'var(--grey,#6b6b85)';
+      b.style.borderColor = active ? 'var(--navy,#2d1b69)' : 'var(--line,#e0ddf0)';
+      b.style.fontWeight = active ? '700' : '600';
+    });
+    gnfColors.style.display = t === 'sticky' ? 'flex' : 'none';
+  }
+
+  function openGnf() {
+    const ctx = window.NoteContext || null;
+    gnfTitle.value = '';
+    gnfContent.value = '';
+    setGnfType('text');
+    // Context badge
+    if (ctx && ctx.linked_label) {
+      const icons = {paper:'📑',flashcard_block:'🗂️',chapter:'📖',tutor_message:'🤖'};
+      gnfCtxTag.textContent = (icons[ctx.linked_type] || '🔗') + ' ' + ctx.linked_label;
+      gnfCtxTag.style.display = 'inline-block';
+    } else {
+      gnfCtxTag.style.display = 'none';
+    }
+    gnfOverlay.style.pointerEvents = 'all';
+    gnfBackdrop.style.opacity = '1';
+    gnfModal.style.transform = 'translateX(0)';
+    setTimeout(() => gnfContent.focus(), 280);
+  }
+
+  function closeGnf() {
+    gnfOverlay.style.pointerEvents = 'none';
+    gnfBackdrop.style.opacity = '0';
+    gnfModal.style.transform = 'translateX(100%)';
+  }
+
+  async function saveGnf() {
+    const title   = gnfTitle.value.trim();
+    const content = gnfContent.value.trim();
+    if (!content && !title) { gnfContent.focus(); return; }
+    gnfSave.disabled = true; gnfSave.textContent = 'Saving…';
+    const ctx = window.NoteContext || {};
+    try {
+      const r = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          type: gnfType,
+          title: title || null,
+          content: content || null,
+          color: gnfType === 'sticky' ? gnfColor : null,
+          linked_type: ctx.linked_type || null,
+          linked_id:   String(ctx.linked_id || '') || null,
+          linked_label: ctx.linked_label || null,
+        }),
+      });
+      if (!r.ok) throw new Error();
+      closeGnf();
+      // Brief confirmation badge
+      const badge = document.createElement('div');
+      badge.textContent = '✅ Note saved';
+      badge.style.cssText = `position:fixed;bottom:1.6rem;left:50%;transform:translateX(-50%);
+        background:var(--navy,#2d1b69);color:#fff;border-radius:12px;
+        padding:.6rem 1.2rem;font-size:.84rem;font-weight:600;z-index:9999;
+        transition:opacity .4s;`;
+      document.body.appendChild(badge);
+      setTimeout(() => { badge.style.opacity='0'; setTimeout(()=>badge.remove(),400); }, 2200);
+    } catch (_) {
+      gnfSave.textContent = '❌ Failed';
+      setTimeout(() => { gnfSave.disabled=false; gnfSave.textContent='Save Note'; }, 1500);
+      return;
+    }
+    gnfSave.disabled = false; gnfSave.textContent = 'Save Note';
+  }
+
+  // Colour swatch click
+  gnfColors.querySelectorAll('[data-color]').forEach(s => {
+    s.addEventListener('click', () => {
+      gnfColor = s.dataset.color;
+      gnfColors.querySelectorAll('[data-color]').forEach(x => {
+        x.style.borderColor = x === s ? 'var(--navy,#2d1b69)' : 'transparent';
+      });
+    });
+  });
+
+  // Type pill click
+  document.querySelectorAll('.gnf-type').forEach(b => {
+    b.addEventListener('click', () => setGnfType(b.dataset.type));
+  });
+
+  fab.addEventListener('click', openGnf);
+  gnfClose.addEventListener('click', closeGnf);
+  gnfCancel.addEventListener('click', closeGnf);
+  gnfBackdrop.addEventListener('click', closeGnf);
+  gnfSave.addEventListener('click', saveGnf);
+
+  document.addEventListener('keydown', e => {
+    if (gnfOverlay.style.pointerEvents === 'all') {
+      if (e.key === 'Escape') closeGnf();
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') saveGnf();
+    } else if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+      openGnf();
+    }
+  });
+
+  // Expose globally so other scripts can open the fab modal
+  window.openGlobalNote = openGnf;
+})();
+
+// ── Load chatbot widget on all pages that include main.js ─────────────────────
+(function () {
+  var s = document.createElement('script');
+  s.src = 'chatbot-widget.js?v=20260830a';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
