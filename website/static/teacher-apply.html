@@ -1,19 +1,11 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Our Teachers — PrepWithTee</title>
-  <meta name="description"
-    content="Meet the tutors behind PrepWithTee — Cambridge O Level, IGCSE and A Level specialists teaching one-on-one from the official syllabus. Apply to teach with us.">
-  <link rel="canonical" href="https://prepwithtee.com/teachers.html">
-  <meta property="og:type"        content="website">
-  <meta property="og:title"       content="Our Teachers — PrepWithTee">
-  <meta property="og:description" content="Meet the tutors behind PrepWithTee — Cambridge O Level, IGCSE and A Level specialists teaching one-on-one from the official syllabus. Apply to teach with us.">
-  <meta property="og:image"       content="https://prepwithtee.com/logo.png">
-  <meta property="og:url"         content="https://prepwithtee.com/teachers.html">
-  <meta name="twitter:card"       content="summary_large_image">
+  <link rel="canonical" href="https://prepwithtee.com/teacher-apply.html">
+  <title>Apply to teach — PrepWithTee</title>
+  <meta name="description" content="Apply to join the PrepWithTee team as a subject tutor.">
   <link rel="icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +15,127 @@
   <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <link rel="stylesheet" href="styles.css?v=20260831a">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
-  <link rel="stylesheet" href="tools.css?v=20260829a">
-</head>
+  <style>
+    /* Page shell */
+    body { background: var(--cream); }
+    .apply-page {
+      min-height: 100vh;
+      padding: 3rem 1rem 5rem;
+    }
+    .apply-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
 
+    /* Hero header */
+    .apply-hero {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .apply-hero .eyebrow {
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: .6rem;
+    }
+    .apply-hero h1 {
+      font-family: 'Archivo', sans-serif; font-weight: 900;
+      font-size: clamp(1.9rem, 5vw, 2.6rem); color: var(--navy-deep);
+      line-height: 1.12; margin-bottom: .75rem;
+    }
+    .apply-hero p {
+      font-size: 1rem; color: var(--ink); opacity: .75; max-width: 520px; margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* Card */
+    .apply-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 6px 32px rgba(44,30,70,.1);
+      padding: 2.5rem 2.25rem;
+    }
+    @media (max-width: 520px) {
+      .apply-card { padding: 1.75rem 1.25rem; border-radius: var(--radius); }
+    }
+
+    /* Form fields */
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 1.4rem; }
+    .field label {
+      font-size: 14px; font-weight: 700; color: var(--navy-deep); letter-spacing: .01em;
+    }
+    .field label .req { color: var(--gold); margin-left: 2px; }
+    .field input,
+    .field select,
+    .field textarea {
+      font-family: inherit; font-size: 15px; padding: 11px 14px;
+      border: 1.5px solid #D9D0C4; border-radius: 10px;
+      background: #FDFBF8; color: var(--ink); width: 100%;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field textarea { min-height: 115px; resize: vertical; }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(232,145,58,.15);
+    }
+    .field .hint { font-size: 12px; color: #8a7f72; }
+
+    /* Divider between sections */
+    .form-section-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--gold); margin: 1.75rem 0 1.25rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .form-section-label::after {
+      content: ''; flex: 1; height: 1px; background: #E8DFD0;
+    }
+
+    /* Subjects grid */
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 8px;
+    }
+    .subj-label {
+      display: flex; align-items: center; gap: 9px;
+      cursor: pointer; padding: 9px 12px;
+      border-radius: 10px;
+      border: 1.5px solid #D9D0C4;
+      background: #FDFBF8;
+      font-size: 13px; font-weight: 500; color: var(--ink);
+      transition: border-color .12s, background .12s;
+      user-select: none;
+    }
+    .subj-label:hover { border-color: var(--gold); background: #fff7ee; }
+    .subj-label input[type=checkbox] { accent-color: var(--gold); width: 15px; height: 15px; flex-shrink: 0; }
+    .subj-label:has(input:checked) {
+      border-color: var(--gold); background: #fff7ee; font-weight: 700;
+    }
+
+    /* Alert / feedback */
+    .apply-alert {
+      padding: 13px 16px; border-radius: 10px; margin-bottom: 1.5rem;
+      border: 1.5px solid transparent; font-size: 14px; line-height: 1.5;
+    }
+    .apply-alert.error   { background: #fff1f0; border-color: #fca5a5; color: #b91c1c; }
+    .apply-alert.success { background: #f0fdf4; border-color: #86efac; color: #166534; }
+
+    /* Submit */
+    .apply-submit {
+      width: 100%; margin-top: 1.75rem;
+      padding: 14px; font-size: 1rem; font-weight: 800;
+      border-radius: 12px; cursor: pointer; border: none;
+      background: linear-gradient(135deg, var(--gold) 0%, #f0c040 100%);
+      color: var(--navy-deep);
+      box-shadow: 0 4px 16px rgba(232,145,58,.3);
+      font-family: 'Archivo', sans-serif; letter-spacing: .02em;
+      transition: opacity .15s, transform .1s;
+    }
+    .apply-submit:hover { opacity: .9; transform: translateY(-1px); }
+    .apply-submit:disabled { opacity: .6; transform: none; cursor: default; }
+  </style>
+</head>
 <body>
 
   <header class="site-header">
@@ -46,143 +156,168 @@
     </div>
   </header>
 
-  <section class="hero hero-slim">
-    <div class="container">
-      <p class="eyebrow">The people who teach you</p>
-      <h1>Small team.<br>Every lesson taught <em>personally.</em></h1>
-      <p class="sub">No rotating pool of tutors and no handing you off to an
-        assistant. You get the same teacher every week, someone who knows which
-        chapter you struggled with last month.</p>
-    </div>
-  </section>
+  <main class="apply-page">
+    <div class="apply-wrap">
 
-  <main class="container">
-
-    <section class="section">
-      <div class="teacher-grid" id="teacher-grid">
-        <p class="teacher-loading">Loading our teachers…</p>
+      <div class="apply-hero">
+        <p class="eyebrow">Join the team</p>
+        <h1>Apply to teach at PrepWithTee</h1>
+        <p>Fill in the form below. Once reviewed, the admin will reach out — if approved, you'll receive login credentials for the teacher dashboard.</p>
       </div>
-    </section>
 
-    <!-- ============ APPLY TO TEACH ============ -->
-    <section class="section" id="apply">
-      <div class="apply-panel">
-        <div class="apply-intro">
-          <p class="eyebrow">Join the team</p>
-          <h2 class="section-title">Teach</h2>
-          <p>We take on a small number of tutors each year. What matters is
-            depth in your subject and patience with students who don't get it
-            the first time — not how many years you've been at it.</p>
-          <ul class="apply-points">
-            <li>One-on-one only. No packed group classes.</li>
-            <li>You keep your own schedule and student load.</li>
-            <li>Full access to the topical past-paper engine and mark schemes.</li>
-          </ul>
-          <p class="apply-note">We read every application and reply either way,
-            usually within a week.</p>
-        </div>
+      <div class="apply-card">
+        <div class="apply-alert" id="apply-alert" hidden></div>
 
-        <form class="apply-form" id="apply-form" novalidate>
-          <div class="auth-alert" id="apply-alert" hidden role="alert"></div>
+        <form id="apply-form" novalidate>
 
-          <div class="auth-row">
-            <label class="auth-field">
-              <span>Full name</span>
-              <input type="text" name="name" autocomplete="name" required placeholder="Your name">
-            </label>
-            <label class="auth-field">
-              <span>Email</span>
-              <input type="email" name="email" autocomplete="email" required placeholder="you@example.com">
-            </label>
+          <div class="form-section-label">Your details</div>
+
+          <div class="field">
+            <label for="name">Full name <span class="req">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" required
+                   placeholder="e.g. Fatima Malik">
           </div>
 
-          <label class="auth-field">
-            <span>WhatsApp number <em>optional</em></span>
-            <input type="tel" name="phone" autocomplete="tel" placeholder="+92 3xx xxxxxxx">
-          </label>
-
-          <fieldset class="auth-field">
-            <legend>Which subjects can you teach?</legend>
-            <div class="subject-checks" id="subject-checks"></div>
-          </fieldset>
-
-          <div class="auth-row">
-            <label class="auth-field">
-              <span>Highest qualification</span>
-              <input type="text" name="qualifications" placeholder="BSc Physics, Punjab University">
-            </label>
-            <label class="auth-field">
-              <span>Years of teaching</span>
-              <input type="text" name="experience" placeholder="3">
-            </label>
+          <div class="field">
+            <label for="email">Email address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" autocomplete="email" required
+                   placeholder="you@example.com">
+            <p class="hint">This will become your login email.</p>
           </div>
 
-          <label class="auth-field">
-            <span>Why do you want to teach here?</span>
-            <textarea name="message" rows="4"
-              placeholder="Tell us how you teach, and what you'd want your students to walk away with."></textarea>
-          </label>
+          <div class="field">
+            <label for="phone">WhatsApp / phone number</label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel"
+                   placeholder="e.g. 0300 1234567">
+          </div>
 
-          <button type="submit" class="btn btn-gold auth-submit" id="apply-submit">
-            Send application
+          <div class="form-section-label">Subjects</div>
+
+          <div class="field">
+            <label>Subjects you can teach <span class="req">*</span></label>
+            <div class="subjects-grid" id="subjects-grid">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <div class="form-section-label">Background</div>
+
+          <div class="field">
+            <label for="qualifications">Qualifications <span class="req">*</span></label>
+            <input type="text" id="qualifications" name="qualifications" required
+                   placeholder="e.g. BSc Physics (LUMS), A Levels (PISAS)">
+          </div>
+
+          <div class="field">
+            <label for="experience">Teaching experience</label>
+            <input type="text" id="experience" name="experience"
+                   placeholder="e.g. 3 years private tutoring, O & A Level students">
+          </div>
+
+          <div class="field">
+            <label for="message">Why PrepWithTee?</label>
+            <textarea id="message" name="message"
+                      placeholder="Tell us a little about your teaching approach and why you'd like to join."></textarea>
+          </div>
+
+          <button type="submit" class="apply-submit" id="submit-btn">
+            Submit application →
           </button>
+
         </form>
       </div>
-    </section>
 
+    </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-top">
-      <div>
-        <a class="footer-brand" href="index.html">
-          <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee">
-          <span>PrepWithTee</span>
-        </a>
-        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
-        <div class="footer-socials">
-          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
-          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
-        </div>
-      </div>
-      <div class="footer-col">
-        <h4>Study Tools</h4>
-        <a href="tools.html">All Study Tools</a>
-        <a href="calculator.html">Scientific Calculator</a>
-        <a href="formulas.html">Formula Sheets</a>
-        <a href="graph.html">Graph Plotter</a>
-        <a href="periodic-table.html">Periodic Table</a>
-        <a href="bases-logic.html">Bases &amp; Logic</a>
-        <a href="pseudocode.html">Pseudocode Runner</a>
-        <a href="papers.html">Past Papers Engine</a>
-      </div>
-      <div class="footer-col">
-        <h4>What We Teach</h4>
-        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
-        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
-        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
-        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
-      </div>
-      <div class="footer-col">
-        <h4>Enrol</h4>
-        <a href="pricing.html">Fees &amp; Pricing</a>
-        <a href="index.html#contact">Book a Free Demo</a>
-        <a href="teachers.html#apply">Teach With Us</a>
-        <a href="index.html#faq">Questions &amp; Answers</a>
-      </div>
-    </div>
-    <div class="container footer-bottom">
-      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
-      <span>Past papers &copy; Cambridge Assessment International Education</span>
-    </div>
-  </footer>
+  <script type="module">
+    import { initNavbar } from "/auth.js?v=20260829a";
+    initNavbar();
 
-  <script type="module" src="/auth.js?v=20260829a"></script>
-  <script type="module" src="/teachers.js"></script>
+    const SUBJECTS = [
+      { code: "5054", name: "O Level Physics" },
+      { code: "0625", name: "IGCSE Physics" },
+      { code: "4024", name: "O Level Mathematics D" },
+      { code: "0580", name: "IGCSE Mathematics" },
+      { code: "9709", name: "A Level Mathematics" },
+      { code: "9702", name: "A Level Physics" },
+      { code: "2210", name: "O Level Computer Science" },
+      { code: "0478", name: "IGCSE Computer Science" },
+      { code: "9618", name: "A Level Computer Science" },
+      { code: "5070", name: "O Level Chemistry" },
+      { code: "0620", name: "IGCSE Chemistry" },
+      { code: "2058", name: "O Level Islamiyat" },
+      { code: "2059", name: "O Level Pakistan Studies" },
+    ];
+
+    const grid = document.getElementById("subjects-grid");
+    SUBJECTS.forEach(s => {
+      const lbl = document.createElement("label");
+      lbl.className = "subj-label";
+      lbl.innerHTML = `<input type="checkbox" name="subject_code" value="${s.code}">
+                       <span>${s.name}</span>`;
+      grid.appendChild(lbl);
+    });
+
+    const form      = document.getElementById("apply-form");
+    const alertBox  = document.getElementById("apply-alert");
+    const submitBtn = document.getElementById("submit-btn");
+
+    function showMsg(msg, isError = true) {
+      alertBox.textContent = msg;
+      alertBox.className = "apply-alert " + (isError ? "error" : "success");
+      alertBox.hidden = false;
+      alertBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      alertBox.hidden = true;
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim().toLowerCase();
+      const qualifications = form.qualifications.value.trim();
+      const codes = [...form.querySelectorAll("[name=subject_code]:checked")].map(el => el.value);
+      const subjects = SUBJECTS.filter(s => codes.includes(s.code)).map(s => s.name).join(", ");
+
+      if (!name) return showMsg("Please enter your full name.");
+      if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) return showMsg("Please enter a valid email address.");
+      if (!qualifications) return showMsg("Please enter your qualifications.");
+      if (!codes.length) return showMsg("Select at least one subject you can teach.");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting…";
+
+      try {
+        const body = {
+          name,
+          email,
+          phone: form.phone.value.trim(),
+          subjects,
+          subject_codes: codes.join(","),
+          qualifications,
+          experience: form.experience.value.trim(),
+          message: form.message.value.trim(),
+        };
+        await fetch("/api/teacher-applications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }).then(r => r.ok ? r.json() : r.json().then(d => Promise.reject(new Error(d.detail || "Submission failed"))));
+
+        showMsg("Application submitted! We'll review it and email you within a few days.", false);
+        form.reset();
+      } catch (err) {
+        showMsg(err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit application";
+      }
+    });
+  </script>
 
   <script src="tools-core.js?v=20260811d"></script>
   <script src="tools-nav.js?v=20260811d"></script>
-  <script defer src="chatbot-widget.js?v=20260830a"></script>
 </body>
-
 </html>
+
