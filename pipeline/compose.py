@@ -132,8 +132,15 @@ class Booklet:
                             color=ACCENT, width=1.2)
         self.y += TOPIC_HEADER_H
 
-    def question_header(self, number: int, ref_text: str, first_rect_h: float):
-        """'Q1' in the booklet's own sequence, then the Cambridge source ref."""
+    def question_header(self, number: int, ref_text: str, first_rect_h: float,
+                        topic: str | None = None):
+        """'Q1' in the booklet's own sequence, then the Cambridge source ref.
+
+        `topic` prints as a gold chapter tag on the right. In session order the
+        section heading is a sitting ("Oct/Nov 2025"), so this is the only place
+        the chapter appears — a student flicking through must still be able to
+        tell what each question is testing.
+        """
         max_keep = BOTTOM_Y - TOP_Y - Q_HEADER_H
         self.ensure(Q_HEADER_H + min(first_rect_h, max_keep))
         # Small navy accent bar signals the question boundary
@@ -146,8 +153,30 @@ class Booklet:
         self.page.insert_text((lx, self.y + 11), label,
                               fontsize=12, fontname="hebo", color=ACCENT)
         x = lx + fitz.get_text_length(label, fontname="hebo", fontsize=12)
-        self.page.insert_text((x + 8, self.y + 10), ref_text,
-                              fontsize=8.5, fontname="helv", color=GREY)
+
+        # Reserve the right-hand end for the chapter tag, then let the ref use
+        # whatever is left — a long ref must not run underneath the tag.
+        tag_w = 0.0
+        if topic:
+            tag_fs = 7.5
+            tag_w = fitz.get_text_length(topic, fontname="hebo", fontsize=tag_fs) + 14
+            tag = fitz.Rect(PAGE_W - MARGIN_X - tag_w, self.y + 1,
+                            PAGE_W - MARGIN_X, self.y + 13.5)
+            self.page.draw_rect(tag, color=None, fill=(0.996, 0.957, 0.878),
+                                radius=0.35)
+            self.page.insert_text((tag.x0 + 7, tag.y0 + 9), topic,
+                                  fontsize=tag_fs, fontname="hebo",
+                                  color=(0.66, 0.44, 0.06))
+        ref_x = x + 8
+        avail = (PAGE_W - MARGIN_X - tag_w - 8) - ref_x
+        if avail > 40:
+            shown = ref_text
+            while (fitz.get_text_length(shown, fontname="helv", fontsize=8.5) > avail
+                   and len(shown) > 8):
+                shown = shown[:-2]
+            self.page.insert_text((ref_x, self.y + 10), shown,
+                                  fontsize=8.5, fontname="helv", color=GREY)
+
         # Subtle gold rule under the header
         rule_y = self.y + Q_HEADER_H - 1
         self.page.draw_line(fitz.Point(MARGIN_X, rule_y),
@@ -523,8 +552,13 @@ def answer_key(doc, entries):
     return made
 
 
-def build_cover(doc, args, subject, sections):
-    """Branded PrepWithTee cover: logo, faint owl watermark, contents card."""
+def build_cover(doc, args, subject, sections, contents=None):
+    """Branded PrepWithTee cover: logo, faint owl watermark, contents card.
+
+    The title always names the TOPICS — that is what the booklet is — while
+    `contents` is however the pages are actually grouped, so a session-ordered
+    booklet lists its sittings without the cover claiming to be about them.
+    """
     page = brand_backdrop(doc)
     y = 270
     title = " · ".join(name for name, _ in sections)
@@ -551,9 +585,18 @@ def build_cover(doc, args, subject, sections):
     _centre(page, "   ·   ".join(meta), y, 9.5, "helv", GREY)
     y += 36
 
-    # Contents card: white on cream so it reads as a panel.
+    # Contents card: white on cream so it reads as a panel. A long booklet can
+    # run to many sittings, so the list is capped and the remainder summarised
+    # rather than overflowing off the bottom of the cover.
+    listing = contents if contents is not None else [
+        (name, [(name, q) for q in qs]) for name, qs in sections]
+    MAX_ROWS = 12
+    shown = listing[:MAX_ROWS]
+    hidden = listing[MAX_ROWS:]
+    rows_h = (len(shown) + (1 if hidden else 0)) * 17
+
     panel = fitz.Rect(MARGIN_X + 46, y, PAGE_W - MARGIN_X - 46,
-                      y + 42 + len(sections) * 17 + 14)
+                      y + 42 + rows_h + 14)
     page.draw_rect(panel, color=None, fill=(1, 1, 1))
     page.draw_line(fitz.Point(panel.x0, panel.y0), fitz.Point(panel.x0, panel.y1),
                    color=GOLD, width=2.5)
@@ -562,13 +605,19 @@ def build_cover(doc, args, subject, sections):
     page.insert_text((panel.x0 + 18, ty), "CONTENTS", fontsize=8.5,
                      fontname="hebo", color=GOLD)
     ty += 20
-    for name, questions in sections:
-        marks = sum(q["marks"] or 0 for q in questions)
+    for name, questions in shown:
+        marks = sum(q["marks"] or 0 for _t, q in questions)
         page.insert_text((panel.x0 + 18, ty), name, fontsize=10,
                          fontname="hebo", color=ACCENT)
         tail = f"{len(questions)} questions · {marks} marks"
         tw = fitz.get_text_length(tail, fontname="helv", fontsize=9)
         page.insert_text((panel.x1 - 18 - tw, ty), tail, fontsize=9,
+                         fontname="helv", color=GREY)
+        ty += 17
+    if hidden:
+        more = sum(len(qs) for _n, qs in hidden)
+        page.insert_text((panel.x0 + 18, ty),
+                         f"+ {len(hidden)} more · {more} questions", fontsize=9,
                          fontname="helv", color=GREY)
         ty += 17
 
@@ -660,9 +709,56 @@ def fetch_sections(con, args, topics: list[str]):
         if home:
             if subtopic_filter and r["subtopic"] not in subtopic_filter:
                 continue
-            sections[home].append(r)
+            # `home` is which of the SELECTED topics this question was filed
+            # under. Session ordering regroups the rows and would otherwise
+            # lose it, so carry it on the row itself.
+            sections[home].append((home, r))
             seen.add(r["id"])
-    return [(t, qs) for t, qs in sections.items() if qs]
+    return [(t, [r for _h, r in qs]) for t, qs in sections.items() if qs]
+
+
+# Sessions run Feb/March, then May/June, then Oct/Nov. Sorting the codes would
+# give m,s,w by luck; the real order is written down.
+_SESSION_SEQ = {"m": 0, "s": 1, "w": 2}
+
+# Section headings say the sitting in full. "F/M 2025" is the Cambridge source
+# ref shorthand — right on a question line, too terse for a heading a student
+# navigates by.
+_SESSION_FULL = {"s": "May/June", "w": "Oct/Nov", "m": "Feb/March"}
+
+
+def render_groups(sections, order_mode: str):
+    """Sections -> [(heading, [(topic, row), ...])] in the requested order.
+
+    One uniform shape for both modes so the render loop never has to ask which
+    one it is looking at; the topic travels with every row either way, which is
+    what lets the question header print the chapter.
+    """
+    if order_mode != "session":
+        return [(t, [(t, r) for r in rows]) for t, rows in sections]
+
+    # Session order: the tutor's booklets are worked through the way papers are
+    # sat, not the way a syllabus is indexed — one sitting at a time, and inside
+    # it every selected topic in turn. Grouping by topic instead put six years
+    # between two questions a student would answer in the same half hour.
+    order = {t: i for i, (t, _) in enumerate(sections)}
+    buckets: dict[tuple, list] = {}
+    for topic, rows in sections:
+        for r in rows:
+            buckets.setdefault((r["year"], r["session"]), []).append((topic, r))
+
+    out = []
+    # Newest sitting first, and newest WITHIN a year too — Oct/Nov before
+    # May/June before Feb/March — so the booklet opens on the most recent paper.
+    for year, session in sorted(
+            buckets, key=lambda k: (-k[0], -_SESSION_SEQ.get(k[1], 9))):
+        rows = buckets[(year, session)]
+        # Inside a sitting: selected-topic order, then paper, variant, number —
+        # so one chapter's questions from P1 and P2 still sit together.
+        rows.sort(key=lambda tr: (order.get(tr[0], 99), tr[1]["paper"],
+                                  str(tr[1]["variant"]), tr[1]["number"]))
+        out.append((f"{_SESSION_FULL.get(session, session)} {year}", rows))
+    return out
 
 
 def main():
@@ -685,6 +781,9 @@ def main():
                    help="keep only questions whose text matches this regex — "
                         "for sub-topics too small to be a chapter of their own, "
                         r'e.g. --contains "frustum|cone .{0,40}removed"')
+    p.add_argument("--order", choices=("session", "topic"), default="session",
+                   help="session: newest sitting first, topics grouped inside "
+                        "each (default). topic: all of one chapter, then the next.")
     p.add_argument("--no-ms", action="store_true", help="omit mark schemes")
     p.add_argument("--out", help="output path (default: data/output/...)")
     args = p.parse_args()
@@ -763,9 +862,10 @@ def main():
                 ins_cache[key] = None
         return ins_cache[key]
 
-    for topic, questions in sections:
-        booklet.topic_header(topic)
-        for q in questions:
+    groups = render_groups(sections, getattr(args, "order", "session"))
+    for heading, questions in groups:
+        booklet.topic_header(heading)
+        for topic, q in questions:
             syl = q["syllabus"]
             year, session, paper = q["year"], q["session"], q["paper"]
             sd = config.session_display(session)
@@ -818,7 +918,9 @@ def main():
             if q["topic"] != topic:
                 ref += f"   (also covers {q['topic']})"
             first_h = (rects[0]["y1"] - rects[0]["y0"]) if rects else 40.0
-            booklet.question_header(seq, ref, first_h)
+            # In session order the section heading is a sitting, so the chapter
+            # has to ride on the question itself or it is nowhere on the page.
+            booklet.question_header(seq, ref, first_h, topic=topic)
             if rects:
                 booklet.place_rects(src(q["rel_path"]), rects)
 
@@ -873,7 +975,7 @@ def main():
     codes = ", ".join(args.syllabuses)
     if mcq_answers and not args.no_ms:
         answer_key(booklet.doc, mcq_answers)
-    build_cover(booklet.doc, args, subject, sections)
+    build_cover(booklet.doc, args, subject, sections, contents=groups)
     if mcq_answers:
         # Built last but moved to sit straight after the cover, so the sheet(s)
         # can be detached and used while working.

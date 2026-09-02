@@ -315,27 +315,46 @@ def render_test(con, args, subject, topics, chosen, cache):
             b.place_rects(_src(cache, q["rel_path"]), rects)
         b.divider()
     cover(b.doc, args, subject, topics, chosen, is_ms=False)
-    if all(config.is_mcq(args.syllabus, q["paper"]) for q in chosen):
-        # Multiple-choice test: the student needs somewhere to record answers,
-        # so the bubble sheet ships with the test itself (page 2), while the
-        # letters stay in the separate mark-scheme file.
+    mcq_seqs = [seq for seq, q in enumerate(chosen, 1)
+                if config.is_mcq(args.syllabus, q["paper"])]
+    if mcq_seqs:
+        # Multiple-choice questions need somewhere to record answers, so the
+        # bubble sheet ships with the test itself (page 2), while the letters
+        # stay in the separate mark-scheme file. The rows carry the booklet's
+        # own numbers, not 1..N: a test drawn from both an MCQ and a structured
+        # component interleaves the two, and the sheet has to skip the
+        # structured questions rather than renumber.
         base = b.doc.page_count
-        sheets = bubble_sheet(b.doc, list(range(1, len(chosen) + 1)),
-                              f"{subject} {args.syllabus}  ·  Paper 1 Multiple Choice")
+        papers = "/".join(f"P{p}" for p in sorted(
+            {q["paper"] for q in chosen
+             if config.is_mcq(args.syllabus, q["paper"])}))
+        sheets = bubble_sheet(b.doc, mcq_seqs,
+                              f"{subject} {args.syllabus}  ·  {papers} Multiple Choice")
         for i in range(len(sheets)):
             b.doc.move_page(base + i, 1 + i)
     return b.doc
 
 
 def render_ms(con, args, subject, topics, chosen, cache):
-    # An all-MCQ test has no prose mark scheme - the companion file is the
-    # answer grid, nothing else.
-    if all(config.is_mcq(args.syllabus, q["paper"]) for q in chosen):
-        entries, missing = [], 0
-        for seq, q in enumerate(chosen, 1):
-            code = f"{q['paper']}{q['variant']}"
-            ref = config.source_ref(args.syllabus, code, q["session"],
-                                    q["year"], q["number"], q["sub_part"] or "")
+    """The companion mark-scheme file.
+
+    A multiple-choice question has no prose scheme - its answer is one letter,
+    so it goes to the answer grid at the back. A structured question gets its
+    mark scheme cropped inline. That choice is made PER QUESTION, not per
+    booklet: an MCQ syllabus with a structured component (0625 P1+P4,
+    9702 P1+P2, 5054/5070/0620 alike) yields tests containing both kinds, and
+    MCQ mark-scheme rows carry empty rects - cropping one raises ValueError.
+    """
+    b = Booklet()
+    missing = 0
+    mcq_answers = []          # [(seq, letter, ref)] for the grid at the back
+
+    for seq, q in enumerate(chosen, 1):
+        code = f"{q['paper']}{q['variant']}"
+        ref = config.source_ref(args.syllabus, code, q["session"], q["year"],
+                                q["number"], q["sub_part"] or "")
+
+        if config.is_mcq(args.syllabus, q["paper"]):
             row = con.execute(
                 """SELECT m.answer FROM ms_entries m
                    JOIN papers mp ON mp.id = m.paper_id
@@ -347,18 +366,9 @@ def render_ms(con, args, subject, topics, chosen, cache):
             answer = row["answer"] if row else None
             if answer is None:
                 missing += 1
-            entries.append((seq, answer, ref))
-        doc = fitz.open()
-        answer_key(doc, entries)
-        cover(doc, args, subject, topics, chosen, is_ms=True)
-        return doc, missing
+            mcq_answers.append((seq, answer, ref))
+            continue
 
-    b = Booklet()
-    missing = 0
-    for seq, q in enumerate(chosen, 1):
-        code = f"{q['paper']}{q['variant']}"
-        ref = config.source_ref(args.syllabus, code, q["session"], q["year"],
-                                q["number"], q["sub_part"] or "")
         ms = con.execute(
             """
             SELECT m.rects_json, mp.rel_path FROM ms_entries m
@@ -370,17 +380,22 @@ def render_ms(con, args, subject, topics, chosen, cache):
             ORDER BY length(m.sub_part) DESC LIMIT 1
             """, (args.syllabus, q["year"], q["session"], q["paper"],
                   q["variant"], q["number"], q["sub_part"] or "")).fetchone()
-        if ms is None:
+        # No row at all, or a row whose crop is empty - either way there is
+        # nothing to show, so say so rather than emitting a silent gap.
+        ms_rects = json.loads(ms["rects_json"]) if ms is not None else []
+        if not ms_rects:
             missing += 1
             b.question_header(seq, ref, 0)
             b.label(f"Mark scheme not available for {ref}", keep_with=0)
             b.divider()
             continue
-        ms_rects = json.loads(ms["rects_json"])
         scale = min(1.0, CONTENT_W / max(r["x1"] - r["x0"] for r in ms_rects))
         b.question_header(seq, ref, (ms_rects[0]["y1"] - ms_rects[0]["y0"]) * scale)
         b.place_rects(_src(cache, ms["rel_path"]), ms_rects, scale)
         b.divider()
+
+    if mcq_answers:
+        answer_key(b.doc, mcq_answers)
     cover(b.doc, args, subject, topics, chosen, is_ms=True)
     return b.doc, missing
 
