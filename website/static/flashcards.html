@@ -1,0 +1,1148 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Study Library — PrepWithTee</title>
+  <meta name="description" content="Browse flashcards, definitions, formulas and notes for every Cambridge subject.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="window._katexReady=true"></script>
+  <style>
+    /* ── legacy variable aliases ── */
+    :root {
+      --border: var(--line);
+      --muted:  var(--grey);
+      --text:   var(--ink);
+    }
+
+    /* ── local button definitions ── */
+    .btn-primary   { background: var(--navy); color: #fff; }
+    .btn-primary:hover { background: var(--navy-deep); box-shadow: 0 4px 20px rgba(76,46,114,.28); transform: translateY(-1px); }
+    .btn-secondary { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+    .btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════ */
+    .sl-hero {
+      padding: 2.2rem 0 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .sl-eyebrow {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: .3rem;
+    }
+    .sl-h1 {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(1.75rem, 3.8vw, 2.4rem);
+      line-height: 1.1; color: var(--navy); margin-bottom: .35rem;
+    }
+    .sl-desc {
+      color: var(--grey); max-width: 500px;
+      font-size: .9rem; line-height: 1.65;
+    }
+
+    /* Study nav tabs */
+    .study-nav {
+      display: flex; margin-top: 1.4rem;
+    }
+    .sn-tab {
+      padding: .62rem 1.2rem;
+      font-size: .88rem; font-weight: 600;
+      color: var(--grey); text-decoration: none;
+      border-bottom: 2.5px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .sn-tab:hover { color: var(--navy); }
+    .sn-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+    /* ════════════════════════════════════════
+       CONTINUE STRIP
+    ════════════════════════════════════════ */
+    .continue-strip {
+      display: flex; gap: .8rem;
+      padding: 1rem 0; border-bottom: 1px solid var(--line);
+    }
+    @media(max-width:600px){ .continue-strip { flex-direction: column; } }
+    .cc {
+      flex: 1; background: #fff;
+      border: 1.5px solid var(--line); border-radius: 14px;
+      padding: .85rem 1rem; display: flex; align-items: center; gap: .8rem;
+    }
+    .cc-icon {
+      width: 38px; height: 38px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; flex-shrink: 0;
+    }
+    .cc.cc-resume .cc-icon { background: var(--lav); }
+    .cc.cc-review .cc-icon { background: var(--orange); }
+    .cc-body { flex: 1; min-width: 0; }
+    .cc-label {
+      font-size: .62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em; color: var(--grey);
+    }
+    .cc-title {
+      font-size: .9rem; font-weight: 700; color: var(--ink);
+      margin: .06rem 0 .1rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cc-sub { font-size: .74rem; color: var(--grey); }
+    .cc-btn {
+      flex-shrink: 0; padding: .38rem .85rem; border-radius: 999px;
+      font-size: .78rem; font-weight: 700; text-decoration: none;
+      white-space: nowrap; transition: opacity .15s, transform .15s;
+    }
+    .cc-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .cc.cc-resume .cc-btn { background: var(--navy); color: #fff; }
+    .cc.cc-review .cc-btn { background: var(--gold); color: #fff; }
+
+    /* ════════════════════════════════════════
+       FILTER BAR
+    ════════════════════════════════════════ */
+    .sl-filters { padding: 1rem 0 .4rem; }
+    .sl-filter-row {
+      display: flex; gap: .45rem; flex-wrap: wrap; align-items: center;
+    }
+    .sl-sel {
+      appearance: none;
+      padding: .46rem 1.9rem .46rem .75rem;
+      border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: .83rem; font-family: inherit; color: var(--ink);
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%235A5A72' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .6rem center;
+      cursor: pointer; min-width: 108px; transition: border-color .15s;
+    }
+    .sl-sel:hover { border-color: #b8b0cc; }
+    .sl-sel:focus { outline: none; border-color: var(--navy); }
+    .sl-search-wrap { position: relative; flex: 1; max-width: 250px; }
+    .sl-search-icon {
+      position: absolute; left: .7rem; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px; color: var(--grey); pointer-events: none;
+    }
+    .sl-search {
+      width: 100%; padding: .46rem .75rem .46rem 2rem;
+      border: 1.5px solid var(--line); border-radius: 10px;
+      font-size: .83rem; font-family: inherit; background: #fff; color: var(--ink);
+      transition: border-color .15s;
+    }
+    .sl-search:focus { outline: none; border-color: var(--navy); }
+    .sl-search::placeholder { color: var(--grey); }
+
+    /* type pills */
+    .sl-type-row { display: flex; gap: .3rem; flex-wrap: wrap; padding: .55rem 0 .2rem; }
+    .sl-pill {
+      padding: .32rem .85rem; border-radius: 999px;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      border: 1.5px solid var(--line); background: #fff; color: var(--grey);
+      transition: all .15s;
+    }
+    .sl-pill:hover { border-color: var(--navy); color: var(--navy); }
+    .sl-pill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .sl-count { font-size: .77rem; color: var(--grey); padding: .2rem 0 .55rem; }
+
+    /* ════════════════════════════════════════
+       CARD GRID
+    ════════════════════════════════════════ */
+    .sl-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .85rem; padding: .15rem 0 3rem;
+    }
+    @media(max-width:880px){ .sl-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:520px){ .sl-grid { grid-template-columns: 1fr; } }
+
+    /* individual card */
+    .slc {
+      background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+      padding: .95rem 1.05rem .85rem; display: flex; flex-direction: column;
+      gap: .5rem; cursor: default; position: relative;
+      transition: transform .18s, box-shadow .18s, border-color .18s;
+    }
+    .slc[data-type="card"] { cursor: pointer; }
+    .slc:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(76,46,114,.09);
+      border-color: #cdc5de;
+    }
+
+    .slc-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: .35rem;
+    }
+    .slc-meta {
+      display: flex; align-items: baseline;
+      gap: .25rem; min-width: 0; flex-wrap: wrap;
+    }
+    .slc-subject {
+      font-size: .62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--navy); opacity: .6; white-space: nowrap;
+    }
+    .slc-dot-sep { font-size: .6rem; color: var(--grey); }
+    .slc-chapter {
+      font-size: .7rem; color: var(--grey); font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: 120px;
+    }
+    .slc-type-badge {
+      font-size: .62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      padding: .16rem .48rem; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+    }
+    .slc-type-card    { background: var(--lav);    color: var(--lav-ink);    }
+    .slc-type-def     { background: var(--blue);   color: var(--blue-ink);   }
+    .slc-type-formula { background: var(--orange); color: var(--orange-ink); }
+    .slc-type-list    { background: var(--green);  color: var(--green-ink);  }
+
+    .slc-body { flex: 1; }
+
+    /* card type */
+    .slc-question {
+      font-size: .9rem; font-weight: 700; color: var(--ink); line-height: 1.4;
+    }
+    .slc-tap-hint { font-size: .7rem; color: var(--gold); font-weight: 600; margin-top: .3rem; }
+    .slc-answer {
+      margin-top: .4rem; font-size: .83rem; color: var(--grey); line-height: 1.5;
+      border-top: 1px solid var(--line); padding-top: .4rem;
+    }
+    .slc-answer.hidden { display: none; }
+    .slc.revealed .slc-tap-hint { display: none; }
+
+    /* definition type */
+    .slc-term { font-size: .9rem; font-weight: 700; color: var(--ink); margin-bottom: .22rem; }
+    .slc-definition {
+      font-size: .83rem; color: var(--grey); line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* formula type */
+    .slc-formula-label { font-size: .87rem; font-weight: 700; color: var(--ink); margin-bottom: .28rem; display: flex; align-items: center; gap: .4rem; }
+    .slc-fb-badge { background: var(--orange); color: var(--orange-ink); border-radius: 6px; padding: .1rem .38rem; font-size: .6rem; font-weight: 700; }
+    .slc-formula-box {
+      background: rgba(232,145,58,.07); border: 1.5px solid rgba(232,145,58,.22);
+      border-radius: 9px; padding: .42rem .7rem;
+      font-family: monospace; font-size: .9rem; color: var(--ink);
+    }
+    .slc-formula-where { font-size: .74rem; color: var(--grey); margin-top: .28rem; line-height: 1.4; }
+
+    /* list type */
+    .slc-list-title { font-size: .88rem; font-weight: 700; color: var(--ink); margin-bottom: .3rem; }
+    .slc-list { margin: 0; padding-left: 1.1rem; }
+    .slc-list li { font-size: .81rem; color: var(--grey); margin-bottom: .16rem; line-height: 1.45; }
+    .slc-list .slc-list-more { color: var(--gold); font-weight: 600; list-style: none; margin-left: -1.1rem; }
+
+    /* card footer */
+    .slc-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--line); padding-top: .55rem; margin-top: auto;
+    }
+    .slc-status { display: flex; align-items: center; gap: .28rem; }
+    .slc-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .slc-status-text { font-size: .7rem; color: var(--grey); font-weight: 500; text-transform: capitalize; }
+    .slc-actions { display: flex; align-items: center; gap: .55rem; }
+    .slc-save {
+      background: none; border: none; cursor: pointer;
+      font-size: .95rem; color: var(--grey); padding: 0; line-height: 1;
+      transition: color .15s; flex-shrink: 0;
+    }
+    .slc-save.saved { color: var(--gold); }
+    .slc-save:hover { color: var(--gold); }
+    .slc-study-link {
+      font-size: .74rem; font-weight: 700; color: var(--gold);
+      text-decoration: none; white-space: nowrap; transition: color .15s;
+    }
+    .slc-study-link:hover { color: var(--navy); }
+
+    /* Hover lift on all cards; pointer only on card-type (has flip interaction) */
+    .slc { transition: box-shadow .15s, transform .12s, border-color .15s; }
+    .slc:hover { box-shadow: 0 4px 18px rgba(76,46,114,.1); transform: translateY(-1px); border-color: #c0b8d8; }
+    .slc[data-type="card"] { cursor: pointer; }
+
+    /* Skeleton loading cards */
+    @keyframes sl-pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+    .slc-skeleton {
+      background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+      padding: .95rem 1.05rem .85rem; min-height: 170px;
+      animation: sl-pulse 1.6s ease infinite;
+    }
+    .sl-bone {
+      height: 11px; background: var(--line); border-radius: 6px; margin-bottom: 10px;
+    }
+    .sl-bone.w-60 { width: 60%; }
+    .sl-bone.w-40 { width: 40%; }
+    .sl-bone.w-80 { width: 80%; }
+    .sl-bone.h-tall { height: 36px; }
+
+    /* Select loading state */
+    .sl-sel:disabled { opacity: .55; cursor: wait; }
+
+    /* ════════════════════════════════════════
+       EMPTY STATE
+    ════════════════════════════════════════ */
+    .sl-empty {
+      grid-column: 1 / -1; text-align: center; padding: 4rem 1rem;
+    }
+    .sl-empty-emoji { font-size: 2.5rem; margin-bottom: .7rem; }
+    .sl-empty h3 {
+      font-size: 1.05rem; color: var(--ink); margin-bottom: .3rem;
+      font-family: "Hanken Grotesk", sans-serif; font-weight: 700;
+    }
+    .sl-empty p { color: var(--grey); font-size: .86rem; margin-bottom: 1rem; }
+
+    .load-more-row { text-align: center; padding: .5rem 0 2.5rem; }
+
+    /* ════════════════════════════════════════
+       PICKER EMPTY STATE (no filter chosen)
+    ════════════════════════════════════════ */
+    .sl-picker-state {
+      grid-column: 1 / -1;
+      text-align: center; padding: 3.5rem 1rem 4rem;
+    }
+    .sl-picker-state .sps-icon { font-size: 3rem; margin-bottom: .65rem; }
+    .sl-picker-state h3 { font-size: 1.1rem; color: var(--navy); margin-bottom: .35rem; font-weight: 700; }
+    .sl-picker-state p { color: var(--grey); font-size: .86rem; max-width: 320px; margin: 0 auto; }
+    /* Glow on the Board + Subject dropdowns to guide eye */
+    .sl-sel.sl-sel-guide {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(232,145,58,.16);
+      animation: guide-pulse 2s ease infinite;
+    }
+    @keyframes guide-pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(232,145,58,.16); }
+      50%      { box-shadow: 0 0 0 5px rgba(232,145,58,.08); }
+    }
+
+    /* ════════════════════════════════════════
+       FLASHCARD LIGHTBOX OVERLAY
+    ════════════════════════════════════════ */
+    .fc-lb {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .fc-lb-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(20, 12, 40, 0.74);
+      backdrop-filter: blur(5px);
+    }
+    .fc-lb-wrap {
+      position: relative; z-index: 1;
+      width: min(520px, 96vw);
+      display: flex; flex-direction: column; gap: .85rem;
+    }
+    /* header row */
+    .fc-lb-header {
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .fc-lb-counter {
+      font-size: .78rem; font-weight: 700; color: rgba(255,255,255,.7);
+      font-family: "Archivo", sans-serif; flex-shrink: 0;
+    }
+    .fc-lb-meta {
+      font-size: .72rem; color: rgba(255,255,255,.5); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fc-lb-badge {
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; padding: .16rem .48rem; border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .fc-lb-close {
+      background: rgba(255,255,255,.12); border: none; cursor: pointer;
+      color: #fff; width: 30px; height: 30px; border-radius: 8px;
+      font-size: .95rem; line-height: 1; flex-shrink: 0;
+      transition: background .15s;
+    }
+    .fc-lb-close:hover { background: rgba(255,255,255,.25); }
+
+    /* flip scene */
+    .fc-lb-scene { perspective: 1400px; }
+    .fc-lb-card {
+      position: relative; min-height: 300px;
+      transform-style: preserve-3d;
+      transition: transform .42s cubic-bezier(.4, 0, .2, 1);
+      border-radius: 20px; cursor: pointer;
+    }
+    .fc-lb-card.flipped { transform: rotateY(180deg); }
+    .fc-lb-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      padding: 1.6rem 1.7rem;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .fc-lb-front {
+      background: var(--page);
+      border: 2px solid var(--line);
+    }
+    .fc-lb-back {
+      background: var(--cream);
+      border: 2px solid var(--gold);
+      transform: rotateY(180deg);
+    }
+    /* content inside faces */
+    .fc-lb-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--grey); margin-bottom: .8rem;
+    }
+    .fc-lb-q {
+      font-size: 1.08rem; font-weight: 700; color: var(--navy);
+      line-height: 1.45; flex: 1;
+    }
+    .fc-lb-a {
+      font-size: .95rem; color: var(--ink); line-height: 1.6; flex: 1;
+    }
+    .fc-lb-formula-box {
+      background: rgba(232,145,58,.08); border: 1.5px solid rgba(232,145,58,.3);
+      border-radius: 10px; padding: .7rem 1rem;
+      font-family: monospace; font-size: 1rem; color: var(--ink);
+      margin: .5rem 0;
+    }
+    .fc-lb-formula-where { font-size: .82rem; color: var(--grey); line-height: 1.5; }
+    .fc-lb-list { padding-left: 1.2rem; margin: .4rem 0; }
+    .fc-lb-list li { font-size: .9rem; color: var(--ink); margin-bottom: .3rem; line-height: 1.5; }
+    .fc-lb-flip-hint {
+      margin-top: auto; padding-top: .8rem;
+      font-size: .74rem; font-weight: 600; color: var(--gold);
+      text-align: center;
+    }
+    /* status chip on back face */
+    .fc-lb-status {
+      font-size: .72rem; font-weight: 600; color: var(--grey);
+      margin-top: .5rem; display: flex; align-items: center; gap: .35rem;
+    }
+    .fc-lb-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* nav row */
+    .fc-lb-nav {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: .5rem;
+    }
+    .fc-lb-arrow {
+      background: rgba(255,255,255,.12); border: none; cursor: pointer;
+      color: #fff; padding: .5rem .9rem; border-radius: 10px;
+      font-size: .8rem; font-weight: 700; transition: background .15s;
+      font-family: "Archivo", sans-serif;
+    }
+    .fc-lb-arrow:hover { background: rgba(255,255,255,.22); }
+    .fc-lb-arrow:disabled { opacity: .35; cursor: default; }
+    .fc-lb-arrow.prev { text-align: left; }
+    .fc-lb-arrow.next { text-align: right; }
+    .fc-lb-center { display: flex; gap: .45rem; justify-content: center; flex-wrap: wrap; }
+    .fc-lb-flip-btn {
+      background: var(--navy); color: #fff; border: none; cursor: pointer;
+      padding: .5rem 1.1rem; border-radius: 10px; font-size: .82rem;
+      font-weight: 700; font-family: "Archivo", sans-serif; transition: background .15s;
+    }
+    .fc-lb-flip-btn:hover { background: var(--navy-deep); }
+    .fc-lb-got, .fc-lb-miss {
+      border: none; cursor: pointer; padding: .48rem .95rem; border-radius: 10px;
+      font-size: .8rem; font-weight: 700; font-family: "Archivo", sans-serif;
+      transition: opacity .15s, transform .12s;
+    }
+    .fc-lb-got  { background: #34d399; color: #0a3d2a; }
+    .fc-lb-miss { background: var(--orange); color: var(--orange-ink); }
+    .fc-lb-got:hover, .fc-lb-miss:hover { opacity: .88; transform: translateY(-1px); }
+    /* Make all grid cards clickable */
+    .slc { cursor: pointer; }
+
+
+    /* ════════════════════════════════════════
+       DARK MODE TOKEN OVERRIDES
+    ════════════════════════════════════════ */
+    :root { --fc-card: #fff; }
+
+    html[data-theme="dark"] {
+      --page:      #0d0d1a;
+      --cream:     #14142a;
+      --line:      #28284a;
+      --ink:       #e4e0f8;
+      --grey:      #8a87b0;
+      --navy:      #a898e8;
+      --navy-deep: #9080d8;
+      --gold:      #f2c440;
+      --lav:       #1c1a36;   --lav-ink:    #c4b4fc;
+      --green:     #0c2418;   --green-ink:  #5dde96;
+      --orange:    #281608;   --orange-ink: #f0a860;
+      --blue:      #0c1a30;   --blue-ink:   #64b4fc;
+      --teal:      #081e22;   --teal-ink:   #44dcd0;
+      --yellow:    #261a04;   --yellow-ink: #f2d464;
+      --fc-card: #14142a;
+    }
+
+    /* cards + inputs */
+    html[data-theme="dark"] .slc,
+    html[data-theme="dark"] .slc-skeleton { background: var(--fc-card); border-color: var(--line); color: var(--ink); }
+    html[data-theme="dark"] .slc-question,
+    html[data-theme="dark"] .slc-term,
+    html[data-theme="dark"] .slc-formula-label,
+    html[data-theme="dark"] .slc-list-title,
+    html[data-theme="dark"] .slc-list li { color: var(--ink); }
+    html[data-theme="dark"] .cc { background: #1a1a32; border-color: var(--line); }
+    html[data-theme="dark"] .sl-sel {
+      background: #1a1830 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a87b0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .6rem center;
+      color: var(--ink); border-color: var(--line);
+    }
+    html[data-theme="dark"] .sl-search { background: #1a1830; color: var(--ink); }
+    html[data-theme="dark"] .sl-pill { background: #1a1830; }
+    html[data-theme="dark"] .sl-pill.active { background: var(--navy); color: #0d0d1a; border-color: var(--navy); }
+
+    /* header */
+    html[data-theme="dark"] .site-header { background: #09091a; border-bottom-color: var(--line); }
+
+    /* card hover */
+    html[data-theme="dark"] .slc:hover { border-color: #4a4068; }
+
+    /* formula boxes */
+    html[data-theme="dark"] .slc-formula-box,
+    html[data-theme="dark"] .fc-lb-formula-box {
+      background: rgba(240,168,96,.06); border-color: rgba(240,168,96,.22); color: var(--ink);
+    }
+
+    /* lightbox faces in dark mode stay the same (dark backdrop already) */
+    html[data-theme="dark"] .fc-lb-front { background: #1c1a38; border-color: #3a3660; }
+    html[data-theme="dark"] .fc-lb-back  { background: #1e2038; border-color: var(--gold); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <div class="header-right"></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ── HERO ── -->
+      <div class="sl-hero">
+        <p class="sl-eyebrow">Study Library</p>
+        <h1 class="sl-h1">Flashcards &amp; Notes</h1>
+        <p class="sl-desc">Browse definitions, formulas, key lists, revision cards and topic summaries across Cambridge subjects.</p>
+        <nav class="study-nav" aria-label="Study sections">
+          <a href="flashcards.html" class="sn-tab active">Flashcards</a>
+          <a href="notes-view.html" class="sn-tab">Notes</a>
+          <a href="quiz.html" class="sn-tab">Quiz</a>
+        </nav>
+      </div>
+
+      <!-- ── CONTINUE STRIP (shown when logged in with progress) ── -->
+      <div class="continue-strip" id="continue-strip" style="display:none">
+        <div class="cc cc-resume" id="cc-resume" style="display:none">
+          <div class="cc-icon">📚</div>
+          <div class="cc-body">
+            <span class="cc-label">Continue Studying</span>
+            <div class="cc-title" id="cc-resume-title">—</div>
+            <div class="cc-sub" id="cc-resume-sub"></div>
+          </div>
+          <a href="study.html" class="cc-btn" id="cc-resume-link">Continue →</a>
+        </div>
+        <div class="cc cc-review" id="cc-review" style="display:none">
+          <div class="cc-icon">🔄</div>
+          <div class="cc-body">
+            <span class="cc-label">Quick Revision</span>
+            <div class="cc-title" id="cc-review-title">Cards due for review</div>
+            <div class="cc-sub">Spaced repetition queue</div>
+          </div>
+          <a href="study.html?mode=review" class="cc-btn">Review Cards →</a>
+        </div>
+      </div>
+
+      <!-- ── FILTERS ── -->
+      <div class="sl-filters">
+        <div class="sl-filter-row">
+          <select class="sl-sel" id="f-subject" aria-label="Subject" data-styled data-placeholder="All subjects">
+            <option value="">All subjects</option>
+          </select>
+          <select class="sl-sel" id="f-chapter" aria-label="Chapter" data-styled data-placeholder="All chapters" data-grouped="true">
+            <option value="">All chapters</option>
+          </select>
+          <div class="sl-search-wrap">
+            <svg class="sl-search-icon" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <circle cx="7.5" cy="7.5" r="5" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M11.5 11.5L15 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <input class="sl-search" type="text" id="f-search" placeholder="Search cards…" aria-label="Search">
+          </div>
+        </div>
+        <div class="sl-type-row">
+          <button class="sl-pill active" data-type="">All</button>
+          <button class="sl-pill" data-type="def">Definitions</button>
+          <button class="sl-pill" data-type="formula">Formulae</button>
+          <button class="sl-pill" data-type="list">Lists</button>
+          <button class="sl-pill" data-type="card">Key Facts</button>
+        </div>
+      </div>
+
+      <p class="sl-count" id="fc-count"></p>
+      <div class="sl-grid" id="fc-grid"></div>
+      <div class="load-more-row" id="load-more-row" style="display:none">
+        <button class="btn btn-secondary" id="load-more-btn">Load more cards</button>
+      </div>
+
+    </div><!-- /container -->
+  </main>
+
+  <!-- ── FLASHCARD LIGHTBOX ── -->
+  <div class="fc-lb" id="fc-lb" hidden role="dialog" aria-modal="true" aria-label="Flashcard viewer">
+    <div class="fc-lb-backdrop" id="fc-lb-backdrop"></div>
+    <div class="fc-lb-wrap">
+      <div class="fc-lb-header">
+        <span class="fc-lb-counter" id="fc-lb-counter">1 / 1</span>
+        <span class="fc-lb-meta" id="fc-lb-meta"></span>
+        <span class="fc-lb-badge" id="fc-lb-badge"></span>
+        <button class="fc-lb-close" id="fc-lb-close" aria-label="Close">✕</button>
+      </div>
+      <div class="fc-lb-scene">
+        <div class="fc-lb-card" id="fc-lb-card">
+          <div class="fc-lb-face fc-lb-front" id="fc-lb-front"></div>
+          <div class="fc-lb-face fc-lb-back"  id="fc-lb-back"></div>
+        </div>
+      </div>
+      <div class="fc-lb-nav">
+        <button class="fc-lb-arrow prev" id="fc-lb-prev">← Prev</button>
+        <div class="fc-lb-center" id="fc-lb-center">
+          <button class="fc-lb-flip-btn" id="fc-lb-flip">Flip card ↕</button>
+        </div>
+        <button class="fc-lb-arrow next" id="fc-lb-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js?v=20260831a"></script>
+  <script src="styled-dropdown.js?v=20260828a"></script>
+  <script>
+  (() => {
+    /* ── state ──────────────────────────────────────────────────────── */
+    const LIMIT = 48;
+    let offset = 0, loading = false;
+    let activeType = '', currentUser = null;
+    let papersBySubject = {}, chaptersByPaper = {};
+    let allBlocks = [];       // all rendered block data objects
+    let lbIdx = 0;            // current lightbox index
+    let lbFlipped = false;    // current flip state
+    let hasAppliedFilter = false; // true once user has made a selection
+
+    /* ── helpers ────────────────────────────────────────────────────── */
+    function esc(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    const STATUS_COLOR = { new:'#d1d5db', learning:'var(--gold)', review:'#60a5fa', mastered:'#34d399' };
+    const TYPE_LABEL   = { card:'Key Fact', def:'Definition', formula:'Formula', list:'List' };
+    const TYPE_CSS     = { card:'slc-type-card', def:'slc-type-def', formula:'slc-type-formula', list:'slc-type-list' };
+
+    /* ── dropdown helpers ───────────────────────────────────────────── */
+    function setDropdownsLoading(on) {
+      ['f-subject','f-chapter'].forEach(id => {
+        const el = document.getElementById(id);
+        el.disabled = on;
+      });
+      // Only touch subject text when loading
+      const sub = document.getElementById('f-subject');
+      if (on) sub.innerHTML = '<option value="">Loading…</option>';
+      else if (!sub.options.length || sub.options[0].value !== '')
+        sub.innerHTML = '<option value="">All subjects</option>';
+    }
+
+    function guideDropdowns(on) {
+      ['f-subject'].forEach(id =>
+        document.getElementById(id).classList.toggle('sl-sel-guide', on)
+      );
+    }
+
+    /* ── picker / skeleton states ───────────────────────────────────── */
+    function showPickerState() {
+      document.getElementById('fc-grid').innerHTML = `
+        <div class="sl-picker-state">
+          <div class="sps-icon">🗂️</div>
+          <h3>Select a subject to browse</h3>
+          <p>Choose a board and subject above to explore flashcards, definitions, formulas and lists.</p>
+        </div>`;
+      document.getElementById('fc-count').textContent = '';
+      document.getElementById('load-more-row').style.display = 'none';
+      guideDropdowns(true);
+    }
+
+    function showSkeletonCards(n = 6) {
+      document.getElementById('fc-grid').innerHTML = Array.from({length: n}, () => `
+        <div class="slc-skeleton">
+          <div class="sl-bone w-40"></div>
+          <div class="sl-bone w-80 h-tall"></div>
+          <div class="sl-bone w-60"></div>
+        </div>`).join('');
+      guideDropdowns(false);
+    }
+
+    function showEmpty() {
+      document.getElementById('fc-grid').innerHTML = `
+        <div class="sl-empty">
+          <div class="sl-empty-emoji">🔍</div>
+          <h3>No study cards found</h3>
+          <p>Try changing your filters or browse another subject.</p>
+          <button class="btn btn-secondary" onclick="clearFilters()">Clear filters</button>
+        </div>`;
+    }
+
+    /* ── taxonomy / init ────────────────────────────────────────────── */
+    async function init() {
+      try {
+        const r = await fetch('/api/auth/me');
+        if (r.ok) { currentUser = await r.json(); loadRecentActivity(); }
+      } catch {}
+
+      // Show picker state while taxonomy loads — NOT skeletons
+      showPickerState();
+      setDropdownsLoading(true);
+
+      const resp = await fetch('/api/fc/taxonomy');
+      setDropdownsLoading(false);
+      if (!resp.ok) return;
+
+      const data = await resp.json();
+      const tree = data.boards || [];
+      const subSel = document.getElementById('f-subject');
+
+      tree.forEach(b => {
+        const subs = b.subjects || [];
+        if (!subs.length) return;
+        subSel.insertAdjacentHTML('beforeend', `<optgroup label="${b.name}">`);
+        subs.forEach(s => {
+          papersBySubject[s.id] = s.papers || [];
+          subSel.insertAdjacentHTML('beforeend', `<option value="${s.id}">${s.name} (${s.code})</option>`);
+          (s.papers || []).forEach(p => { chaptersByPaper[p.id] = p.chapters || []; });
+        });
+        subSel.insertAdjacentHTML('beforeend', `</optgroup>`);
+      });
+
+      populateChapters();
+
+      // Refresh StyledDropdowns after taxonomy loaded
+      const subSd = document.getElementById('f-subject');
+      if (subSd._sdInstance) subSd._sdInstance.refresh();
+
+      // Wire filters — each change sets hasAppliedFilter
+      document.getElementById('f-subject').addEventListener('change', () => { hasAppliedFilter = true; populateChapters(); resetAndLoad(); });
+      document.getElementById('f-chapter').addEventListener('change', () => { hasAppliedFilter = true; resetAndLoad(); });
+
+      let searchTimer;
+      document.getElementById('f-search').addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => { hasAppliedFilter = true; resetAndLoad(); }, 300);
+      });
+
+      document.querySelectorAll('.sl-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sl-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeType = btn.dataset.type;
+          hasAppliedFilter = true;
+          resetAndLoad();
+        });
+      });
+
+      document.getElementById('load-more-btn').addEventListener('click', loadBlocks);
+
+      // Handle URL params (direct deep-link)
+      const params = new URLSearchParams(location.search);
+      if (params.get('type')) {
+        activeType = params.get('type');
+        document.querySelectorAll('.sl-pill').forEach(b =>
+          b.classList.toggle('active', b.dataset.type === activeType));
+      }
+      if (params.get('chapter_id') || params.get('subject_id') || params.get('type')) {
+        hasAppliedFilter = true;
+        resetAndLoad();
+      } else {
+        // Stay on picker state — guide dropdowns already shown
+        showPickerState();
+      }
+    }
+
+    async function loadRecentActivity() {
+      try {
+        const r = await fetch('/api/fc/recent-activity');
+        if (!r.ok) return;
+        const d = await r.json();
+        const strip = document.getElementById('continue-strip');
+        let shown = false;
+        if (d.last_chapter) {
+          const el = document.getElementById('cc-resume');
+          document.getElementById('cc-resume-title').textContent = d.last_chapter.name;
+          document.getElementById('cc-resume-sub').textContent = d.last_chapter.progress_label || '';
+          document.getElementById('cc-resume-link').href = `study.html?chapter_ids=${d.last_chapter.id}`;
+          el.style.display = 'flex'; shown = true;
+        }
+        if (d.review_count) {
+          document.getElementById('cc-review-title').textContent =
+            `${d.review_count} card${d.review_count !== 1 ? 's' : ''} due for review`;
+          document.getElementById('cc-review').style.display = 'flex'; shown = true;
+        }
+        if (shown) strip.style.display = 'flex';
+      } catch {}
+    }
+
+    /* ── cascade dropdowns ──────────────────────────────────────────── */
+    function populateSubjects() {
+      populateChapters();
+    }
+    function populateChapters() {
+      const sid = document.getElementById('f-subject').value;
+      const sel = document.getElementById('f-chapter');
+      sel.innerHTML = '<option value="">All chapters</option>';
+      if (sid) {
+        const papers = papersBySubject[sid] || [];
+        const useGroups = papers.length > 1;
+        papers.forEach(p => {
+          const chs = (chaptersByPaper[p.id] || [])
+            .sort((a, b) => a.order_index - b.order_index || a.name.localeCompare(b.name));
+          if (!chs.length) return;
+          if (useGroups) sel.insertAdjacentHTML('beforeend', `<optgroup label="${p.name}">`);
+          chs.forEach(c => sel.insertAdjacentHTML('beforeend', `<option value="${c.id}">${c.name}</option>`));
+          if (useGroups) sel.insertAdjacentHTML('beforeend', `</optgroup>`);
+        });
+      } else {
+        Object.values(chaptersByPaper).flat()
+          .sort((a, b) => a.order_index - b.order_index || a.name.localeCompare(b.name))
+          .forEach(c => sel.insertAdjacentHTML('beforeend', `<option value="${c.id}">${c.name}</option>`));
+      }
+      // Refresh chapter StyledDropdown
+      const chapEl = document.getElementById('f-chapter');
+      if (chapEl._sdInstance) chapEl._sdInstance.refresh();
+    }
+
+    /* ── load / render cards ────────────────────────────────────────── */
+    function resetAndLoad() {
+      offset = 0;
+      allBlocks = [];
+      showSkeletonCards();
+      document.getElementById('load-more-row').style.display = 'none';
+      loadBlocks();
+    }
+
+    function buildParams(lim, off) {
+      const p = new URLSearchParams();
+      const ch  = document.getElementById('f-chapter').value;
+      const sub = document.getElementById('f-subject').value;
+      if (ch) p.set('chapter_id', ch);
+      else if (sub) p.set('subject_id', sub);
+      if (activeType) p.set('type', activeType);
+      const q = document.getElementById('f-search').value.trim();
+      if (q) p.set('search', q);
+      p.set('limit', lim); p.set('offset', off);
+      return p;
+    }
+
+    async function loadBlocks() {
+      if (loading) return;
+      loading = true;
+      try {
+        const resp = await fetch('/api/fc/blocks?' + buildParams(LIMIT, offset));
+        if (!resp.ok) { loading = false; return; }
+        const data   = await resp.json();
+        const blocks = data.blocks || [];
+        if (offset === 0) document.getElementById('fc-grid').innerHTML = '';
+        if (offset === 0 && !blocks.length) { showEmpty(); loading = false; return; }
+        blocks.forEach(b => renderBlock(b));
+        offset += blocks.length;
+        document.getElementById('fc-count').textContent =
+          `Showing ${offset} card${offset !== 1 ? 's' : ''}`;
+        document.getElementById('load-more-row').style.display =
+          blocks.length === LIMIT ? '' : 'none';
+      } finally { loading = false; }
+
+      if (window._katexReady) {
+        renderMathInElement(document.getElementById('fc-grid'), {
+          delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+        });
+      }
+    }
+
+    window.clearFilters = function() {
+      ['f-subject','f-chapter'].forEach(id =>
+        document.getElementById(id).value = '');
+      document.getElementById('f-search').value = '';
+      document.querySelectorAll('.sl-pill').forEach((b, i) => b.classList.toggle('active', i === 0));
+      activeType = '';
+      hasAppliedFilter = false;
+      showPickerState();
+    };
+
+    function renderBlock(b) {
+      const grid = document.getElementById('fc-grid');
+      const p    = b.payload || {};
+      const status = b.progress?.status || '';
+      const saved  = b.progress?.saved ?? false;
+
+      let bodyHtml = '';
+      if (b.type === 'card') {
+        bodyHtml = `
+          <div class="slc-question">${esc(p.question || '')}</div>
+          <div class="slc-tap-hint">Click to open →</div>`;
+      } else if (b.type === 'def') {
+        bodyHtml = `
+          <div class="slc-term">${esc(p.term || '')}</div>
+          <div class="slc-definition">${esc(p.definition || '')}</div>`;
+      } else if (b.type === 'formula') {
+        const fb = p.in_formula_booklet ? '<span class="slc-fb-badge">In FB</span>' : '';
+        bodyHtml = `
+          <div class="slc-formula-label">${esc(p.label || '')} ${fb}</div>
+          <div class="slc-formula-box">${esc(p.formula || '')}</div>
+          ${p.where ? `<div class="slc-formula-where">${esc(p.where)}</div>` : ''}`;
+      } else if (b.type === 'list') {
+        const items = (p.items || []).slice(0, 5).map(i => `<li>${esc(i)}</li>`).join('');
+        const more  = (p.items || []).length > 5
+          ? `<li class="slc-list-more">+${p.items.length - 5} more…</li>` : '';
+        bodyHtml = `
+          <div class="slc-list-title">${esc(p.title || p.topic || '')}</div>
+          <ul class="slc-list">${items}${more}</ul>`;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'slc';
+      card.dataset.blockId = b.id;
+      card.dataset.type    = b.type;
+      card.dataset.idx     = allBlocks.length;   // index into allBlocks
+      card.innerHTML = `
+        <div class="slc-top">
+          <div class="slc-meta">
+            <span class="slc-subject">${esc(b.subject.name)}</span>
+            <span class="slc-dot-sep">·</span>
+            <span class="slc-chapter" title="${esc(b.chapter.name)}">${esc(b.chapter.name)}</span>
+          </div>
+          <span class="slc-type-badge ${TYPE_CSS[b.type] || ''}">${TYPE_LABEL[b.type] || b.type}</span>
+        </div>
+        <div class="slc-body">${bodyHtml}</div>
+        <div class="slc-footer">
+          <div class="slc-status">
+            ${status ? `<span class="slc-status-dot" style="background:${STATUS_COLOR[status]||'#d1d5db'}"></span>
+              <span class="slc-status-text">${status}</span>` : ''}
+          </div>
+          <div class="slc-actions">
+            ${currentUser
+              ? `<button class="slc-save${saved?' saved':''}" data-block="${b.id}"
+                   title="${saved?'Saved':'Save for later'}">${saved?'★':'☆'}</button>` : ''}
+            <span class="slc-study-link">Open →</span>
+          </div>
+        </div>`;
+
+      // Click → open lightbox (whole card is clickable)
+      card.addEventListener('click', e => {
+        if (e.target.closest('.slc-save')) return;
+        openLightbox(Number(card.dataset.idx));
+      });
+
+      // Save button
+      const saveBtn = card.querySelector('.slc-save');
+      if (saveBtn && currentUser) {
+        saveBtn.addEventListener('click', async e => {
+          e.stopPropagation();
+          const s = !saveBtn.classList.contains('saved');
+          saveBtn.classList.toggle('saved', s);
+          saveBtn.textContent = s ? '★' : '☆';
+          b.progress = b.progress || {};
+          b.progress.saved = s;
+          await fetch('/api/fc/save', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({block_id: b.id, saved: s})
+          });
+        });
+      }
+
+      allBlocks.push(b);
+      grid.appendChild(card);
+    }
+
+    /* ════════════════════════════════════════════════
+       LIGHTBOX
+    ════════════════════════════════════════════════ */
+    const lb        = document.getElementById('fc-lb');
+    const lbCard    = document.getElementById('fc-lb-card');
+    const lbFront   = document.getElementById('fc-lb-front');
+    const lbBack    = document.getElementById('fc-lb-back');
+    const lbCounter = document.getElementById('fc-lb-counter');
+    const lbMeta    = document.getElementById('fc-lb-meta');
+    const lbBadge   = document.getElementById('fc-lb-badge');
+    const lbCenter  = document.getElementById('fc-lb-center');
+    const lbPrev    = document.getElementById('fc-lb-prev');
+    const lbNext    = document.getElementById('fc-lb-next');
+    const lbFlipBtn = document.getElementById('fc-lb-flip');
+
+    function openLightbox(idx) {
+      lbIdx = Math.max(0, Math.min(idx, allBlocks.length - 1));
+      lb.hidden = false;
+      document.body.style.overflow = 'hidden';
+      renderLightboxCard();
+    }
+
+    function closeLightbox() {
+      lb.hidden = true;
+      document.body.style.overflow = '';
+      lbCard.classList.remove('flipped');
+      lbFlipped = false;
+    }
+
+    function flipLightbox() {
+      lbFlipped = !lbFlipped;
+      lbCard.classList.toggle('flipped', lbFlipped);
+      // Show self-check after flip (logged-in only)
+      if (lbFlipped && currentUser) {
+        lbCenter.innerHTML = `
+          <button class="fc-lb-miss" id="fc-lb-miss">↺ Still learning</button>
+          <button class="fc-lb-got"  id="fc-lb-got">✓ Got it</button>`;
+        document.getElementById('fc-lb-miss').addEventListener('click', () => rateCard(1));
+        document.getElementById('fc-lb-got' ).addEventListener('click', () => rateCard(5));
+      } else if (!lbFlipped) {
+        lbCenter.innerHTML = `<button class="fc-lb-flip-btn" id="fc-lb-flip">Flip card ↕</button>`;
+        document.getElementById('fc-lb-flip').addEventListener('click', flipLightbox);
+      }
+    }
+
+    async function rateCard(ease) {
+      const b = allBlocks[lbIdx];
+      if (!b) return;
+      try {
+        const res = await fetch('/api/fc/rate', {
+          method: 'POST', credentials: 'include',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({block_id: b.id, ease})
+        });
+        if (res.ok) {
+          const newStatus = ease >= 4 ? 'mastered' : ease >= 3 ? 'review' : 'learning';
+          b.progress = b.progress || {};
+          b.progress.status = newStatus;
+          // Update dot in the grid card
+          const gridCard = document.querySelector(`.slc[data-block-id="${b.id}"]`);
+          if (gridCard) {
+            const dot  = gridCard.querySelector('.slc-status-dot');
+            const text = gridCard.querySelector('.slc-status-text');
+            if (dot)  dot.style.background  = STATUS_COLOR[newStatus] || '#d1d5db';
+            if (text) text.textContent = newStatus;
+          }
+        }
+      } catch {}
+      // Auto-advance to next card
+      navLightbox(1);
+    }
+
+    function navLightbox(dir) {
+      const next = lbIdx + dir;
+      if (next < 0 || next >= allBlocks.length) return;
+      lbIdx = next;
+      lbCard.classList.remove('flipped');
+      lbFlipped = false;
+      renderLightboxCard();
+    }
+
+    function renderLightboxCard() {
+      const b = allBlocks[lbIdx];
+      if (!b) return;
+      const p      = b.payload || {};
+      const type   = b.type;
+      const status = b.progress?.status || '';
+
+      // Header
+      lbCounter.textContent = `${lbIdx + 1} / ${allBlocks.length}`;
+      lbMeta.textContent    = `${b.subject.name} · ${b.chapter.name}`;
+      lbBadge.textContent   = TYPE_LABEL[type] || type;
+      lbBadge.className     = `fc-lb-badge slc-type-${type}`;
+
+      // Nav buttons
+      lbPrev.disabled = lbIdx === 0;
+      lbNext.disabled = lbIdx === allBlocks.length - 1;
+
+      // Reset flip + center controls
+      lbCard.classList.remove('flipped');
+      lbFlipped = false;
+      lbCenter.innerHTML = `<button class="fc-lb-flip-btn" id="fc-lb-flip">Flip card ↕</button>`;
+      document.getElementById('fc-lb-flip').addEventListener('click', flipLightbox);
+
+      // Front content
+      let frontHtml = `<div class="fc-lb-label">Question</div>`;
+      if (type === 'card') {
+        frontHtml += `<div class="fc-lb-q">${esc(p.question || '')}</div>`;
+      } else if (type === 'def') {
+        frontHtml = `<div class="fc-lb-label">Term</div><div class="fc-lb-q">${esc(p.term || '')}</div>`;
+      } else if (type === 'formula') {
+        frontHtml = `<div class="fc-lb-label">Formula</div><div class="fc-lb-q">${esc(p.label || '')}</div>`;
+      } else if (type === 'list') {
+        frontHtml = `<div class="fc-lb-label">List</div><div class="fc-lb-q">${esc(p.title || p.topic || '')}</div>`;
+      }
+      frontHtml += `<div class="fc-lb-flip-hint">Click card or press Space to flip</div>`;
+      lbFront.innerHTML = frontHtml;
+
+      // Back content
+      let backHtml = `<div class="fc-lb-label">Answer</div>`;
+      if (type === 'card') {
+        backHtml += `<div class="fc-lb-a">${esc(p.answer || '')}</div>`;
+      } else if (type === 'def') {
+        backHtml = `<div class="fc-lb-label">Definition</div><div class="fc-lb-a">${esc(p.definition || '')}</div>`;
+      } else if (type === 'formula') {
+        const fb = p.in_formula_booklet ? '<span class="slc-fb-badge" style="font-size:.7rem">In Formula Booklet</span>' : '';
+        backHtml = `
+          <div class="fc-lb-label">Formula ${fb}</div>
+          <div class="fc-lb-formula-box">${esc(p.formula || '')}</div>
+          ${p.where ? `<div class="fc-lb-formula-where">${esc(p.where)}</div>` : ''}`;
+      } else if (type === 'list') {
+        const items = (p.items || []).map(i => `<li>${esc(i)}</li>`).join('');
+        backHtml = `<div class="fc-lb-label">Full List</div><ul class="fc-lb-list">${items}</ul>`;
+      }
+      if (status) {
+        backHtml += `<div class="fc-lb-status">
+          <span class="fc-lb-status-dot" style="background:${STATUS_COLOR[status]||'#d1d5db'}"></span>
+          ${status}
+        </div>`;
+      }
+      lbBack.innerHTML = backHtml;
+    }
+
+    /* lightbox events */
+    document.getElementById('fc-lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('fc-lb-backdrop').addEventListener('click', closeLightbox);
+    lbCard.addEventListener('click', flipLightbox);
+    lbPrev.addEventListener('click', () => navLightbox(-1));
+    lbNext.addEventListener('click', () => navLightbox(1));
+
+    document.addEventListener('keydown', e => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape')    closeLightbox();
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipLightbox(); }
+      if (e.key === 'ArrowLeft')  navLightbox(-1);
+      if (e.key === 'ArrowRight') navLightbox(1);
+    });
+
+    init();
+
+  })();
+  </script>
+  <script type="module" src="/auth.js?v=20260829a"></script>
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+  <script src="tour.js?v=20260829a"></script>
+</body>
+</html>
+

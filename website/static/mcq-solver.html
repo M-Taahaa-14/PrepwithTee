@@ -1,0 +1,621 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://prepwithtee.com/mcq-solver.html">
+<title>Cambridge MCQ Practice | Physics & Computer Science Multiple Choice — PrepWithTee</title>
+<meta name="description" content="Timed Cambridge MCQ practice — Physics 9702 P1 and Computer Science 9618/9608 multiple-choice questions with instant answer checking, A/B/C/D options, and full score breakdown. O Level &amp; IGCSE Physics, Chemistry, A Level Physics.">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+<link rel="stylesheet" href="tools.css?v=20260829a">
+<link rel="stylesheet" href="mcq-session.css?v=20260812b">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<script>
+/* Resolve the session theme before first paint. Blocking + classic on purpose:
+   a module would be deferred and the page would flash the wrong theme.
+   Precedence: explicit choice > OS preference > dark (the brand exam mode). */
+(function () {
+  var t = null;
+  try { t = localStorage.getItem("pwt_mcq_theme"); } catch (e) {}
+  if (t !== "light" && t !== "dark") {
+    t = (window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches)
+      ? "light" : "dark";
+  }
+  document.documentElement.setAttribute("data-mcq-theme", t);
+})();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" href="index.html">
+      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+      <span>PrepWithTee</span>
+    </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <div class="header-right"></div>
+  </div>
+</header>
+
+<!-- ============================================================
+     PANEL 1: SETUP
+============================================================ -->
+<main id="setup-panel" class="container mcq-setup-panel">
+  <div class="mcq-setup-hero">
+    <p class="eyebrow">Cambridge MCQ &middot; Live Session</p>
+    <h1>MCQ Live Solver</h1>
+    <p class="hero-sub">Answer real Cambridge MCQ questions one at a time, race the clock, and get instant green&nbsp;/ red feedback with the official mark-scheme answer.</p>
+  </div>
+
+  <div class="mcq-setup-grid">
+    <!-- Left: configure -->
+    <div class="card mcq-setup-card">
+      <h2>Configure your session</h2>
+
+      <!-- Step 1: Subject -->
+      <div class="field">
+        <label class="field-label">1 &middot; Subject</label>
+        <div class="subject-groups" id="mcq-subjects"></div>
+      </div>
+
+      <!-- Step 2: Mode toggle -->
+      <div class="field">
+        <label class="field-label">2 &middot; Mode</label>
+        <div class="pill-row" id="mcq-mode-seg">
+          <button type="button" class="pill filter-pill active" data-mode="topic">&#x1F4DA; By Topic</button>
+          <button type="button" class="pill filter-pill" data-mode="paper">&#x1F4C4; Full Past Paper</button>
+        </div>
+      </div>
+
+      <!-- ── By Topic mode ── -->
+      <div id="mcq-mode-topic">
+        <div class="field hidden" id="mcq-component-field">
+          <label class="field-label" id="mcq-comp-label">3 &middot; Paper (MCQ only)</label>
+          <div class="pill-row" id="mcq-components"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label-row">
+            <label class="field-label">
+              <span id="mcq-topics-step">3 &middot; Topics</span>
+              <span class="topic-note" id="mcq-topic-note"></span>
+            </label>
+            <span class="mini-actions">
+              <button type="button" class="mini" id="mcq-all">select all</button>
+              <button type="button" class="mini" id="mcq-none">clear</button>
+            </span>
+          </div>
+          <input type="search" id="mcq-topic-search" class="topic-search" placeholder="Search topics&hellip;" autocomplete="off">
+          <div class="topics" id="mcq-topics"></div>
+        </div>
+
+        <div class="field split">
+          <div>
+            <label class="field-label" id="mcq-years-label">4 &middot; Years</label>
+            <div class="inline">
+              <select id="mcq-yfrom" data-styled data-placeholder="From"></select><span class="dash">to</span><select id="mcq-yto" data-styled data-placeholder="To"></select>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Questions</label>
+            <div class="mcq-count-pills" id="mcq-count-pills">
+              <button type="button" class="pill filter-pill" data-cnt="10">10</button>
+              <button type="button" class="pill filter-pill" data-cnt="20">20</button>
+              <button type="button" class="pill filter-pill" data-cnt="30">30</button>
+              <button type="button" class="pill filter-pill active" data-cnt="40">40</button>
+              <button type="button" class="pill filter-pill" data-cnt="0">All</button>
+              <button type="button" class="pill filter-pill" data-cnt="-1">Custom</button>
+            </div>
+            <div class="mcq-custom-wrap" id="mcq-custom-wrap" hidden>
+              <input type="number" id="mcq-custom-n" min="1" max="9999"
+                     placeholder="How many?" class="mcq-custom-input">
+              <span class="mcq-custom-hint muted" id="mcq-custom-hint"></span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /mcq-mode-topic -->
+
+      <!-- ── Full Past Paper mode ── -->
+      <div id="mcq-mode-paper" hidden>
+        <div class="field">
+          <div class="field-label-row">
+            <label class="field-label">3 &middot; Select paper</label>
+            <span class="mini-actions">
+              <button type="button" class="mini" id="fp-latest">jump to latest</button>
+            </span>
+          </div>
+
+          <!-- Each step is labelled: "P1v2" on its own tells a student nothing. -->
+          <div class="fp-step" id="fp-step-year">
+            <span class="fp-step-label">Year</span>
+            <div class="fp-year-tabs" id="fp-year-tabs"><span class="muted">Select a subject first.</span></div>
+          </div>
+
+          <div class="fp-step" id="fp-step-sess" hidden>
+            <span class="fp-step-label">Session</span>
+            <div class="fp-sess-tabs" id="fp-sess-tabs"></div>
+          </div>
+
+          <!-- Only rendered when the subject has more than one MCQ component
+               (0625/0620 have both P1 Core and P2 Extended). -->
+          <div class="fp-step" id="fp-step-comp" hidden>
+            <span class="fp-step-label">Paper</span>
+            <div class="fp-comp-row" id="fp-comp-row"></div>
+          </div>
+
+          <div class="fp-step" id="fp-step-var" hidden>
+            <span class="fp-step-label">Variant</span>
+            <div class="fp-var-row" id="fp-var-row"></div>
+          </div>
+
+          <div class="mcq-fp-info" id="mcq-fp-info"></div>
+        </div>
+      </div><!-- /mcq-mode-paper -->
+
+      <!-- Time (shared between modes) -->
+      <div class="field">
+        <label class="field-label">&#x23F1; Time per question</label>
+        <div class="pill-row" id="mcq-time-pills">
+          <button type="button" class="pill filter-pill" data-secs="60">60 s</button>
+          <button type="button" class="pill filter-pill active" data-secs="90">90 s</button>
+          <button type="button" class="pill filter-pill" data-secs="120">2 min</button>
+          <button type="button" class="pill filter-pill" data-secs="0">No limit</button>
+        </div>
+      </div>
+
+      <div class="mcq-setup-summary" id="mcq-summary">
+        <span class="muted">Pick at least one topic to start.</span>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-dark" id="mcq-start" disabled>&#x26A1; Start Session</button>
+        <a class="btn btn-outline" href="papers.html">&larr; Back to Papers</a>
+        <span class="status" id="mcq-setup-status"></span>
+      </div>
+    </div><!-- /setup-card -->
+
+    <!-- Right: info panel -->
+    <div class="mcq-info-stack">
+      <div class="mcq-info-card tint-lav">
+        <div class="mcq-info-icon">&#x23F1;</div>
+        <div>
+          <b>Dual timer</b>
+          <p>A countdown ring per question, plus a whole-booklet clock (your per-question time &times; the number of questions).</p>
+        </div>
+      </div>
+      <div class="mcq-info-card tint-green">
+        <div class="mcq-info-icon">&#x2713;</div>
+        <div>
+          <b>Instant answer checking</b>
+          <p>Green for correct, red for wrong, straight from the mark scheme &mdash; and a worked explanation loads automatically whenever you get one wrong.</p>
+        </div>
+      </div>
+      <div class="mcq-info-card tint-orange">
+        <div class="mcq-info-icon">&#x2328;</div>
+        <div>
+          <b>Keyboard shortcuts</b>
+          <p><kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> answer &middot; <kbd>&rarr;</kbd> next/skip &middot; <kbd>&larr;</kbd> back &middot; <kbd>F</kbd> flag &middot; <kbd>T</kbd> theme &middot; <kbd>Space</kbd> pause</p>
+        </div>
+      </div>
+      <div class="mcq-info-card tint-blue">
+        <div class="mcq-info-icon">&#x1F4CA;</div>
+        <div>
+          <b>Score breakdown</b>
+          <p>Per-question table with your answer, correct answer and time taken.</p>
+        </div>
+      </div>
+      <div class="mcq-subjects-badge">
+        <p class="mcq-badge-title">MCQ papers in scope</p>
+        <div class="mcq-badge-grid">
+          <span>&#x1F52C; O Level Physics 5054 P1</span>
+          <span>&#x2697;&#xFE0F; O Level Chemistry 5070 P1</span>
+          <span>&#x1F52C; IGCSE Physics 0625 P1/P2</span>
+          <span>&#x2697;&#xFE0F; IGCSE Chemistry 0620 P1/P2</span>
+          <span>&#x269B;&#xFE0F; A Level Physics 9702 P1</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /mcq-setup-grid -->
+</main>
+
+<!-- ============================================================
+     PANEL 2: SESSION
+============================================================ -->
+<main id="session-panel" class="mcq-session-panel" hidden aria-label="MCQ Live Session">
+
+  <!-- Top bar -->
+  <div class="mcq-session-bar">
+    <div class="mcq-bar-left">
+      <button class="mcq-bar-btn" id="mcq-pause-btn" title="Pause (Space)" aria-label="Pause session">&#x23F8;</button>
+      <button class="mcq-bar-btn mcq-quit-btn" id="mcq-quit-btn" title="End session" aria-label="End session">&#x2715;</button>
+      <span class="mcq-session-subject-label" id="mcq-session-subject-label"></span>
+    </div>
+    <div class="mcq-bar-center">
+      <span class="mcq-q-counter" id="mcq-q-counter">Q&nbsp;1&nbsp;/&nbsp;40</span>
+      <span class="mcq-streak" id="mcq-streak" hidden aria-live="polite">
+        <span class="mcq-streak-ico" aria-hidden="true">&#x1F525;</span>
+        <span class="mcq-streak-n" id="mcq-streak-n">0</span>
+        <span class="mcq-streak-lbl">streak</span>
+      </span>
+    </div>
+    <div class="mcq-bar-right">
+      <button class="mcq-bar-btn mcq-flag-btn" id="mcq-flag-btn" aria-pressed="false"
+              title="Flag for review (F)" aria-label="Flag this question for review">&#x2691;</button>
+      <div class="mcq-ring-wrap" id="mcq-ring-wrap">
+        <svg class="mcq-ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="mcq-ring-track" cx="60" cy="60" r="52"/>
+          <circle class="mcq-ring-fill" id="mcq-ring-fill" cx="60" cy="60" r="52"
+                  stroke-dasharray="326.7" stroke-dashoffset="0"/>
+        </svg>
+        <div class="mcq-ring-num" id="mcq-ring-num">90</div>
+      </div>
+      <div class="mcq-paper-time" id="mcq-paper-time" hidden title="Booklet time remaining"></div>
+      <div class="mcq-overall-timer" id="mcq-overall-timer" title="Total session time">00:00</div>
+      <div class="mcq-score-live" id="mcq-score-live" title="Score">0&nbsp;/&nbsp;0</div>
+      <button class="mcq-bar-btn mcq-theme-btn" id="mcq-theme-toggle" aria-pressed="false"
+              title="Switch theme (T)" aria-label="Toggle light and dark theme">
+        <span class="mcq-theme-ico mcq-theme-ico-dark" aria-hidden="true">&#x1F319;</span>
+        <span class="mcq-theme-ico mcq-theme-ico-light" aria-hidden="true">&#x2600;&#xFE0F;</span>
+      </button>
+    </div>
+  </div><!-- /mcq-session-bar -->
+
+  <!-- Progress bar -->
+  <div class="mcq-progress-wrap"><div class="mcq-progress-fill" id="mcq-progress-fill"></div></div>
+
+  <!-- Question area -->
+  <div class="mcq-question-wrap">
+
+    <!-- Question card -->
+    <div class="mcq-question-card" id="mcq-question-card">
+      <div class="mcq-q-ref" id="mcq-q-ref">&mdash;</div>
+      <div class="mcq-q-topic-badge" id="mcq-q-topic"></div>
+      <div class="mcq-q-img-wrap">
+        <img id="mcq-q-img" src="" alt="Question image" class="mcq-q-img">
+        <div id="mcq-q-img-spinner" class="mcq-q-spinner">Loading&hellip;</div>
+        <div id="mcq-q-img-error" class="mcq-q-img-error" hidden>
+          <span>&#x1F4F7; Preview unavailable</span>
+          <p id="mcq-q-text-fallback" class="mcq-q-text-fallback"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer buttons -->
+    <div class="mcq-answers" id="mcq-answers" role="group" aria-label="Answer options">
+      <button class="mcq-ans-btn" id="mcq-btn-A" data-letter="A" aria-label="Answer A">
+        <span class="mcq-ans-letter">A</span>
+        <span class="mcq-ans-kbd">A</span>
+      </button>
+      <button class="mcq-ans-btn" id="mcq-btn-B" data-letter="B" aria-label="Answer B">
+        <span class="mcq-ans-letter">B</span>
+        <span class="mcq-ans-kbd">B</span>
+      </button>
+      <button class="mcq-ans-btn" id="mcq-btn-C" data-letter="C" aria-label="Answer C">
+        <span class="mcq-ans-letter">C</span>
+        <span class="mcq-ans-kbd">C</span>
+      </button>
+      <button class="mcq-ans-btn" id="mcq-btn-D" data-letter="D" aria-label="Answer D">
+        <span class="mcq-ans-letter">D</span>
+        <span class="mcq-ans-kbd">D</span>
+      </button>
+    </div>
+
+    <!-- Inline answer feedback (auto-check when answer is stored) -->
+    <div class="mcq-inline-feedback" id="mcq-inline-feedback" hidden role="status" aria-live="polite">
+      <span class="mcq-fb-icon" id="mcq-fb-icon"></span>
+      <div class="mcq-fb-body">
+        <div class="mcq-fb-result" id="mcq-fb-result"></div>
+        <div class="mcq-fb-letters" id="mcq-fb-letters"></div>
+      </div>
+      <button class="mcqb mcqb-ghost mcq-fb-action mcq-explain-btn" id="mcq-explain-btn" title="AI explanation">&#x1F4A1; Explain</button>
+      <button class="mcqb mcqb-primary mcq-fb-action mcq-fb-next" id="mcq-fb-next-btn">Next &rarr;</button>
+    </div>
+
+    <!-- AI explanation panel (loads on demand) -->
+    <div class="mcq-explanation-panel" id="mcq-explanation-panel" hidden aria-label="Answer explanation">
+      <div class="mcq-explanation-header">
+        <span class="mcq-explanation-icon">&#x1F4A1;</span>
+        <span class="mcq-explanation-title">Worked explanation</span>
+        <span class="mcq-explanation-auto" id="mcq-explanation-auto" hidden>auto</span>
+        <button class="mcq-explanation-close" id="mcq-explanation-close" aria-label="Close explanation">&times;</button>
+      </div>
+      <div class="mcq-explanation-body" id="mcq-explanation-body">
+        <div class="mcq-explanation-loading" id="mcq-explanation-loading">
+          <div class="mcq-shimmer-line"></div>
+          <div class="mcq-shimmer-line short"></div>
+          <div class="mcq-shimmer-line"></div>
+        </div>
+        <div class="mcq-explanation-content" id="mcq-explanation-content"></div>
+      </div>
+    </div>
+
+    <div class="mcq-session-footer">
+      <button class="mcqb mcqb-ghost mcq-skip-btn" id="mcq-skip-btn">Skip &rarr;</button>
+    </div>
+  </div><!-- /mcq-question-wrap -->
+
+  <!-- Answer feedback overlay -->
+  <div class="mcq-feedback-overlay" id="mcq-feedback-overlay" hidden role="dialog" aria-label="Answer feedback">
+    <div class="mcq-feedback-card">
+      <div class="mcq-feedback-result" id="mcq-feedback-result"></div>
+      <div class="mcq-feedback-letters" id="mcq-feedback-letters"></div>
+      <div class="mcq-feedback-ms-wrap" id="mcq-feedback-ms-wrap">
+        <p class="mcq-feedback-ms-label">Mark scheme</p>
+        <img id="mcq-feedback-ms-img" src="" alt="Mark scheme" class="mcq-feedback-ms-img">
+        <div id="mcq-feedback-ms-spinner" class="mcq-q-spinner">Loading&hellip;</div>
+        <div id="mcq-feedback-ms-error" class="mcq-q-img-error" hidden>
+          Mark scheme image not available for this question.
+        </div>
+      </div>
+      <div class="mcq-feedback-actions">
+        <button class="mcqb mcqb-primary mcq-next-btn" id="mcq-next-btn">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause overlay -->
+  <div class="mcq-pause-overlay" id="mcq-pause-overlay" hidden role="dialog" aria-label="Paused">
+    <div class="mcq-pause-box">
+      <div class="mcq-pause-icon">&#x23F8;</div>
+      <h2>Paused</h2>
+      <p>Every timer is stopped — nothing is counting against you.</p>
+
+      <div class="mcq-pause-bar"><i id="mcq-pause-bar-fill"></i></div>
+      <p class="mcq-pause-hint" id="mcq-pause-progress"></p>
+
+      <div class="mcq-pause-stats">
+        <div class="mcq-pause-stat"><b id="mcq-pause-done">0</b><span>Answered</span></div>
+        <div class="mcq-pause-stat is-good"><b id="mcq-pause-correct">0</b><span>Correct</span></div>
+        <div class="mcq-pause-stat"><b id="mcq-pause-elapsed">0:00</b><span>Elapsed</span></div>
+        <div class="mcq-pause-stat is-accent"><b id="mcq-pause-left">&mdash;</b><span>Time left</span></div>
+      </div>
+
+      <button class="mcqb mcqb-primary" id="mcq-resume-btn">&#x25B6; Resume</button>
+    </div>
+  </div>
+
+  <!-- Question navigator — fixed bottom-right, built by JS -->
+  <div class="mcq-q-nav" id="mcq-q-nav"></div>
+</main><!-- /session-panel -->
+
+<!-- Resume prompt — sibling of the session panel so it can render on boot,
+     before any panel is ready. Shown only when a saved session is found. -->
+<div class="mcq-resume-modal" id="mcq-resume-modal" hidden role="dialog" aria-modal="true"
+     aria-labelledby="mcq-resume-title">
+  <div class="mcq-resume-box">
+    <div class="mcq-resume-ico" aria-hidden="true">&#x21BA;</div>
+    <h2 id="mcq-resume-title">Resume your session?</h2>
+    <p class="mcq-resume-info" id="mcq-resume-info"></p>
+    <div class="mcq-resume-actions">
+      <button class="mcqb mcqb-primary" id="mcq-resume-yes" disabled>Resume</button>
+      <button class="mcqb mcqb-ghost" id="mcq-resume-no">Start fresh</button>
+    </div>
+    <p class="mcq-resume-err" id="mcq-resume-err" hidden></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANEL 3: RESULTS
+============================================================ -->
+<main id="results-panel" class="container mcq-results-panel" hidden aria-label="Session results">
+
+  <div class="mcq-results-hero">
+    <h1 id="res-headline">Session complete!</h1>
+
+    <div class="mcq-results-score-row">
+      <!-- Big score ring -->
+      <div class="mcq-results-ring-wrap">
+        <svg viewBox="0 0 160 160" aria-hidden="true">
+          <circle class="mcq-ring-track" cx="80" cy="80" r="68"/>
+          <circle class="mcq-results-fill" id="mcq-results-ring" cx="80" cy="80" r="68"
+                  stroke-dasharray="427.3" stroke-dashoffset="427.3"/>
+        </svg>
+        <div class="mcq-results-score-num">
+          <span id="res-score">0</span>
+          <small>/<span id="res-total">0</span></small>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="mcq-stat-grid">
+        <div class="mcq-stat-card tint-green">
+          <b id="res-correct">0</b><span>Correct</span>
+        </div>
+        <div class="mcq-stat-card tint-pink">
+          <b id="res-wrong">0</b><span>Wrong</span>
+        </div>
+        <div class="mcq-stat-card tint-lav">
+          <b id="res-skipped">0</b><span>Skipped</span>
+        </div>
+        <div class="mcq-stat-card tint-blue">
+          <b id="res-time">0:00</b><span>Total time</span>
+        </div>
+        <div class="mcq-stat-card tint-orange">
+          <b id="res-avg-time">0 s</b><span>Avg / Q</span>
+        </div>
+        <div class="mcq-stat-card tint-teal">
+          <b id="res-pct">0%</b><span>Score %</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="mcq-results-message" id="res-message"></p>
+    <!-- Visual Q grid — coloured dots for each question -->
+    <div class="mcq-results-q-grid" id="mcq-results-q-grid"></div>
+  </div>
+
+  <div class="mcq-results-actions">
+    <button class="btn btn-dark" id="res-download-btn">&#x1F4E5; Download review PDF</button>
+    <button class="btn btn-outline" id="res-retry-btn">&#x21BA; Retry same topics</button>
+    <a class="btn btn-outline" href="papers.html" id="res-pdf-btn">&#x1F4C4; Build PDF of this set</a>
+    <a class="btn btn-outline" href="mcq-solver.html">New session</a>
+  </div>
+
+  <!-- Breakdown table -->
+  <div class="card mcq-results-table-wrap">
+    <div class="mcq-results-table-head">
+      <h2>Question breakdown</h2>
+      <div class="mcq-results-filter-row">
+        <button class="pill filter-pill active" data-res-filter="all">All</button>
+        <button class="pill filter-pill" data-res-filter="correct">&#x2713; Correct</button>
+        <button class="pill filter-pill" data-res-filter="wrong">&#x2717; Wrong</button>
+        <button class="pill filter-pill" data-res-filter="skipped">&mdash; Skipped</button>
+      </div>
+    </div>
+    <div class="mcq-results-table-scroll">
+      <table class="mcq-results-table" id="mcq-results-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Reference</th>
+            <th>Topic</th>
+            <th>Your answer</th>
+            <th>Correct</th>
+            <th>Time</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="mcq-results-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main><!-- /results-panel -->
+
+<!-- ============================================================
+     SAVE SCORE DIALOG
+     Appears after completing a full past paper in paper mode.
+============================================================ -->
+<div class="mcq-dl-modal" id="mcq-save-modal" hidden role="dialog" aria-modal="true"
+     aria-labelledby="mcq-save-title">
+  <div class="mcq-dl-box" style="max-width:420px">
+    <div class="mcq-dl-ico" aria-hidden="true">🎉</div>
+    <h2 id="mcq-save-title">Paper complete!</h2>
+    <p id="mcq-save-desc" class="mcq-dl-sub"></p>
+    <p id="mcq-save-score" style="font-size:1.5rem;font-weight:700;margin:8px 0 4px"></p>
+    <p id="mcq-save-pct" style="color:var(--grey);margin:0 0 20px"></p>
+    <p style="margin:0 0 18px;font-size:.95rem">Save this to your dashboard so it shows up as <strong>done</strong> in your past papers?</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-dark" id="mcq-save-yes">Save &amp; mark done</button>
+      <button class="btn btn-outline" id="mcq-save-no">Dismiss</button>
+    </div>
+    <p id="mcq-save-status" style="margin-top:12px;font-size:.9rem;color:var(--grey);min-height:1.4em"></p>
+  </div>
+</div>
+
+<!-- Enrollment gating modal -->
+<div class="mcq-dl-modal" id="mcq-enroll-gate-modal" hidden role="dialog" aria-modal="true"
+     aria-labelledby="mcq-enroll-gate-title">
+  <div class="mcq-dl-box" style="max-width:420px">
+    <div class="mcq-dl-ico" aria-hidden="true">⚠️</div>
+    <h2 id="mcq-enroll-gate-title">Enrollment Required</h2>
+    <p id="mcq-enroll-gate-message" class="mcq-dl-sub" style="margin: 15px 0; line-height: 1.5; color: var(--text);"></p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-dark" id="mcq-enroll-gate-yes">Enroll now</button>
+      <button class="btn btn-outline" id="mcq-enroll-gate-no">Dismiss</button>
+    </div>
+    <p id="mcq-enroll-gate-status" style="margin-top:12px;font-size:.9rem;color:var(--grey);min-height:1.4em"></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     REVIEW PDF DOWNLOAD
+     Every question you saw, your answer against the mark scheme,
+     and the worked solution — as one printable booklet.
+============================================================ -->
+<div class="mcq-dl-modal" id="mcq-dl-modal" hidden role="dialog" aria-modal="true"
+     aria-labelledby="mcq-dl-title">
+  <div class="mcq-dl-box">
+    <button class="mcq-dl-close" id="mcq-dl-close" aria-label="Close">&times;</button>
+    <div class="mcq-dl-ico" aria-hidden="true">&#x1F4E5;</div>
+    <h2 id="mcq-dl-title">Download your review PDF</h2>
+    <p class="mcq-dl-sub" id="mcq-dl-sub"></p>
+
+    <!-- Setup step -->
+    <div id="mcq-dl-setup">
+      <p class="field-label">Include worked explanations for</p>
+      <div class="mcq-dl-opts" id="mcq-dl-opts">
+        <label class="mcq-dl-opt">
+          <input type="radio" name="mcq-dl-scope" value="wrong" checked>
+          <span>
+            <b>The ones I got wrong</b>
+            <small id="mcq-dl-n-wrong">wrong and skipped questions</small>
+          </span>
+        </label>
+        <label class="mcq-dl-opt">
+          <input type="radio" name="mcq-dl-scope" value="all">
+          <span>
+            <b>Every question</b>
+            <small id="mcq-dl-n-all">the most complete booklet — takes longest</small>
+          </span>
+        </label>
+        <label class="mcq-dl-opt">
+          <input type="radio" name="mcq-dl-scope" value="none">
+          <span>
+            <b>None &mdash; just the paper and answers</b>
+            <small>ready in a few seconds</small>
+          </span>
+        </label>
+      </div>
+      <p class="mcq-dl-note">
+        Explanations already written for a question come back instantly, so
+        these are worst-case times &mdash; the more you practise a paper, the
+        faster its booklet builds.
+      </p>
+      <div class="mcq-dl-actions">
+        <button class="btn btn-dark" id="mcq-dl-start">Build my PDF</button>
+        <button class="btn btn-outline" id="mcq-dl-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Progress step -->
+    <div id="mcq-dl-progress" hidden>
+      <p class="mcq-dl-phase" id="mcq-dl-phase">Starting&hellip;</p>
+      <div class="mcq-dl-bar"><i id="mcq-dl-bar-fill"></i></div>
+      <p class="mcq-dl-count" id="mcq-dl-count"></p>
+      <p class="mcq-dl-note">You can leave this open &mdash; the download starts on its own.</p>
+      <div class="mcq-dl-actions">
+        <button class="btn btn-outline" id="mcq-dl-abandon">Stop waiting</button>
+      </div>
+    </div>
+
+    <!-- Done step -->
+    <div id="mcq-dl-done" hidden>
+      <p class="mcq-dl-ok">&#x2713; Your review booklet is ready.</p>
+      <div class="mcq-dl-actions">
+        <a class="btn btn-dark" id="mcq-dl-link" href="#" download>Download again</a>
+        <button class="btn btn-outline" id="mcq-dl-finish">Done</button>
+      </div>
+    </div>
+
+    <p class="mcq-dl-err" id="mcq-dl-err" hidden></p>
+  </div>
+</div>
+
+<script src="main.js?v=20260831a"></script>
+<script src="styled-dropdown.js?v=20260828a"></script>
+<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="mcq-solver.js?v=20260813a"></script>
+<script src="tools-core.js?v=20260811d"></script>
+<script src="tools-nav.js?v=20260811d"></script>
+<script src="tools-dock.js?v=20260810k"></script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+<script src="tour.js?v=20260829a"></script>
+</body>
+</html>
+
