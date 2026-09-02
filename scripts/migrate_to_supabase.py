@@ -82,10 +82,10 @@ else:
          "confidence","rationale","backend","classified_at"], "question_id")
 
     copy_table(sq,
-        "SELECT id,paper_id,question_number,sub_part,crop_path,rects_json "
+        "SELECT id,paper_id,question_number,sub_part,crop_path,rects_json,answer "
         "FROM ms_entries",
         "ms_entries",
-        ["id","paper_id","question_number","sub_part","crop_path","rects_json"],
+        ["id","paper_id","question_number","sub_part","crop_path","rects_json","answer"],
         "id")
 
     copy_table(sq,

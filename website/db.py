@@ -21,6 +21,16 @@ if USE_PG:
     import psycopg2
     from psycopg2.extras import RealDictCursor
 
+    # Ensure ms_entries has 'answer' column in Postgres
+    try:
+        _conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        with _conn.cursor() as _cur:
+            _cur.execute("ALTER TABLE ms_entries ADD COLUMN IF NOT EXISTS answer TEXT")
+        _conn.commit()
+        _conn.close()
+    except Exception as _e:
+        print(f"Database startup migration warning: {_e}")
+
 
 class _Row(dict):
     """Dict that also supports positional [0] indexing (like sqlite3.Row)."""
