@@ -13,20 +13,41 @@ ADMIN_KEY must be set in the environment on any public deployment.
 
 import json
 import os
+import random as _random
+import re
 import secrets
+import smtplib
+import string as _string
 import time
+import uuid as _uuid
+from email.mime.text import MIMEText as _MIMEText
+from pathlib import Path
 
 import requests
-from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Query
+from fastapi import (APIRouter, Cookie, Depends, File, Form, Header,
+                     HTTPException, Query, UploadFile)
+from jose import JWTError, jwt as _jwt
 from pydantic import BaseModel
 
 from . import users_db as _udb
 
 router = APIRouter(prefix="/api/admin")
 
+ROOT = Path(__file__).resolve().parent.parent
+TAXONOMY_DIR = ROOT / "taxonomy"
+RESOURCES_DIR = ROOT / "data" / "resources"
+# Homework attachments land outside data/resources so they can never show up in
+# the public Resources browser — they are one student's worksheet, not a note.
+UPLOADS_DIR = ROOT / "data" / "uploads" / "homework"
+
+STATUSES = {"not_started", "learning", "confident"}
+
 ADMIN_KEY = (os.environ.get("ADMIN_ACCESS_KEY")
              or os.environ.get("ADMIN_KEY")
              or "prepwithtee-admin-2026")
+
+_JWT_SECRET = os.environ.get("SECRET_KEY", "dev-only-change-me-in-production")
+_JWT_ALG = "HS256"
 
 SUBJECT_NAMES = {
     "4024": "O Level Mathematics D",
@@ -49,14 +70,98 @@ def require_admin(
     key: str | None = Query(None),
     x_admin_key: str | None = Header(None),
     admin_key: str | None = Cookie(None),
+    session: str | None = Cookie(None),
 ) -> bool:
+    # Preferred: JWT session cookie with role='admin'
+    if session:
+        try:
+            payload = _jwt.decode(session, _JWT_SECRET, algorithms=[_JWT_ALG])
+            u = payload.get("u", {})
+            if u.get("role") == "admin":
+                return True
+        except (JWTError, Exception):
+            pass
+    # Legacy: shared admin key via query param, header, or cookie
     supplied = key or x_admin_key or admin_key or ""
-    if not secrets.compare_digest(supplied, ADMIN_KEY):
-        raise HTTPException(401, "Invalid or missing admin key")
-    return True
+    if supplied and secrets.compare_digest(supplied, ADMIN_KEY):
+        return True
+    raise HTTPException(401, "Invalid or missing admin credentials")
 
 
 _Admin = Depends(require_admin)
+
+
+# ── Teacher account helpers ───────────────────────────────────────────────────
+
+def _generate_temp_password(length: int = 12) -> str:
+    chars = _string.ascii_letters + _string.digits
+    pwd = (
+        _random.choice(_string.ascii_uppercase) +
+        _random.choice(_string.digits) +
+        ''.join(_random.choice(chars) for _ in range(length - 2))
+    )
+    return ''.join(_random.sample(pwd, len(pwd)))
+
+
+def _send_teacher_welcome(to_email: str, name: str, temp_password: str) -> tuple[bool, str]:
+    """Email the new teacher their login credentials. Returns (success, error_message)."""
+    import logging
+    log = logging.getLogger(__name__)
+
+    base_url = os.environ.get("APP_BASE_URL", "https://prepwithtee.com")
+    subject = "Welcome to PrepWithTee — your teacher account is ready"
+    body = (
+        f"Hi {name},\n\n"
+        f"Your PrepWithTee teacher account has been approved!\n\n"
+        f"Login page: {base_url}/login.html\n"
+        f"Email: {to_email}\n"
+        f"Temporary password: {temp_password}\n\n"
+        f"You will be asked to set a new password on your first login.\n\n"
+        f"If you have any questions, reply to this email.\n\n"
+        f"PrepWithTee Team"
+    )
+    smtp_user = os.environ.get("SMTP_USER", "")
+
+    resend_key = os.environ.get("RESEND_API_KEY")
+    if resend_key:
+        # Use SMTP_USER as from if it's a verified domain address; fallback to
+        # the Resend test sender which works without domain verification.
+        from_addr = (f"PrepWithTee <{smtp_user}>" if smtp_user else
+                     "PrepWithTee <onboarding@resend.dev>")
+        try:
+            r = requests.post(
+                "https://api.resend.com/emails",
+                json={"from": from_addr, "to": [to_email],
+                      "subject": subject, "text": body},
+                headers={"Authorization": f"Bearer {resend_key}"},
+                timeout=10,
+            )
+            if r.status_code < 300:
+                return True, ""
+            err = f"Resend {r.status_code}: {r.text[:200]}"
+            log.warning("_send_teacher_welcome Resend failed: %s", err)
+        except Exception as exc:
+            err = str(exc)
+            log.warning("_send_teacher_welcome Resend exception: %s", exc)
+    else:
+        err = "No RESEND_API_KEY"
+
+    smtp_pass = os.environ.get("SMTP_PASS")
+    if smtp_user and smtp_pass:
+        try:
+            msg = _MIMEText(body)
+            msg["Subject"] = subject
+            msg["From"] = smtp_user
+            msg["To"] = to_email
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=8) as srv:
+                srv.starttls()
+                srv.login(smtp_user, smtp_pass)
+                srv.sendmail(smtp_user, to_email, msg.as_string())
+            return True, ""
+        except Exception as exc:
+            err = str(exc)
+            log.warning("_send_teacher_welcome SMTP exception: %s", exc)
+    return False, err
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -77,6 +182,33 @@ def _decorate_teacher(t: dict) -> dict:
     codes = _subjects_of(t)
     return {**t, "subjects": codes,
             "subject_names": [SUBJECT_NAMES.get(c, c) for c in codes]}
+
+
+def _student_or_404(user_id: str) -> dict:
+    user = _udb.get_user(user_id)
+    if user is None:
+        raise HTTPException(404, "No such student")
+    return user
+
+
+def _json_list(raw) -> list:
+    """attachments_json / topics_json come back as text from SQLite and as a
+    parsed list from Supabase's jsonb. Normalise both to a list."""
+    if isinstance(raw, list):
+        return raw
+    try:
+        val = json.loads(raw or "[]")
+        return val if isinstance(val, list) else []
+    except (TypeError, ValueError):
+        return []
+
+
+def _decorate_assignment(a: dict) -> dict:
+    return {**a,
+            "topics": _json_list(a.get("topics_json")),
+            "attachments": _json_list(a.get("attachments_json")),
+            "submissions": _json_list(a.get("student_submissions_json")),
+            "subject_name": SUBJECT_NAMES.get(a.get("syllabus"), a.get("syllabus"))}
 
 
 # ── Overview ─────────────────────────────────────────────────────────────────
@@ -114,8 +246,10 @@ def subject_requests(_: bool = _Admin):
 @router.get("/students")
 def students(_: bool = _Admin):
     rows = _udb.list_students()
+    open_hw = _udb.count_open_assignments([r["id"] for r in rows])
     for r in rows:
         r["subject_names"] = [SUBJECT_NAMES.get(s, s) for s in r.get("subjects", [])]
+        r["open_homework"] = open_hw.get(r["id"], 0)
     return {"students": rows}
 
 
@@ -126,16 +260,41 @@ def student_detail(user_id: str, _: bool = _Admin):
         raise HTTPException(404, "No such student")
 
     # Group topic progress by syllabus so the drill-down reads subject by subject.
+    #
+    # The percentage is confident CHAPTERS over the chapters in the syllabus.
+    # It used to be confident rows over *touched* rows, which made a student who
+    # had ticked 14 subtopics of a single chapter show "14 confident — 100%".
+    # Two separate faults there: subtopics counted as chapters, and the
+    # denominator was whatever happened to be in the table.
     by_syllabus: dict[str, dict] = {}
     for p in detail["progress"]:
         syl = p.get("syllabus") or "?"
         entry = by_syllabus.setdefault(syl, {
             "syllabus": syl, "name": SUBJECT_NAMES.get(syl, syl),
-            "topics": [], "confident": 0, "learning": 0, "not_started": 0})
-        entry["topics"].append(p)
+            "topics": [], "subtopics": [],
+            "confident": 0, "learning": 0, "not_started": 0,
+            "sub_confident": 0, "chapters_total": 0})
         status = p.get("status") or "not_started"
-        if status in entry:
-            entry[status] += 1
+        if p.get("subtopic"):
+            entry["subtopics"].append(p)
+            if status == "confident":
+                entry["sub_confident"] += 1
+        else:
+            entry["topics"].append(p)
+            if status in entry:
+                entry[status] += 1
+
+    for syl, entry in by_syllabus.items():
+        try:
+            entry["chapters_total"] = len(_taxonomy(syl)["topics"])
+        except HTTPException:
+            entry["chapters_total"] = len(entry["topics"])   # unknown syllabus
+        # Chapters the student has never opened are genuinely "not started";
+        # only counting rows that exist understates the work left.
+        entry["not_started"] = max(
+            0, entry["chapters_total"] - entry["confident"] - entry["learning"])
+        entry["pct"] = (round(entry["confident"] / entry["chapters_total"] * 100)
+                        if entry["chapters_total"] else 0)
 
     quizzes = detail["quizzes"]
     scored = [q["score"] for q in quizzes if q.get("score") is not None]
@@ -143,17 +302,626 @@ def student_detail(user_id: str, _: bool = _Admin):
     for e in detail["enrollments"]:
         e["name"] = SUBJECT_NAMES.get(e.get("syllabus"), e.get("syllabus"))
 
+    assignments = [_decorate_assignment(a) for a in detail.get("assignments", [])]
+    classes = detail.get("classes", [])
+    held = [c for c in classes if (c.get("status") or "held") == "held"]
+
     return {
         **detail,
+        "assignments": assignments,
         "by_syllabus": sorted(by_syllabus.values(), key=lambda s: s["syllabus"]),
         "stats": {
             "quiz_count": len(quizzes),
             "avg_score": round(sum(scored) / len(scored), 1) if scored else None,
             "topics_tracked": len(detail["progress"]),
+            "papers_done": sum(1 for p in detail.get("papers", [])
+                               if p.get("status") == "confident"),
+            "classes_held": len(held),
+            "last_class": max((c.get("class_date") or "" for c in held),
+                              default=None) or None,
+            "open_homework": sum(1 for a in assignments if a.get("status") != "done"),
             "last_active": max((q.get("created_at") or "" for q in quizzes),
                                default=None) or None,
         },
     }
+
+
+# ── Syllabus taxonomy (the picker behind every topic control) ────────────────
+
+_TAX_CACHE: dict[str, dict] = {}
+
+
+def _taxonomy(syllabus: str) -> dict:
+    """Topics + subtopics straight from taxonomy/<code>.json.
+
+    The tutor must be able to set a status on a chapter the student has never
+    opened, so the editor is driven by the syllabus, not by existing rows.
+    """
+    if syllabus in _TAX_CACHE:
+        return _TAX_CACHE[syllabus]
+    if not re.fullmatch(r"[0-9A-Za-z]{4,6}", syllabus):
+        raise HTTPException(400, "Invalid syllabus code")
+    path = TAXONOMY_DIR / f"{syllabus}.json"
+    if not path.is_file():
+        raise HTTPException(404, f"No taxonomy for {syllabus}")
+    data = json.loads(path.read_text("utf-8"))
+    out = {
+        "syllabus": syllabus,
+        "subject": data.get("subject", syllabus),
+        "name": SUBJECT_NAMES.get(syllabus, data.get("subject", syllabus)),
+        "topics": [{"name": t["name"],
+                    "subtopics": [s["name"] for s in t.get("subtopics", [])]}
+                   for t in data.get("topics", [])],
+    }
+    _TAX_CACHE[syllabus] = out
+    return out
+
+
+@router.get("/syllabus/{syllabus}/topics")
+def syllabus_topics(syllabus: str, _: bool = _Admin):
+    return _taxonomy(syllabus)
+
+
+# ── Student topic progress (tutor-set) ───────────────────────────────────────
+
+class ProgressWrite(BaseModel):
+    syllabus: str
+    topic: str
+    subtopic: str | None = None
+    status: str | None = None          # how well they know it
+    papers_status: str | None = None   # whether they've drilled its past papers
+
+
+class ProgressBulk(BaseModel):
+    items: list[ProgressWrite]
+
+
+def _apply_progress(user_id: str, item: ProgressWrite) -> dict:
+    for field, value in (("status", item.status),
+                         ("papers_status", item.papers_status)):
+        if value is not None and value not in STATUSES:
+            raise HTTPException(
+                400, f"{field} must be one of: {', '.join(sorted(STATUSES))}")
+    if item.status is None and item.papers_status is None:
+        raise HTTPException(400, "Send status, papers_status, or both")
+    _taxonomy(item.syllabus)          # 400/404 on a bogus syllabus code
+    return _udb.upsert_progress(user_id, item.syllabus, item.topic,
+                                item.subtopic, item.status, item.papers_status)
+
+
+class PlanUpdate(BaseModel):
+    plan: str                         # 'free' | 'solo' | 'three' | 'all'
+    trial: bool = False               # Grant a 7-day trial instead of full term
+    plan_expires_at: str | None = None  # Override: ISO-8601 or null (auto-computed if absent)
+
+
+VALID_PLANS = {"free", "solo", "three", "all"}
+
+
+@router.patch("/students/{user_id}/plan")
+def set_student_plan(user_id: str, req: PlanUpdate, _: bool = _Admin):
+    from datetime import datetime, timedelta, timezone
+    from .access import TRIAL_DAYS, BILLING_CYCLE_DAYS
+
+    if req.plan not in VALID_PLANS:
+        raise HTTPException(400, f"plan must be one of: {', '.join(sorted(VALID_PLANS))}")
+    _student_or_404(user_id)
+
+    now = datetime.now(timezone.utc)
+    started_at = now.isoformat()
+
+    if req.plan == "free":
+        expires_at = None
+        trial = False
+    elif req.plan_expires_at:
+        expires_at = req.plan_expires_at
+        trial = req.trial
+    elif req.trial:
+        expires_at = (now + timedelta(days=TRIAL_DAYS)).isoformat()
+        trial = True
+    else:
+        expires_at = (now + timedelta(days=BILLING_CYCLE_DAYS)).isoformat()
+        trial = False
+
+    updated = _udb.update_user_plan(
+        user_id, req.plan, expires_at,
+        started_at=started_at, trial=trial,
+    )
+    return {
+        "ok": True,
+        "plan": updated.get("plan"),
+        "plan_expires_at": updated.get("plan_expires_at"),
+        "plan_started_at": updated.get("plan_started_at"),
+        "plan_trial": updated.get("plan_trial"),
+    }
+
+
+@router.post("/students/{user_id}/progress")
+def set_student_progress(user_id: str, req: ProgressWrite, _: bool = _Admin):
+    _student_or_404(user_id)
+    return {"progress": _apply_progress(user_id, req)}
+
+
+@router.post("/students/{user_id}/progress/bulk")
+def set_student_progress_bulk(user_id: str, req: ProgressBulk, _: bool = _Admin):
+    """Used by "mark the whole chapter" — one call instead of N round-trips."""
+    _student_or_404(user_id)
+    if not req.items:
+        raise HTTPException(400, "Nothing to update")
+    return {"updated": [_apply_progress(user_id, i) for i in req.items]}
+
+
+# ── Student past-paper practice ──────────────────────────────────────────────
+
+class PaperWrite(BaseModel):
+    syllabus: str
+    year: int
+    session: str
+    paper: int
+    variant: str | None = ""
+    status: str
+    score: int | None = None
+    max_score: int | None = None
+    note: str | None = None
+
+
+@router.get("/students/{user_id}/papers")
+def student_papers(user_id: str, _: bool = _Admin):
+    _student_or_404(user_id)
+    return {"papers": _udb.get_paper_progress(user_id)}
+
+
+@router.post("/students/{user_id}/papers")
+def set_student_paper(user_id: str, req: PaperWrite, _: bool = _Admin):
+    _student_or_404(user_id)
+    if req.status not in STATUSES:
+        raise HTTPException(400, f"status must be one of: {', '.join(sorted(STATUSES))}")
+    row = _udb.upsert_paper_progress(
+        user_id, req.syllabus, req.year, req.session, req.paper,
+        req.variant or "", req.status, req.score, req.max_score, req.note,
+        set_by="tutor")
+    return {"paper": row}
+
+
+# ── Class log (per-student attendance calendar) ──────────────────────────────
+
+CLASS_STATUSES = {"held", "cancelled", "missed", "rescheduled"}
+
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_TIME_RE = re.compile(r"^\d{2}:\d{2}$")
+
+
+class ClassWrite(BaseModel):
+    class_date: str | None = None
+    start_time: str | None = None
+    duration_min: int | None = None
+    syllabus: str | None = None
+    status: str | None = None
+    topic: str | None = None
+    note: str | None = None
+
+
+def _class_fields(req: ClassWrite, *, creating: bool) -> dict:
+    fields: dict = {}
+    if req.class_date is not None:
+        if not _DATE_RE.match(req.class_date):
+            raise HTTPException(400, "class_date must be YYYY-MM-DD")
+        fields["class_date"] = req.class_date
+    elif creating:
+        raise HTTPException(400, "class_date is required")
+
+    if req.start_time is not None:
+        t = req.start_time.strip()
+        if t and not _TIME_RE.match(t):
+            raise HTTPException(400, "start_time must be HH:MM")
+        fields["start_time"] = t or None
+    if req.status is not None:
+        if req.status not in CLASS_STATUSES:
+            raise HTTPException(
+                400, f"status must be one of: {', '.join(sorted(CLASS_STATUSES))}")
+        fields["status"] = req.status
+    for name in ("duration_min", "syllabus", "topic", "note"):
+        value = getattr(req, name)
+        if value is not None:
+            fields[name] = value
+    return fields
+
+
+@router.get("/students/{user_id}/classes")
+def student_classes(user_id: str, _: bool = _Admin):
+    _student_or_404(user_id)
+    return {"classes": _udb.get_class_log(user_id)}
+
+
+@router.post("/students/{user_id}/classes")
+def add_class(user_id: str, req: ClassWrite, _: bool = _Admin):
+    _student_or_404(user_id)
+    fields = _class_fields(req, creating=True)
+    fields.setdefault("status", "held")
+    fields["user_id"] = user_id
+    return {"class": _udb.create_class_entry(fields)}
+
+
+@router.patch("/classes/{entry_id}")
+def edit_class(entry_id: int, req: ClassWrite, _: bool = _Admin):
+    if _udb.get_class_entry(entry_id) is None:
+        raise HTTPException(404, "No such class entry")
+    fields = _class_fields(req, creating=False)
+    if not fields:
+        raise HTTPException(400, "Nothing to update")
+    return {"class": _udb.update_class_entry(entry_id, fields)}
+
+
+@router.delete("/classes/{entry_id}")
+def remove_class(entry_id: int, _: bool = _Admin):
+    if _udb.get_class_entry(entry_id) is None:
+        raise HTTPException(404, "No such class entry")
+    _udb.delete_class_entry(entry_id)
+    return {"status": "deleted"}
+
+
+# ── Assignments (the student diary) ──────────────────────────────────────────
+
+ASSIGN_KINDS = {"homework", "reading", "practice", "test"}
+
+
+class AttachmentIn(BaseModel):
+    """One item hanging off an assignment.
+
+    type=resource → `rel` points into data/resources (a notes/formula PDF).
+    type=booklet  → `params` is a /api/generate body the student can run.
+    type=upload   → written by the upload endpoint, never accepted from a client.
+    """
+    type: str
+    name: str | None = None
+    rel: str | None = None
+    params: dict | None = None
+
+
+class AssignmentWrite(BaseModel):
+    syllabus: str | None = None
+    kind: str | None = None
+    title: str | None = None
+    instructions: str | None = None
+    topics: list[str] | None = None
+    attachments: list[AttachmentIn] | None = None
+    due_date: str | None = None
+    status: str | None = None
+
+
+def _clean_attachments(items: list[AttachmentIn]) -> list[dict]:
+    out = []
+    for a in items:
+        if a.type == "resource":
+            if not a.rel:
+                raise HTTPException(400, "A resource attachment needs `rel`")
+            # Same resolve-and-check the public resource route uses: `rel` is
+            # attacker-controlled text and must not escape data/resources.
+            base = RESOURCES_DIR.resolve()
+            path = (RESOURCES_DIR / a.rel).resolve()
+            if not str(path).startswith(str(base)) or not path.is_file():
+                raise HTTPException(400, f"No such resource: {a.rel}")
+            out.append({"type": "resource", "rel": a.rel,
+                        "name": a.name or path.name})
+        elif a.type == "booklet":
+            if not isinstance(a.params, dict) or not a.params.get("topics"):
+                raise HTTPException(400, "A booklet attachment needs params.topics")
+            out.append({"type": "booklet", "name": a.name or "Practice booklet",
+                        "params": a.params})
+        elif a.type == "upload":
+            # Uploads are minted server-side; echoing one back keeps an edit
+            # from dropping files the tutor already attached.
+            if not a.rel:
+                raise HTTPException(400, "An upload attachment needs `rel`")
+            out.append({"type": "upload", "rel": a.rel, "name": a.name or a.rel})
+        else:
+            raise HTTPException(400, f"Unknown attachment type: {a.type}")
+    return out
+
+
+def _assignment_fields(req: AssignmentWrite, *, creating: bool) -> dict:
+    fields: dict = {}
+    if req.title is not None:
+        if not req.title.strip():
+            raise HTTPException(400, "Title cannot be blank")
+        fields["title"] = req.title.strip()
+    elif creating:
+        raise HTTPException(400, "Title is required")
+
+    if req.kind is not None:
+        if req.kind not in ASSIGN_KINDS:
+            raise HTTPException(
+                400, f"kind must be one of: {', '.join(sorted(ASSIGN_KINDS))}")
+        fields["kind"] = req.kind
+    if req.due_date is not None:
+        d = req.due_date.strip()
+        if d and not _DATE_RE.match(d):
+            raise HTTPException(400, "due_date must be YYYY-MM-DD")
+        fields["due_date"] = d or None
+    if req.status is not None:
+        if req.status not in {"assigned", "done"}:
+            raise HTTPException(400, "status must be 'assigned' or 'done'")
+        fields["status"] = req.status
+        fields["completed_at"] = _udb._now() if req.status == "done" else None
+    if req.topics is not None:
+        fields["topics_json"] = json.dumps(req.topics)
+    if req.attachments is not None:
+        fields["attachments_json"] = json.dumps(_clean_attachments(req.attachments))
+    for name in ("syllabus", "instructions"):
+        value = getattr(req, name)
+        if value is not None:
+            fields[name] = value
+    return fields
+
+
+@router.get("/students/{user_id}/assignments")
+def student_assignments(user_id: str, _: bool = _Admin):
+    _student_or_404(user_id)
+    return {"assignments": [_decorate_assignment(a)
+                            for a in _udb.get_assignments(user_id)]}
+
+
+@router.get("/homework")
+def homework_overview(_: bool = _Admin):
+    """Every student's work in one payload, for the Homework page.
+
+    Returns students already sorted by what needs attention — anything a
+    student has submitted and the tutor has not marked done floats to the top,
+    then overdue, then open. That ordering is the whole point of the page: the
+    tutor opens it to answer "who is waiting on me?".
+    """
+    from datetime import date
+    today = date.today().isoformat()
+
+    students = {s["id"]: s for s in _udb.list_students()}
+
+    def shape(a: dict) -> dict:
+        d = _decorate_assignment(a)
+        # Submissions are downloaded by index, so the stored `rel` (a server
+        # path) has no reason to travel to the browser.
+        d["submissions"] = [
+            {"idx": i, "name": s.get("name"), "size": s.get("size"),
+             "submitted_at": s.get("submitted_at")}
+            for i, s in enumerate(d.get("submissions") or [])]
+        return d
+
+    rows = [shape(a) for a in _udb.get_all_assignments()]
+
+    by_student: dict[str, list] = {}
+    for a in rows:
+        # An assignment whose student no longer exists is a leftover, not a row
+        # worth rendering — the page is a per-student view.
+        if a.get("user_id") in students:
+            by_student.setdefault(a["user_id"], []).append(a)
+
+    out = []
+    for uid, items in by_student.items():
+        s = students[uid]
+        open_items = [a for a in items if a.get("status") != "done"]
+        overdue = [a for a in open_items
+                   if a.get("due_date") and str(a["due_date"]) < today]
+        # "Waiting on you": the student has handed something in and it is still
+        # sitting open.
+        awaiting = [a for a in open_items if a.get("submissions")]
+        out.append({
+            "user_id": uid,
+            "name": s.get("name") or s.get("email") or "Student",
+            "email": s.get("email"),
+            "picture_url": s.get("picture_url"),
+            "total": len(items),
+            "open": len(open_items),
+            "overdue": len(overdue),
+            "awaiting_review": len(awaiting),
+            "submissions": sum(len(a.get("submissions") or []) for a in items),
+            "assignments": items,
+        })
+
+    out.sort(key=lambda s: (-s["awaiting_review"], -s["overdue"], -s["open"],
+                            s["name"].lower()))
+    return {
+        "students": out,
+        "totals": {
+            "students": len(out),
+            "open": sum(s["open"] for s in out),
+            "overdue": sum(s["overdue"] for s in out),
+            "awaiting_review": sum(s["awaiting_review"] for s in out),
+            "submissions": sum(s["submissions"] for s in out),
+        },
+    }
+
+
+@router.post("/students/{user_id}/assignments")
+def add_assignment(user_id: str, req: AssignmentWrite, notify: bool = True,
+                   _: bool = _Admin):
+    user = _student_or_404(user_id)
+    fields = _assignment_fields(req, creating=True)
+    fields["user_id"] = user_id
+    fields.setdefault("kind", "homework")
+    fields.setdefault("status", "assigned")
+    fields.setdefault("topics_json", "[]")
+    fields.setdefault("attachments_json", "[]")
+    row = _decorate_assignment(_udb.create_assignment(fields))
+
+    # Tell the student straight away. Attachments are usually added in the step
+    # after this, so ?notify=false lets the console hold the email until the
+    # tutor has finished putting the assignment together.
+    emailed = False
+    if notify:
+        from .app import _notify
+        from . import reminders
+        emailed = reminders.send_assigned_email(user, row, _notify)
+    return {"assignment": row, "emailed": emailed}
+
+
+@router.patch("/assignments/{assignment_id}")
+def edit_assignment(assignment_id: int, req: AssignmentWrite, _: bool = _Admin):
+    if _udb.get_assignment(assignment_id) is None:
+        raise HTTPException(404, "No such assignment")
+    fields = _assignment_fields(req, creating=False)
+    if not fields:
+        raise HTTPException(400, "Nothing to update")
+    return {"assignment": _decorate_assignment(
+        _udb.update_assignment(assignment_id, fields))}
+
+
+@router.delete("/assignments/{assignment_id}")
+def remove_assignment(assignment_id: int, _: bool = _Admin):
+    row = _udb.get_assignment(assignment_id)
+    if row is None:
+        raise HTTPException(404, "No such assignment")
+    # Take the uploaded files with it — nothing else references them.
+    for att in _json_list(row.get("attachments_json")):
+        if att.get("type") == "upload":
+            try:
+                (UPLOADS_DIR / att["rel"]).unlink(missing_ok=True)
+            except (OSError, KeyError):
+                pass
+    _udb.delete_assignment(assignment_id)
+    return {"status": "deleted"}
+
+
+# ── Reminders ────────────────────────────────────────────────────────────────
+
+@router.post("/students/{user_id}/remind")
+def remind_student(user_id: str, _: bool = _Admin):
+    """Nudge a student about everything still outstanding, on demand."""
+    user = _student_or_404(user_id)
+    from .app import _notify
+    from . import reminders
+
+    items = reminders.open_homework(user_id)
+    if not items:
+        raise HTTPException(400, "Nothing outstanding to remind them about")
+    for a in items:
+        a.setdefault("subject_name", SUBJECT_NAMES.get(a.get("syllabus"),
+                                                       a.get("syllabus")))
+    sent = reminders.send_digest_email(user, items, _notify)
+    return {
+        "sent": sent, "count": len(items),
+        "email": user.get("email"),
+        # WhatsApp cannot be automated without the Business API, so hand the
+        # tutor a prefilled link to send themselves.
+        "whatsapp": _wa_reminder_link(user, items),
+        "detail": None if sent else
+                  "SMTP is not configured on this server, so no email was sent.",
+    }
+
+
+def _wa_reminder_link(user: dict, items: list[dict]) -> str | None:
+    import urllib.parse
+    from . import reminders
+    digits = "".join(ch for ch in (user.get("phone") or "") if ch.isdigit())
+    if not digits:
+        return None
+    if digits.startswith("0"):
+        digits = "92" + digits[1:]
+    elif not digits.startswith("92") and len(digits) <= 11:
+        digits = "92" + digits
+    first = (user.get("name") or "there").split(" ")[0]
+    lines = "\n".join(
+        f"- {a.get('title')} ({reminders.due_phrase(reminders.days_left(a.get('due_date')))})"
+        for a in items[:6])
+    text = (f"Hi {first}! Reminder about your PrepWithTee homework:\n{lines}\n\n"
+            f"{reminders.APP_BASE_URL}/homework.html")
+    return f"https://wa.me/{digits}?text={urllib.parse.quote(text)}"
+
+
+@router.get("/students/{user_id}/calendar-url")
+def student_calendar_url(user_id: str, _: bool = _Admin):
+    """The subscribe-once feed URL to hand a student."""
+    _student_or_404(user_id)
+    from . import reminders
+    return {"url": reminders.calendar_url(user_id)}
+
+
+# ── Homework file uploads ────────────────────────────────────────────────────
+
+MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+ALLOWED_UPLOAD_EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".webp", ".doc", ".docx",
+                       ".txt", ".csv", ".xlsx", ".ppt", ".pptx", ".zip"}
+
+
+@router.post("/assignments/{assignment_id}/files")
+async def upload_assignment_file(assignment_id: int,
+                                 file: UploadFile = File(...),
+                                 label: str | None = Form(None),
+                                 _: bool = _Admin):
+    """Attach a worksheet to an assignment.
+
+    The stored name is generated, never the client's: an uploaded filename is
+    untrusted input and would otherwise be a path-traversal hole. The original
+    is kept only as the display label.
+    """
+    row = _udb.get_assignment(assignment_id)
+    if row is None:
+        raise HTTPException(404, "No such assignment")
+
+    original = os.path.basename(file.filename or "file")
+    ext = Path(original).suffix.lower()
+    if ext not in ALLOWED_UPLOAD_EXTS:
+        raise HTTPException(400, f"{ext or 'That file type'} is not allowed")
+
+    data = await file.read(MAX_UPLOAD_BYTES + 1)
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, "File is larger than 25 MB")
+    if not data:
+        raise HTTPException(400, "That file is empty")
+
+    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    rel = f"{assignment_id}_{_uuid.uuid4().hex[:12]}{ext}"
+    (UPLOADS_DIR / rel).write_bytes(data)
+
+    attachments = _json_list(row.get("attachments_json"))
+    attachments.append({"type": "upload", "rel": rel,
+                        "name": (label or original).strip() or original,
+                        "size": len(data)})
+    updated = _udb.update_assignment(
+        assignment_id, {"attachments_json": json.dumps(attachments)})
+    return {"assignment": _decorate_assignment(updated)}
+
+
+@router.get("/assignments/{assignment_id}/submission/{idx}")
+def download_student_submission(assignment_id: int, idx: int, _: bool = _Admin):
+    """Serve a student's submission to the administrator."""
+    from fastapi.responses import FileResponse
+    from .admin import UPLOADS_DIR
+    row = _udb.get_assignment(assignment_id)
+    if row is None:
+        raise HTTPException(404, "No such assignment")
+    submissions = _json_list(row.get("student_submissions_json"))
+    if not 0 <= idx < len(submissions):
+        raise HTTPException(404, "No such submission")
+    sub = submissions[idx]
+    path = (UPLOADS_DIR / (sub.get("rel") or "")).resolve()
+    if not path.is_file():
+        raise HTTPException(404, "That file is no longer on the server")
+    import mimetypes as _mt
+    name = sub.get("name") or path.name
+    ext = path.suffix.lower()
+    if ext and not name.lower().endswith(ext):
+        name = name + ext
+    media_type = _mt.guess_type(str(path))[0] or "application/octet-stream"
+    return FileResponse(path, filename=name, media_type=media_type)
+
+
+
+# ── Resource picker ──────────────────────────────────────────────────────────
+
+@router.get("/resources-flat")
+def resources_flat(_: bool = _Admin):
+    """Every resource file as one flat list, for the "assign notes" dropdown."""
+    if not RESOURCES_DIR.is_dir():
+        return {"files": []}
+    base = RESOURCES_DIR.resolve()
+    files = []
+    for path in sorted(base.rglob("*")):
+        if not path.is_file() or path.name.startswith((".", "_")):
+            continue
+        rel = path.relative_to(base)
+        files.append({"rel": rel.as_posix(), "name": path.name,
+                      "category": rel.parts[0] if len(rel.parts) > 1 else "",
+                      "size": path.stat().st_size})
+    return {"files": files}
 
 
 # ── Teacher applications ─────────────────────────────────────────────────────
@@ -182,6 +950,7 @@ class ApproveReq(BaseModel):
 
 @router.post("/teacher-applications/{app_id}/approve")
 def approve_application(app_id: int, req: ApproveReq, _: bool = _Admin):
+    from .auth import hash_password as _hash_pw
     application = _udb.get_teacher_application(app_id)
     if application is None:
         raise HTTPException(404, "No such application")
@@ -213,8 +982,35 @@ def approve_application(app_id: int, req: ApproveReq, _: bool = _Admin):
         "teacher_id": teacher.get("id"),
         "admin_note": req.admin_note,
     })
+
+    # Create a login account for the teacher (if one doesn't exist already)
+    app_email = (application.get("email") or "").strip().lower()
+    app_name  = (req.name or application.get("name") or "").strip()
+    temp_password = None
+    email_sent = False
+    profile_id = None
+
+    if app_email:
+        existing = _udb.get_user_by_email(app_email)
+        if existing:
+            # Promote to teacher if needed
+            if existing.get("role") not in ("teacher", "admin"):
+                _udb.update_profile(existing["id"], {"role": "teacher"})
+            profile_id = existing["id"]
+        else:
+            temp_password = _generate_temp_password()
+            profile = _udb.create_teacher_profile(app_email, app_name, _hash_pw(temp_password))
+            profile_id = profile["id"]
+            email_sent, email_error = _send_teacher_welcome(app_email, app_name, temp_password)
+    else:
+        email_error = ""
+
     return {"status": "approved", "application": updated,
-            "teacher": _decorate_teacher(teacher)}
+            "teacher": _decorate_teacher(teacher),
+            "profile_id": profile_id,
+            "email_sent": email_sent,
+            "email_error": email_error,
+            "temp_password": temp_password}
 
 
 class RejectReq(BaseModel):
@@ -299,6 +1095,52 @@ def remove_teacher(teacher_id: int, _: bool = _Admin):
     return {"status": "deleted"}
 
 
+# ── Teacher ↔ student assignment ─────────────────────────────────────────────
+
+
+def _teacher_profile_id(teacher_id: int) -> str:
+    """Resolve a teachers.id integer to the teacher's profiles.id UUID via email."""
+    t = _udb.get_teacher(teacher_id)
+    if not t:
+        raise HTTPException(404, "No such teacher")
+    profile = _udb.get_user_by_email(t.get("email", ""))
+    if not profile:
+        raise HTTPException(404, "Teacher has no login account (email not found in profiles)")
+    return profile["id"]
+
+
+class TeacherStudentIn(BaseModel):
+    student_id: str
+    syllabus: str
+
+
+@router.get("/teachers/{teacher_id}/students")
+def teacher_student_list(teacher_id: int, _: bool = _Admin):
+    """Return all active student links for a teacher."""
+    pid = _teacher_profile_id(teacher_id)
+    rows = _udb.get_teacher_students(pid)
+    return {"assignments": rows}
+
+
+@router.post("/teachers/{teacher_id}/students")
+def assign_student(teacher_id: int, req: TeacherStudentIn, _: bool = _Admin):
+    """Link a student to a teacher for a given syllabus."""
+    pid = _teacher_profile_id(teacher_id)
+    if not _udb.get_user(req.student_id):
+        raise HTTPException(404, "Student not found")
+    _udb.assign_teacher_student(pid, req.student_id, req.syllabus)
+    return {"status": "assigned"}
+
+
+@router.delete("/teachers/{teacher_id}/students/{student_id}")
+def unassign_student(teacher_id: int, student_id: str,
+                     syllabus: str = Query(...), _: bool = _Admin):
+    """Remove a teacher-student link for a specific syllabus."""
+    pid = _teacher_profile_id(teacher_id)
+    _udb.remove_teacher_student(pid, student_id, syllabus)
+    return {"status": "removed"}
+
+
 # ── Calendly ─────────────────────────────────────────────────────────────────
 #
 # Calendly has no webhook set up for this site, so the admin reads the calendar
@@ -379,3 +1221,362 @@ def calendly(_: bool = _Admin, refresh: bool = False):
             "events": events}
     _CAL_CACHE.update(at=now, data=data)
     return data
+
+
+# ── Course catalog (admin CRUD) ───────────────────────────────────────────────
+
+
+class CourseWrite(BaseModel):
+    syllabus_code: str
+    slug: str
+    title: str
+    level: str
+    subject: str
+    tagline: str | None = None
+    overview_html: str | None = None
+    approach_html: str | None = None
+    what_you_get_json: str | None = "[]"
+    teacher_id: int | None = None
+    meta_title: str | None = None
+    meta_description: str | None = None
+    published: bool = False
+    sort_order: int = 0
+
+
+@router.get("/courses")
+def admin_list_courses(_: bool = _Admin):
+    """All courses including unpublished."""
+    return {"courses": _udb.get_all_courses(published_only=False)}
+
+
+@router.post("/courses")
+def admin_create_course(req: CourseWrite, _: bool = _Admin):
+    import json as _json
+    payload = req.model_dump()
+    payload["published"] = payload["published"] if _udb._USE_SUPABASE else int(payload["published"])
+    course = _udb.create_course(payload)
+    return {"course": course}
+
+
+@router.put("/courses/{course_id}")
+def admin_update_course(course_id: int, req: CourseWrite, _: bool = _Admin):
+    if _udb.get_course(course_id) is None:
+        raise HTTPException(404, "Course not found")
+    fields = {k: v for k, v in req.model_dump().items() if v is not None}
+    if "published" in fields and not _udb._USE_SUPABASE:
+        fields["published"] = int(fields["published"])
+    updated = _udb.update_course(course_id, fields)
+    return {"course": updated}
+
+
+@router.patch("/courses/{course_id}")
+def admin_patch_course(course_id: int, body: dict, _: bool = _Admin):
+    """Partial update — pass only the fields to change (e.g. {published: true})."""
+    if _udb.get_course(course_id) is None:
+        raise HTTPException(404, "Course not found")
+    if "published" in body and not _udb._USE_SUPABASE:
+        body["published"] = int(body["published"])
+    updated = _udb.update_course(course_id, body)
+    return {"course": updated}
+
+
+@router.delete("/courses/{course_id}")
+def admin_delete_course(course_id: int, _: bool = _Admin):
+    if _udb.get_course(course_id) is None:
+        raise HTTPException(404, "Course not found")
+    _udb.delete_course(course_id)
+    return {"ok": True}
+
+
+# ── Groups (admin) ────────────────────────────────────────────────────────────
+
+class GroupStatusUpdate(BaseModel):
+    status: str   # draft|active|closed
+
+
+@router.get("/groups")
+def admin_list_groups(_: bool = _Admin):
+    groups = _udb.get_all_groups()
+    for g in groups:
+        g["member_count"] = _udb.get_group_member_count(g["id"])
+    return {"groups": groups}
+
+
+@router.get("/groups/{group_id}")
+def admin_get_group(group_id: int, _: bool = _Admin):
+    g = _udb.get_group(group_id)
+    if not g:
+        raise HTTPException(404, "Group not found")
+    return {"group": g, "members": _udb.get_group_members(group_id),
+            "sessions": _udb.get_group_sessions(group_id)}
+
+
+@router.patch("/groups/{group_id}/status")
+def admin_set_group_status(group_id: int, req: GroupStatusUpdate, _: bool = _Admin):
+    if req.status not in {"draft", "active", "closed"}:
+        raise HTTPException(400, "status must be draft|active|closed")
+    if not _udb.get_group(group_id):
+        raise HTTPException(404, "Group not found")
+    updated = _udb.update_group(group_id, {"status": req.status})
+    return {"ok": True, "group": updated}
+
+
+# ── Payment proofs (admin) ────────────────────────────────────────────────────
+
+class ProofReview(BaseModel):
+    status: str          # approved|rejected
+    reviewer_note: str | None = None
+
+
+@router.get("/payment-proofs")
+def admin_list_proofs(status: str | None = None, _: bool = _Admin):
+    return {"proofs": _udb.get_payment_proofs(status=status)}
+
+
+@router.get("/payment-proofs/{proof_id}")
+def admin_get_proof(proof_id: int, _: bool = _Admin):
+    p = _udb.get_payment_proof(proof_id)
+    if not p:
+        raise HTTPException(404, "Proof not found")
+    return {"proof": p}
+
+
+@router.post("/payment-proofs/{proof_id}/review")
+def admin_review_proof(proof_id: int, req: ProofReview, _: bool = _Admin):
+    from datetime import datetime, timezone
+    if req.status not in {"approved", "rejected"}:
+        raise HTTPException(400, "status must be approved or rejected")
+    proof = _udb.get_payment_proof(proof_id)
+    if not proof:
+        raise HTTPException(404, "Proof not found")
+    if proof.get("status") != "pending":
+        raise HTTPException(409, "This proof has already been reviewed")
+
+    update_fields = {
+        "status": req.status,
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if req.reviewer_note:
+        update_fields["note"] = req.reviewer_note
+    _udb.update_payment_proof(proof_id, update_fields)
+
+    if req.status == "approved":
+        from datetime import datetime, timedelta, timezone
+        from .access import BILLING_CYCLE_DAYS
+        now = datetime.now(timezone.utc)
+        expires = (now + timedelta(days=BILLING_CYCLE_DAYS)).isoformat()
+        _udb.update_user_plan(
+            proof["user_id"], proof["plan"], expires,
+            started_at=now.isoformat(), trial=False,
+        )
+
+    return {"ok": True, "proof": _udb.get_payment_proof(proof_id)}
+
+
+# ── Teacher-student allocations ───────────────────────────────────────────────
+
+class AllocationReq(BaseModel):
+    teacher_id: str
+    student_id: str
+    syllabus: str
+
+
+@router.get("/teacher-profiles")
+def list_teacher_profiles(_: bool = _Admin):
+    """Profiles with role=teacher — used for allocation dropdowns."""
+    return {"teachers": _udb.list_teacher_profiles()}
+
+
+@router.get("/allocations")
+def admin_list_allocations(_: bool = _Admin):
+    return {"allocations": _udb.get_allocations()}
+
+
+@router.post("/allocations")
+def admin_create_allocation(req: AllocationReq, _: bool = _Admin):
+    # Verify both IDs are actual profiles before inserting
+    if not _udb.get_user(req.teacher_id):
+        raise HTTPException(404, f"Teacher profile not found: {req.teacher_id}")
+    if not _udb.get_user(req.student_id):
+        raise HTTPException(404, f"Student profile not found: {req.student_id}")
+    alloc = _udb.create_allocation(req.teacher_id, req.student_id, req.syllabus)
+    return {"ok": True, "allocation": alloc}
+
+
+@router.delete("/allocations/{alloc_id}")
+def admin_delete_allocation(alloc_id: int, _: bool = _Admin):
+    _udb.delete_allocation(alloc_id)
+    return {"ok": True}
+
+
+# ── Contacts ──────────────────────────────────────────────────────────────────
+
+@router.get("/contacts")
+def admin_list_contacts(_: bool = _Admin):
+    return {"contacts": _udb.get_contacts()}
+
+
+# ── Newsletter ────────────────────────────────────────────────────────────────
+
+@router.get("/newsletter")
+def admin_list_newsletter(_: bool = _Admin):
+    return {"subscribers": _udb.get_newsletter_subscribers()}
+
+
+# ── Blog ──────────────────────────────────────────────────────────────────────
+
+class _BlogPostIn(BaseModel):
+    title: str
+    slug: str
+    excerpt: str | None = None
+    body_markdown: str = ""
+    cover_url: str | None = None
+    author: str = "Muhammad Taahaa"
+    meta_title: str | None = None
+    meta_desc: str | None = None
+
+
+class _BlogPostPatch(BaseModel):
+    title: str | None = None
+    slug: str | None = None
+    excerpt: str | None = None
+    body_markdown: str | None = None
+    cover_url: str | None = None
+    author: str | None = None
+    meta_title: str | None = None
+    meta_desc: str | None = None
+    published: bool | None = None
+
+
+@router.get("/blog")
+def admin_blog_list(_: bool = _Admin):
+    from . import blog as _blog
+    return {"posts": _blog.get_all_posts_admin()}
+
+
+@router.post("/blog")
+def admin_blog_create(post: _BlogPostIn, _: bool = _Admin):
+    from . import blog as _blog
+    if not re.match(r"^[a-z0-9-]+$", post.slug):
+        raise HTTPException(400, "Slug must contain only lowercase letters, numbers and hyphens")
+    _blog.ensure_table()
+    con = _blog._con()
+    try:
+        con.execute(
+            """INSERT INTO blog_posts
+               (title, slug, excerpt, body_markdown, cover_url, author, meta_title, meta_desc)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (post.title, post.slug, post.excerpt, post.body_markdown,
+             post.cover_url, post.author, post.meta_title, post.meta_desc))
+        con.commit()
+    except Exception as exc:
+        if "UNIQUE" in str(exc).upper():
+            raise HTTPException(409, "A post with that slug already exists")
+        raise HTTPException(500, str(exc))
+    finally:
+        con.close()
+    return {"ok": True}
+
+
+@router.patch("/blog/{post_id}")
+def admin_blog_update(post_id: int, data: _BlogPostPatch, _: bool = _Admin):
+    from . import blog as _blog
+    fields = data.model_dump(exclude_unset=True)
+    if not fields:
+        return {"ok": True}
+    if "slug" in fields and fields["slug"] is not None:
+        if not re.match(r"^[a-z0-9-]+$", fields["slug"]):
+            raise HTTPException(400, "Slug must contain only lowercase letters, numbers and hyphens")
+    if fields.get("published") is True:
+        fields.setdefault("published_at", _blog._now_iso())
+    fields["updated_at"] = _blog._now_iso()
+    set_clause = ", ".join(f"{k} = ?" for k in fields)
+    values = list(fields.values()) + [post_id]
+    _blog.ensure_table()
+    con = _blog._con()
+    try:
+        con.execute(f"UPDATE blog_posts SET {set_clause} WHERE id = ?", values)
+        con.commit()
+    except Exception as exc:
+        if "UNIQUE" in str(exc).upper():
+            raise HTTPException(409, "A post with that slug already exists")
+        raise HTTPException(500, str(exc))
+    finally:
+        con.close()
+    return {"ok": True}
+
+
+@router.delete("/blog/{post_id}")
+def admin_blog_delete(post_id: int, _: bool = _Admin):
+    from . import blog as _blog
+    _blog.ensure_table()
+    con = _blog._con()
+    try:
+        con.execute("DELETE FROM blog_posts WHERE id = ?", (post_id,))
+        con.commit()
+    finally:
+        con.close()
+    return {"ok": True}
+
+
+# ── Newsletter Admin ──────────────────────────────────────────────────────────
+
+class NewsletterBroadcastReq(BaseModel):
+    subject: str
+    body: str
+
+
+@router.get("/newsletter/subscribers")
+def admin_list_newsletter(_: bool = _Admin):
+    subs = _udb.get_newsletter_subscribers(limit=2000)
+    return {"subscribers": subs}
+
+
+@router.get("/newsletter/export")
+def admin_export_newsletter(_: bool = _Admin):
+    import csv
+    import io
+    subs = _udb.get_newsletter_subscribers(limit=10000, active_only=True)
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["email", "subscribed_at", "status"])
+    for s in subs:
+        writer.writerow([s.get("email"), s.get("subscribed_at"), s.get("status", "subscribed")])
+    return Response(
+        content=out.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="newsletter_subscribers.csv"'}
+    )
+
+
+@router.post("/newsletter/broadcast")
+def admin_broadcast_newsletter(req: NewsletterBroadcastReq, _: bool = _Admin):
+    if not (req.subject or "").strip():
+        raise HTTPException(400, "Subject required")
+    if not (req.body or "").strip():
+        raise HTTPException(400, "Body required")
+
+    subs = _udb.get_newsletter_subscribers(limit=5000, active_only=True)
+    if not subs:
+        return {"ok": True, "sent": 0, "total": 0}
+
+    from .app import _notify
+    sent_count = 0
+    # Batch processing in chunks of 100
+    batch_size = 100
+    for i in range(0, len(subs), batch_size):
+        chunk = subs[i:i + batch_size]
+        for sub in chunk:
+            email = sub["email"]
+            tok = sub.get("unsubscribe_token") or "legacy"
+            unsub_link = f"https://prepwithtee.com/unsubscribe?token={tok}"
+            full_body = (
+                f"{req.body}\n\n"
+                f"---\n"
+                f"To unsubscribe, visit: {unsub_link}\n"
+            )
+            ok = _notify(req.subject, full_body, to=email, cta=("PrepWithTee", "https://prepwithtee.com/"))
+            if ok:
+                sent_count += 1
+
+    return {"ok": True, "sent": sent_count, "total": len(subs)}
