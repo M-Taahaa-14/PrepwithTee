@@ -6,6 +6,7 @@ anthropic>=0.40
 
 # website (website/app.py)
 fastapi>=0.110
+markdown>=3.6
 uvicorn[standard]>=0.29
 gunicorn>=21.2
 

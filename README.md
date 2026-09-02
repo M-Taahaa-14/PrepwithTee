@@ -420,6 +420,32 @@ Each syllabus has a `taxonomy/{syllabus}.json`:
 | `GET /api/resources` | Resource categories and file tree |
 | `GET /api/resources/file` | Serve a resource file |
 | `POST /api/ask` | AI tutor chat (proxied to Groq) |
+| `GET /api/mcq/papers` | MCQ papers for a syllabus — drives the full-past-paper picker |
+| `POST /api/mcq/questions` | Question set for a live MCQ session (topic pool or one paper) |
+| `POST /api/mcq/explain` | Worked solution for one MCQ — served from the cache when stored |
+| `POST /api/mcq/report` | Start a review-PDF build; returns a `job_id` |
+| `GET /api/mcq/report/{job_id}` | Build progress (`state`, `phase`, `done`/`total`) |
+| `GET /api/mcq/report/{job_id}/pdf` | Download the finished review booklet |
+
+**MCQ review PDF.** After a live session the student can download every
+question they saw as one branded booklet: the original vector crop, the option
+they picked (red when wrong), the mark-scheme answer in green, and the worked
+solution. Built by `website/mcq_report.py`, which reuses the `pipeline.compose`
+cover, watermark and footer so it matches the topical booklets.
+
+Two things about it are worth knowing before editing:
+
+- Explanations are cached in `mcq_explanations`, keyed on the Cambridge
+  coordinates (`0625_s21_12_q07`) rather than `questions.id` — re-segmenting a
+  paper re-issues those ids, and an id-keyed cache would eventually serve one
+  question's solution under another's number. In Supabase mode the table sits
+  with the pipeline tables; without `DATABASE_URL` it goes to a sidecar
+  `data/mcq_cache.db`, deliberately *not* `data/index.db`, which is rsynced
+  over on deploy.
+- PyMuPDF's base-14 fonts are Latin-1 only and fail silently — `√`, `π`, `Δ`
+  and superscripts all draw as a middle dot. `mcq_report.pdf_text()`
+  transliterates every string before it reaches the page, so a worked solution
+  prints `sqrt(2gh)` rather than `·(2gh)`.
 
 **Frontend pages:**
 
@@ -429,6 +455,7 @@ Each syllabus has a `taxonomy/{syllabus}.json`:
 | `papers.html` | Two-mode viewer: **Topical Builder** (filter by subject/topic/year → compose PDF) and **Yearly Library** (browse all papers by year/session) |
 | `resources.html` | Study resource browser with full-text search across all categories and files |
 | `subjects.html` | All subjects with live/coming-soon status for each |
+| `mcq-solver.html` | Live MCQ session: pick topics or one full past paper, timed A/B/C/D with instant marking, then a score breakdown and a downloadable review PDF |
 | `tutor.html` | AI chat tutor powered by Groq |
 | `guide.html` | Structured Cambridge exam revision guide |
 | `pricing.html` | Fee breakdown with comparison table |

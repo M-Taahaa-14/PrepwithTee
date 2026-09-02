@@ -12,3 +12,5 @@ data/
 .claude/
 claude_code_kickoff_prompt.md
 /scratchpadwebsite/public/
+scratchpad/classify_cs_rules.py
+scratchpad/digest_cs.py

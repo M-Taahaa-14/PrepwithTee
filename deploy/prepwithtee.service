@@ -22,7 +22,7 @@ ExecStart=/srv/prepwithtee/.venv/bin/gunicorn website.app:app \
     -k uvicorn.workers.UvicornWorker \
     -w 2 \
     -b 127.0.0.1:8017 \
-    --timeout 320 \
+    --timeout 620 \
     --graceful-timeout 30 \
     --access-logfile - \
     --error-logfile -
