@@ -1,0 +1,1058 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://prepwithtee.com/walkthrough.html">
+  <title>How to use PrepWithTee — the complete walkthrough</title>
+  <meta name="description"
+    content="A complete, step-by-step walkthrough of PrepWithTee: where to go for what, in what order, and exactly how to use every tool to ace your Cambridge O Level, IGCSE or A Level exams.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="tools.css?v=20260829a">
+
+  <style>
+    /* ==========================================================================
+       WALKTHROUGH — page-scoped. Everything here is prefixed .wt- so it cannot
+       leak into the shared stylesheet's cards, and every animation is gated
+       behind prefers-reduced-motion at the bottom of the block.
+       ========================================================================== */
+
+    /* ---- scroll progress bar (fixed, under the sticky header) ---- */
+    .wt-progress { position: fixed; top: 0; left: 0; height: 3px; width: 100%;
+      z-index: 60; background: transparent; pointer-events: none; }
+    .wt-progress span { display: block; height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--gold), var(--purple-bright));
+      transform-origin: left center; transition: width .12s linear; }
+
+    /* ---- hero ---- */
+    .wt-hero { position: relative; overflow: hidden; padding: 72px 0 64px;
+      background:
+        radial-gradient(900px 380px at 12% -8%, rgba(232,145,58,.18), transparent 62%),
+        radial-gradient(760px 340px at 88% 8%, rgba(107,63,160,.16), transparent 64%),
+        var(--page); }
+    .wt-hero .container { position: relative; z-index: 2; }
+    .wt-hero h1 { font-size: clamp(2.1rem, 5.4vw, 3.5rem); line-height: 1.08;
+      color: var(--purple); margin: 10px 0 16px; }
+    .wt-hero h1 em { font-style: italic; color: var(--gold); }
+    .wt-hero .wt-lede { max-width: 640px; color: var(--grey); font-size: 1.05rem;
+      line-height: 1.65; }
+    .wt-hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+
+    /* floating decorative blobs — pure decoration, aria-hidden in the markup */
+    .wt-blob { position: absolute; border-radius: 50%; filter: blur(2px);
+      opacity: .5; z-index: 1; animation: wt-float 9s ease-in-out infinite; }
+    .wt-blob.b1 { width: 78px; height: 78px; background: var(--lav);   top: 16%; right: 12%; }
+    .wt-blob.b2 { width: 44px; height: 44px; background: var(--green);  top: 62%; right: 26%;
+      animation-delay: -2.4s; }
+    .wt-blob.b3 { width: 110px; height: 110px; background: var(--orange); bottom: -34px; right: 4%;
+      animation-delay: -4.8s; }
+    .wt-blob.b4 { width: 34px; height: 34px; background: var(--pink);   top: 26%; left: 4%;
+      animation-delay: -1.2s; }
+    @keyframes wt-float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-18px) scale(1.06); }
+    }
+
+    /* ---- stat strip with count-up numbers ---- */
+    .wt-stats { display: grid; gap: 14px; margin-top: 38px;
+      grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .wt-stat { background: #fff; border: 1.5px solid var(--line); border-radius: 18px;
+      padding: 18px 16px; text-align: center;
+      transition: transform .25s ease, box-shadow .3s; }
+    .wt-stat:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(26,26,46,.09); }
+    .wt-stat b { display: block; font: 800 1.6rem "Archivo", sans-serif;
+      color: var(--purple); font-variant-numeric: tabular-nums; }
+    .wt-stat span { font-size: .78rem; color: var(--grey); }
+    @media (max-width: 720px) { .wt-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    /* ---- two-column layout: sticky rail + steps ---- */
+    .wt-main { display: grid; gap: 42px; grid-template-columns: 232px minmax(0, 1fr);
+      align-items: start; padding: 60px 0 20px; }
+    @media (max-width: 900px) { .wt-main { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+
+    .wt-rail { position: sticky; top: 96px; }
+    @media (max-width: 900px) { .wt-rail { display: none; } }
+    .wt-rail-title { font-size: .72rem; font-weight: 800; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--grey); margin-bottom: 12px; }
+    .wt-rail a { display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border-radius: 11px; text-decoration: none; color: var(--grey);
+      font-size: .85rem; font-weight: 600; line-height: 1.3;
+      border-left: 3px solid transparent; transition: all .22s ease; }
+    .wt-rail a:hover { color: var(--ink); background: rgba(107,63,160,.06); }
+    .wt-rail a .wt-rail-n { flex: none; width: 22px; height: 22px; border-radius: 50%;
+      display: grid; place-items: center; font: 800 .68rem "Archivo", sans-serif;
+      background: var(--line); color: var(--grey); transition: all .22s ease; }
+    .wt-rail a.on { color: var(--purple); background: rgba(107,63,160,.09);
+      border-left-color: var(--gold); }
+    .wt-rail a.on .wt-rail-n { background: var(--gold); color: #fff; transform: scale(1.12); }
+
+    /* ---- step cards ---- */
+    .wt-steps { position: relative; padding-left: 34px; }
+    /* The spine draws itself in as you scroll — --spine is set from JS. */
+    .wt-steps::before { content: ""; position: absolute; left: 8px; top: 12px; bottom: 12px;
+      width: 3px; border-radius: 3px; background: var(--line); }
+    .wt-steps::after { content: ""; position: absolute; left: 8px; top: 12px; width: 3px;
+      border-radius: 3px; height: var(--spine, 0%);
+      background: linear-gradient(180deg, var(--gold), var(--purple-bright));
+      transition: height .18s linear; }
+    @media (max-width: 560px) { .wt-steps { padding-left: 0; }
+      .wt-steps::before, .wt-steps::after { display: none; } }
+
+    .wt-step { position: relative; margin-bottom: 34px; scroll-margin-top: 100px; }
+    .wt-step:last-child { margin-bottom: 0; }
+    .wt-dot { position: absolute; left: -34px; top: 26px; width: 19px; height: 19px;
+      border-radius: 50%; background: var(--page); border: 3px solid var(--line);
+      z-index: 2; transition: border-color .3s, background .3s, transform .3s; }
+    .wt-step.seen .wt-dot { border-color: var(--gold); }
+    .wt-step.on .wt-dot { border-color: var(--purple-bright); background: var(--purple-bright);
+      transform: scale(1.25); box-shadow: 0 0 0 6px rgba(107,63,160,.14); }
+    @media (max-width: 560px) { .wt-dot { display: none; } }
+
+    .wt-card { background: #fff; border: 1.5px solid var(--line);
+      border-radius: var(--radius-lg); padding: 28px 30px;
+      transition: transform .28s ease, box-shadow .32s, border-color .28s; }
+    .wt-card:hover { transform: translateY(-3px); border-color: var(--lav-line);
+      box-shadow: 0 18px 40px rgba(26,26,46,.08); }
+    @media (max-width: 560px) { .wt-card { padding: 22px 20px; } }
+
+    .wt-card-head { display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .wt-num { font: 800 .82rem "Archivo", sans-serif; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--gold); }
+    .wt-tag { font-size: .72rem; font-weight: 800; letter-spacing: .05em;
+      padding: 5px 13px; border-radius: 999px; color: #fff; }
+    .wt-tag.lav { background: var(--lav-ink); }
+    .wt-tag.green { background: var(--green-ink); }
+    .wt-tag.blue { background: var(--blue-ink); }
+    .wt-tag.pink { background: var(--pink-ink); }
+    .wt-tag.orange { background: var(--orange-ink); }
+    .wt-tag.teal { background: var(--teal-ink); }
+
+    .wt-card h2 { font-size: clamp(1.25rem, 2.6vw, 1.55rem); color: var(--purple);
+      margin-bottom: 10px; line-height: 1.25; }
+    .wt-card > p { color: var(--grey); font-size: .95rem; line-height: 1.68;
+      margin-bottom: 14px; }
+    .wt-card p strong { color: var(--ink); font-weight: 700; }
+
+    /* "do this" checklist */
+    .wt-do { list-style: none; display: flex; flex-direction: column; gap: 9px;
+      margin: 0 0 18px; }
+    .wt-do li { display: flex; gap: 11px; align-items: flex-start;
+      font-size: .92rem; line-height: 1.55; color: var(--ink); }
+    .wt-do li::before { content: "✓"; flex: none; width: 21px; height: 21px;
+      border-radius: 50%; display: grid; place-items: center; margin-top: 1px;
+      background: var(--green); color: var(--green-ink);
+      font: 800 .72rem "Archivo", sans-serif; }
+    .wt-do li b { font-weight: 700; }
+
+    /* "where to go" — the signpost row */
+    .wt-goto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 14px 16px; border-radius: 15px; margin-bottom: 16px;
+      background: var(--page); border: 1.5px dashed var(--line); }
+    .wt-goto-label { font-size: .72rem; font-weight: 800; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey); }
+    .wt-chip { display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 999px; text-decoration: none;
+      font-size: .84rem; font-weight: 700; background: #fff;
+      border: 1.5px solid var(--line); color: var(--ink);
+      transition: transform .18s ease, border-color .2s, background .2s; }
+    .wt-chip:hover { transform: translateY(-2px); border-color: var(--purple-bright);
+      background: var(--lav); color: var(--lav-ink); }
+
+    /* Tee's tip pull-out */
+    .wt-tip { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+      border-radius: 15px; background: var(--yellow);
+      border: 1.5px solid var(--yellow-line); color: var(--yellow-ink);
+      font-size: .88rem; line-height: 1.6; }
+    .wt-tip b { display: block; font-family: "Archivo", sans-serif; font-size: .8rem;
+      letter-spacing: .04em; text-transform: uppercase; margin-bottom: 3px; }
+    .wt-tip-icon { flex: none; font-size: 1.15rem; line-height: 1.3; }
+
+    /* ---- "where do I go for what" quick table ---- */
+    .wt-band { background: var(--cream); border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line); padding: 64px 0; margin-top: 56px; }
+    .wt-band-head { text-align: center; max-width: 620px; margin: 0 auto 34px; }
+    .wt-band-head h2 { font-size: clamp(1.6rem, 3.6vw, 2.2rem); color: var(--purple);
+      margin-bottom: 10px; }
+    .wt-band-head p { color: var(--grey); font-size: .96rem; line-height: 1.6; }
+
+    .wt-map { display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(238px, 1fr)); }
+    .wt-map-card { display: flex; flex-direction: column; gap: 6px; padding: 20px;
+      border-radius: var(--radius); text-decoration: none; border: 1.5px solid transparent;
+      transition: transform .22s ease, box-shadow .28s; }
+    .wt-map-card:hover { transform: translateY(-5px); box-shadow: 0 16px 36px rgba(26,26,46,.12); }
+    .wt-map-card .wt-map-when { font-size: .71rem; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase; opacity: .8; }
+    .wt-map-card h3 { font-size: 1.02rem; color: inherit; }
+    .wt-map-card p { font-size: .86rem; line-height: 1.55; opacity: .9; flex: 1; margin: 0; }
+    .wt-map-card .wt-map-go { font-weight: 800; font-size: .86rem; margin-top: 8px; }
+    .wt-map-card.lav    { background: var(--lav);    color: var(--lav-ink);    border-color: var(--lav-line); }
+    .wt-map-card.green  { background: var(--green);  color: var(--green-ink);  border-color: var(--green-line); }
+    .wt-map-card.blue   { background: var(--blue);   color: var(--blue-ink);   border-color: var(--blue-line); }
+    .wt-map-card.pink   { background: var(--pink);   color: var(--pink-ink);   border-color: var(--pink-line); }
+    .wt-map-card.orange { background: var(--orange); color: var(--orange-ink); border-color: var(--orange-line); }
+    .wt-map-card.teal   { background: var(--teal);   color: var(--teal-ink);   border-color: var(--teal-line); }
+    .wt-map-card.yellow { background: var(--yellow); color: var(--yellow-ink); border-color: var(--yellow-line); }
+
+    /* ---- weekly rhythm ---- */
+    .wt-week { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    @media (max-width: 860px) { .wt-week { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 460px) { .wt-week { grid-template-columns: minmax(0, 1fr); } }
+    .wt-day { background: #fff; border: 1.5px solid var(--line); border-radius: 16px;
+      padding: 18px; transition: transform .22s ease, border-color .22s; }
+    .wt-day:hover { transform: translateY(-3px); border-color: var(--gold); }
+    .wt-day h4 { font: 800 .78rem "Archivo", sans-serif; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+    .wt-day p { font-size: .88rem; color: var(--grey); line-height: 1.55; }
+    .wt-day p b { color: var(--ink); }
+
+    /* ---- countdown plan ---- */
+    .wt-count { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 6px; }
+    @media (max-width: 800px) { .wt-count { grid-template-columns: minmax(0, 1fr); } }
+    .wt-phase { border-radius: var(--radius); padding: 22px; border: 1.5px solid var(--line);
+      background: #fff; position: relative; overflow: hidden;
+      transition: transform .24s ease, box-shadow .3s; }
+    .wt-phase:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(26,26,46,.1); }
+    .wt-phase::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; }
+    .wt-phase.p1::before { background: var(--blue-ink); }
+    .wt-phase.p2::before { background: var(--orange-ink); }
+    .wt-phase.p3::before { background: var(--pink-ink); }
+    .wt-phase-when { font: 800 .72rem "Archivo", sans-serif; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey); margin-bottom: 6px; }
+    .wt-phase h3 { font-size: 1.05rem; color: var(--purple); margin-bottom: 8px; }
+    .wt-phase ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .wt-phase li { font-size: .87rem; color: var(--grey); line-height: 1.5;
+      padding-left: 15px; position: relative; }
+    .wt-phase li::before { content: "→"; position: absolute; left: 0; color: var(--gold);
+      font-weight: 800; }
+
+    /* ---- FAQ accordion ---- */
+    .wt-faq { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .wt-faq details { background: #fff; border: 1.5px solid var(--line);
+      border-radius: 16px; overflow: hidden; transition: border-color .22s, box-shadow .28s; }
+    .wt-faq details[open] { border-color: var(--lav-line); box-shadow: 0 10px 26px rgba(26,26,46,.06); }
+    .wt-faq summary { cursor: pointer; list-style: none; padding: 16px 20px;
+      font-family: "Archivo", sans-serif; font-weight: 700; font-size: .95rem;
+      color: var(--ink); display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; }
+    .wt-faq summary::-webkit-details-marker { display: none; }
+    .wt-faq summary::after { content: "+"; flex: none; font-size: 1.3rem; line-height: 1;
+      color: var(--gold); transition: transform .25s ease; }
+    .wt-faq details[open] summary::after { transform: rotate(45deg); }
+    .wt-faq .wt-faq-body { padding: 0 20px 18px; font-size: .91rem; color: var(--grey);
+      line-height: 1.65; animation: wt-open .3s ease both; }
+    .wt-faq .wt-faq-body a { color: var(--purple-bright); font-weight: 700; }
+    @keyframes wt-open { from { opacity: 0; transform: translateY(-6px); } }
+
+    /* ---- closing CTA ---- */
+    .wt-end { text-align: center; padding: 66px 0 84px; }
+    .wt-end h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); color: var(--purple);
+      margin-bottom: 12px; }
+    .wt-end p { color: var(--grey); max-width: 540px; margin: 0 auto 24px;
+      font-size: 1rem; line-height: 1.65; }
+    .wt-end-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ---- shared: honour reduced motion ---- */
+    @media (prefers-reduced-motion: reduce) {
+      .wt-blob { animation: none; }
+      .wt-progress span, .wt-steps::after { transition: none; }
+      .wt-stat, .wt-card, .wt-map-card, .wt-day, .wt-phase, .wt-chip { transition: none; }
+      .wt-stat:hover, .wt-card:hover, .wt-map-card:hover, .wt-day:hover,
+      .wt-phase:hover, .wt-chip:hover { transform: none; }
+      .wt-faq .wt-faq-body { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wt-progress" aria-hidden="true"><span id="wt-bar"></span></div>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <div class="header-right"></div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="wt-hero">
+    <span class="wt-blob b1" aria-hidden="true"></span>
+    <span class="wt-blob b2" aria-hidden="true"></span>
+    <span class="wt-blob b3" aria-hidden="true"></span>
+    <span class="wt-blob b4" aria-hidden="true"></span>
+
+    <div class="container reveal-stagger">
+      <p class="eyebrow reveal">The complete walkthrough</p>
+      <h1 class="reveal">Everything on this site,<br><em>in the order you should use it.</em></h1>
+      <p class="wt-lede reveal">
+        PrepWithTee has a lot of tools — a topical paper builder, a full past-paper
+        archive, chapter notes, a progress tracker, an AI tutor and mock tests.
+        This page walks you through <strong>which one to open, when, and what to
+        actually do inside it</strong>. Follow it top to bottom and you'll never
+        wonder what to study next.
+      </p>
+
+      <div class="wt-hero-cta reveal">
+        <a class="btn btn-outline" href="#step-1">Start the walkthrough ↓</a>
+        <a class="btn btn-outline" href="#wt-map">Just show me where things are</a>
+      </div>
+
+      <div class="wt-stats reveal-stagger">
+        <div class="wt-stat reveal"><b class="count" data-target="9">0</b>
+          <span>steps, start to exam day</span></div>
+        <div class="wt-stat reveal"><b class="count" data-target="6">0</b>
+          <span>tools, each with one job</span></div>
+        <div class="wt-stat reveal"><b class="count" data-target="6" data-suffix=" yrs">0</b>
+          <span>of real past papers (2020&ndash;25)</span></div>
+        <div class="wt-stat reveal"><b class="count" data-target="30" data-suffix=" min">0</b>
+          <span>to set your whole plan up</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RAIL + STEPS ============ -->
+  <div class="container">
+    <div class="wt-main">
+
+      <aside class="wt-rail" id="wt-rail">
+        <p class="wt-rail-title">The walkthrough</p>
+        <a href="#step-1"><span class="wt-rail-n">1</span>Set up your account</a>
+        <a href="#step-2"><span class="wt-rail-n">2</span>Know your syllabus</a>
+        <a href="#step-3"><span class="wt-rail-n">3</span>Map every chapter</a>
+        <a href="#step-4"><span class="wt-rail-n">4</span>Learn the theory</a>
+        <a href="#step-5"><span class="wt-rail-n">5</span>Build topical papers</a>
+        <a href="#step-6"><span class="wt-rail-n">6</span>Mark yourself honestly</a>
+        <a href="#step-7"><span class="wt-rail-n">7</span>Clear every doubt</a>
+        <a href="#step-8"><span class="wt-rail-n">8</span>Sit timed mock tests</a>
+        <a href="#step-9"><span class="wt-rail-n">9</span>Full papers, exam mode</a>
+      </aside>
+
+      <div class="wt-steps" id="wt-steps">
+
+        <!-- STEP 1 -->
+        <section class="wt-step" id="step-1">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 01</span>
+              <span class="wt-tag blue">5 minutes · once</span>
+            </div>
+            <h2>Set up your account and pick your board</h2>
+            <p>
+              Everything on PrepWithTee is filtered by <strong>the qualification you're
+              actually sitting</strong>. Tell us once — O Level, IGCSE or A Level — and
+              your dashboard, progress tracker and paper builder stop showing you
+              syllabuses you'll never sit.
+            </p>
+            <ul class="wt-do">
+              <li><b>Create your account</b> and fill in the short profile — name and
+                qualification are all that's required.</li>
+              <li><b>Add your subjects</b> on the dashboard. Only your board's subjects
+                appear, so you can't add the wrong syllabus by accident.</li>
+              <li><b>Sitting a different board?</b> Change it in your profile and the
+                whole site re-filters instantly — nothing you've done is lost.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="dashboard.html">Dashboard</a>
+              <a class="wt-chip" href="profile.html">Edit profile</a>
+            </div>
+            <div class="wt-tip">
+              <span class="wt-tip-icon" aria-hidden="true">💡</span>
+              <div><b>Tee's tip</b>Add every subject you're sitting now, even the ones
+                you feel fine about. The dashboard progress rings are only useful when
+                they show the whole picture.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2 -->
+        <section class="wt-step" id="step-2">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 02</span>
+              <span class="wt-tag teal">20 minutes · once per subject</span>
+            </div>
+            <h2>Read the syllabus before you study a single page</h2>
+            <p>
+              Cambridge tells you exactly what it will examine. Most students never read
+              it, then waste weeks on topics that were removed years ago. The official
+              syllabus PDF for every subject is in Resources.
+            </p>
+            <ul class="wt-do">
+              <li><b>Download your syllabus</b> and skim the subject content list — that
+                list <em>is</em> your chapter list.</li>
+              <li><b>Check the paper structure:</b> how many papers, how long, how many
+                marks, which are calculator-allowed.</li>
+              <li><b>Note what changed.</b> Recent syllabuses drop topics — for O Level
+                Maths, Loci and Matrices are gone; Surds and Exponential growth are in.
+                Don't practise dead topics.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="resources.html">Resources → Official Syllabuses</a>
+              <a class="wt-chip" href="subjects.html">Subjects overview</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3 -->
+        <section class="wt-step" id="step-3">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 03</span>
+              <span class="wt-tag lav">30 minutes · your baseline</span>
+            </div>
+            <h2>Map every chapter — honestly — in Progress Tracker</h2>
+            <p>
+              Progress Tracker lists every chapter of your syllabus with a
+              <strong>Not started / Learning / Confident</strong> switch. Go through the
+              whole list in one sitting and mark where you genuinely stand. This is the
+              single most valuable half-hour of your prep, because from here on the site
+              knows what to point you at.
+            </p>
+            <ul class="wt-do">
+              <li><b>Be brutal.</b> "I've seen it in class" is <em>Not started</em>.
+                Confident means you'd get full marks under time pressure.</li>
+              <li><b>Mark subtopics too</b> where they're listed — that's how you find the
+                one weak area inside an otherwise fine chapter.</li>
+              <li><b>Watch your dashboard rings fill</b> as you convert chapters to
+                Confident. That percentage is your real revision progress.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="topical-progress.html">Progress Tracker</a>
+              <a class="wt-chip" href="dashboard.html">Dashboard rings</a>
+            </div>
+            <div class="wt-tip">
+              <span class="wt-tip-icon" aria-hidden="true">🎯</span>
+              <div><b>Why this matters</b>Students who study "everything" run out of time
+                and revise their strong chapters most, because those are the comfortable
+                ones. The tracker forces you to spend your hours where the marks are.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4 -->
+        <section class="wt-step" id="step-4">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 04</span>
+              <span class="wt-tag pink">Per chapter · learning phase</span>
+            </div>
+            <h2>Learn the theory, chapter by chapter</h2>
+            <p>
+              Take one chapter marked <em>Not started</em> or <em>Learning</em> — start
+              with a weak one, not a favourite. Read the notes, watch the linked revision
+              video if there is one, and write your own one-page summary. Don't try to
+              memorise; aim to be able to explain it out loud.
+            </p>
+            <ul class="wt-do">
+              <li><b>Open Resources</b> and filter to your subject for chapter notes,
+                formula sheets and revision videos.</li>
+              <li><b>Make one page of your own notes</b> per chapter — definitions,
+                formulae, and the two or three things you always get wrong.</li>
+              <li><b>Keep it beside you</b> while you do Step 5. Looking things up while
+                practising is learning; guessing is not.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="resources.html">Notes &amp; resources</a>
+              <a class="wt-chip" href="tutor.html">AI Tutor — explain a concept</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 5 -->
+        <section class="wt-step" id="step-5">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 05</span>
+              <span class="wt-tag green">The core habit · every study session</span>
+            </div>
+            <h2>Build a topical past-paper booklet and solve it</h2>
+            <p>
+              This is the heart of PrepWithTee. Instead of solving whole papers where one
+              chapter appears once, the builder pulls <strong>every real Cambridge
+              question ever asked on your chosen chapters</strong> and composes them into
+              one PDF booklet — original diagrams, graphs and answer lines untouched,
+              with the mark scheme attached.
+            </p>
+            <ul class="wt-do">
+              <li><b>Pick your subject</b>, tick the one or two chapters you just learned.</li>
+              <li><b>Set the year range.</b> Recent years first (2022–2025) — they match
+                the current syllabus style most closely.</li>
+              <li><b>Choose the paper</b> (P1 vs P2, or a component) so you practise the
+                format you'll actually sit.</li>
+              <li><b>Download and print it.</b> Write on paper, with a pen, the way the
+                exam works. Screen practice hides how slow your working really is.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="papers.html">Topical Paper Builder</a>
+            </div>
+            <div class="wt-tip">
+              <span class="wt-tip-icon" aria-hidden="true">📄</span>
+              <div><b>Do this in order</b>One chapter at a time, oldest-to-newest questions.
+                You'll physically see how the examiner's phrasing repeats — that pattern
+                recognition is what separates a B from an A*.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 6 -->
+        <section class="wt-step" id="step-6">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 06</span>
+              <span class="wt-tag orange">After every booklet · non-negotiable</span>
+            </div>
+            <h2>Mark yourself against the real mark scheme</h2>
+            <p>
+              Every booklet ships with the official mark scheme. Marking is where the
+              learning happens — not in the solving. Give yourself marks the way an
+              examiner would: method marks for working, accuracy marks for the answer,
+              nothing for "I basically knew it".
+            </p>
+            <ul class="wt-do">
+              <li><b>Mark in a different colour</b> so mistakes stay visible when you
+                come back to the booklet.</li>
+              <li><b>For every lost mark, write why</b> in the margin: didn't know it,
+                misread it, or careless. Three different problems, three different fixes.</li>
+              <li><b>Re-mark the chapter in Progress Tracker.</b> Full marks → Confident.
+                Anything below → stay on Learning and come back to it.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="topical-progress.html">Update your chapter status</a>
+              <a class="wt-chip" href="papers.html">Rebuild with more years</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 7 -->
+        <section class="wt-step" id="step-7">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 07</span>
+              <span class="wt-tag lav">Same day · never leave it</span>
+            </div>
+            <h2>Clear every doubt the same day you find it</h2>
+            <p>
+              A question you couldn't do is a gap, and gaps compound — the next chapter
+              builds on this one. The AI Tutor answers concept questions and works
+              through problems step by step, and the photo solver reads a question
+              straight off your paper.
+            </p>
+            <ul class="wt-do">
+              <li><b>Ask the AI Tutor</b> to explain the concept, not just the answer —
+                "why does this step work?" beats "what's the answer?".</li>
+              <li><b>Stuck on a printed question?</b> Photograph it in the solver and get
+                examiner-style working, mark by mark.</li>
+              <li><b>Get quizzed.</b> Progress Tracker's <em>Quiz me</em> generates an
+                exam-style question on any chapter and marks your answer against the
+                real criteria.</li>
+              <li><b>Still stuck after all that?</b> That's what a human tutor is for —
+                message Tee.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="tutor.html">AI Tutor</a>
+              <a class="wt-chip" href="tutor.html?tab=solver">Photo solver</a>
+              <a class="wt-chip" href="topical-progress.html">Quiz me</a>
+              <a class="wt-chip" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27m%20stuck%20on%20a%20question.">Ask Tee</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 8 -->
+        <section class="wt-step" id="step-8">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 08</span>
+              <span class="wt-tag blue">Weekly · once a chapter is Confident</span>
+            </div>
+            <h2>Test yourself with a timed mock — answers hidden</h2>
+            <p>
+              A topical booklet has the mark scheme right there, which is perfect for
+              learning and useless for testing. A generated <strong>mock test</strong>
+              picks a random set of questions to a mark target and puts the mark scheme
+              in a <strong>separate file</strong>, so you can genuinely sit it.
+            </p>
+            <ul class="wt-do">
+              <li><b>Set a mark target</b>, not a question count — the suggested time is
+                roughly a minute a mark, exactly like the real exam.</li>
+              <li><b>Sit it in one go, timed, no notes.</b> Phone in another room.</li>
+              <li><b>Only then open the mark scheme.</b> Score it, and log what you lost
+                marks on.</li>
+              <li><b>Repeat the same chapters a fortnight later</b> — a different random
+                pick each time proves whether it stuck.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="papers.html">Paper builder → Mock test mode</a>
+            </div>
+            <div class="wt-tip">
+              <span class="wt-tip-icon" aria-hidden="true">⏱️</span>
+              <div><b>Timing is a skill</b>Most students lose more marks to running out of
+                time than to not knowing the content. You can only train that under a
+                real clock.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 9 -->
+        <section class="wt-step" id="step-9">
+          <span class="wt-dot" aria-hidden="true"></span>
+          <div class="wt-card reveal">
+            <div class="wt-card-head">
+              <span class="wt-num">Step 09</span>
+              <span class="wt-tag pink">Final 6–8 weeks</span>
+            </div>
+            <h2>Switch to full past papers, under exam conditions</h2>
+            <p>
+              Once most of your chapters are Confident, stop doing topicals and start
+              doing whole papers. The library has every original question paper and mark
+              scheme, by year and session. This is where you learn to switch between
+              topics mid-paper — the thing topical practice can't teach you.
+            </p>
+            <ul class="wt-do">
+              <li><b>One full paper per subject per week</b>, strictly timed, in one sitting.</li>
+              <li><b>Mark it the same day</b> and record the score. You want the trend,
+                not one number.</li>
+              <li><b>Turn every mistake back into a topical.</b> Lost marks on circle
+                theorems? Build a circle-theorem booklet the next day.</li>
+              <li><b>Save the two most recent years</b> for the fortnight before the exam
+                — those are your truest predictor.</li>
+            </ul>
+            <div class="wt-goto">
+              <span class="wt-goto-label">Go here</span>
+              <a class="wt-chip" href="papers.html?tab=yearly">Full paper library</a>
+              <a class="wt-chip" href="papers.html">Back to topicals for weak areas</a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WHERE DO I GO FOR WHAT ============ -->
+  <section class="wt-band" id="wt-map">
+    <div class="container">
+      <div class="wt-band-head reveal">
+        <h2>Where do I go for what?</h2>
+        <p>The whole site on one screen. If you only remember one thing from this page,
+          remember this grid.</p>
+      </div>
+
+      <div class="wt-map reveal-stagger">
+        <a class="wt-map-card lav reveal" href="dashboard.html">
+          <span class="wt-map-when">Start here, every time</span>
+          <h3>Dashboard</h3>
+          <p>Your subjects, progress rings, streak and recent practice. Shows only your
+            board's syllabuses.</p>
+          <span class="wt-map-go">Open dashboard →</span>
+        </a>
+
+        <a class="wt-map-card green reveal" href="papers.html">
+          <span class="wt-map-when">Practising a chapter</span>
+          <h3>Topical Paper Builder</h3>
+          <p>Every real Cambridge question on your chosen chapters, composed into one PDF
+            with the mark scheme.</p>
+          <span class="wt-map-go">Build a booklet →</span>
+        </a>
+
+        <a class="wt-map-card blue reveal" href="papers.html?tab=yearly">
+          <span class="wt-map-when">Final weeks</span>
+          <h3>Full Paper Library</h3>
+          <p>Original question papers and mark schemes by year, session and variant —
+            for timed, whole-paper practice.</p>
+          <span class="wt-map-go">Browse papers →</span>
+        </a>
+
+        <a class="wt-map-card pink reveal" href="topical-progress.html">
+          <span class="wt-map-when">Tracking where you stand</span>
+          <h3>Progress Tracker</h3>
+          <p>Chapter-by-chapter tracker plus <em>Quiz me</em> — an exam-style question
+            marked against the real criteria.</p>
+          <span class="wt-map-go">Open progress tracker →</span>
+        </a>
+
+        <a class="wt-map-card orange reveal" href="tutor.html">
+          <span class="wt-map-when">Stuck, right now</span>
+          <h3>AI Tutor &amp; Photo Solver</h3>
+          <p>Concept explanations, worked examples, and step-by-step working from a photo
+            of your question.</p>
+          <span class="wt-map-go">Ask the tutor →</span>
+        </a>
+
+        <a class="wt-map-card teal reveal" href="resources.html">
+          <span class="wt-map-when">Learning the theory</span>
+          <h3>Resources &amp; Notes</h3>
+          <p>Chapter notes, formula sheets, revision videos and the official syllabus PDF
+            for every subject.</p>
+          <span class="wt-map-go">Browse resources →</span>
+        </a>
+
+        <a class="wt-map-card yellow reveal" href="guide.html">
+          <span class="wt-map-when">Want the short version</span>
+          <h3>Study Roadmap</h3>
+          <p>The five-step summary of this walkthrough, if you'd rather have it on one
+            screen.</p>
+          <span class="wt-map-go">See the roadmap →</span>
+        </a>
+
+        <a class="wt-map-card lav reveal" href="profile.html">
+          <span class="wt-map-when">Changed board or subjects</span>
+          <h3>Your Profile</h3>
+          <p>Switch between O Level, IGCSE and A Level. Everything on the site re-filters
+            to match.</p>
+          <span class="wt-map-go">Edit profile →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WEEKLY RHYTHM ============ -->
+  <main class="container">
+    <section style="padding: 64px 0 8px;">
+      <div class="wt-band-head reveal">
+        <h2>What a good study week actually looks like</h2>
+        <p>Four sessions a week per subject beats one long panic session. Here's the
+          shape of it.</p>
+      </div>
+
+      <div class="wt-week reveal-stagger">
+        <div class="wt-day reveal">
+          <h4>Session 1 · Learn</h4>
+          <p>One new chapter. Notes, video, and <b>your own one-page summary</b>. No
+            questions yet.</p>
+        </div>
+        <div class="wt-day reveal">
+          <h4>Session 2 · Practise</h4>
+          <p>Build a topical booklet on that chapter, <b>2022–2025</b>. Solve it with
+            your notes open.</p>
+        </div>
+        <div class="wt-day reveal">
+          <h4>Session 3 · Mark &amp; fix</h4>
+          <p>Mark against the scheme, <b>write down why</b> each mark was lost, clear the
+            doubts with the tutor.</p>
+        </div>
+        <div class="wt-day reveal">
+          <h4>Session 4 · Test</h4>
+          <p>Timed mock test covering <b>this chapter plus two older ones</b>. Mark
+            scheme stays shut until you're done.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COUNTDOWN ============ -->
+    <section style="padding: 56px 0 8px;">
+      <div class="wt-band-head reveal">
+        <h2>Counting down to the exam</h2>
+        <p>The same tools, used differently depending on how much time is left.</p>
+      </div>
+
+      <div class="wt-count reveal-stagger">
+        <div class="wt-phase p1 reveal">
+          <p class="wt-phase-when">6+ months out</p>
+          <h3>Build the base</h3>
+          <ul>
+            <li>Map all chapters in Progress Tracker</li>
+            <li>Learn + topical-practise one chapter at a time</li>
+            <li>Widest year range — depth over speed</li>
+            <li>Don't touch full papers yet</li>
+          </ul>
+        </div>
+        <div class="wt-phase p2 reveal">
+          <p class="wt-phase-when">2–6 months out</p>
+          <h3>Close the gaps</h3>
+          <ul>
+            <li>Target every chapter still on <em>Learning</em></li>
+            <li>Weekly timed mock tests by mark target</li>
+            <li>Mixed-chapter booklets, not single chapters</li>
+            <li>First full paper, untimed, to see the shape</li>
+          </ul>
+        </div>
+        <div class="wt-phase p3 reveal">
+          <p class="wt-phase-when">Final 6–8 weeks</p>
+          <h3>Exam conditions</h3>
+          <ul>
+            <li>One full timed paper per subject per week</li>
+            <li>Every mistake becomes a same-week topical</li>
+            <li>Save the two newest years for the last fortnight</li>
+            <li>Re-read your own one-page summaries daily</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section style="padding: 56px 0 8px;">
+      <div class="wt-band-head reveal">
+        <h2>Questions students actually ask</h2>
+        <p>The ones that come up in almost every first lesson.</p>
+      </div>
+
+      <div class="wt-faq reveal-stagger">
+        <details class="reveal">
+          <summary>I only see some subjects — where are the rest?</summary>
+          <div class="wt-faq-body">
+            The dashboard and progress tracker show <strong>only the subjects for the
+            qualification on your profile</strong> — O Level, IGCSE or A Level. That's
+            deliberate: it stops you building a booklet from the wrong syllabus. If
+            you're sitting a different board, or a mix, open
+            <a href="profile.html">your profile</a>, change the qualification and save.
+            The whole site re-filters straight away, and nothing you've already tracked
+            is lost.
+          </div>
+        </details>
+
+        <details class="reveal">
+          <summary>Topical booklets or full past papers — which should I do?</summary>
+          <div class="wt-faq-body">
+            Topical until most of your chapters are Confident, then full papers. Doing
+            whole papers early feels productive but teaches you very little: you meet
+            each chapter once, in a random order, and half the paper is on things you
+            haven't learned yet. Topical practice is what builds the pattern
+            recognition; full papers train stamina and timing at the end.
+          </div>
+        </details>
+
+        <details class="reveal">
+          <summary>How many years should I include in a booklet?</summary>
+          <div class="wt-faq-body">
+            Start with the most recent three or four years — they match the current
+            syllabus and the current examiner style. Once you've cleared those and want
+            more volume, widen the range. If your syllabus changed recently, be careful
+            with older papers: some questions cover topics that have since been removed.
+          </div>
+        </details>
+
+        <details class="reveal">
+          <summary>Do I have to print the booklets?</summary>
+          <div class="wt-faq-body">
+            You don't have to, but you should. The exam is handwritten under time
+            pressure, and solving on a screen quietly hides how slow your working is and
+            how much you rely on scrolling back. Print it, use a pen, mark in a second
+            colour.
+          </div>
+        </details>
+
+        <details class="reveal">
+          <summary>What's the difference between a topical booklet and a mock test?</summary>
+          <div class="wt-faq-body">
+            A <strong>topical booklet</strong> gives you every question on your chosen
+            chapters with the mark scheme right there — it's for learning. A
+            <strong>mock test</strong> takes a random subset to a mark target and puts
+            the mark scheme in a separate file — it's for testing. Use the first while
+            you're building the skill, the second to prove you have it.
+          </div>
+        </details>
+
+        <details class="reveal">
+          <summary>How do I know if I'm actually improving?</summary>
+          <div class="wt-faq-body">
+            Two signals. Your <a href="dashboard.html">dashboard rings</a> show what
+            share of each syllabus you've moved to Confident — that's coverage. Your
+            mock test scores over time show whether it's holding up under pressure —
+            that's retention. You want both climbing; if coverage climbs and scores
+            don't, you're marking yourself too generously.
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ CLOSING CTA ============ -->
+  <section class="container">
+    <div class="wt-end reveal">
+      <h2>That's the whole system.</h2>
+      <p>
+        Nine steps, five tools, one habit: learn a chapter, practise it on real questions,
+        mark it honestly, fix what broke. Do that on repeat and the grade takes care of
+        itself.
+      </p>
+      <div class="wt-end-row">
+        <a class="btn btn-outline" href="dashboard.html">Go to my dashboard →</a>
+        <a class="btn btn-outline" href="papers.html">Build my first booklet →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="confused tint-yellow reveal">
+      <div>
+        <h2 class="tint-ink">Want someone to walk it with you?</h2>
+        <p>Book a free demo lesson. Tee will look at where you actually are and build the
+          plan around it.</p>
+      </div>
+      <a class="btn btn-tint" href="" onclick="openBooking();return false;">Book a free session</a>
+    </section>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Questions before you book?</p>
+          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top">
+      <div>
+        <a class="footer-brand" href="index.html">
+          <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee">
+          <span>PrepWithTee</span>
+        </a>
+        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Study Tools</h4>
+        <a href="tools.html">All Study Tools</a>
+        <a href="calculator.html">Scientific Calculator</a>
+        <a href="formulas.html">Formula Sheets</a>
+        <a href="graph.html">Graph Plotter</a>
+        <a href="periodic-table.html">Periodic Table</a>
+        <a href="bases-logic.html">Bases &amp; Logic</a>
+        <a href="pseudocode.html">Pseudocode Runner</a>
+        <a href="papers.html">Past Papers Engine</a>
+      </div>
+      <div class="footer-col">
+        <h4>What We Teach</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
+        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
+        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Enrol</h4>
+        <a href="pricing.html">Fees &amp; Pricing</a>
+        <a href="index.html#contact">Book a Free Demo</a>
+        <a href="subjects.html">Find Your Subject</a>
+        <a href="index.html#faq">Questions &amp; Answers</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span>Past papers &copy; Cambridge Assessment International Education</span>
+    </div>
+  </footer>
+
+  <script src="main.js?v=20260831a"></script>
+  <script type="module" src="/auth.js?v=20260829a"></script>
+
+  <script>
+    /* Walkthrough-only behaviour. main.js already handles the .reveal classes,
+       the count-up numbers and the booking modal; this adds the three things
+       that are specific to this page: the scroll progress bar, the sticky rail
+       highlight, and the timeline spine that draws itself in. */
+    (function () {
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const bar    = document.getElementById("wt-bar");
+      const stepsW = document.getElementById("wt-steps");
+      const steps  = [...document.querySelectorAll(".wt-step")];
+      const links  = [...document.querySelectorAll("#wt-rail a")];
+
+      /* ---- scroll progress across the whole document ---- */
+      function progress() {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const pct = max > 0 ? Math.min(scrollY / max, 1) * 100 : 0;
+        bar.style.width = pct.toFixed(2) + "%";
+      }
+
+      /* ---- spine fill: how far through the step list the reader is ---- */
+      function spine() {
+        if (!stepsW) return;
+        const r = stepsW.getBoundingClientRect();
+        const anchor = innerHeight * 0.45;          // the "reading line"
+        const pct = Math.max(0, Math.min((anchor - r.top) / r.height, 1)) * 100;
+        stepsW.style.setProperty("--spine", pct.toFixed(2) + "%");
+      }
+
+      /* ---- which step is being read ---- */
+      function active() {
+        const anchor = innerHeight * 0.42;
+        let current = -1;
+        steps.forEach((s, i) => {
+          const r = s.getBoundingClientRect();
+          if (r.top <= anchor) current = i;
+          // "seen" is sticky — scrolling back up shouldn't undo the trail.
+          if (r.top <= anchor) s.classList.add("seen");
+        });
+        steps.forEach((s, i) => s.classList.toggle("on", i === current));
+        links.forEach((a, i) => a.classList.toggle("on", i === current));
+      }
+
+      function update() {
+        progress();
+        if (!reduced) spine();
+        active();
+      }
+
+      let ticking = false;
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { update(); ticking = false; });
+      }
+
+      addEventListener("scroll", onScroll, { passive: true });
+      addEventListener("resize", onScroll);
+      // Straight call, not onScroll — a background tab never runs rAF, and the
+      // rail/spine must be right on the very first paint either way.
+      update();
+
+      /* Rail links jump with the header offset already handled by
+         scroll-margin-top in CSS, so nothing to do here but let the browser
+         smooth-scroll (html { scroll-behavior: smooth } is site-wide). */
+    })();
+  </script>
+
+  <script src="tools-core.js?v=20260811d"></script>
+  <script src="tools-nav.js?v=20260811d"></script>
+</body>
+
+</html>
