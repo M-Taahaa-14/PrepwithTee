@@ -1,0 +1,399 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Achievements — PrepWithTee</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <link rel="stylesheet" href="tools.css?v=20260829a">
+  <style>
+    /* ── Achievements page ─────────────────────────────────── */
+    .ach-hero {
+      background:linear-gradient(135deg,#160f30 0%,#3b1f6b 55%,#1a1040 100%);
+      padding:32px 32px 36px; position:relative; overflow:hidden;
+    }
+    .ach-hero::before {
+      content:''; position:absolute; top:-60px; right:-40px;
+      width:280px; height:280px; border-radius:50%;
+      background:radial-gradient(circle,rgba(232,145,58,.25) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .ach-hero-eyebrow {
+      font-size:.74rem; font-weight:700; letter-spacing:.12em;
+      text-transform:uppercase; color:rgba(255,255,255,.45);
+      font-family:"Hanken Grotesk",sans-serif; margin-bottom:8px;
+    }
+    .ach-hero h1 {
+      font-family:"Playfair Display",Georgia,serif;
+      font-size:clamp(1.6rem,3vw,2.3rem); font-weight:900;
+      color:#fff; margin:0 0 6px; position:relative;
+    }
+    .ach-hero-sub { font-size:.9rem; color:rgba(255,255,255,.55); margin:0; position:relative; }
+
+    /* ── Inner layout ───────────────────────────────────────── */
+    .ach-layout {
+      display:grid; grid-template-columns:300px 1fr; gap:20px;
+      padding:24px 28px 80px; max-width:1100px; margin:0 auto;
+    }
+
+    /* ── Left: level + streak ───────────────────────────────── */
+    .ach-card {
+      background:#fff; border:1.5px solid var(--line);
+      border-radius:var(--radius-lg); padding:22px;
+    }
+    .ach-card + .ach-card { margin-top:16px; }
+
+    .level-big {
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+      padding:20px 0 18px; text-align:center;
+    }
+    .level-badge {
+      width:80px; height:80px; border-radius:50%;
+      background:linear-gradient(135deg,#E8913A,#f9c260);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem; box-shadow:0 4px 20px rgba(232,145,58,.35);
+      margin-bottom:10px;
+    }
+    .level-num {
+      font-family:"Archivo",sans-serif; font-weight:900;
+      font-size:1.5rem; color:var(--navy); line-height:1;
+    }
+    .level-label {
+      font-size:.78rem; color:var(--grey); font-weight:600;
+      text-transform:uppercase; letter-spacing:.06em;
+    }
+
+    /* XP bar */
+    .xp-bar-wrap { margin:14px 0 10px; }
+    .xp-bar-labels {
+      display:flex; justify-content:space-between;
+      font-size:.72rem; color:var(--grey); margin-bottom:5px;
+    }
+    .xp-bar-track {
+      width:100%; height:10px; background:var(--line);
+      border-radius:99px; overflow:hidden;
+    }
+    .xp-bar-fill {
+      height:100%; border-radius:99px;
+      background:linear-gradient(90deg,#E8913A,#f9c260);
+      transition:width .6s ease;
+    }
+    .xp-total-row {
+      text-align:center; font-size:.8rem; color:var(--grey); margin-top:6px;
+    }
+    .xp-total-row strong { color:var(--navy); }
+
+    /* streak card */
+    .streak-row {
+      display:flex; align-items:center; gap:14px;
+    }
+    .streak-ico {
+      font-size:2rem; width:54px; height:54px; border-radius:14px;
+      background:rgba(232,145,58,.1); display:flex;
+      align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .streak-info {}
+    .streak-num {
+      font-family:"Archivo",sans-serif; font-weight:900;
+      font-size:1.5rem; color:var(--navy); line-height:1.1;
+    }
+    .streak-label { font-size:.78rem; color:var(--grey); }
+
+    /* stat pair */
+    .stat-pair {
+      display:flex; gap:10px; margin-top:12px;
+    }
+    .stat-box {
+      flex:1; background:var(--page); border:1.5px solid var(--line);
+      border-radius:12px; padding:12px; text-align:center;
+    }
+    .stat-box b {
+      display:block; font-family:"Archivo",sans-serif; font-weight:800;
+      font-size:1.2rem; color:var(--navy); line-height:1.2;
+    }
+    .stat-box small { font-size:.68rem; color:var(--grey);
+      text-transform:uppercase; letter-spacing:.04em; }
+
+    /* ── Right: badge grid ─────────────────────────────────── */
+    .ach-badges-head {
+      font-family:"Archivo",sans-serif; font-weight:800;
+      font-size:.78rem; color:var(--grey); text-transform:uppercase;
+      letter-spacing:.08em; margin:0 0 14px;
+    }
+    .badge-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+      gap:14px;
+    }
+    .badge-card {
+      background:#fff; border:1.5px solid var(--line);
+      border-radius:16px; padding:18px 14px 16px;
+      text-align:center; display:flex; flex-direction:column;
+      align-items:center; gap:8px; position:relative;
+      transition:box-shadow .2s, transform .2s;
+    }
+    .badge-card:hover { box-shadow:0 6px 24px rgba(0,0,0,.08); transform:translateY(-2px); }
+    .badge-card.locked { opacity:.45; filter:grayscale(.9); }
+    .badge-ico {
+      font-size:2rem; width:56px; height:56px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--page); border:2px solid var(--line);
+    }
+    .badge-card.earned .badge-ico {
+      background:color-mix(in srgb, var(--b-color,var(--gold)) 14%, transparent);
+      border-color:color-mix(in srgb, var(--b-color,var(--gold)) 35%, transparent);
+    }
+    .badge-name {
+      font-family:"Archivo",sans-serif; font-weight:800;
+      font-size:.78rem; color:var(--navy); line-height:1.2;
+    }
+    .badge-desc { font-size:.7rem; color:var(--grey); line-height:1.4; }
+    .badge-earned-tag {
+      font-size:.62rem; font-weight:800; font-family:"Archivo",sans-serif;
+      color:#fff; background:var(--b-color,var(--gold));
+      border-radius:99px; padding:2px 8px; position:absolute;
+      top:10px; right:10px; display:none;
+    }
+    .badge-card.earned .badge-earned-tag { display:block; }
+
+    /* XP log */
+    .xp-log-list { display:flex; flex-direction:column; gap:6px; margin-top:14px; }
+    .xp-log-item {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 12px; background:var(--page);
+      border:1px solid var(--line); border-radius:10px;
+    }
+    .xp-log-ico { font-size:1rem; flex-shrink:0; }
+    .xp-log-text { flex:1; font-size:.82rem; color:var(--ink); }
+    .xp-log-xp {
+      font-family:"Archivo",sans-serif; font-weight:800;
+      font-size:.82rem; color:#16a34a;
+    }
+    .xp-log-date { font-size:.7rem; color:var(--grey); }
+
+    /* responsive */
+    @media (max-width:820px) {
+      .ach-layout { grid-template-columns:1fr; padding:18px 18px 80px; }
+    }
+    @media (max-width:480px) {
+      .badge-grid { grid-template-columns:repeat(2,1fr); }
+      .ach-hero { padding:24px 16px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <div class="header-right"></div>
+    </div>
+  </header>
+  <div class="page-back-bar"><a href="dashboard.html" class="page-back-link">Dashboard</a></div>
+
+  <main class="hub-page">
+
+    <div class="ach-hero">
+      <p class="ach-hero-eyebrow">Gamification</p>
+      <h1>Achievements</h1>
+      <p class="ach-hero-sub">Track your level, streak and the badges you've earned along the way.</p>
+    </div>
+
+    <div class="ach-layout">
+
+      <!-- Left column: Level + Streak -->
+      <div class="ach-left">
+
+        <!-- Level card -->
+        <div class="ach-card">
+          <div class="level-big">
+            <div class="level-badge" id="ach-level-badge">⭐</div>
+            <div class="level-num" id="ach-level-num">Level 1</div>
+            <div class="level-label">PrepWithTee learner</div>
+          </div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-labels">
+              <span id="ach-xp-cur">0 XP</span>
+              <span id="ach-xp-nxt">100 XP to next level</span>
+            </div>
+            <div class="xp-bar-track">
+              <div class="xp-bar-fill" id="ach-xp-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="xp-total-row">Total: <strong id="ach-xp-total">0 XP</strong></div>
+        </div>
+
+        <!-- Streak card -->
+        <div class="ach-card">
+          <div class="streak-row">
+            <div class="streak-ico">🔥</div>
+            <div class="streak-info">
+              <div class="streak-num"><span id="ach-streak">0</span> day streak</div>
+              <div class="streak-label">Keep studying every day!</div>
+            </div>
+          </div>
+          <div class="stat-pair">
+            <div class="stat-box"><b id="ach-longest-streak">0</b><small>Longest streak</small></div>
+            <div class="stat-box"><b id="ach-days-studied">0</b><small>Days studied</small></div>
+          </div>
+        </div>
+
+        <!-- Recent XP log -->
+        <div class="ach-card">
+          <div class="ach-badges-head">Recent XP gains</div>
+          <div class="xp-log-list" id="xp-log-list">
+            <div style="font-size:.82rem;color:var(--grey);text-align:center;padding:16px 0;">Start studying to earn XP!</div>
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- Right: badge grid -->
+      <div>
+        <div class="ach-badges-head">Badges</div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script type="module" src="/auth.js?v=20260829a"></script>
+  <script type="module">
+    import { requireProfile, api } from "/auth.js";
+    const _achUser = await requireProfile();
+
+    /* ── Guard: clear stale XP data from a different account ── */
+    if (_achUser) {
+      const storedUid = localStorage.getItem("pwt_uid");
+      if (storedUid && storedUid !== _achUser.id) {
+        ["pwt_xp_total","pwt_xp_log","pwt_badges","pwt_missions",
+         "pwt_focus","pwt_streak","pwt_streak_max"].forEach(k => {
+          try { localStorage.removeItem(k); } catch {}
+        });
+      }
+      try { localStorage.setItem("pwt_uid", _achUser.id); } catch {}
+    }
+
+    /* ── Hydrate from server (cross-device sync) ──────────────────────────── */
+    function _lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+    try {
+      const srv = await api("/api/stats");
+      if (srv && (srv.xp_total > 0 || srv.badges?.length > 0)) {
+        _lsSet("pwt_xp_total", srv.xp_total);
+        if (srv.xp_log?.length) _lsSet("pwt_xp_log", srv.xp_log);
+        _lsSet("pwt_badges", srv.badges || []);
+        _lsSet("pwt_streak", srv.streak || 0);
+        if (srv.streak_max > 0) _lsSet("pwt_streak_max", srv.streak_max);
+      }
+    } catch { /* fall back to localStorage */ }
+
+    /* ── Data from localStorage ───────────────────────────── */
+    function ls(k, def) {
+      try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }
+      catch { return def; }
+    }
+
+    const totalXP  = ls('pwt_xp_total', 0);
+    const xpLog    = ls('pwt_xp_log', []);   // [{date,xp,reason}]
+    const streak   = ls('pwt_streak', 0);
+    const longest  = ls('pwt_streak_max', streak);
+    const badges   = new Set(ls('pwt_badges', []));
+
+    /* ── Compute level ────────────────────────────────────── */
+    const XP_PER_LVL = 100;
+    const level    = Math.floor(totalXP / XP_PER_LVL) + 1;
+    const xpInLvl  = totalXP % XP_PER_LVL;
+    const pct      = Math.min(100, Math.round((xpInLvl / XP_PER_LVL) * 100));
+
+    const LEVEL_ICONS = ['⭐','🌟','💫','🏅','🥉','🥈','🥇','🏆','👑','💎'];
+    const ico = LEVEL_ICONS[Math.min(level - 1, LEVEL_ICONS.length - 1)];
+
+    document.getElementById('ach-level-badge').textContent = ico;
+    document.getElementById('ach-level-num').textContent   = `Level ${level}`;
+    document.getElementById('ach-xp-cur').textContent      = `${xpInLvl} XP`;
+    document.getElementById('ach-xp-nxt').textContent      = `${XP_PER_LVL - xpInLvl} XP to next level`;
+    document.getElementById('ach-xp-bar').style.width      = pct + '%';
+    document.getElementById('ach-xp-total').textContent    = `${totalXP} XP`;
+    document.getElementById('ach-streak').textContent      = streak;
+    document.getElementById('ach-longest-streak').textContent = longest;
+
+    // days studied = unique dates in XP log
+    const daysStudied = new Set(xpLog.map(e => e.date).filter(Boolean)).size;
+    document.getElementById('ach-days-studied').textContent = daysStudied;
+
+    /* ── XP log ───────────────────────────────────────────── */
+    const logEl = document.getElementById('xp-log-list');
+    const recent = [...xpLog].reverse().slice(0, 8);
+    if (recent.length) {
+      logEl.innerHTML = recent.map(e => {
+        const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+        const ico = e.reason?.includes('quiz') ? '⚡' : e.reason?.includes('flash') ? '🗂️' : e.reason?.includes('streak') ? '🔥' : '✅';
+        return `<div class="xp-log-item">
+          <span class="xp-log-ico">${ico}</span>
+          <span class="xp-log-text">${esc(e.reason || 'Study session')}</span>
+          <span class="xp-log-xp">+${e.xp ?? 0} XP</span>
+          <span class="xp-log-date">${dateStr}</span>
+        </div>`;
+      }).join('');
+    }
+
+    /* ── Badges ───────────────────────────────────────────── */
+    const BADGES = [
+      { id:'first_quiz',   ico:'⚡', name:'First Spark',     desc:'Complete your first quiz',          color:'#e74c3c' },
+      { id:'streak_3',     ico:'🔥', name:'3-Day Streak',    desc:'Study 3 days in a row',             color:'#E8913A' },
+      { id:'streak_7',     ico:'🏅', name:'Week Warrior',    desc:'Study 7 days in a row',             color:'#f39c12' },
+      { id:'streak_30',    ico:'👑', name:'Monthly Master',  desc:'Study 30 days in a row',            color:'#7c4dff' },
+      { id:'cards_10',     ico:'🗂️', name:'Card Starter',   desc:'Review 10 flashcards',              color:'#00b8a9' },
+      { id:'cards_100',    ico:'📦', name:'Card Collector',  desc:'Review 100 flashcards',             color:'#2196f3' },
+      { id:'cards_500',    ico:'🎴', name:'Card Master',     desc:'Review 500 flashcards',             color:'#3f51b5' },
+      { id:'quiz_first',   ico:'🧠', name:'Quiz Starter',    desc:'Score on your first quiz',          color:'#e74c3c' },
+      { id:'quiz_90',      ico:'🏆', name:'Quiz Champion',   desc:'Score 90%+ on any quiz',            color:'#f39c12' },
+      { id:'hw_hero',      ico:'📝', name:'Homework Hero',   desc:'Submit 5 homework assignments',     color:'#43a047' },
+      { id:'rev_master',   ico:'📖', name:'Revision Master', desc:'Complete a full revision set',      color:'#43a047' },
+      { id:'ai_convo',     ico:'🤖', name:'AI Explorer',     desc:'Have your first AI Tutor chat',     color:'#E8913A' },
+    ];
+
+    const grid = document.getElementById('badge-grid');
+    BADGES.forEach(b => {
+      const earned = badges.has(b.id)
+        || (b.id === 'streak_3'  && streak >= 3)
+        || (b.id === 'streak_7'  && streak >= 7)
+        || (b.id === 'streak_30' && streak >= 30);
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="badge-card${earned ? ' earned' : ' locked'}" style="--b-color:${b.color}">
+          <div class="badge-earned-tag">✓</div>
+          <div class="badge-ico">${b.ico}</div>
+          <div class="badge-name">${esc(b.name)}</div>
+          <div class="badge-desc">${esc(b.desc)}</div>
+        </div>`);
+    });
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+  </script>
+  <script src="tools-core.js?v=20260811d"></script>
+  <script src="tools-nav.js?v=20260811d"></script>
+  <script src="tools-dock.js?v=20260810k"></script>
+  <script defer src="chatbot-widget.js?v=20260830a"></script>
+</body>
+</html>
+
