@@ -144,6 +144,10 @@ sudo -u prepwithtee .venv/bin/python -c "import fitz; print('PyMuPDF', fitz.Vers
 sudo tee /etc/prepwithtee.env >/dev/null <<'EOF'
 ANTHROPIC_API_KEY=sk-ant-...
 GROQ_API_KEY=gsk_...
+RESEND_API_KEY=re_...
+MAIL_FROM=PrepWithTee <noreply@prepwithtee.com>
+NOTIFY_EMAIL=nexgentutors6@gmail.com
+ADMIN_ACCESS_KEY=...
 SMTP_USER=nexgentutors6@gmail.com
 SMTP_PASS=your-gmail-app-password
 EOF
@@ -158,7 +162,39 @@ Each key enables one feature and every feature degrades gracefully without it:
 |----------|--------|-----------|
 | `ANTHROPIC_API_KEY` | Ask page (photo → worked solution) | "not switched on yet" message |
 | `GROQ_API_KEY` | AI Tutor (question generator / concept chat) | "not switched on yet" message |
-| `SMTP_USER`/`SMTP_PASS` | Demo-booking email notification | booking still saved to `data/leads.db`, email skipped |
+| `RESEND_API_KEY` | All outbound email, from `prepwithtee.com` | falls back to Gmail SMTP below |
+| `MAIL_FROM` | The `From:` on Resend mail | defaults to `PrepWithTee <noreply@prepwithtee.com>` |
+| `NOTIFY_EMAIL` | `Reply-To:`, and where form submissions land | defaults to `nexgentutors6@gmail.com` |
+| `SMTP_USER`/`SMTP_PASS` | Email fallback when Resend is unset or failing | booking still saved to `data/leads.db`, email skipped |
+
+### Email deliverability
+
+Mail is sent through **Resend** so it leaves as `noreply@prepwithtee.com`,
+DKIM-signed with `d=prepwithtee.com`. Sending student reminders from a free
+`@gmail.com` address is itself the spam signal: there is no domain reputation
+to accrue, and Gmail's bulk-sender rules treat consumer `From:` addresses
+poorly. Gmail SMTP stays wired as a fallback, so an expired key degrades to
+working mail rather than to silence.
+
+`prepwithtee.com` had **no SPF and no MX record** before this (only GoDaddy's
+default `_dmarc` at `p=quarantine`). Add these at **GoDaddy → DNS**, taking the
+exact `resend._domainkey` value from the Resend dashboard — it is unique per
+domain:
+
+| Type | Name | Value |
+|------|------|-------|
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` |
+| TXT | `resend._domainkey` | *(the long `p=…` key Resend shows)* |
+| MX | `send` | `feedback-smtp.eu-west-1.amazonses.com` (priority 10) |
+
+The existing `_dmarc` record is fine as-is; `p=quarantine` with relaxed
+alignment passes once SPF and DKIM are in place.
+
+Verify after DNS propagates (a few minutes to an hour):
+
+```bash
+dig +short TXT resend._domainkey.prepwithtee.com
+```
 
 Get the free Groq key at **console.groq.com → API Keys** (starts `gsk_`). The
 tutor also supports `OPENROUTER_API_KEY` and `CEREBRAS_API_KEY` as automatic

@@ -13,15 +13,46 @@
   const SESSION_LABELS = { s: "May/Jun", w: "Oct/Nov", m: "Feb/Mar", y: "Yearly" };
 
 async function init() {
-  const r = await fetch("/api/meta");
-  state.meta = await r.json();
+  const [metaRes, enrollRes, meRes] = await Promise.all([
+    fetch("/api/meta").then(r => r.json()),
+    fetch("/api/enrollments").then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/auth/me", { credentials: "same-origin" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]);
+  state.meta = metaRes;
+  const userRole = meRes?.role || null;
+  const isPrivileged = userRole === "teacher" || userRole === "admin";
 
-  // hero stats
-  let total = 0;
-  for (const s of state.meta.subjects)
-    for (const t of s.topics) total += t.count;
-  $("#stat-questions").textContent = total.toLocaleString() + "+";
-  $("#stat-subjects").textContent = state.meta.subjects.length;
+  const isLoggedIn = !!meRes;
+  const hasEnrollments = enrollRes?.enrollments?.length > 0;
+
+  // Store auth state on state so click handlers can check it without an extra request
+  state.isLoggedIn = isLoggedIn;
+  state.hasEnrollments = hasEnrollments;
+
+  // Global stats from the full catalogue (shown before enrollment filter)
+  let globalTotal = 0, globalSubjects = metaRes.subjects?.length || 0;
+  for (const s of (metaRes.subjects || []))
+    for (const t of s.topics) globalTotal += t.count;
+  $("#stat-questions").textContent = globalTotal.toLocaleString() + "+";
+  $("#stat-subjects").textContent = globalSubjects;
+
+  if (!isPrivileged && enrollRes && enrollRes.enrollments) {
+    const activeCodes = enrollRes.enrollments.map(e => e.syllabus);
+    state.meta.subjects = state.meta.subjects.filter(s => activeCodes.includes(s.syllabus));
+  }
+
+  // No subjects to show — guide the user on what to do instead of crashing
+  if (!state.meta.subjects.length) {
+    showEnrollPrompt(meRes, isLoggedIn, hasEnrollments);
+    return;
+  }
+
+  // For guests: show a subtle sign-in nudge near the Generate button so they
+  // know a free account is required before they hit generate and see the modal.
+  if (!isLoggedIn) {
+    const hint = document.getElementById("guest-hint");
+    if (hint) hint.hidden = false;
+  }
 
   // years — initial defaults (overridden per-subject in pickSubject)
   setYearRange(state.meta.year_min, state.meta.year_max);
@@ -74,6 +105,60 @@ async function init() {
     state.meta.subjects[0];
   switchBoard(first.board);
   pickSubject(first.syllabus);
+}
+
+function showEnrollPrompt(meRes, isLoggedIn, hasEnrollments) {
+  const generator = document.getElementById("generator");
+  if (!generator) return;
+
+  const hasGrade = !!meRes?.grade;
+
+  // Determine which step the user is stuck on
+  let icon, heading, body, primaryHref, primaryLabel, secondaryHref, secondaryLabel;
+
+  if (!isLoggedIn) {
+    icon = "🔒";
+    heading = "Sign in to build topical papers";
+    body = "Create a free account to access 4,000+ classified Cambridge questions sorted by topic.";
+    primaryHref = "/login.html?next=/papers.html";
+    primaryLabel = "Sign in / Register";
+    secondaryHref = "/walkthrough.html";
+    secondaryLabel = "See how it works →";
+  } else if (!hasGrade) {
+    icon = "📋";
+    heading = "First: tell us which qualification you're sitting";
+    body = "The paper builder filters by your board — O Level, IGCSE or A Level. Set it once on your profile and the right subjects appear here automatically.";
+    primaryHref = "/profile.html?next=/papers.html";
+    primaryLabel = "Set my qualification →";
+    secondaryHref = "/walkthrough.html#step-1";
+    secondaryLabel = "Why does this matter?";
+  } else {
+    icon = "📚";
+    heading = "Add your subjects to unlock the paper builder";
+    body = "You're signed in as " + (meRes.grade || "a student") + " but haven't enrolled in any subjects yet. Go to your dashboard, click <strong>Add subject</strong> next to any syllabus, and come straight back — the builder will load.";
+    primaryHref = "/dashboard.html#enrol-grid";
+    primaryLabel = "Go to Dashboard → Add subjects";
+    secondaryHref = "/walkthrough.html#step-1";
+    secondaryLabel = "See the walkthrough";
+  }
+
+  generator.innerHTML = `
+    <div style="text-align:center;padding:48px 24px 40px;max-width:520px;margin:0 auto;">
+      <span style="font-size:3rem;display:block;margin-bottom:16px;">${icon}</span>
+      <h2 style="font-size:1.4rem;color:var(--navy);margin-bottom:10px;">${heading}</h2>
+      <p style="color:var(--grey);font-size:.95rem;line-height:1.65;margin-bottom:26px;">${body}</p>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+        <a href="${primaryHref}"
+           style="display:inline-block;background:var(--navy);color:#fff;font-weight:700;
+                  font-size:.95rem;padding:12px 28px;border-radius:10px;text-decoration:none;">
+          ${primaryLabel}
+        </a>
+        <a href="${secondaryHref}"
+           style="color:var(--grey);font-size:.87rem;text-decoration:underline;">
+          ${secondaryLabel}
+        </a>
+      </div>
+    </div>`;
 }
 
 function setYearRange(yearMin, yearMax) {
@@ -305,7 +390,7 @@ function renderTopics() {
 
     label.innerHTML =
       `<input type="checkbox" class="topic-cb" value="${t.name}">` +
-      `<span>${t.name}</span><span class="n">${count}</span>` +
+      `<span>${t.display || t.name}</span><span class="n">${count}</span>` +
       (hasSubtopics
         ? `<button type="button" class="subtopic-toggle" title="Filter by sub-topic">▾</button>`
         : "");
@@ -374,7 +459,28 @@ function renderTopics() {
   search.style.display = shown > 8 ? "" : "none";
   search.value = "";
   filterTopics("");
+  applyPendingTopics();
   updateSummary();
+}
+
+// Topics named in ?topics=A,B arrive from the formula sheet and the tools hub,
+// which deep-link into a specific chapter. Consumed once: re-rendering after
+// the student changes a filter must not silently re-tick what they unticked.
+let pendingTopics = (new URLSearchParams(location.search).get("topics") || "")
+  .split(",").map((t) => t.trim()).filter(Boolean);
+
+function applyPendingTopics() {
+  if (!pendingTopics.length) return;
+  const wanted = new Set(pendingTopics.map((t) => t.toLowerCase()));
+  let hit = false;
+  document.querySelectorAll("#topics .topic-cb").forEach((cb) => {
+    if (!wanted.has(cb.value.toLowerCase())) return;
+    cb.checked = true;
+    cb.closest(".topic").classList.add("on");
+    hit = true;
+  });
+  pendingTopics = [];
+  if (hit) $("#topics").scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function filterTopics(q) {
@@ -528,7 +634,30 @@ async function doGenerate(body, { goEl, pwrapEl, pbarEl, statusFn } = {}) {
   pwrap.hidden = false;
   pbar.className = "progress-bar indeterminate";
   pbar.style.width = "";
-  st("Building your paper — a few seconds…");
+
+  // Rough size estimate: many topics × many years = large booklet
+  const topicCount = (body.topics || []).length;
+  const yearSpan = ((body.year_to || 2025) - (body.year_from || 2020)) + 1;
+  const isLarge = topicCount * yearSpan > 15;
+
+  let elapsed = 0;
+  let timerRunning = true;
+  const fmtElapsed = () => {
+    const m = Math.floor(elapsed / 60), s = elapsed % 60;
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  };
+  const buildMsg = () => {
+    const hint = isLarge ? " — large booklets can take a few minutes" : "";
+    return elapsed === 0
+      ? `Building your paper${hint}…`
+      : `Building your paper… ${fmtElapsed()} elapsed${hint}`;
+  };
+  st(buildMsg());
+  const timerInterval = setInterval(() => {
+    if (!timerRunning) return;
+    elapsed++;
+    st(buildMsg());
+  }, 1000);
 
   try {
     const r = await fetch("/api/generate", {
@@ -537,17 +666,73 @@ async function doGenerate(body, { goEl, pwrapEl, pbarEl, statusFn } = {}) {
       body: JSON.stringify(body),
     });
     if (!r.ok) {
+      if (r.status === 401) {
+        go.disabled = false;
+        pwrap.hidden = true;
+        st("");
+        const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map((i) => i.value);
+        const nextUrl = `${location.pathname}?syllabus=${state.syllabus}&topics=${topics.join(",")}`;
+        if (window.showAuthRequiredModal) {
+          window.showAuthRequiredModal({
+            heading: "Sign in to generate your booklet",
+            text: "You need a free PrepWithTee account to build custom topical booklets.",
+            nextUrl: nextUrl,
+            container: "#generator"
+          });
+        }
+        return;
+      }
       const e = await r.json().catch(() => ({}));
-      throw new Error(e.detail || `server error (${r.status})`);
+      if (r.status === 429) {
+        go.disabled = false;
+        pwrap.hidden = true;
+        const d = (e.detail && typeof e.detail === "object") ? e.detail : {};
+        const used = d.used ?? "?";
+        const limit = d.limit ?? "?";
+        const eventLabel = (d.event_type || "topical_paper").replace(/_/g, " ");
+        const statusEl = $("#status");
+        statusEl.className = "status err";
+        statusEl.innerHTML =
+          `<b>Monthly limit reached</b> — you've used <b>${used}/${limit}</b> ${eventLabel}s this month. ` +
+          `<a href="/pricing.html" style="color:inherit;font-weight:700;text-decoration:underline">View plans →</a>`;
+        return;
+      }
+      if (r.status === 503) {
+        go.disabled = false;
+        pwrap.hidden = true;
+        timerRunning = false;
+        clearInterval(timerInterval);
+        const statusEl = $("#status");
+        statusEl.className = "status err";
+        statusEl.innerHTML = `<b>Generation failed</b> — ${typeof e.detail === "string" ? e.detail : "the server was busy"}. Please try again in a few seconds.`;
+        return;
+      }
+      if (r.status >= 500) {
+        go.disabled = false;
+        pwrap.hidden = true;
+        timerRunning = false;
+        clearInterval(timerInterval);
+        console.error("[generate] server error:", e.detail);
+        const statusEl = $("#status");
+        statusEl.className = "status err";
+        statusEl.innerHTML = `<b>Something went wrong</b> — please try again. If it keeps failing, try fewer topics or a shorter year range.`;
+        return;
+      }
+      const msg = typeof e.detail === "string" ? e.detail
+        : (e.detail?.message || `server error (${r.status})`);
+      throw new Error(msg);
     }
 
+    timerRunning = false;
+    clearInterval(timerInterval);
     const cd = r.headers.get("Content-Disposition") || "";
     const name = (cd.match(/filename="?([^";]+)/) || [])[1] ||
       (body.mode === "test" ? "test.zip" : "topical.pdf");
     const total = +(r.headers.get("Content-Length") || 0);
     pbar.className = "progress-bar";
     pbar.style.width = total ? "0%" : "30%";
-    st("Downloading…");
+    const dlSize = total ? ` (${(total / 1024 / 1024).toFixed(1)} MB)` : "";
+    st(`Downloading${dlSize}…`);
 
     const reader = r.body.getReader();
     const chunks = [];
@@ -574,6 +759,8 @@ async function doGenerate(body, { goEl, pwrapEl, pbarEl, statusFn } = {}) {
     }, 700);
     st(`Done — ${name} downloaded.`, "ok");
   } catch (err) {
+    timerRunning = false;
+    clearInterval(timerInterval);
     pwrap.hidden = true;
     pbar.className = "progress-bar";
     st(err.message, "err");
@@ -583,6 +770,41 @@ async function doGenerate(body, { goEl, pwrapEl, pbarEl, statusFn } = {}) {
 }
 
 // ── Preview & curate (test mode) ──────────────────────────────────────────────
+
+// ── Auth guard ────────────────────────────────────────────────────────────────
+// Shows a sign-up/enrol prompt and returns true if the user should be blocked.
+function requireAuthForGenerate() {
+  if (!state.isLoggedIn) {
+    const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map(i => i.value);
+    const nextUrl = `${location.pathname}?syllabus=${state.syllabus}&topics=${encodeURIComponent(topics.join(","))}`;
+    if (window.showAuthRequiredModal) {
+      window.showAuthRequiredModal({
+        heading: "Sign up free to generate papers",
+        text: "Create a free PrepWithTee account to access 4,000+ classified Cambridge questions sorted by topic — and build topical papers in seconds.",
+        nextUrl,
+        container: "#generator",
+      });
+    } else {
+      location.href = `/login.html?next=${encodeURIComponent(nextUrl)}`;
+    }
+    return true;
+  }
+  if (!state.hasEnrollments) {
+    const nextUrl = `/profile.html?next=${encodeURIComponent(location.href)}`;
+    if (window.showAuthRequiredModal) {
+      window.showAuthRequiredModal({
+        heading: "Enrol in a subject first",
+        text: "Go to your profile, choose your board and tick the subjects you study — then come back to generate papers.",
+        nextUrl,
+        container: "#generator",
+      });
+    } else {
+      location.href = nextUrl;
+    }
+    return true;
+  }
+  return false;
+}
 
 async function fetchPreview(seed) {
   const body = buildBody();
@@ -680,6 +902,7 @@ $("#preview-regen").onclick = () => {
 };
 
 $("#preview-generate").onclick = async () => {
+  if (requireAuthForGenerate()) return;
   const selectedIds = [...document.querySelectorAll(".prev-cb:checked")].map((cb) => +cb.dataset.id);
   if (!selectedIds.length) return;
   const body = { ...state.preview.body, question_ids: selectedIds };
@@ -697,6 +920,7 @@ $("#preview-generate").onclick = async () => {
 };
 
 $("#go").onclick = async () => {
+  if (requireAuthForGenerate()) return;
   const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map((i) => i.value);
   if (!topics.length) return status("Pick at least one topic first.", "err");
   if (state.mode === "test") {
