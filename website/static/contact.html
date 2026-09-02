@@ -1,0 +1,1061 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://prepwithtee.com/contact.html">
+  <title>Contact — PrepWithTee</title>
+  <meta name="description" content="Reach PrepWithTee for tutoring enquiries, technical support, or partnerships. Cambridge O-Level & IGCSE preparation trusted by students across the globe.">
+  <link rel="icon" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <style>
+    /* ── PAGE-LOCAL TOKENS ─────────────────────────────────────── */
+    :root {
+      --c-hero:        #09061a;
+      --c-info-bg:     #2E1B4A;
+      --c-info-item:   rgba(255,255,255,.07);
+      --c-info-border: rgba(255,255,255,.09);
+      --c-form-bg:     #ffffff;
+      --c-form-border: #E8DFCE;
+      --c-input-bg:    #FDF9F3;
+      --c-input-bd:    #E8DFCE;
+      --c-input-ink:   #1A1A2E;
+      --c-label:       #8A7F72;
+      --c-pill-bd:     #E8DFCE;
+      --c-faq-bg:      #F7F0E4;
+      --c-faq-card:    #ffffff;
+      --c-faq-ink:     #1A1A2E;
+      --c-faq-bd:      #E8DFCE;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --c-form-bg:    #160d2c;
+        --c-form-border:#2a1850;
+        --c-input-bg:   #0f0820;
+        --c-input-bd:   rgba(255,255,255,.13);
+        --c-input-ink:  #f0ebe0;
+        --c-label:      #7a7090;
+        --c-pill-bd:    rgba(255,255,255,.15);
+        --c-faq-bg:     #0d0820;
+        --c-faq-card:   #160d2c;
+        --c-faq-ink:    #f0ebe0;
+        --c-faq-bd:     rgba(255,255,255,.1);
+      }
+    }
+    :root[data-theme="dark"] {
+      --c-form-bg:    #160d2c;
+      --c-form-border:#2a1850;
+      --c-input-bg:   #0f0820;
+      --c-input-bd:   rgba(255,255,255,.13);
+      --c-input-ink:  #f0ebe0;
+      --c-label:      #7a7090;
+      --c-pill-bd:    rgba(255,255,255,.15);
+      --c-faq-bg:     #0d0820;
+      --c-faq-card:   #160d2c;
+      --c-faq-ink:    #f0ebe0;
+      --c-faq-bd:     rgba(255,255,255,.1);
+    }
+
+    /* ── HERO MAP ──────────────────────────────────────────────── */
+    .hero-section {
+      position: relative;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: var(--c-hero);
+    }
+    #world-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    /* SVG dot layer — viewBox matches canvas logical coords (1000×500) */
+    .dots-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    @keyframes pulse-gold {
+      0%   { r: 9;  opacity: .85; }
+      100% { r: 36; opacity: 0;   }
+    }
+    @keyframes pulse-gold2 {
+      0%   { r: 9;  opacity: .5; }
+      100% { r: 56; opacity: 0;  }
+    }
+    @keyframes pulse-city {
+      0%   { r: 6;  opacity: .7; }
+      100% { r: 24; opacity: 0;  }
+    }
+    @keyframes pulse-city2 {
+      0%   { r: 6;  opacity: .35; }
+      100% { r: 34; opacity: 0;   }
+    }
+    .rg1 { animation: pulse-gold  2.9s ease-out infinite;
+           transform-box: fill-box; transform-origin: center; }
+    .rg2 { animation: pulse-gold2 2.9s ease-out 1.1s infinite;
+           transform-box: fill-box; transform-origin: center; }
+    .rc1 { animation: pulse-city  3.3s ease-out infinite;
+           transform-box: fill-box; transform-origin: center; }
+    .rc2 { animation: pulse-city2 3.3s ease-out 1.4s infinite;
+           transform-box: fill-box; transform-origin: center; }
+
+    /* Left-biased gradient — map shows on the right */
+    .hero-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg,
+        rgba(9,6,26,.96) 0%,
+        rgba(9,6,26,.82) 42%,
+        rgba(9,6,26,.35) 65%,
+        rgba(9,6,26,.04) 100%);
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 90px 28px 82px;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .17em;
+      color: #E8913A;
+      font-family: 'Archivo', sans-serif;
+      margin-bottom: 1.25rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: #E8913A;
+    }
+    .hero-content h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.5rem, 5.2vw, 4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      color: #F0ECE2;
+      margin-bottom: 1.1rem;
+      text-wrap: balance;
+      max-width: 560px;
+    }
+    .hero-content h1 em {
+      font-style: italic;
+      color: #E8913A;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: rgba(240,236,226,.62);
+      max-width: 400px;
+      line-height: 1.72;
+      margin-bottom: 2.2rem;
+    }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 40px;
+      backdrop-filter: blur(10px);
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(240,236,226,.82);
+    }
+    .hp-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #E8913A;
+    }
+    .hp-dot.green { background: #4ade80; }
+
+    /* ── CONTACT SECTION ───────────────────────────────────────── */
+    .contact-wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 80px 28px 88px;
+    }
+    .c-head {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--gold, #E8913A);
+      font-family: 'Archivo', sans-serif;
+      margin-bottom: .5rem;
+    }
+    .c-head h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      color: var(--purple, #4C2E72);
+      margin-top: .4rem;
+      line-height: 1.12;
+    }
+    .c-grid {
+      display: grid;
+      grid-template-columns: 316px 1fr;
+      gap: 26px;
+      align-items: start;
+    }
+    @media (max-width: 840px) { .c-grid { grid-template-columns: 1fr; } }
+
+    /* INFO CARD */
+    .info-card {
+      background: var(--c-info-bg);
+      border-radius: 22px;
+      padding: 34px 28px;
+      color: #F0ECE2;
+      position: sticky;
+      top: 88px;
+    }
+    .info-card h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #F0ECE2;
+      line-height: 1.17;
+      margin-bottom: .35rem;
+    }
+    .info-sub {
+      font-size: 13.5px;
+      color: rgba(240,236,226,.48);
+      line-height: 1.56;
+      margin-bottom: 2rem;
+    }
+    .qc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1.75rem;
+    }
+    .qc {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 13px 14px;
+      background: var(--c-info-item);
+      border: 1px solid var(--c-info-border);
+      border-radius: 14px;
+      text-decoration: none;
+      transition: background .13s, border-color .13s;
+    }
+    .qc:hover { background: rgba(255,255,255,.11); border-color: rgba(232,145,58,.3); }
+    .qc-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(232,145,58,.14);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .qc-body { min-width: 0; }
+    .qc-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: rgba(240,236,226,.38);
+      margin-bottom: 2px;
+    }
+    .qc-val {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #F0ECE2;
+      word-break: break-all;
+    }
+    a.qc .qc-val { color: #fbd38d; }
+    .info-div { height: 1px; background: rgba(255,255,255,.09); margin: 1.5rem 0; }
+    .info-live {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 13px; color: rgba(240,236,226,.46);
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px 2px rgba(74,222,128,.55);
+      animation: live 2s ease-in-out infinite;
+    }
+    @keyframes live {
+      0%,100% { box-shadow: 0 0 8px 2px rgba(74,222,128,.55); }
+      50%      { box-shadow: 0 0 14px 4px rgba(74,222,128,.8); }
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--c-form-bg);
+      border: 1px solid var(--c-form-border);
+      border-radius: 22px;
+      padding: 38px 36px;
+    }
+    @media (max-width: 600px) { .form-card { padding: 26px 20px; } }
+    .form-card-hd { margin-bottom: 2rem; }
+    .form-card-hd h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--purple, #4C2E72);
+      margin-bottom: .25rem;
+    }
+    .form-card-hd p { font-size: 13.5px; color: var(--grey, #5A5A72); }
+
+    /* Subject pill chooser */
+    .pill-lbl {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--grey, #5A5A72);
+      margin-bottom: 10px;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 22px;
+    }
+    .spill {
+      padding: 7px 14px;
+      border: 1.5px solid var(--c-pill-bd);
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .13s, background .13s, color .13s;
+      color: var(--grey, #5A5A72);
+      background: transparent;
+      font-family: 'Hanken Grotesk', sans-serif;
+    }
+    .spill:hover { border-color: var(--gold, #E8913A); color: var(--gold, #E8913A); }
+    .spill.on {
+      background: var(--gold, #E8913A);
+      border-color: var(--gold, #E8913A);
+      color: #fff;
+    }
+
+    /* Floating-label fields */
+    .frow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 520px) { .frow { grid-template-columns: 1fr; } }
+    .fw {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .fw input, .fw textarea {
+      width: 100%;
+      padding: 22px 16px 8px;
+      border: 1.5px solid var(--c-input-bd);
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      background: var(--c-input-bg);
+      color: var(--c-input-ink);
+      transition: border-color .17s, background .17s;
+      line-height: 1.4;
+    }
+    .fw input:focus, .fw textarea:focus {
+      outline: none;
+      border-color: var(--gold, #E8913A);
+      background: var(--c-form-bg);
+    }
+    .fw.valid input, .fw.valid textarea { border-color: #22c55e; }
+    .fw.err   input, .fw.err   textarea { border-color: #ef4444; }
+    .fw textarea {
+      resize: vertical;
+      min-height: 148px;
+      padding-top: 26px;
+    }
+    .fw label {
+      position: absolute;
+      left: 16px; top: 15px;
+      font-size: 14px;
+      color: var(--c-label);
+      transition: top .18s cubic-bezier(.4,0,.2,1),
+                  font-size .18s, color .18s, letter-spacing .18s;
+      pointer-events: none;
+      font-weight: 500;
+    }
+    .fw input:focus ~ label,
+    .fw input:not(:placeholder-shown) ~ label,
+    .fw textarea:focus ~ label,
+    .fw textarea:not(:placeholder-shown) ~ label {
+      top: 7px;
+      font-size: 10px;
+      color: var(--gold, #E8913A);
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .fw .ferr {
+      display: none;
+      font-size: 12px;
+      color: #ef4444;
+      margin-top: 5px;
+      padding-left: 4px;
+    }
+    .fw.err .ferr { display: block; }
+    .char-ct {
+      position: absolute;
+      right: 14px; bottom: 10px;
+      font-size: 11px;
+      color: var(--c-label);
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+    }
+
+    /* Submit */
+    .sub-btn {
+      width: 100%;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 800;
+      font-family: 'Archivo', sans-serif;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #c07830 0%, #E8913A 50%, #f0ae62 100%);
+      color: #fff;
+      letter-spacing: .04em;
+      transition: opacity .14s, transform .12s, box-shadow .14s;
+      box-shadow: 0 4px 22px rgba(232,145,58,.3);
+    }
+    .sub-btn:hover:not(:disabled) {
+      opacity: .92;
+      transform: translateY(-1px);
+      box-shadow: 0 7px 26px rgba(232,145,58,.42);
+    }
+    .sub-btn:active { transform: translateY(0); }
+    .sub-btn:disabled { opacity: .44; cursor: not-allowed; box-shadow: none; }
+    .form-msg {
+      margin-top: 14px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      min-height: 20px;
+    }
+    .form-msg.ok  { color: #059669; }
+    .form-msg.err { color: #dc2626; }
+
+    /* Success state */
+    .form-ok {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 52px 20px 42px;
+    }
+    .ok-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      margin-bottom: 1.4rem;
+      box-shadow: 0 4px 20px rgba(74,222,128,.22);
+    }
+    .form-ok h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--purple, #4C2E72);
+      margin-bottom: .55rem;
+    }
+    .form-ok p {
+      font-size: 14.5px;
+      color: var(--grey, #5A5A72);
+      line-height: 1.65;
+      max-width: 360px;
+    }
+
+    /* ── FAQ ───────────────────────────────────────────────────── */
+    .faq-section {
+      background: var(--c-faq-bg);
+      padding: 82px 28px;
+    }
+    .faq-inner { max-width: 740px; margin: 0 auto; }
+    .faq-hd { text-align: center; margin-bottom: 3rem; }
+    .faq-hd h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.65rem, 3vw, 2.3rem);
+      font-weight: 800;
+      color: var(--purple, #4C2E72);
+      margin-top: .45rem;
+    }
+    .faq-hd p {
+      font-size: 14.5px;
+      color: var(--grey, #5A5A72);
+      margin-top: .55rem;
+    }
+    .faq-hd a { color: var(--gold, #E8913A); font-weight: 600; text-decoration: none; }
+    .faq-hd a:hover { text-decoration: underline; }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; }
+    details.fq {
+      background: var(--c-faq-card);
+      border: 1px solid var(--c-faq-bd);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color .14s;
+    }
+    details.fq[open] { border-color: var(--gold, #E8913A); }
+    details.fq summary {
+      padding: 18px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-faq-ink);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.fq summary::-webkit-details-marker { display: none; }
+    details.fq summary::after {
+      content: '';
+      width: 20px; height: 20px;
+      flex-shrink: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5l5 5 5-5' stroke='%23E8913A' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+      transition: transform .2s;
+    }
+    details.fq[open] summary::after { transform: rotate(180deg); }
+    .fq-body {
+      padding: 0 20px 20px;
+      font-size: 14.5px;
+      color: var(--grey, #5A5A72);
+      line-height: 1.72;
+    }
+    .fq-body a { color: var(--gold, #E8913A); font-weight: 600; text-decoration: none; }
+    .fq-body a:hover { text-decoration: underline; }
+
+    /* ── TRUST BAND ────────────────────────────────────────────── */
+    .trust-band {
+      background: var(--navy-deep, #2E1B4A);
+      padding: 38px 28px;
+    }
+    .trust-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 36px 64px;
+    }
+    .t-item { text-align: center; }
+    .t-num {
+      font-family: 'Archivo', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: #E8913A;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .t-desc {
+      font-size: 13px;
+      color: rgba(240,236,226,.55);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* ── REDUCED MOTION ────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .rg1, .rg2, .rc1, .rc2, .live-dot { animation: none !important; }
+    }
+    @media (max-width: 640px) {
+      .hero-section { min-height: 440px; }
+      .contact-wrap { padding: 56px 20px 64px; }
+      .faq-section  { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-row">
+    <a class="brand" href="/">
+      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee logo">
+      <span>PrepWithTee</span>
+    </a>
+    <nav class="header-nav" id="site-nav">
+      <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Study Notes</b><span>By topic</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="resources.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Study Notes</b><span>Notes by topic</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+      <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+      <a href="teacher-apply.html" class="nav-link">Teach</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+    </nav>
+    <div class="header-right"></div>
+  </div>
+</header>
+
+<!-- ══ HERO ═══════════════════════════════════════════════════════════ -->
+<section class="hero-section" aria-label="Contact hero">
+  <canvas id="world-canvas" aria-hidden="true"></canvas>
+
+  <!-- Dots — coordinate space 0 0 1000 500 stretched to fill section -->
+  <svg class="dots-svg" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
+    <!-- Lahore — home base, gold, most prominent -->
+    <circle class="rg1" cx="707" cy="162" r="9"   fill="none" stroke="#E8913A" stroke-width="1.6"/>
+    <circle class="rg2" cx="707" cy="162" r="9"   fill="none" stroke="#E8913A" stroke-width="1"/>
+    <circle           cx="707" cy="162" r="5.2" fill="#E8913A"/>
+    <circle           cx="707" cy="162" r="5.2" fill="none"   stroke="rgba(255,200,100,.65)" stroke-width="2.5"/>
+
+    <!-- London -->
+    <circle class="rc1" cx="500" cy="107" r="6" fill="none" stroke="#a78bfa" stroke-width="1.3" style="animation-delay:.4s"/>
+    <circle class="rc2" cx="500" cy="107" r="6" fill="none" stroke="#a78bfa" stroke-width=".7"  style="animation-delay:1.7s"/>
+    <circle           cx="500" cy="107" r="3.5" fill="#a78bfa"/>
+
+    <!-- Dubai -->
+    <circle class="rc1" cx="654" cy="180" r="6" fill="none" stroke="#67e8f9" stroke-width="1.3" style="animation-delay:.9s"/>
+    <circle class="rc2" cx="654" cy="180" r="6" fill="none" stroke="#67e8f9" stroke-width=".7"  style="animation-delay:2.2s"/>
+    <circle           cx="654" cy="180" r="3.5" fill="#67e8f9"/>
+
+    <!-- Cairo -->
+    <circle class="rc1" cx="587" cy="167" r="5.5" fill="none" stroke="#a78bfa" stroke-width="1.2" style="animation-delay:1.5s"/>
+    <circle           cx="587" cy="167" r="3"   fill="#a78bfa"/>
+
+    <!-- Lagos -->
+    <circle class="rc1" cx="510" cy="232" r="5"   fill="none" stroke="#67e8f9" stroke-width="1.1" style="animation-delay:.2s"/>
+    <circle           cx="510" cy="232" r="2.8" fill="#67e8f9"/>
+
+    <!-- Nairobi -->
+    <circle class="rc1" cx="603" cy="254" r="5.5" fill="none" stroke="#a78bfa" stroke-width="1.2" style="animation-delay:1.1s"/>
+    <circle           cx="603" cy="254" r="3"   fill="#a78bfa"/>
+
+    <!-- Dhaka -->
+    <circle class="rc1" cx="751" cy="184" r="5.5" fill="none" stroke="#67e8f9" stroke-width="1.2" style="animation-delay:.7s"/>
+    <circle           cx="751" cy="184" r="3"   fill="#67e8f9"/>
+
+    <!-- Colombo -->
+    <circle class="rc1" cx="722" cy="231" r="4.5" fill="none" stroke="#a78bfa" stroke-width="1"   style="animation-delay:1.9s"/>
+    <circle           cx="722" cy="231" r="2.5" fill="#a78bfa"/>
+
+    <!-- Kuala Lumpur -->
+    <circle class="rc1" cx="783" cy="241" r="5"   fill="none" stroke="#67e8f9" stroke-width="1.1" style="animation-delay:.35s"/>
+    <circle           cx="783" cy="241" r="2.8" fill="#67e8f9"/>
+
+    <!-- Singapore (small, close to KL) -->
+    <circle cx="789" cy="247" r="2.2" fill="#a78bfa" opacity=".9"/>
+  </svg>
+
+  <div class="hero-grad" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Students in 10+ countries</p>
+    <h1>How can we<br><em>help you?</em></h1>
+    <p class="hero-sub">Cambridge O-Level &amp; IGCSE prep — Physics, Maths, and Computer Science. One message. One day. One reply.</p>
+    <div class="hero-pills">
+      <span class="hero-pill"><span class="hp-dot"></span>Reply within 24 hours</span>
+      <span class="hero-pill"><span class="hp-dot green"></span>Online sessions available</span>
+      <span class="hero-pill"><span class="hp-dot"></span>5 Cambridge syllabi</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ════════════════════════════════════════════════════════ -->
+<div class="contact-wrap">
+  <div class="c-head">
+    <p class="eyebrow">Get in touch</p>
+    <h2>Send us a message</h2>
+  </div>
+
+  <div class="c-grid">
+
+    <!-- INFO CARD -->
+    <aside class="info-card">
+      <h3>Contact<br>information</h3>
+      <p class="info-sub">Based in Lahore, teaching students globally. Reach us whichever way works for you.</p>
+
+      <div class="qc-list">
+        <a class="qc" href="mailto:nexgentutors6@gmail.com">
+          <span class="qc-icon">✉️</span>
+          <span class="qc-body">
+            <span class="qc-lbl">Email</span>
+            <span class="qc-val">nexgentutors6@gmail.com</span>
+          </span>
+        </a>
+        <div class="qc">
+          <span class="qc-icon">📍</span>
+          <span class="qc-body">
+            <span class="qc-lbl">Location</span>
+            <span class="qc-val">Lahore, Pakistan</span>
+          </span>
+        </div>
+        <div class="qc">
+          <span class="qc-icon">🎓</span>
+          <span class="qc-body">
+            <span class="qc-lbl">Subjects</span>
+            <span class="qc-val">Physics · Maths · Computer Science</span>
+          </span>
+        </div>
+        <div class="qc">
+          <span class="qc-icon">🌐</span>
+          <span class="qc-body">
+            <span class="qc-lbl">Sessions</span>
+            <span class="qc-val">Online via Zoom / Google Meet</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="info-div"></div>
+      <p class="info-live"><span class="live-dot"></span>We usually reply the same day</p>
+    </aside>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+      <div id="form-area">
+        <div class="form-card-hd">
+          <h3>Write to us</h3>
+          <p>Tell us what you need — we'll get back to you within 24 hours.</p>
+        </div>
+
+        <form id="contact-form" novalidate>
+
+          <!-- Name row -->
+          <div class="frow">
+            <div class="fw">
+              <input type="text" id="cf-fname" placeholder=" " autocomplete="given-name">
+              <label for="cf-fname">First name</label>
+            </div>
+            <div class="fw">
+              <input type="text" id="cf-lname" placeholder=" " autocomplete="family-name">
+              <label for="cf-lname">Last name</label>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="fw" id="fw-email">
+            <input type="email" id="cf-email" placeholder=" " autocomplete="email" required>
+            <label for="cf-email">Email address *</label>
+            <span class="ferr">Please enter a valid email address.</span>
+          </div>
+
+          <!-- Subject pills -->
+          <p class="pill-lbl">What's this about?</p>
+          <div class="pill-row" id="pill-row" role="group" aria-label="Subject">
+            <button type="button" class="spill" data-v="Tutoring enquiry">Tutoring enquiry</button>
+            <button type="button" class="spill" data-v="Pricing &amp; plans">Pricing &amp; plans</button>
+            <button type="button" class="spill" data-v="Technical issue">Technical issue</button>
+            <button type="button" class="spill" data-v="Teacher application">Teacher application</button>
+            <button type="button" class="spill" data-v="Syllabus question">Syllabus question</button>
+            <button type="button" class="spill" data-v="Other">Other</button>
+          </div>
+          <input type="hidden" id="cf-subject" value="">
+
+          <!-- Message -->
+          <div class="fw" id="fw-msg">
+            <textarea id="cf-message" placeholder=" " required maxlength="1500"></textarea>
+            <label for="cf-message">Your message *</label>
+            <span class="ferr">Please write a message.</span>
+            <span class="char-ct" id="char-ct" aria-live="polite">0 / 1500</span>
+          </div>
+
+          <button type="submit" class="sub-btn" id="cf-submit">Send message →</button>
+          <p class="form-msg" id="cf-msg" role="alert"></p>
+        </form>
+      </div>
+
+      <!-- Success -->
+      <div class="form-ok" id="form-ok" aria-live="polite">
+        <div class="ok-ring">✓</div>
+        <h4>Message sent!</h4>
+        <p>Thanks for reaching out. We'll reply to <strong id="ok-email"></strong> within 24 hours.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════════════ -->
+<section class="faq-section">
+  <div class="faq-inner">
+    <div class="faq-hd">
+      <p class="eyebrow">Common questions</p>
+      <h2>Frequently asked</h2>
+      <p>Can't find your answer? <a href="mailto:nexgentutors6@gmail.com">Email us directly.</a></p>
+    </div>
+    <div class="faq-list">
+
+      <details class="fq" open>
+        <summary>Which subjects and syllabi do you cover?</summary>
+        <div class="fq-body">We teach <strong>Physics</strong> (Cambridge 5054 O-Level &amp; 0625 IGCSE), <strong>Mathematics</strong> (4024 O-Level &amp; 0580 IGCSE), and <strong>Computer Science</strong> (2210 O-Level &amp; 0478 IGCSE). All teaching is aligned to the 2026–2028 Cambridge syllabi. If you're unsure which syllabus your school uses, just tell us your school name and we'll confirm.</div>
+      </details>
+
+      <details class="fq">
+        <summary>Are sessions online or in-person?</summary>
+        <div class="fq-body">All sessions run online via Zoom or Google Meet, so students anywhere in the world can join. Our platform and past-paper resources are fully web-based — no app to install. If you're in Lahore and prefer in-person, get in touch and we'll discuss what's possible.</div>
+      </details>
+
+      <details class="fq">
+        <summary>How does the topical past-paper system work?</summary>
+        <div class="fq-body">We've broken every past paper from 2020–2025 into individual questions, classified each one by syllabus topic, and built a system that generates custom practice sets for any topic you choose. You get the original exam crop — diagrams, graphs, and all — plus the mark scheme alongside. It's the fastest way to practise exactly what you struggle with.</div>
+      </details>
+
+      <details class="fq">
+        <summary>Can I try the platform before enrolling?</summary>
+        <div class="fq-body">Yes — study notes, formula sheets, the AI Tutor, and several other tools are available to browse without an account. Send us a message here and we'll arrange a free introductory session so you can see how we teach before committing.</div>
+      </details>
+
+      <details class="fq">
+        <summary>How much does tutoring cost?</summary>
+        <div class="fq-body">Pricing depends on the subject, session frequency, and whether you're enrolling solo or in a small group. Visit the <a href="pricing.html">Pricing page</a> for current plans, or send us a message and we'll put together the right package for your situation.</div>
+      </details>
+
+      <details class="fq">
+        <summary>How quickly will you reply to my message?</summary>
+        <div class="fq-body">We aim to reply within 24 hours on weekdays. Messages sent over the weekend are answered first thing Monday. For urgent matters, email <a href="mailto:nexgentutors6@gmail.com">nexgentutors6@gmail.com</a> directly.</div>
+      </details>
+
+      <details class="fq">
+        <summary>I'm a teacher — how do I apply?</summary>
+        <div class="fq-body">We work with qualified Cambridge teachers who want to reach students globally. Head to the <a href="teacher-apply.html">Teach with Us</a> page to submit an application. We review every application personally and reply within a week.</div>
+      </details>
+
+      <details class="fq">
+        <summary>My child missed a session — is there a recording?</summary>
+        <div class="fq-body">Yes, all live sessions are recorded with the student's consent and shared privately via a secure link for 30 days after the session. Let us know in your message if recordings are important to you and we'll confirm the arrangement upfront.</div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST BAND ═════════════════════════════════════════════════════ -->
+<div class="trust-band">
+  <div class="trust-inner">
+    <div class="t-item"><div class="t-num">500+</div><div class="t-desc">Students taught</div></div>
+    <div class="t-item"><div class="t-num">10+</div><div class="t-desc">Countries reached</div></div>
+    <div class="t-item"><div class="t-num">5</div><div class="t-desc">Cambridge syllabi</div></div>
+    <div class="t-item"><div class="t-num">24h</div><div class="t-desc">Reply guarantee</div></div>
+    <div class="t-item"><div class="t-num">2,405+</div><div class="t-desc">Past-paper questions</div></div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════════════ -->
+<script>
+/* ── World-map canvas ─────────────────────────────────────────────── */
+(function () {
+  const cv  = document.getElementById('world-canvas');
+  const ctx = cv.getContext('2d');
+
+  function draw() {
+    const W = cv.offsetWidth, H = cv.offsetHeight;
+    if (!W || !H) return;
+    cv.width = W; cv.height = H;
+    const sx = W / 1000, sy = H / 500;
+
+    /* Background */
+    ctx.fillStyle = '#09061a';
+    ctx.fillRect(0, 0, W, H);
+
+    /* Latitude / longitude grid — very subtle */
+    ctx.strokeStyle = 'rgba(130,100,200,.055)';
+    ctx.lineWidth = .6;
+    for (let lon = -180; lon <= 180; lon += 30) {
+      const x = (lon + 180) / 360 * W;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let lat = -75; lat <= 75; lat += 30) {
+      const y = (90 - lat) / 180 * H;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    /* Continents — purple-tinted fill, faint lavender edge */
+    ctx.fillStyle   = 'rgba(76,46,114,.26)';
+    ctx.strokeStyle = 'rgba(167,139,250,.12)';
+    ctx.lineWidth   = .85;
+
+    function poly(pts) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0] * sx, pts[1] * sy);
+      for (let i = 2; i < pts.length; i += 2)
+        ctx.lineTo(pts[i] * sx, pts[i+1] * sy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    /* North America */
+    poly([148,38, 205,33, 245,31, 263,50, 279,61, 285,90, 267,109, 297,122,
+          293,154, 259,192, 229,242, 191,264, 169,251, 129,208, 95,169,
+          85,133, 88,95, 110,70, 133,55]);
+    /* Greenland */
+    poly([292,22, 334,15, 369,23, 365,53, 335,63, 296,55, 290,37]);
+    /* South America */
+    poly([233,255, 291,252, 309,278, 315,318, 301,362, 275,415,
+          248,445, 222,443, 201,415, 193,380, 204,342, 216,302, 222,274]);
+    /* Europe */
+    poly([459,63, 468,55, 483,55, 513,52, 538,61, 544,78, 532,97,
+          518,113, 497,126, 475,131, 462,119, 453,104, 452,84]);
+    /* Africa */
+    poly([455,133, 501,122, 544,128, 573,145, 597,168, 606,205, 598,250,
+          581,302, 563,355, 544,408, 521,437, 499,446, 472,441, 452,415,
+          437,374, 432,331, 439,268, 445,212, 449,168]);
+    /* Asia main */
+    poly([543,58, 583,52, 623,47, 687,43, 763,46, 827,55, 873,75, 907,108,
+          913,145, 893,185, 853,218, 806,228, 765,242, 725,256, 695,270,
+          660,282, 629,267, 603,252, 579,236, 559,218, 543,195,
+          541,162, 557,142, 552,111, 541,87]);
+    /* Indian subcontinent */
+    poly([619,145, 655,138, 674,158, 683,193, 673,225, 651,248,
+          622,252, 605,233, 605,201, 611,169]);
+    /* SE Asia */
+    poly([765,240, 799,232, 833,235, 849,253, 841,276, 816,282, 790,270, 768,257]);
+    /* Australia */
+    poly([763,308, 826,298, 863,302, 885,323, 889,358, 873,392,
+          846,414, 805,418, 769,402, 748,375, 745,342, 754,318]);
+    /* Japan */
+    poly([896,108, 909,102, 914,119, 906,131, 894,126]);
+    /* British Isles */
+    poly([465,73, 472,66, 480,68, 479,81, 471,85, 464,79]);
+    /* Iceland */
+    poly([441,50, 457,44, 463,53, 456,60, 441,59]);
+    /* New Zealand */
+    poly([909,373, 916,379, 911,393, 903,390, 904,377]);
+
+    /* Subtle ocean shimmer curves */
+    ctx.strokeStyle = 'rgba(103,232,249,.038)';
+    ctx.lineWidth   = .5;
+    for (let i = 0; i < 5; i++) {
+      const y = H * (.18 + i * .14);
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.bezierCurveTo(W*.3, y - 9, W*.7, y + 9, W, y);
+      ctx.stroke();
+    }
+  }
+
+  draw();
+  let raf;
+  const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
+  ro.observe(cv.parentElement);
+})();
+
+/* ── Subject pill toggle ──────────────────────────────────────────── */
+document.querySelectorAll('#pill-row .spill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const wasOn = btn.classList.contains('on');
+    document.querySelectorAll('#pill-row .spill').forEach(b => b.classList.remove('on'));
+    if (!wasOn) {
+      btn.classList.add('on');
+      document.getElementById('cf-subject').value = btn.getAttribute('data-v');
+    } else {
+      document.getElementById('cf-subject').value = '';
+    }
+  });
+});
+
+/* ── Char counter ─────────────────────────────────────────────────── */
+const msgEl  = document.getElementById('cf-message');
+const charEl = document.getElementById('char-ct');
+msgEl.addEventListener('input', () => {
+  charEl.textContent = msgEl.value.length + ' / 1500';
+});
+
+/* ── Email live validation ────────────────────────────────────────── */
+const emailIn = document.getElementById('cf-email');
+const fwEmail = document.getElementById('fw-email');
+const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+emailIn.addEventListener('blur', () => {
+  if (emailIn.value && !emailRe.test(emailIn.value)) fwEmail.classList.add('err');
+  else { fwEmail.classList.remove('err'); if (emailIn.value) fwEmail.classList.add('valid'); }
+});
+emailIn.addEventListener('input', () => {
+  if (emailRe.test(emailIn.value)) { fwEmail.classList.remove('err'); fwEmail.classList.add('valid'); }
+  else fwEmail.classList.remove('valid');
+});
+
+/* ── Form submit ──────────────────────────────────────────────────── */
+document.getElementById('contact-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email  = emailIn.value.trim();
+  const msg    = msgEl.value.trim();
+  const feedEl = document.getElementById('cf-msg');
+  const btn    = document.getElementById('cf-submit');
+  const fwMsg  = document.getElementById('fw-msg');
+
+  let ok = true;
+  if (!email || !emailRe.test(email)) { fwEmail.classList.add('err'); ok = false; }
+  if (!msg) { fwMsg.classList.add('err'); ok = false; }
+  else fwMsg.classList.remove('err');
+  if (!ok) { feedEl.textContent = 'Please fill in the required fields.'; feedEl.className = 'form-msg err'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  feedEl.textContent = '';
+  feedEl.className = 'form-msg';
+
+  try {
+    const fname = document.getElementById('cf-fname').value.trim();
+    const lname = document.getElementById('cf-lname').value.trim();
+    await fetch('/api/contact', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    [fname, lname].filter(Boolean).join(' ') || null,
+        email,
+        subject: document.getElementById('cf-subject').value || null,
+        message: msg,
+      }),
+    });
+    document.getElementById('ok-email').textContent = email;
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('form-ok').style.display   = 'flex';
+  } catch {
+    feedEl.textContent = 'Something went wrong — please email us directly.';
+    feedEl.className   = 'form-msg err';
+    btn.disabled       = false;
+    btn.textContent    = 'Send message →';
+  }
+});
+
+/* ── Auth nav state ───────────────────────────────────────────────── */
+(async () => {
+  try {
+    const u = await fetch('/auth/me', { credentials: 'same-origin' })
+                    .then(r => r.ok ? r.json() : null);
+    if (u) {
+      const li = document.getElementById('nav-login');
+      const ld = document.getElementById('nav-dash');
+      if (li) li.hidden = true;
+      if (ld) ld.hidden = false;
+    }
+  } catch {}
+})();
+</script>
+</body>
+</html>

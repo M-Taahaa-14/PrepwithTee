@@ -461,6 +461,14 @@
 
   back.addEventListener('click', () => { location.hash = ''; });
 
+  const darkBtn = document.getElementById('res-dark-btn');
+  if (darkBtn && pane) {
+    darkBtn.addEventListener('click', () => {
+      const isDark = pane.classList.toggle('res-dark-active');
+      darkBtn.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Night Mode';
+    });
+  }
+
   function route() {
     const m = location.hash.match(/^#\/(.+)$/);
     if (!m) { closeCat(); return; }

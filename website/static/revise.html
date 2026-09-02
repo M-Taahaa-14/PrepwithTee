@@ -1,83 +1,16 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Revision Mode — PrepWithTee</title>
-  <meta name="description"
-    content="Work through your Cambridge syllabus chapter by chapter. Track what you're confident on and practise with exam-style questions marked instantly.">
-  <meta name="robots" content="noindex">
-  <link rel="icon" href="logo.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260802b">
+  <title>Redirecting… — PrepWithTee</title>
+  <meta http-equiv="refresh" content="0;url=topical-progress.html">
+  <script>
+    // Preserve query params (e.g. ?syllabus=5054) for bookmark compatibility
+    location.replace("topical-progress.html" + location.search + location.hash);
+  </script>
 </head>
-
 <body>
-
-  <header class="site-header">
-    <div class="container header-row">
-      <a class="brand" href="index.html">
-        <img src="logo.png" alt="PrepWithTee owl logo">
-        <span>PrepWithTee</span>
-      </a>
-      <nav class="header-nav">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="subjects.html" class="nav-link">Subjects</a>
-        <a href="papers.html" class="nav-link">Past Papers</a>
-        <a href="resources.html" class="nav-link">Resources</a>
-        <a href="tutor.html" class="nav-link">AI Tutor</a>
-        <a href="pricing.html" class="nav-link">Pricing</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container revise-page">
-
-    <div class="revise-head">
-      <div>
-        <p class="eyebrow">Revision mode</p>
-        <h1 class="section-title">Your syllabus, chapter by chapter</h1>
-        <p class="revise-sub">Mark where you stand on each chapter, then let the
-          examiner test you on it. Your progress feeds straight into your dashboard.</p>
-      </div>
-      <a class="btn btn-outline revise-dash-link" href="dashboard.html">View dashboard</a>
-    </div>
-
-    <div class="revise-subjects" id="revise-subjects"></div>
-
-    <div class="revise-summary" id="revise-summary" hidden></div>
-
-    <div class="revise-body">
-      <div class="topic-list" id="topic-list">
-        <p class="revise-loading">Loading your subjects…</p>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ============ QUIZ PANEL ============ -->
-  <div class="quiz-overlay" id="quiz-overlay" hidden>
-    <div class="quiz-backdrop" data-close></div>
-    <aside class="quiz-panel" role="dialog" aria-modal="true" aria-labelledby="quiz-topic">
-      <header class="quiz-head">
-        <div>
-          <p class="quiz-eyebrow" id="quiz-subject">—</p>
-          <h2 id="quiz-topic">—</h2>
-        </div>
-        <button type="button" class="quiz-close" data-close aria-label="Close">✕</button>
-      </header>
-
-      <div class="quiz-body" id="quiz-body"></div>
-    </aside>
-  </div>
-
-  <script type="module" src="/auth.js?v=20260802b"></script>
-  <script type="module" src="/revise.js"></script>
-
+  <p>Redirecting to <a href="topical-progress.html">Topical Progress</a>…</p>
+  <script defer src="chatbot-widget.js?v=20260830a"></script>
 </body>
-
 </html>

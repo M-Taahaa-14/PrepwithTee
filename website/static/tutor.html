@@ -4,244 +4,316 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Tutor — PrepWithTee</title>
-<meta name="description" content="Ask for practice questions on any Cambridge topic, or get a concept explained. Your own AI study partner, trained on the syllabus.">
+<meta name="description" content="Your personal Cambridge study partner. Ask concepts, generate practice questions, upload a photo of any problem — get instant expert help on your syllabus.">
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260802b">
-  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap"
+  rel="preload" as="style" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=20260830b">
+<link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+<link rel="stylesheet" href="tools.css?v=20260829a">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+<style>
+  body:has(#tutor-app) .site-header { height: 64px; }
+  body:has(#tutor-app) .site-footer { display: none; }
+</style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="container header-row">
     <a class="brand" href="index.html">
-      <img src="logo.png" alt="PrepWithTee owl logo">
+      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
       <span>PrepWithTee</span>
-    </a>
-    <nav class="header-nav">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="subjects.html" class="nav-link">Subjects</a>
-      <a href="papers.html" class="nav-link">Past Papers</a>
-      <a href="resources.html" class="nav-link">Resources</a>
-      <a href="tutor.html" class="nav-link active">AI Tutor</a>
-      <a href="pricing.html" class="nav-link">Pricing</a>
-    </nav>
+    </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+    <div class="header-right"></div>
   </div>
 </header>
 
-<section class="hero hero-slim">
-  <div class="container">
-    <p class="eyebrow">Practice on demand · Trained on the syllabus</p>
-    <h1>AI Tutor &amp; Doubt Solver</h1>
-    <p class="sub">Ask concepts, generate practice questions, or upload a photo of any problem for an instant worked solution.</p>
-  </div>
-</section>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TUTOR APP ROOT — three-panel full-page layout
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="tutor-app">
 
-<div class="centered" style="margin-top: 30px; margin-bottom: 34px;">
-  <div class="seg-large" id="tutor-toggle">
-    <button class="active" data-tab="chat">AI Study Partner</button>
-    <button data-tab="solver">Photo Solver</button>
-  </div>
-</div>
+  <!-- ─── LEFT SIDEBAR ─── -->
+  <aside id="tutor-left">
+    <div class="tc-left-top">
 
-<main class="container" style="padding-top:10px">
-  <!-- Tab 1: AI study partner grid -->
-  <div class="tutor-grid" id="tutor-chat-container">
-    <aside class="tutor-side">
-      <div class="tutor-picker">
-        <label class="field-label" for="subject">Subject</label>
-        <select id="subject" class="text-input"><option value="">Any subject</option></select>
-        <label class="field-label" for="topic" style="margin-top:12px">Topic
-          <span class="muted">(optional)</span></label>
-        <select id="topic" class="text-input"><option value="">Any topic</option></select>
+      <!-- New Chat -->
+      <button class="tc-new-chat" id="tc-new-chat-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>
+
+      <!-- Subject → Paper → Topic hierarchy -->
+      <p class="tc-context-label">Subject</p>
+      <select id="tc-subject" class="tc-subject-select" data-styled data-placeholder="Any subject">
+        <option value="">Any subject</option>
+      </select>
+      <p class="tc-context-label" id="tc-paper-label" style="display:none;margin-top:10px">Paper</p>
+      <select id="tc-paper" class="tc-subject-select" style="margin-top:0;display:none">
+        <option value="">All papers</option>
+      </select>
+      <p class="tc-context-label" style="margin-top:10px">Topic</p>
+      <select id="tc-topic" class="tc-subject-select" style="margin-top:0">
+        <option value="">Any topic</option>
+      </select>
+
+      <!-- Mode toggles -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px;">
+        <p class="tc-context-label" style="margin:0;">Tutor Mode</p>
+        <button type="button" id="tc-mode-help-btn" style="background:none; border:none; color:var(--grey); cursor:pointer; font-size:0.95rem; padding:0; display:flex; align-items:center;" title="Explain modes">
+          ❓
+        </button>
+      </div>
+      <div class="tc-mode-row">
+        <button class="tc-mode-btn" id="tc-mode-normal" data-mode="normal" title="Standard explanations">
+          🎯 Normal
+        </button>
+        <button class="tc-mode-btn" id="tc-mode-socratic" data-mode="socratic" title="AI guides with questions instead of giving answers">
+          🎓 Guide Me
+        </button>
+        <button class="tc-mode-btn" id="tc-mode-exam" data-mode="exam" title="Concise exam-technique responses">
+          ⚡ Exam
+        </button>
       </div>
 
-      <div class="tutor-chips">
-        <p class="field-label">Quick prompts</p>
-        <button class="chip" data-prompt="Give me 5 exam-style practice questions on this topic, with the answers at the end.">5 practice questions</button>
-        <button class="chip" data-prompt="Make me a short mixed quiz of 8 questions on this topic, easy to hard, with an answer key.">Mini quiz (8 Qs)</button>
-        <button class="chip" data-prompt="Explain this topic simply, then give me one worked example.">Explain this topic</button>
-        <button class="chip" data-prompt="Give me 3 hard, exam-style questions on this topic that students usually get wrong, with full worked answers.">3 tricky questions</button>
-      </div>
-
-      <p class="hint">Answers come with each set — try the questions first, then
-      check. Want the real thing? Build a paper from actual past questions in the
-      <a href="papers.html" class="tint-ink" style="font-weight:700">topical
-      builder</a>.</p>
-    </aside>
-
-    <section class="tutor-main">
-      <div class="chat" id="chat">
-        <div class="chat-empty" id="empty">
-          <span>🦉</span>
-          <b>What would you like to practise?</b>
-          <p>Pick a subject on the left, then tap a quick prompt or type your own
-          — like <em>"10 questions on electrolysis"</em> or
-          <em>"explain moments and give me an example"</em>.</p>
+      <!-- Tutor Mode Help Card -->
+      <div id="tc-mode-help-card" style="display:none; margin-top:10px; padding:12px; background:var(--cream); border:1.5px solid var(--line); border-radius:10px; font-size:0.78rem; line-height:1.45; color:var(--ink);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--line); padding-bottom:4px;">
+          <strong style="color:var(--purple)">Tutor Modes</strong>
+          <button type="button" id="tc-mode-help-close" style="background:none; border:none; color:var(--grey); cursor:pointer; font-weight:bold; font-size:0.8rem; line-height:1;">✕</button>
         </div>
+        <p style="margin:0 0 6px 0;"><strong>🎯 Normal:</strong> Explains concepts step-by-step with practical examples. Good for initial study.</p>
+        <p style="margin:0 0 6px 0;"><strong>🎓 Guide Me:</strong> Socratic guidance. The AI asks hints and questions to guide you to the answer instead of giving it away.</p>
+        <p style="margin:0;"><strong>⚡ Exam:</strong> Pure exam strategy. Direct, concise answers styled exactly for mark allocations and Cambridge command words.</p>
       </div>
-      <form class="chat-bar" id="bar">
-        <textarea id="msg" class="chat-input" rows="1"
-          placeholder="Ask for questions on a topic, or a concept to explain…"></textarea>
-        <button class="btn btn-dark" id="send" type="submit">Send</button>
-      </form>
-    </section>
-  </div>
 
-  <!-- Tab 2: Photo solver grid -->
-  <div class="ask-grid" id="tutor-solver-container" style="display: none;">
-    <div class="ask-side">
-      <label class="drop" id="drop" for="file">
-        <span class="big">📸</span>
-        <b>Tap to add a photo</b>
-        <small>or drag one here · PNG, JPG or WebP</small>
-        <input type="file" id="file" accept="image/png,image/jpeg,image/webp"
-               hidden>
-      </label>
-      <div>
-        <label class="field-label" for="note">Anything you want to add?</label>
-        <input type="text" id="note" class="text-input"
-               placeholder="e.g. I got stuck at part (b)">
-      </div>
-      <button class="btn btn-dark" id="go" disabled>Work it out</button>
-      <p class="status" id="status"></p>
-      <p class="hint">Use this to understand the method — then practise it on
-      real questions from the
-      <a href="papers.html" class="tint-ink" style="font-weight:700">topical
-      builder</a>.</p>
+    </div><!-- /tc-left-top -->
+
+    <!-- Sign-in nudge for guests -->
+    <div id="tc-auth-nudge" style="display:none; padding:12px 14px; border-bottom:1px solid var(--line); background:var(--orange-tint);">
+      <p style="font-size:.82rem;color:var(--orange-ink);margin:0 0 8px;font-weight:500;">🔒 Sign in to save your chat history</p>
+      <a href="/login.html" class="btn btn-sm btn-dark" style="width:100%;text-align:center;display:block">Sign In</a>
     </div>
 
-    <section class="ask-out" id="out">
-      <div class="ask-placeholder" id="placeholder">
-        <span>✏️</span>
-        <b>Your worked solution appears here</b>
-        <p style="max-width:38ch;margin:8px auto 0">Add a clear photo of one
-        question — the whole question, including any diagram and the marks in
-        brackets.</p>
-      </div>
-    </section>
-  </div>
-</main>
+    <!-- Session list header -->
+    <div class="tc-sessions-header">
+      <span class="tc-sessions-title">Chats</span>
+    </div>
 
-<div class="container" style="margin-top: 40px;">
-  <section class="section" style="padding-bottom:0">
-    <h2 class="section-title">Getting a good answer</h2>
-    <div class="tcards">
-      <div class="tcard tint-green">
-        <div class="mark tint-ink">1</div>
-        <blockquote>Photograph one question at a time, straight on, with the
-        whole thing in frame — including the marks in brackets.</blockquote>
-      </div>
-      <div class="tcard tint-blue">
-        <div class="mark tint-ink">2</div>
-        <blockquote>Include the diagram. Most Physics questions can't be solved
-        without it, and a cropped graph means a guessed answer.</blockquote>
-      </div>
-      <div class="tcard tint-orange">
-        <div class="mark tint-ink">3</div>
-        <blockquote>Read the working, then close it and redo the question
-        yourself. Copying the answer teaches you nothing by exam day.</blockquote>
+    <!-- Session list -->
+    <div class="tc-sessions-scroll" id="tc-session-scroll">
+      <!-- Populated by JS -->
+      <div class="tc-no-sessions" id="tc-sessions-empty">
+        <span style="font-size:1.6rem;display:block;margin-bottom:8px">💬</span>
+        Start a conversation to save your chat history here.
       </div>
     </div>
-  </section>
 
-  <section class="confused tint-orange" style="margin-top: 50px; margin-bottom: 50px;">
-    <div>
-      <h2 class="tint-ink">Still not clicking? Talk to a real teacher.</h2>
-      <p>Some things need a person. Book a free demo lesson and we'll work
-      through it together, properly.</p>
+
+  </aside>
+
+  <!-- ─── CENTER PANEL ─── -->
+  <div id="tutor-center">
+
+    <!-- Chat top bar -->
+    <div class="tc-chat-header">
+      <button class="tc-sidebar-toggle" id="tc-sidebar-toggle" type="button" title="Collapse / Expand Chat History">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/>
+          <line x1="9" y1="3" x2="9" y2="21"/>
+          <path d="M14 9l-3 3 3 3"/>
+        </svg>
+      </button>
+      <div class="tc-chat-title" id="tc-chat-title-block">
+        <span id="tc-chat-title-main">AI Tutor</span>
+        <span id="tc-chat-title-sub">Ask anything from your Cambridge syllabus</span>
+      </div>
+      <div class="tc-header-btns">
+        <span class="tc-mode-badge hidden" id="tc-mode-badge"></span>
+        <button class="tc-icon-btn" id="tc-right-toggle" title="Context tools" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </button>
+      </div>
     </div>
-    <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%27m%20stuck%20on%20a%20question%20and%20need%20help%20from%20a%20real%20teacher.">Message on WhatsApp</a>
-  </section>
-</div>
 
-    <footer class="site-footer">
-    <div class="footer-wa-strip">
-      <div class="container footer-wa-inner">
+    <!-- Messages scroll area -->
+    <div id="tutor-messages" style="position:relative">
+
+      <!-- Drop overlay -->
+      <div class="tc-drop-overlay" id="tc-drop-overlay">
         <div>
-          <p class="footer-wa-head">Questions before you book?</p>
-          <p class="footer-wa-sub">Drop a WhatsApp — Tee replies personally, usually within a few hours.</p>
-        </div>
-        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
-          WhatsApp Tee
-        </a>
-      </div>
-    </div>
-    <div class="container footer-top">
-      <div>
-        <a class="footer-brand" href="index.html">
-          <img src="logo.png" alt="PrepWithTee">
-          <span>PrepWithTee</span>
-        </a>
-        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
-        <div class="footer-socials">
-          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
-          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
+          <span style="font-size:3rem;display:block">📸</span>
+          <b>Drop photos here</b>
+          <p style="margin:6px 0 0;font-size:.9rem;opacity:.85">Attach them to your next message</p>
         </div>
       </div>
-      <div class="footer-col">
-        <h4>Study Tools</h4>
-        <a href="papers.html">Past Papers Engine</a>
-        <a href="resources.html">Resources &amp; Notes</a>
-        <a href="tutor.html">AI Tutor</a>
-        <a href="guide.html">Revision Study Guide</a>
-      </div>
-      <div class="footer-col">
-        <h4>What We Teach</h4>
-        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
-        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
-        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
-        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
-        <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
-      </div>
-      <div class="footer-col">
-        <h4>Enrol</h4>
-        <a href="pricing.html">Fees &amp; Pricing</a>
-        <a href="index.html#contact">Book a Free Demo</a>
-        <a href="subjects.html">Find Your Subject</a>
-        <a href="index.html#faq">Questions &amp; Answers</a>
-      </div>
-    </div>
-    <div class="container footer-bottom">
-      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
-      <span>Past papers &copy; Cambridge Assessment International Education</span>
-    </div>
-  </footer>
 
-<script src="main.js?v=20260802b"></script>
-<script src="tutor.js?v=20260802b"></script>
-<script src="ask.js?v=20260802b"></script>
+      <!-- Welcome / empty state -->
+      <div class="tc-welcome" id="tc-welcome">
+        <div class="tc-welcome-owl">🦉</div>
+        <h2>Hi, I'm your AI Tutor</h2>
+        <p id="tc-welcome-sub">Pick a subject on the left, then ask me anything — or tap a prompt below to get started.</p>
+        <div class="tc-starter-chips" id="tc-starter-chips">
+          <!-- Subject-aware chips populated by JS; defaults shown immediately -->
+          <button class="tc-starter-chip" data-prompt="Give me 5 Cambridge-style practice questions on a topic of your choice from my subject, with worked answers at the end.">📝 Give me 5 practice questions</button>
+          <button class="tc-starter-chip" data-prompt="Explain a key concept from my subject step by step, then give me one short worked example.">💡 Explain a concept</button>
+          <button class="tc-starter-chip" data-prompt="Quiz me on a topic from my subject — 8 questions, easy to hard, with an answer key at the end.">🧠 Quiz me (8 questions)</button>
+          <button class="tc-starter-chip" data-prompt="What are the 3 most common mistakes students make on this topic in Cambridge exams, and how do I avoid them?">⚠️ Common exam mistakes</button>
+          <button class="tc-starter-chip" data-prompt="Give me 3 difficult exam-style questions on a topic from my subject that students usually get wrong, with full worked solutions.">🔥 3 tricky questions</button>
+          <button class="tc-starter-chip" data-prompt="I have a past paper question — let me describe it and you walk me through the method step by step.">📄 Help with a past paper question</button>
+        </div>
+      </div>
+
+    </div><!-- /tutor-messages -->
+
+    <!-- ─── STICKY INPUT BAR ─── -->
+    <div id="tutor-input-bar">
+      <form id="tc-form">
+        <div class="tc-input-wrap" id="tc-input-wrap">
+          <!-- Attachment thumbnails -->
+          <div class="tc-attach-strip" id="tc-attach-strip"></div>
+          <!-- Input row -->
+          <div class="tc-input-row">
+            <div class="tc-input-actions">
+              <button type="button" class="tc-input-icon" id="tc-attach-btn" title="Attach photos">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <input type="file" id="tc-file-input" accept="image/png,image/jpeg,image/webp,image/heic" multiple hidden>
+              <button type="button" class="tc-input-icon" id="tc-mic-btn" title="Voice input">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10a7 7 0 01-14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+            </div>
+            <textarea id="tc-msg" class="tc-textarea" rows="1"
+              placeholder="Ask a question, or attach a photo of your work… (Enter to send, Shift+Enter for new line)"></textarea>
+            <div class="tc-input-actions">
+              <button type="submit" class="tc-send" id="tc-send">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <p style="font-size:.72rem;color:var(--grey);text-align:center;margin:6px 0 0;">
+        AI can make mistakes. Always verify key facts with your syllabus or teacher.
+      </p>
+    </div>
+
+  </div><!-- /tutor-center -->
+
+  <!-- ─── RIGHT PANEL ─── -->
+  <div id="tutor-right">
+    <div class="tc-right-header">
+      <span class="tc-right-title">📎 Context</span>
+      <button class="tc-right-close" id="tc-right-close" type="button" title="Close panel">✕</button>
+    </div>
+    <div class="tc-right-body" id="tc-right-body">
+      <div class="tc-linked-card" id="tc-linked-card" style="display:none">
+        <div class="tc-linked-label">Linked Material</div>
+        <div class="tc-linked-body" id="tc-linked-body"></div>
+      </div>
+      <div id="tc-right-empty" style="padding:16px 12px;">
+        <div style="text-align:center;margin-bottom:16px;">
+          <span style="font-size:2rem;display:block;margin-bottom:6px">💡</span>
+          <h4 style="margin:0;font-size:0.95rem;color:var(--ink);font-weight:700;">Getting a Good Answer</h4>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0 0 20px 0;font-size:0.8rem;color:var(--grey);line-height:1.5;">
+          <li style="margin-bottom:10px;display:flex;gap:8px;">
+            <span>📸</span>
+            <span><strong>Attach a photo</strong> of the question and your working so the tutor can trace errors.</span>
+          </li>
+          <li style="margin-bottom:10px;display:flex;gap:8px;">
+            <span>🎯</span>
+            <span><strong>Specify the part</strong> you are stuck on (e.g., "I need help with part b").</span>
+          </li>
+          <li style="margin-bottom:10px;display:flex;gap:8px;">
+            <span>🎓</span>
+            <span><strong>Switch modes</strong> in the sidebar: Normal explanations, Socratic guide, or Exam technique.</span>
+          </li>
+        </ul>
+        <div style="border-top:1px solid var(--line);padding-top:16px;text-align:center;">
+          <p style="font-size:0.8rem;color:var(--grey);margin:0 0 10px 0;">Stuck on a tricky concept? Ask Tee on WhatsApp!</p>
+          <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee%20AI%20Tutor." target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#25d366;color:#fff;border:none;font-weight:600;padding:8px 14px;border-radius:8px;font-size:0.82rem;text-decoration:none;width:100%;box-sizing:border-box;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="margin-right:2px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+            WhatsApp Tee
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tutor-app -->
+
+
+<script src="main.js?v=20260831a"></script>
+<script src="styled-dropdown.js?v=20260828a"></script>
+<script type="module" src="tutor.js?v=20260830b"></script>
+<script type="module" src="note-annotate.js?v=20260829b"></script>
+<script type="module" src="/auth.js?v=20260829a"></script>
+<script src="tools-core.js?v=20260811d"></script>
+<script src="tools-nav.js?v=20260811d"></script>
+<script src="tools-dock.js?v=20260810k"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("tutor-toggle");
-    const chatBtn = toggle.querySelector("[data-tab='chat']");
-    const solverBtn = toggle.querySelector("[data-tab='solver']");
-    const chatContainer = document.getElementById("tutor-chat-container");
-    const solverContainer = document.getElementById("tutor-solver-container");
+  // Right panel toggle
+  document.getElementById('tc-right-toggle').addEventListener('click', () => {
+    document.getElementById('tutor-app').classList.toggle('right-open');
+  });
+  document.getElementById('tc-right-close').addEventListener('click', () => {
+    document.getElementById('tutor-app').classList.remove('right-open');
+  });
 
-    function switchTab(tab) {
-      const chat = tab === "chat";
-      chatBtn.classList.toggle("active", chat);
-      solverBtn.classList.toggle("active", !chat);
-      chatContainer.style.display = chat ? "" : "none";
-      solverContainer.style.display = chat ? "none" : "";
-    }
+  // Mobile sidebar toggle
+  document.getElementById('tc-sidebar-toggle').addEventListener('click', () => {
+    document.getElementById('tutor-app').classList.toggle('sidebar-open');
+  });
 
-    chatBtn.addEventListener("click", () => switchTab("chat"));
-    solverBtn.addEventListener("click", () => switchTab("solver"));
-
-    // Check url hash/param to deep link
-    const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get("tab") === "solver" || location.hash === "#solver") {
-      switchTab("solver");
+  // Close sidebar on outside click (mobile)
+  document.addEventListener('click', (e) => {
+    const app = document.getElementById('tutor-app');
+    const sidebar = document.getElementById('tutor-left');
+    const toggle = document.getElementById('tc-sidebar-toggle');
+    if (app.classList.contains('sidebar-open') && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+      app.classList.remove('sidebar-open');
     }
   });
-</script>
-  <script type="module" src="/auth.js?v=20260802b"></script>
 
+  // Deep-link: ?context=... populates right panel
+  (function() {
+    const p = new URLSearchParams(location.search);
+    const ctx = p.get('context');
+    const ctxTitle = p.get('ctxTitle');
+    if (ctx) {
+      const card = document.getElementById('tc-linked-card');
+      const body = document.getElementById('tc-linked-body');
+      const empty = document.getElementById('tc-right-empty');
+      card.style.display = 'block';
+      empty.style.display = 'none';
+      body.textContent = decodeURIComponent(ctx);
+      if (ctxTitle) {
+        document.querySelector('.tc-linked-label').textContent = decodeURIComponent(ctxTitle);
+      }
+      document.getElementById('tutor-app').classList.add('right-open');
+    }
+  })();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+<script src="tour.js?v=20260829a"></script>
 </body>
 </html>

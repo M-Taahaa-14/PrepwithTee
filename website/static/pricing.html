@@ -1,348 +1,1303 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pricing — PrepWithTee</title>
-  <meta name="description"
-    content="One-on-one Cambridge tutoring priced per subject, per month. Everything included: live lessons, topical past papers, mark schemes and topic tests.">
+  <meta name="description" content="Affordable Cambridge exam prep — Free, Solo, 3 Subjects or All Subjects. Topical past papers, AI Tutor, Test Builder and teacher support included.">
+  <link rel="canonical" href="https://prepwithtee.com/pricing.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Pricing — PrepWithTee">
+  <meta property="og:description" content="Affordable Cambridge exam prep — Free, Solo, 3 Subjects or All Subjects. Topical past papers, AI Tutor, Test Builder and teacher support included.">
+  <meta property="og:image"       content="https://prepwithtee.com/logo.png">
+  <meta property="og:url"         content="https://prepwithtee.com/pricing.html">
+  <meta name="twitter:card"       content="summary_large_image">
   <link rel="icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260802b">
-  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <link rel="stylesheet" href="tools.css?v=20260829a">
+
+  <style>
+    /* ── Pricing page scoped styles ───────────────────────────────── */
+    .pr-hero {
+      text-align:center; padding: 72px 0 44px;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,39,.08) 0%, transparent 70%);
+    }
+    .pr-hero-rule {
+      width:48px; height:3px; background:#c9a227; border-radius:2px;
+      margin:0 auto 18px; display:block;
+    }
+    .pr-hero h1 { font-size: clamp(2.4rem,5.5vw,3.4rem); margin:.4rem 0 .9rem; }
+    .pr-hero-sub { max-width:56ch; margin:0 auto 24px; color:var(--grey); font-size:1.05rem; line-height:1.6; }
+
+    /* Hero primary CTA */
+    .pr-hero-cta {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      background:#1a2340; color:#fff; padding:13px 28px; border-radius:999px;
+      font-weight:700; font-size:.95rem; font-family:'Hanken Grotesk',sans-serif;
+      text-decoration:none; box-shadow:0 4px 18px rgba(26,35,64,.18);
+      transition:all .2s ease; margin-bottom:32px; border:1.5px solid transparent;
+    }
+    .pr-hero-cta:hover {
+      background:#283663; transform:translateY(-2px);
+      box-shadow:0 8px 24px rgba(26,35,64,.25); color:#fff;
+    }
+    .pr-hero-cta svg { transition:transform .2s ease; color:#c9a227; }
+    .pr-hero-cta:hover svg { transform:translateY(2px); }
+
+    /* Stats row */
+    .pr-stats {
+      display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px 24px;
+      margin:0 auto 22px; max-width:820px;
+    }
+    .pr-stat {
+      display:flex; align-items:center; gap:6px; font-size:.86rem; color:var(--ink);
+    }
+    .pr-stat-num { font-weight:900; font-family:'Archivo',sans-serif; color:#1a2340; font-size:1rem; }
+    .pr-stat-sep { color:#c9a227; font-weight:700; }
+
+    /* Trust chips */
+    .pr-trust {
+      display:flex; justify-content:center; align-items:center; flex-wrap:nowrap; gap:10px;
+      margin:0 auto; max-width:840px;
+    }
+    .pr-trust-chip {
+      display:inline-flex; align-items:center; gap:6px;
+      background:#fff; border:1px solid #e8e3da; border-radius:999px;
+      padding:6px 14px; font-size:.78rem; font-weight:600; color:var(--ink);
+      white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,.03);
+    }
+    .pr-trust-chip svg { color:#c9a227; flex-shrink:0; }
+
+    @media(max-width:768px) {
+      .pr-stats {
+        display:grid; grid-template-columns:repeat(2,1fr); gap:12px 16px;
+        max-width:460px; text-align:center;
+      }
+      .pr-stat { justify-content:center; }
+      .pr-stat-sep { display:none; }
+
+      .pr-trust {
+        display:grid; grid-template-columns:repeat(2,1fr); gap:8px 10px;
+        max-width:460px;
+      }
+      .pr-trust-chip { justify-content:center; white-space:normal; text-align:center; }
+    }
+
+    /* Billing tabs — single pill container */
+    .pr-tabs {
+      display:flex; justify-content:center; flex-wrap:wrap;
+      gap:4px; margin: 32px auto 0; max-width:860px; padding:8px;
+      background:var(--purple,#1a2340);
+      border-radius:999px;
+      width:fit-content;
+    }
+    @media(max-width:700px){
+      .pr-tabs { border-radius:20px; }
+    }
+    .pr-tab {
+      display:flex; align-items:center; gap:6px;
+      padding:9px 20px; border-radius:999px; border:none;
+      background:transparent; cursor:pointer;
+      font-family:'Hanken Grotesk',sans-serif; font-size:.87rem; font-weight:600;
+      color:rgba(255,255,255,.5);
+      transition:all .18s;
+    }
+    .pr-tab:hover { color:#fff; }
+    .pr-tab.active {
+      background:rgba(255,255,255,.12); color:#fff;
+    }
+    .pr-tab-badge {
+      font-size:10px; font-weight:800; letter-spacing:.06em;
+      background:#c9a227; color:#1a2340;
+      padding:2px 7px; border-radius:999px;
+    }
+
+    /* Per-day pill */
+    .pr-pill-wrap { text-align:center; margin:20px 0 36px; }
+    .pr-pill {
+      display:inline-flex; align-items:center; gap:10px;
+      background:var(--purple,#1a2340); color:#fff;
+      padding:10px 22px; border-radius:999px; font-size:.88rem;
+      font-family:'Hanken Grotesk',sans-serif; font-weight:600;
+      box-shadow:0 4px 20px rgba(26,35,64,.18);
+    }
+    .pr-pill-amount { color:#c9a227; font-weight:800; }
+    .pr-pill-meta { color:rgba(255,255,255,.55); font-size:.78rem; font-weight:500; }
+
+    /* Plan grid — equal height cards */
+    .pr-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px; align-items:stretch;
+      max-width:1140px; margin:0 auto; padding:0 20px;
+    }
+    @media(max-width:900px){ .pr-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:560px){ .pr-grid{ grid-template-columns:1fr; } }
+
+    /* Plan card — stretches to full grid row height */
+    .pr-card {
+      background:#fff;
+      border:1.5px solid #e4dfd6;
+      border-radius:18px; padding:28px 24px;
+      display:flex; flex-direction:column; gap:0;
+      position:relative; transition:box-shadow .2s;
+      height:100%;
+      box-sizing:border-box;
+    }
+    .pr-card:hover { box-shadow:0 8px 32px rgba(26,35,64,.10); }
+    /* Hero card — navy with gold border */
+    .pr-card.pr-recommended {
+      background:#1a2340; color:#fff;
+      border:2px solid #c9a227;
+    }
+    /* SOLO — warm amber tint */
+    .pr-card.pr-amber {
+      background:#fffbeb; color:#1a2340;
+      border-color:#e8c84a;
+    }
+    /* ALL SUBJECTS — rich purple */
+    .pr-card.pr-purple {
+      background:#2d1b69; color:#fff;
+      border:2px solid #7c3aed;
+    }
+    .pr-badge-wrap {
+      position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+      white-space:nowrap;
+    }
+    .pr-badge {
+      background:#c9a227; color:#1a2340;
+      font-size:.72rem; font-weight:800; letter-spacing:.08em;
+      padding:4px 14px; border-radius:999px;
+    }
+
+    /* Card header */
+    .pr-plan-name {
+      font-size:.72rem; font-weight:800; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--grey); margin:0 0 6px;
+    }
+    /* recommended = dark card → white muted name; dark = light card → grey */
+    .pr-recommended .pr-plan-name { color:rgba(255,255,255,.5); }
+
+    .pr-price-row { margin:0 0 2px; }
+    .pr-price-prefix { font-size:.85rem; font-weight:600; vertical-align:super; line-height:1; }
+    .pr-price-num   { font-size:3rem; font-weight:900; line-height:1; font-family:'Archivo',sans-serif; }
+    .pr-price-suf   { font-size:.85rem; font-weight:500; color:var(--grey); }
+    .pr-recommended .pr-price-suf { color:rgba(255,255,255,.5); }
+
+    .pr-price-sub {
+      font-size:.78rem; color:var(--grey); margin:0 0 16px; line-height:1.4;
+    }
+    .pr-recommended .pr-price-sub { color:#c9a227; font-weight:600; }
+
+    .pr-divider { border:none; border-top:1px solid var(--border,#e8e3da); margin:16px 0; }
+    .pr-recommended .pr-divider { border-color:rgba(255,255,255,.15); }
+    .pr-dark .pr-divider         { border-color:rgba(26,35,64,.12); }
+
+    /* Subject picker label */
+    .pr-subject-label {
+      font-size:.78rem; font-weight:700; color:var(--grey);
+      margin:0 0 6px; display:block;
+    }
+    .pr-recommended .pr-subject-label { color:rgba(255,255,255,.55); }
+
+    /* Custom subject picker — default style for .pr-recommended (dark card) */
+    .pr-subj-picker { position:relative; margin-bottom:12px; }
+    .pr-subj-trigger {
+      width:100%; padding:9px 32px 9px 12px; border-radius:8px;
+      border:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.1);
+      color:#fff; font-size:.85rem; font-family:'Hanken Grotesk',sans-serif;
+      cursor:pointer; text-align:left; display:flex; justify-content:space-between;
+      align-items:center; gap:8px;
+    }
+    .pr-subj-trigger svg { flex-shrink:0; opacity:.6; transition:transform .2s; }
+    .pr-subj-picker.open .pr-subj-trigger svg { transform:rotate(180deg); }
+    .pr-subj-dropdown {
+      display:none; position:absolute; top:calc(100% + 4px); left:0; right:0;
+      background:#1e2c50; border:1.5px solid rgba(255,255,255,.15);
+      border-radius:10px; overflow-y:auto; max-height:260px; z-index:100;
+      box-shadow:0 8px 32px rgba(0,0,0,.4);
+    }
+    .pr-subj-picker.open .pr-subj-dropdown { display:block; }
+    .pr-subj-group-label {
+      font-size:.68rem; font-weight:800; letter-spacing:.08em;
+      text-transform:uppercase; color:rgba(255,255,255,.35);
+      padding:8px 12px 4px;
+    }
+    .pr-subj-option {
+      display:flex; align-items:center; gap:9px;
+      padding:9px 12px; cursor:pointer; font-size:.84rem;
+      color:rgba(255,255,255,.75); transition:background .12s;
+    }
+    .pr-subj-option:hover { background:rgba(255,255,255,.07); color:#fff; }
+    .pr-subj-option.selected { color:#fff; }
+    .pr-subj-check {
+      width:16px; height:16px; border-radius:4px; flex-shrink:0;
+      border:1.5px solid rgba(255,255,255,.25); background:transparent;
+      display:flex; align-items:center; justify-content:center;
+      transition:all .15s;
+    }
+    .pr-subj-option.selected .pr-subj-check {
+      background:#c9a227; border-color:#c9a227;
+    }
+    /* Multi-hint: white on dark recommended card, grey on light dark card */
+    .pr-multi-hint { font-size:.72rem; color:var(--grey); margin:2px 0 10px; }
+    .pr-recommended .pr-multi-hint { color:rgba(255,255,255,.45); }
+
+    /* AMBER card (SOLO) overrides */
+    .pr-amber .pr-plan-name  { color:#92610a; }
+    .pr-amber .pr-price-suf  { color:#92610a; }
+    .pr-amber .pr-price-sub  { color:#b07d14; }
+    .pr-amber .pr-divider    { border-color:rgba(180,130,20,.2); }
+    .pr-amber .pr-subject-label { color:#92610a; }
+    .pr-amber .pr-subj-trigger {
+      background:rgba(180,130,20,.08); border-color:rgba(180,130,20,.3); color:#1a2340;
+    }
+    .pr-amber .pr-subj-dropdown  { background:#fff; border-color:rgba(180,130,20,.2); }
+    .pr-amber .pr-subj-group-label { color:var(--grey); }
+    .pr-amber .pr-subj-option    { color:#1a2340; }
+    .pr-amber .pr-subj-option:hover { background:rgba(180,130,20,.06); }
+    .pr-amber .pr-feat-check { color:#b07d14; }
+    .pr-amber .pr-feat-name  { color:#1a2340; }
+    .pr-amber .pr-feat-sub   { color:#7a6030; }
+    .pr-amber .pr-multi-hint { color:#92610a; }
+
+    /* PURPLE card (ALL SUBJECTS) overrides */
+    .pr-purple .pr-plan-name  { color:rgba(255,255,255,.5); }
+    .pr-purple .pr-price-prefix { color:#c4b5fd; }
+    .pr-purple .pr-price-suf  { color:rgba(255,255,255,.5); }
+    .pr-purple .pr-price-sub  { color:#c4b5fd; font-weight:600; }
+    .pr-purple .pr-divider    { border-color:rgba(255,255,255,.15); }
+    .pr-purple .pr-feat-check { color:#a78bfa; }
+    .pr-purple .pr-feat-name  { color:#fff; }
+    .pr-purple .pr-feat-sub   { color:rgba(255,255,255,.55); }
+    .pr-purple .pr-cta        { background:#7c3aed; color:#fff; }
+    .pr-purple .pr-cta:hover  { background:#6d28d9; }
+    .pr-dark .pr-subj-option.selected { color:#1a2340; }
+    .pr-dark .pr-subj-check { border-color:rgba(26,35,64,.25); }
+
+    /* Feature list — grows to fill card, pushing CTA to bottom */
+    .pr-features { list-style:none; padding:0; margin:0 0 0; display:flex; flex-direction:column; gap:10px; flex:1; padding-bottom:4px; }
+    .pr-feat {
+      display:flex; gap:10px; align-items:flex-start;
+      font-size:.85rem; line-height:1.4;
+    }
+    .pr-feat-icon {
+      flex-shrink:0; width:20px; height:20px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:#c9a22722; font-size:.7rem;
+    }
+    .pr-recommended .pr-feat-icon { background:rgba(201,162,39,.18); }
+    .pr-amber       .pr-feat-icon { background:rgba(180,130,20,.14); }
+    .pr-amber       .pr-feat-icon svg { color:#b07d14; }
+    .pr-purple      .pr-feat-icon { background:rgba(167,139,250,.18); }
+    .pr-purple      .pr-feat-icon svg { color:#a78bfa; }
+    .pr-feat-icon svg { color:#c9a227; }
+    .pr-feat-icon.pr-feat-icon-dim { background:rgba(107,100,96,.08); }
+    .pr-feat-icon.pr-feat-icon-dim svg { color:var(--grey); }
+
+    .pr-feat-body strong { display:block; font-weight:700; }
+    .pr-feat-body span   { font-size:.76rem; color:var(--grey); }
+    .pr-recommended .pr-feat-body span { color:rgba(255,255,255,.5); }
+    .pr-purple      .pr-feat-body strong { color:#fff; }
+    .pr-purple      .pr-feat-body span   { color:rgba(255,255,255,.5); }
+    .pr-feat-section-head {
+      font-size:.76rem; font-weight:800; letter-spacing:.06em;
+      text-transform:uppercase; color:var(--grey); padding-top:4px;
+    }
+    .pr-recommended .pr-feat-section-head { color:rgba(255,255,255,.4); }
+
+    /* CTA button */
+    .pr-cta {
+      display:block; width:100%; text-align:center;
+      padding:12px; border-radius:10px; font-weight:700;
+      font-family:'Hanken Grotesk',sans-serif; font-size:.92rem;
+      text-decoration:none; margin-top:20px;
+      transition:all .15s; cursor:pointer; appearance:none;
+    }
+    .pr-cta-outline {
+      border:1.5px solid var(--border,#e8e3da); color:var(--ink);
+      background:transparent;
+    }
+    .pr-cta-outline:hover { border-color:var(--purple); color:var(--purple); }
+    .pr-cta-gold {
+      background:#c9a227; color:#1a2340; border:none;
+    }
+    .pr-cta-gold:hover { background:#dbb535; }
+    .pr-cta-navy {
+      background:var(--purple,#1a2340); color:#fff; border:none;
+    }
+    .pr-cta-navy:hover { background:#232e58; }
+    .pr-cta-purple {
+      background:#7c3aed; color:#fff; border:none;
+    }
+    .pr-cta-purple:hover { background:#6d28d9; }
+    .pr-cta-white {
+      background:#fff; color:#1a2340; border:none;
+    }
+    .pr-cta-white:hover { background:#f0f0f0; }
+
+    /* Enterprise view */
+    .pr-enterprise {
+      max-width:600px; margin:0 auto; padding:0 20px;
+    }
+    .pr-enterprise-badge {
+      text-align:center; margin-bottom:24px;
+    }
+    .pr-enterprise-badge span {
+      display:inline-block;
+      background:#c9a227; color:#1a2340;
+      font-size:.75rem; font-weight:800; letter-spacing:.1em;
+      padding:5px 16px; border-radius:999px;
+    }
+    .pr-enterprise-card {
+      background:var(--purple,#1a2340); color:#fff;
+      border-radius:20px; padding:36px 32px;
+    }
+    .pr-enterprise-card h2 {
+      font-size:3rem; font-family:'Archivo',sans-serif;
+      font-weight:900; margin:8px 0 6px; color:#fff;
+    }
+    .pr-enterprise-card .pr-ent-label {
+      font-size:.72rem; font-weight:800; letter-spacing:.1em;
+      text-transform:uppercase; color:rgba(255,255,255,.4);
+      display:flex; align-items:center; gap:6px;
+    }
+    .pr-enterprise-card p {
+      color:rgba(255,255,255,.6); font-size:.92rem; margin:0 0 24px;
+    }
+    .pr-ent-feats {
+      list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0;
+    }
+    .pr-ent-feat {
+      display:flex; gap:12px; align-items:flex-start;
+      padding:14px 0; border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:.88rem;
+    }
+    .pr-ent-feat:last-child { border-bottom:none; }
+    .pr-ent-feat-icon {
+      flex-shrink:0; width:22px; height:22px; border-radius:50%;
+      background:rgba(201,162,39,.2); display:flex; align-items:center;
+      justify-content:center; margin-top:1px;
+    }
+    .pr-ent-feat strong { display:block; font-weight:700; color:#fff; }
+    .pr-ent-feat span   { font-size:.76rem; color:rgba(255,255,255,.45); }
+    .pr-ent-cta {
+      background:#fff; color:#1a2340;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:14px; border-radius:12px; font-weight:700;
+      font-size:.95rem; text-decoration:none; margin-top:24px;
+      transition:background .15s;
+    }
+    .pr-ent-cta:hover { background:#f0f0f0; }
+
+    /* Feature comparison table */
+    .pr-table-wrap { overflow-x:auto; margin-top:8px; }
+    .pr-table {
+      width:100%; border-collapse:collapse;
+      font-size:.85rem; min-width:560px;
+    }
+    .pr-table th {
+      padding:12px 14px; text-align:center; font-weight:700;
+      background:var(--cream-deep,#F0EAE0); color:var(--purple);
+      border-bottom:2px solid var(--border);
+    }
+    .pr-table th:first-child { text-align:left; }
+    .pr-table td {
+      padding:11px 14px; border-bottom:1px solid var(--border,#e8e3da);
+      text-align:center; vertical-align:middle;
+    }
+    .pr-table td:first-child { text-align:left; font-weight:500; }
+    .pr-table tr:hover td { background:var(--cream,#faf7f2); }
+    .pr-table .pr-t-yes { color:#16a34a; font-weight:700; }
+    .pr-table .pr-t-no  { color:#9ca3af; }
+    .pr-table .pr-t-lim { color:#c9a227; font-weight:600; font-size:.8rem; }
+    .pr-table .pr-t-cat {
+      background:var(--cream-deep,#F0EAE0);
+      font-size:.72rem; font-weight:800; letter-spacing:.07em;
+      text-transform:uppercase; color:var(--grey);
+      text-align:left;
+    }
+
+    /* FAQ */
+    .pr-faq-wrap { max-width:680px; margin:0 auto; }
+    .pr-faq {
+      border-bottom:1px solid var(--border,#e8e3da);
+    }
+    .pr-faq summary {
+      padding:16px 0; font-weight:700; cursor:pointer;
+      list-style:none; display:flex; justify-content:space-between;
+      align-items:center; gap:12px;
+    }
+    .pr-faq summary::after {
+      content:'＋'; font-size:1.1rem; color:var(--grey); flex-shrink:0;
+    }
+    .pr-faq[open] summary::after { content:'－'; }
+    .pr-faq p { padding:0 0 16px; color:var(--grey); line-height:1.7; margin:0; }
+
+    /* Testimonial grid */
+    .pr-tcards {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+      gap:16px;
+    }
+
+    /* Hidden elements controlled by JS */
+    [data-pr-view] { display:none; }
+    [data-pr-view].active { display:block; }
+    .pr-pill-wrap[data-pr-pill]  { display:none; }
+    .pr-pill-wrap[data-pr-pill].active { display:block; }
+
+    /* ── Board toggle (seg-large) ───────────────────────────────── */
+    .seg-large {
+      display:inline-flex; background:var(--cream-deep,#f0ead8);
+      border-radius:999px; padding:4px; gap:4px;
+    }
+    .seg-large button {
+      padding:9px 22px; border-radius:999px; border:none;
+      background:transparent; cursor:pointer;
+      font-family:'Hanken Grotesk',sans-serif; font-weight:600; font-size:.9rem;
+      color:var(--grey,#6b6460); transition:all .18s;
+    }
+    .seg-large button.active {
+      background:var(--purple,#1a2340); color:#fff;
+      box-shadow:0 2px 8px rgba(26,35,64,.2);
+    }
+
+    /* ── Tutoring grid ──────────────────────────────────────────── */
+    .tut-grid {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:20px; max-width:960px; margin:0 auto;
+    }
+    @media(max-width:800px){ .tut-grid{ grid-template-columns:1fr; max-width:480px; } }
+
+    .tut-card {
+      background:#fff; border:1.5px solid var(--border,#e8e3da);
+      border-radius:18px; padding:28px 24px;
+      display:flex; flex-direction:column; position:relative;
+      transition:box-shadow .2s;
+    }
+    .tut-card:hover { box-shadow:0 8px 28px rgba(26,35,64,.09); }
+    .tut-card-featured {
+      background:var(--purple,#1a2340); color:#fff;
+      border-color:var(--purple,#1a2340);
+    }
+
+    .tut-plan-name {
+      font-size:.72rem; font-weight:800; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--grey); margin:0 0 6px;
+    }
+    .tut-card-featured .tut-plan-name { color:rgba(255,255,255,.5); }
+
+    .tut-price-row { margin:0 0 2px; }
+    .tut-price-prefix { font-size:.85rem; font-weight:600; vertical-align:super; line-height:1; color:var(--grey); }
+    .tut-card-featured .tut-price-prefix { color:#c9a227; }
+    .tut-price-num { font-size:2.6rem; font-weight:900; line-height:1; font-family:'Archivo',sans-serif; }
+    .tut-price-suf { font-size:.85rem; font-weight:500; color:var(--grey); }
+    .tut-card-featured .tut-price-suf { color:rgba(255,255,255,.5); }
+
+    .tut-price-sub {
+      font-size:.78rem; color:var(--grey); margin:0 0 16px; line-height:1.4;
+    }
+    .tut-card-featured .tut-price-sub { color:#c9a227; font-weight:600; }
+
+    .tut-divider { border:none; border-top:1px solid var(--border,#e8e3da); margin:14px 0 16px; }
+    .tut-card-featured .tut-divider { border-color:rgba(255,255,255,.12); }
+
+    .tut-feats {
+      list-style:none; padding:0; margin:0 0 20px; display:flex; flex-direction:column; gap:9px; flex:1;
+    }
+    .tut-feats li {
+      display:flex; align-items:flex-start; gap:9px;
+      font-size:.85rem; line-height:1.45;
+      color:var(--ink);
+    }
+    .tut-card-featured .tut-feats li { color:rgba(255,255,255,.85); }
+    .tut-check {
+      flex-shrink:0; color:#c9a227; font-weight:800; font-size:.9rem; margin-top:1px;
+    }
+
+    /* ── Course catalog ─────────────────────────────────────────── */
+    .course-grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:20px;
+    }
+    @media(max-width:900px){ .course-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:560px){ .course-grid{ grid-template-columns:1fr; } }
+
+    .course-card {
+      background:#fff; border:1.5px solid var(--border,#e8e3da);
+      border-radius:16px; padding:24px;
+      display:flex; flex-direction:column; gap:0;
+      transition:box-shadow .2s;
+    }
+    .course-card:hover { box-shadow:0 6px 24px rgba(26,35,64,.09); }
+    .course-card-wide { grid-column: span 1; }
+    @media(min-width:900px){ .course-card-wide { grid-column: span 1; } }
+
+    .course-head {
+      display:flex; align-items:center; gap:8px; margin-bottom:10px;
+    }
+    .course-chip {
+      font-size:.68rem; font-weight:800; letter-spacing:.07em;
+      text-transform:uppercase; padding:3px 10px; border-radius:999px;
+    }
+    .course-chip-math  { background:#dbeafe; color:#1e40af; }
+    .course-chip-phys  { background:#dcfce7; color:#15803d; }
+    .course-chip-cs    { background:#f3e8ff; color:#7c3aed; }
+    .course-chip-alevel{ background:#fff7ed; color:#c2410c; }
+
+    .course-code {
+      font-size:.78rem; font-weight:700; color:var(--grey);
+      margin-left:auto;
+    }
+    .course-title {
+      font-family:'Archivo',sans-serif; font-size:1.05rem;
+      font-weight:800; margin:0 0 8px; color:var(--ink);
+    }
+    .course-tagline {
+      font-size:.84rem; color:var(--grey); font-style:italic;
+      margin:0 0 12px; line-height:1.4;
+    }
+    .course-outcomes {
+      list-style:none; padding:0; margin:0 0 14px; flex:1;
+      display:flex; flex-direction:column; gap:7px;
+    }
+    .course-outcomes li {
+      font-size:.81rem; color:var(--ink); line-height:1.45;
+      padding-left:16px; position:relative;
+    }
+    .course-outcomes li::before {
+      content:'✓'; position:absolute; left:0;
+      color:#c9a227; font-weight:800; font-size:.78rem;
+    }
+    .course-meta {
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:.76rem; color:var(--grey); margin-bottom:14px;
+      padding-top:12px; border-top:1px solid var(--border,#e8e3da);
+    }
+    .course-avail { font-style:italic; }
+    .course-cta {
+      display:block; text-align:center;
+      background:var(--purple,#1a2340); color:#fff;
+      padding:10px; border-radius:10px;
+      font-family:'Hanken Grotesk',sans-serif; font-weight:700; font-size:.85rem;
+      text-decoration:none; transition:background .15s;
+    }
+    .course-cta:hover { background:#232e58; }
+
+    .centered { text-align:center; }
+    /* ── Payment modal ──────────────────────────────────────────── */
+    .pay-modal-overlay {
+      position:fixed; inset:0; z-index:9000;
+      background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center; padding:16px;
+    }
+    .pay-modal-overlay[hidden] { display:none; }
+    .pay-modal-box {
+      background:#fff; color:#1a2340; border-radius:16px;
+      padding:28px 28px 24px; max-width:460px; width:100%;
+      max-height:90vh; overflow-y:auto; position:relative;
+      box-shadow:0 24px 70px rgba(0,0,0,.35);
+    }
+    .pay-modal-close {
+      position:absolute; top:16px; right:16px; background:none;
+      border:none; cursor:pointer; font-size:22px; color:#888;
+      width:32px; height:32px; display:flex; align-items:center;
+      justify-content:center; border-radius:50%; transition:background .12s;
+    }
+    .pay-modal-close:hover { background:rgba(0,0,0,.08); }
+    .pay-modal-title { font-size:1.2rem; font-weight:800; margin:0 0 2px; }
+    .pay-modal-amount { font-size:1rem; color:#555; margin:0 0 18px; }
+    .pay-step-label {
+      font-size:.72rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:.07em; color:#888; margin:0 0 10px;
+    }
+    .pay-tabs { display:flex; gap:6px; margin-bottom:12px; }
+    .pay-tab {
+      flex:1; padding:8px 4px; border-radius:8px; font-size:.8rem;
+      font-weight:600; border:1.5px solid #d9d3c8; background:transparent;
+      cursor:pointer; color:#1a2340; transition:all .12s; font-family:'Hanken Grotesk',sans-serif;
+    }
+    .pay-tab.active { background:#c9a227; border-color:#c9a227; color:#1a2340; }
+    .pay-panel { display:none; }
+    .pay-panel.active { display:block; }
+    .pay-account-table { width:100%; border-collapse:collapse; margin-bottom:4px; }
+    .pay-account-table th {
+      text-align:left; font-size:.78rem; color:#777; font-weight:600;
+      padding:6px 8px 6px 0; width:44%; vertical-align:top;
+    }
+    .pay-account-table td { font-size:.87rem; font-weight:600; padding:6px 0; }    .pay-file-area input[type=file] {
+      position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+    }
+    #pay-file-name { color:#888; font-size:.8rem; }
+    .pay-input {
+      width:100%; padding:9px 12px; border-radius:8px; font-size:.87rem;
+      border:1.5px solid #d9d3c8; outline:none; box-sizing:border-box;
+      background:#fff; color:#1a2340; resize:vertical;
+      font-family:'Hanken Grotesk',sans-serif;
+    }
+    .pay-input:focus { border-color:#c9a227; }
+    .pay-submit-btn {
+      width:100%; margin-top:18px; padding:12px; border-radius:10px;
+      background:#c9a227; color:#1a2340; font-weight:700; font-size:.92rem;
+      border:none; cursor:pointer; transition:background .15s;
+      font-family:'Hanken Grotesk',sans-serif;
+    }
+    .pay-submit-btn:hover:not(:disabled) { background:#dbb535; }
+    .pay-submit-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .pay-err { color:#dc2626; font-size:.82rem; margin-top:8px; }
+    .pay-fine-print { font-size:.73rem; color:#999; margin-top:10px; text-align:center; }
+    .pay-success-state { text-align:center; padding:24px 0 8px; }
+    .pay-check {
+      width:54px; height:54px; border-radius:50%; background:#22c55e;
+      color:#fff; font-size:28px; display:flex; align-items:center;
+      justify-content:center; margin:0 auto 16px;
+    }
+    .pay-success-state h3 { margin:0 0 8px; font-size:1.1rem; }
+    .pay-success-state p { color:#555; margin:0 0 22px; font-size:.9rem; }
+    .pay-dash-link {
+      display:inline-block; padding:10px 28px; border-radius:10px;
+      background:#1a2340; color:#fff; text-decoration:none;
+      font-weight:700; font-size:.88rem;
+    }
+  </style>
 </head>
 
 <body>
-
   <header class="site-header">
     <div class="container header-row">
       <a class="brand" href="index.html">
-        <img src="logo.png" alt="PrepWithTee owl logo">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
         <span>PrepWithTee</span>
-      </a>
-      <nav class="header-nav">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="subjects.html" class="nav-link">Subjects</a>
-        <a href="papers.html" class="nav-link">Past Papers</a>
-        <a href="resources.html" class="nav-link">Resources</a>
-        <a href="tutor.html" class="nav-link">AI Tutor</a>
-        <a href="pricing.html" class="nav-link active">Pricing</a>
+      </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
+      <div class="header-right"></div>
     </div>
   </header>
 
-  <section class="hero hero-slim">
-    <div class="container">
-      <p class="eyebrow">Simple, per subject, per month</p>
-      <h1>Pay for the subjects<br>you actually <em>need.</em></h1>
-      <p class="sub">No joining fee, no annual lock-in, no paying for a timetable
-        of subjects you're already fine at. Add a subject when you need it, drop it
-        when you don't.</p>
-    </div>
-  </section>
+  <main>
+    <!-- Hero -->
+    <div class="container pr-hero">
+      <p class="eyebrow">Cambridge O Level · IGCSE · A Level</p>
+      <span class="pr-hero-rule"></span>
+      <h1>Real exam prep.<br><em>Honest pricing.</em></h1>
+      <p class="pr-hero-sub">Topical past papers, AI Tutor, Test Builder and teacher support — choose the subjects you need and pay only for those.</p>
 
-  <main class="container">
+      <!-- Primary CTA Button -->
+      <a href="#plans" class="pr-hero-cta">
+        View Plans &amp; Pricing
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+      </a>
 
-    <!-- ============ BOARD SWITCHER ============ -->
-    <div class="centered" style="margin-top: 24px; margin-bottom: 28px;">
-      <div class="seg-large" id="pricing-board-toggle">
-        <button class="active" data-board="olevel">O Level</button>
-        <button data-board="igcse">IGCSE</button>
-        <button data-board="alevel">A Level</button>
+      <!-- Stats row -->
+      <div class="pr-stats">
+        <div class="pr-stat"><span class="pr-stat-num">2,400+</span> classified questions</div>
+        <span class="pr-stat-sep">·</span>
+        <div class="pr-stat"><span class="pr-stat-num">5</span> Cambridge syllabi</div>
+        <span class="pr-stat-sep">·</span>
+        <div class="pr-stat"><span class="pr-stat-num">2015–2025</span> coverage</div>
+        <span class="pr-stat-sep">·</span>
+        <div class="pr-stat"><span class="pr-stat-num">Lahore-based</span> tutors</div>
+      </div>
+
+      <!-- Trust chips -->
+      <div class="pr-trust">
+        <span class="pr-trust-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          No credit card required
+        </span>
+        <span class="pr-trust-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Cancel anytime
+        </span>
+        <span class="pr-trust-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Free demo lesson
+        </span>
+        <span class="pr-trust-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Official past papers only
+        </span>
       </div>
     </div>
 
-    <!-- ============ PLANS ============ -->
-    <section class="section" style="padding-top:10px">
-      <div class="plan-grid">
+    <!-- Billing tabs -->
+    <div class="pr-tabs" id="plans">
+      <button class="pr-tab active" data-period="monthly">Monthly</button>
+      <button class="pr-tab" data-period="octnov">
+        Oct / Nov 2026 <span class="pr-tab-badge">LIMITED OFFER</span>
+      </button>
+      <button class="pr-tab" data-period="mayjun">
+        May / June 2027 <span class="pr-tab-badge">LIMITED OFFER</span>
+      </button>
+      <button class="pr-tab" data-period="yearly">Yearly</button>
+      <button class="pr-tab" data-period="enterprise">Enterprise / Schools</button>
+    </div>
 
-        <!-- PLAN 1 -->
-        <div class="flip-card-container">
-          <div class="flip-card">
-            <!-- FRONT -->
-            <div class="flip-card-front plan">
-              <h3>One Subject</h3>
-              <p class="who-for">Focused 1-on-1 mastery for your target course code.</p>
-              <div class="price" id="p1-price">PKR 20,000<small> /month</small></div>
-              <p class="per" id="p1-per">per subject · billed monthly</p>
-              <ul>
-                <li>Weekly one-on-one live lessons</li>
-                <li>Full topical past-paper access</li>
-                <li>Mark schemes with every question</li>
-                <li>WhatsApp doubt support between lessons</li>
-              </ul>
-              <div class="plan-card-foot">
-                <a class="btn btn-outline" id="p1-btn-front" href="index.html#contact">Book a free demo</a>
-              </div>
-            </div>
-            <!-- BACK -->
-            <div class="flip-card-back plan tint-lav">
-              <div class="back-head">
-                <span class="back-badge">Methodology &amp; Details</span>
-                <button type="button" class="btn-flip-back">✕ Back</button>
-              </div>
-              <h4 class="back-title">Single Subject Plan</h4>
-              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
-              <ul class="back-points">
-                <li><b>Timings:</b> Scheduled around your school timetable.</li>
-                <li><b>Topicals:</b> Custom worksheets after every chapter.</li>
-                <li><b>Target:</b> Syllabus finished 2 months before exams.</li>
-                <li><b>Support:</b> Direct teacher support via WhatsApp.</li>
-              </ul>
-              <a class="btn btn-dark" id="p1-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
-            </div>
+    <!-- Per-day pills (one per billing period) -->
+    <div class="pr-pill-wrap active" data-pr-pill="monthly">
+      <div class="pr-pill">
+        Pay as low as <span class="pr-pill-amount">PKR 33 per day</span>
+        <span class="pr-pill-meta">Cancel anytime</span>
+      </div>
+    </div>
+    <div class="pr-pill-wrap" data-pr-pill="octnov">
+      <div class="pr-pill">
+        Pay as low as <span class="pr-pill-amount">PKR 30 per day</span>
+        <span class="pr-pill-meta" id="octnov-meta">Expires 30 Nov · <span id="octnov-days">—</span> days left</span>
+      </div>
+    </div>
+    <div class="pr-pill-wrap" data-pr-pill="mayjun">
+      <div class="pr-pill">
+        Pay as low as <span class="pr-pill-amount">PKR 27 per day</span>
+        <span class="pr-pill-meta">Expires 15 Jun · <span id="mayjun-days">—</span> days left</span>
+      </div>
+    </div>
+    <div class="pr-pill-wrap" data-pr-pill="yearly">
+      <div class="pr-pill">
+        Pay as low as <span class="pr-pill-amount">PKR 26 per day</span>
+        <span class="pr-pill-meta">Save 20% vs monthly · billed annually</span>
+      </div>
+    </div>
+
+    <!-- ── Plan cards view ── -->
+    <div data-pr-view="monthly" class="active" style="padding-bottom:0">
+      <div class="pr-grid" style="margin-top:8px">
+        <!-- FREE -->
+        <div class="pr-card">
+          <p class="pr-plan-name">Free</p>
+          <div class="pr-price-row">
+            <span class="pr-price-prefix">PKR</span>
+            <span class="pr-price-num">0</span>
           </div>
+          <p class="pr-price-sub">Always free · no card needed</p>
+          <hr class="pr-divider">
+          <ul class="pr-features">
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Personalised Dashboard</strong></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>All Yearly Past Papers</strong></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Subject Progress Tracker</strong></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Study Tools</strong><span>Calculator, formulas, graph plotter</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon pr-feat-icon-dim"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>×3 uses / month only</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon pr-feat-icon-dim"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Topical Past Papers</strong><span>Limited access · preview only</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon pr-feat-icon-dim"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>AI Tutor</strong><span>10 queries / month</span></div></li>
+          </ul>
+          <a class="pr-cta pr-cta-outline" href="login.html">Get started free</a>
         </div>
 
-        <!-- PLAN 2 (FEATURED) -->
-        <div class="flip-card-container">
-          <div class="flip-card">
-            <!-- FRONT -->
-            <div class="flip-card-front plan featured">
-              <span class="tag">Most popular</span>
-              <h3>Two Subjects</h3>
-              <p class="who-for">The ideal combo — Maths plus Physics or CS.</p>
-              <div class="price" id="p2-price">PKR 35,000<small> /month</small></div>
-              <p class="per" id="p2-per">for both subjects · saves PKR 5,000</p>
-              <ul>
-                <li>Everything in One subject, twice over</li>
-                <li>Topic tests with full mark schemes</li>
-                <li>Timed mock exams before papers</li>
-                <li>Monthly progress reports for parents</li>
-              </ul>
-              <div class="plan-card-foot">
-                <a class="btn btn-dark" id="p2-btn-front" href="index.html#contact">Book a free demo</a>
-              </div>
-            </div>
-            <!-- BACK -->
-            <div class="flip-card-back plan tint-pink">
-              <div class="back-head">
-                <span class="back-badge" style="background:var(--pink-ink)">Methodology &amp; Details</span>
-                <button type="button" class="btn-flip-back">✕ Back</button>
-              </div>
-              <h4 class="back-title">Dual Subject Pass</h4>
-              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
-              <ul class="back-points">
-                <li><b>Timings:</b> Flexible schedule across both subjects.</li>
-                <li><b>Mocks:</b> Full simulation before exam series.</li>
-                <li><b>Reports:</b> Chapter-by-chapter progress tracking.</li>
-                <li><b>Revision:</b> Exam crash course included.</li>
-              </ul>
-              <a class="btn btn-dark" id="p2-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
+        <!-- SOLO -->
+        <div class="pr-card pr-amber">
+          <p class="pr-plan-name">Solo</p>
+          <div class="pr-price-row">
+            <span class="pr-price-prefix" style="color:#b07d14">PKR</span>
+            <span class="pr-price-num" data-price="solo">1,000</span>
+            <span class="pr-price-suf" data-suf="solo">/mo</span>
+          </div>
+          <p class="pr-price-sub" data-sub="solo">Single subject · billed monthly</p>
+          <hr class="pr-divider">
+          <span class="pr-subject-label">Choose your subject:</span>
+          <div class="pr-subj-picker" id="solo-picker">
+            <button type="button" class="pr-subj-trigger">
+              <span class="pr-subj-trigger-text">Select subject…</span>
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="pr-subj-dropdown">
+              <div class="pr-subj-group-label">O Level</div>
+              <div class="pr-subj-option" data-val="Mathematics (4024)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Mathematics (4024)</div>
+              <div class="pr-subj-option" data-val="Physics (5054)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (5054)</div>
+              <div class="pr-subj-option" data-val="Computer Science (2210)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Computer Science (2210)</div>
+              <div class="pr-subj-group-label">IGCSE</div>
+              <div class="pr-subj-option" data-val="Mathematics (0580)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Mathematics (0580)</div>
+              <div class="pr-subj-option" data-val="Physics (0625)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (0625)</div>
+              <div class="pr-subj-option" data-val="Computer Science (0478)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Computer Science (0478)</div>
+              <div class="pr-subj-group-label">A Level</div>
+              <div class="pr-subj-option" data-val="Physics (9702)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (9702)</div>
             </div>
           </div>
+          <ul class="pr-features">
+            <li class="pr-feat" style="font-size:.82rem;color:rgba(255,255,255,.5);font-weight:600">Everything in Free, plus:</li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>Unlimited · 1 subject</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Topical Past Papers</strong><span>Full PDF downloads · 1 subject</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>AI Tutor</strong><span>Unlimited · 1 subject</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Flashcards &amp; Notes</strong><span>1 subject</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Teacher Link &amp; Homework</strong></div></li>
+          </ul>
+          <button type="button" class="pr-cta pr-cta-gold" data-plan="solo">Get Solo</button>
         </div>
 
-        <!-- PLAN 3 -->
-        <div class="flip-card-container">
-          <div class="flip-card">
-            <!-- FRONT -->
-            <div class="flip-card-front plan">
-              <h3>Three Subjects</h3>
-              <p class="who-for">Complete exam-session coverage across your timetable.</p>
-              <div class="price" id="p3-price">PKR 50,000<small> /month</small></div>
-              <p class="per" id="p3-per">saves PKR 10,000 · full access</p>
-              <ul>
-                <li>Everything in Two subjects</li>
-                <li>Priority scheduling around your school</li>
-                <li>Full exam crash revision course</li>
-                <li>Custom paper-by-paper revision plan</li>
-              </ul>
-              <div class="plan-card-foot">
-                <a class="btn btn-outline" id="p3-btn-front" href="index.html#contact">Book a free demo</a>
-              </div>
-            </div>
-            <!-- BACK -->
-            <div class="flip-card-back plan tint-green">
-              <div class="back-head">
-                <span class="back-badge" style="background:var(--green-ink)">Methodology &amp; Details</span>
-                <button type="button" class="btn-flip-back">✕ Back</button>
-              </div>
-              <h4 class="back-title">Full Timetable Pass</h4>
-              <p class="instructor">Course Instructor: <b>Sir Muhammad Taahaa</b></p>
-              <ul class="back-points">
-                <li><b>Timings:</b> Priority slots for all three subjects.</li>
-                <li><b>Topicals:</b> Unlimited custom past papers.</li>
-                <li><b>Strategy:</b> Cambridge command word training.</li>
-                <li><b>Guarantee:</b> Free trial demo lesson.</li>
-              </ul>
-              <a class="btn btn-dark" id="p3-btn-back" href="index.html#contact" style="margin-top:auto">Book Demo Lesson</a>
+        <!-- 3 SUBJECTS -->
+        <div class="pr-card pr-recommended">
+          <div class="pr-badge-wrap"><span class="pr-badge">RECOMMENDED</span></div>
+          <p class="pr-plan-name">3 Subjects</p>
+          <div class="pr-price-row">
+            <span class="pr-price-prefix" style="color:#c9a227">PKR</span>
+            <span class="pr-price-num" data-price="three">2,000</span>
+            <span class="pr-price-suf" data-suf="three">/mo</span>
+          </div>
+          <p class="pr-price-sub" data-sub="three">Three subjects · billed monthly</p>
+          <hr class="pr-divider">
+          <span class="pr-subject-label">Choose your 3 subjects:</span>
+          <div class="pr-subj-picker" id="three-picker">
+            <button type="button" class="pr-subj-trigger">
+              <span class="pr-subj-trigger-text">Select subjects…</span>
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="pr-subj-dropdown">
+              <div class="pr-subj-group-label">O Level</div>
+              <div class="pr-subj-option" data-val="Mathematics (4024)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Mathematics (4024)</div>
+              <div class="pr-subj-option" data-val="Physics (5054)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (5054)</div>
+              <div class="pr-subj-option" data-val="Computer Science (2210)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Computer Science (2210)</div>
+              <div class="pr-subj-group-label">IGCSE</div>
+              <div class="pr-subj-option" data-val="Mathematics (0580)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Mathematics (0580)</div>
+              <div class="pr-subj-option" data-val="Physics (0625)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (0625)</div>
+              <div class="pr-subj-option" data-val="Computer Science (0478)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Computer Science (0478)</div>
+              <div class="pr-subj-group-label">A Level</div>
+              <div class="pr-subj-option" data-val="Physics (9702)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (9702)</div>
             </div>
           </div>
+          <p class="pr-multi-hint" id="three-hint">0 of 3 selected</p>
+          <ul class="pr-features">
+            <li class="pr-feat" style="font-size:.82rem;color:rgba(255,255,255,.5);font-weight:600">Everything in Solo, plus:</li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>Unlimited · 3 subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Topical Past Papers</strong><span>Full PDF downloads · 3 subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>AI Tutor</strong><span>Unlimited · 3 subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Flashcards &amp; Notes</strong><span>3 subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>MCQ Live Solver</strong><span>All subjects included</span></div></li>
+          </ul>
+          <button type="button" class="pr-cta pr-cta-gold" data-plan="three">Get 3 Subjects</button>
+        </div>
+
+        <!-- ALL SUBJECTS -->
+        <div class="pr-card pr-purple">
+          <p class="pr-plan-name">All Subjects</p>
+          <div class="pr-price-row">
+            <span class="pr-price-prefix" style="color:#c4b5fd">PKR</span>
+            <span class="pr-price-num" data-price="all">3,000</span>
+            <span class="pr-price-suf" data-suf="all">/mo</span>
+          </div>
+          <p class="pr-price-sub" data-sub="all">All subjects · billed monthly</p>
+          <hr class="pr-divider">
+          <ul class="pr-features">
+            <li class="pr-feat" style="font-size:.82rem;color:rgba(255,255,255,.5);font-weight:600">Everything in 3 Subjects, plus:</li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>Unlimited · all subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Topical Past Papers</strong><span>Full PDF downloads · all subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>AI Tutor</strong><span>Unlimited · all subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Flashcards &amp; Notes</strong><span>All subjects</span></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>MCQ Live Solver</strong></div></li>
+            <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Priority Support</strong></div></li>
+          </ul>
+          <button type="button" class="pr-cta pr-cta-purple" data-plan="all">Get All Subjects</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session / yearly views re-use same grid — JS swaps prices -->
+    <div data-pr-view="octnov"  style="padding-bottom:0"><div id="grid-octnov"  class="pr-grid" style="margin-top:8px"></div></div>
+    <div data-pr-view="mayjun"  style="padding-bottom:0"><div id="grid-mayjun"  class="pr-grid" style="margin-top:8px"></div></div>
+    <div data-pr-view="yearly"  style="padding-bottom:0"><div id="grid-yearly"  class="pr-grid" style="margin-top:8px"></div></div>
+
+    <!-- Compare CTA — hidden on Enterprise tab by JS -->
+    <div class="centered" style="margin-top:28px" id="pr-compare-btn-wrap">
+      <button class="btn btn-outline" onclick="document.getElementById('pr-features-section').scrollIntoView({behavior:'smooth'})">
+        Compare what each plan includes ↓
+      </button>
+    </div>
+
+    <!-- Enterprise view -->
+    <div data-pr-view="enterprise">
+      <div class="pr-enterprise">
+        <div class="pr-enterprise-badge"><span>FOR SCHOOLS &amp; INSTITUTIONS</span></div>
+        <div class="pr-enterprise-card">
+          <div class="pr-ent-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            ENTERPRISE
+          </div>
+          <h2>Custom</h2>
+          <p>Tailored to your school's needs — contact us to get a custom quote.</p>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:0 0 8px">
+          <ul class="pr-ent-feats">
+            <li class="pr-ent-feat">
+              <span class="pr-ent-feat-icon"><svg width="11" height="11" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <div><strong>Bulk licensing</strong><span>For schools and institutions of any size</span></div>
+            </li>
+            <li class="pr-ent-feat">
+              <span class="pr-ent-feat-icon"><svg width="11" height="11" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <div><strong>Custom pricing</strong><span>Volume-based, flexible billing cycles</span></div>
+            </li>
+            <li class="pr-ent-feat">
+              <span class="pr-ent-feat-icon"><svg width="11" height="11" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <div><strong>Dedicated support</strong><span>Priority onboarding &amp; account manager</span></div>
+            </li>
+            <li class="pr-ent-feat">
+              <span class="pr-ent-feat-icon"><svg width="11" height="11" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <div><strong>Tailored deployment</strong><span>Set up to match your school's workflow</span></div>
+            </li>
+            <li class="pr-ent-feat">
+              <span class="pr-ent-feat-icon"><svg width="11" height="11" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="#c9a227" stroke-width="2" stroke-linecap="round"/></svg></span>
+              <div><strong>Everything in All Subjects</strong><span>Full platform access for all enrolled students</span></div>
+            </li>
+          </ul>
+          <a class="pr-ent-cta" href="https://wa.me/923204884375?text=Hi%2C%20I%27d%20like%20to%20ask%20about%20school%2Finstitution%20pricing%20for%20PrepWithTee.">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+            Contact via WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         TUTORING PRICING
+    ═══════════════════════════════════════════════════════════ -->
+    <section class="section container" style="padding-top:80px" id="tutoring-section">
+      <div style="text-align:center;margin-bottom:40px">
+        <p class="eyebrow">1-on-1 with Sir Taahaa</p>
+        <h2 class="section-title" style="margin:.4rem 0 .8rem">Live tutoring plans</h2>
+        <p style="max-width:54ch;margin:0 auto;color:var(--grey)">Weekly one-on-one sessions, WhatsApp support between lessons, custom topical past papers and full mark schemes — everything in one monthly fee.</p>
+      </div>
+
+      <!-- O Level / IGCSE / A Level board toggle -->
+      <div class="centered" style="margin-bottom:32px">
+        <div class="seg-large" id="tut-board-toggle">
+          <button class="active" data-board="olevel">O Level</button>
+          <button data-board="igcse">IGCSE</button>
+          <button data-board="alevel">A Level</button>
+        </div>
+      </div>
+
+      <div class="tut-grid">
+
+        <!-- 1 SUBJECT -->
+        <div class="tut-card">
+          <p class="tut-plan-name">One Subject</p>
+          <div class="tut-price-row">
+            <span class="tut-price-prefix">PKR</span>
+            <span class="tut-price-num" id="tut-p1">20,000</span>
+            <span class="tut-price-suf">/mo</span>
+          </div>
+          <p class="tut-price-sub">per subject · billed monthly</p>
+          <hr class="tut-divider">
+          <ul class="tut-feats">
+            <li><span class="tut-check">✓</span>Weekly one-on-one live lessons</li>
+            <li><span class="tut-check">✓</span>Full topical past-paper access</li>
+            <li><span class="tut-check">✓</span>Mark schemes with every question</li>
+            <li><span class="tut-check">✓</span>WhatsApp doubt support</li>
+            <li><span class="tut-check">✓</span>All Subjects platform plan included</li>
+          </ul>
+          <a class="pr-cta pr-cta-navy" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20book%20a%20free%20demo%20lesson%20for%20one%20subject." style="margin-top:auto">Book free demo</a>
+        </div>
+
+        <!-- 2 SUBJECTS (FEATURED) -->
+        <div class="tut-card tut-card-featured">
+          <div class="pr-badge-wrap"><span class="pr-badge">MOST POPULAR</span></div>
+          <p class="tut-plan-name">Two Subjects</p>
+          <div class="tut-price-row">
+            <span class="tut-price-prefix" style="color:#c9a227">PKR</span>
+            <span class="tut-price-num" style="color:#fff" id="tut-p2">35,000</span>
+            <span class="tut-price-suf">/mo</span>
+          </div>
+          <p class="tut-price-sub" style="color:#c9a227">saves PKR 5,000 · ideal Maths + Physics combo</p>
+          <hr class="tut-divider">
+          <ul class="tut-feats">
+            <li><span class="tut-check">✓</span>Everything in One Subject, twice over</li>
+            <li><span class="tut-check">✓</span>Topic tests with full mark schemes</li>
+            <li><span class="tut-check">✓</span>Timed mock exams before papers</li>
+            <li><span class="tut-check">✓</span>Monthly progress reports for parents</li>
+            <li><span class="tut-check">✓</span>All Subjects platform plan included</li>
+          </ul>
+          <a class="pr-cta pr-cta-gold" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20two%20subjects." style="margin-top:auto">Book free demo</a>
+        </div>
+
+        <!-- 3 SUBJECTS -->
+        <div class="tut-card">
+          <p class="tut-plan-name">Three Subjects</p>
+          <div class="tut-price-row">
+            <span class="tut-price-prefix">PKR</span>
+            <span class="tut-price-num" id="tut-p3">50,000</span>
+            <span class="tut-price-suf">/mo</span>
+          </div>
+          <p class="tut-price-sub">saves PKR 10,000 · full timetable coverage</p>
+          <hr class="tut-divider">
+          <ul class="tut-feats">
+            <li><span class="tut-check">✓</span>Everything in Two Subjects</li>
+            <li><span class="tut-check">✓</span>Priority scheduling around your school</li>
+            <li><span class="tut-check">✓</span>Full exam crash revision course</li>
+            <li><span class="tut-check">✓</span>Custom paper-by-paper revision plan</li>
+            <li><span class="tut-check">✓</span>All Subjects platform plan included</li>
+          </ul>
+          <a class="pr-cta pr-cta-navy" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20three%20subjects." style="margin-top:auto">Book free demo</a>
         </div>
 
       </div>
-      <p class="hint" style="text-align:center;margin-top:28px">
-        Every plan starts with a <b>free demo lesson</b> — meet the tutor, see the material, then decide.</p>
+      <p class="hint" style="text-align:center;margin-top:20px">Every plan starts with a <strong>free demo lesson</strong> — meet the tutor, see the material, no commitment.</p>
     </section>
 
-    <!-- ============ SAVE BIG COMPARISON ============ -->
-    <section class="section section-cream" style="border-radius:var(--radius-lg);
-           padding:52px 34px;margin-bottom:16px">
-      <h2 class="section-title centered" style="color:var(--purple)">
-        What it replaces</h2>
-      <p class="centered hint" style="margin:-18px auto 26px;max-width:60ch">
-        Taking three subjects as the example. The figures on the right are typical
-        market rates, not quotes — check them against what you're paying now.</p>
-      <div class="vs-wrap">
-        <div class="vs-col">
-          <div class="vs-tile tint-lav">
-            <h3>PrepWithTee</h3>
-            <p class="amount tint-ink">PKR 50,000/month · all three subjects</p>
-            <ul class="tint-ink">
-              <li>One-on-one lessons, not a room of forty</li>
-              <li>Topical past papers built on demand</li>
-              <li>Mark schemes after every question</li>
-              <li>Timed topic tests and mock papers</li>
-              <li>The full paper library, 2019–2025</li>
-              <li>Doubt support between lessons</li>
-              <li>Learn from home — no commute</li>
-            </ul>
-            <span class="vs-op">=</span>
-          </div>
-          <p class="vs-total tint-ink" style="color:var(--lav-ink)">PKR 50,000/month</p>
-        </div>
-
-        <div class="vs-badge">VS</div>
-
-        <div class="vs-col">
-          <div class="vs-tile tint-pink">
-            <h3>Private tutors</h3>
-            <p class="amount tint-ink">≈ PKR 25,000/month each · three subjects
-              = PKR 75,000</p>
-            <span class="vs-op">+</span>
-          </div>
-          <div class="vs-tile tint-green">
-            <h3>Past-paper books</h3>
-            <p class="amount tint-ink">≈ PKR 3,000/month across three subjects</p>
-            <span class="vs-op">+</span>
-          </div>
-          <div class="vs-tile tint-orange">
-            <h3>Travel &amp; fuel</h3>
-            <p class="amount tint-ink">≈ PKR 12,000/month, both ways, every lesson</p>
-            <span class="vs-op">=</span>
-          </div>
-          <p class="vs-total tint-ink" style="color:var(--pink-ink)">PKR 90,000/month</p>
-        </div>
+    <!-- ══════════════════════════════════════════════════════════
+         COURSE CATALOG  (SEO powerhouse)
+    ═══════════════════════════════════════════════════════════ -->
+    <section class="section container" style="padding-top:72px" id="courses">
+      <div style="text-align:center;margin-bottom:40px">
+        <p class="eyebrow">Cambridge-aligned · Lahore &amp; online</p>
+        <h2 class="section-title" style="margin:.4rem 0 .8rem">Courses available</h2>
+        <p style="max-width:58ch;margin:0 auto;color:var(--grey)">Every course follows the official Cambridge syllabus chapter by chapter — structured revision, past papers and live tutoring all in one place.</p>
       </div>
-      <p class="centered" style="margin-top:28px;font-family:'Playfair Display',Georgia,serif;
-       font-size:1.45rem;font-weight:700;color:var(--purple)">
-        That's around <span style="color:var(--green-ink)">PKR 40,000 a month</span>
-        back in your pocket.</p>
+
+      <div class="course-grid">
+
+        <!-- 4024 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-math">O Level</span>
+            <span class="course-code">4024</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Mathematics D — O Level</h3>
+          <p class="course-tagline">Build exam confidence, chapter by chapter.</p>
+          <ul class="course-outcomes">
+            <li>Every chapter covered — Paper 1 (non-calc) and Paper 2 (calc)</li>
+            <li>Topical past papers 2020–2025 with mark schemes after each question</li>
+            <li>Timed past-paper sessions and mid-topic tests</li>
+            <li>Weekly lessons + WhatsApp support between sessions</li>
+          </ul>
+          <div class="course-meta">
+            <span itemprop="provider" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">PrepWithTee Tutors</span></span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=o-level-mathematics-4024" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 0580 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-math">IGCSE</span>
+            <span class="course-code">0580</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Mathematics — IGCSE Extended</h3>
+          <p class="course-tagline">Extended tier, no surprises on exam day.</p>
+          <ul class="course-outcomes">
+            <li>Paper 2 and Paper 4 — every topic from algebra to calculus</li>
+            <li>Topical revision by chapter, not chronologically</li>
+            <li>Timed sessions and mock papers under exam conditions</li>
+            <li>Mark-scheme breakdowns after every question</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=igcse-mathematics-0580" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 5054 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-phys">O Level</span>
+            <span class="course-code">5054</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Physics — O Level</h3>
+          <p class="course-tagline">Physics made logical, mark schemes made clear.</p>
+          <ul class="course-outcomes">
+            <li>All 25 chapters from the 2026–2028 Cambridge syllabus</li>
+            <li>Paper 2 structured-theory techniques explained step by step</li>
+            <li>Mark scheme after every past-paper question — method marks demystified</li>
+            <li>Real experiments discussed for describe / explain questions</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=o-level-physics-5054" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 0625 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-phys">IGCSE</span>
+            <span class="course-code">0625</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Physics — IGCSE Extended</h3>
+          <p class="course-tagline">Every calculation step, every mark explained.</p>
+          <ul class="course-outcomes">
+            <li>All 24 topics from the latest Cambridge syllabus (incl. Space Physics)</li>
+            <li>Paper 4 extended structured theory — calculation and essay-style answers</li>
+            <li>Command-word focus: describe, explain, calculate, sketch</li>
+            <li>Topical past papers with full mark-by-mark breakdowns</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=igcse-physics-0625" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 2210 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-cs">O Level</span>
+            <span class="course-code">2210</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Computer Science — O Level</h3>
+          <p class="course-tagline">From pseudocode to full marks.</p>
+          <ul class="course-outcomes">
+            <li>Paper 1 theory + Paper 2 problem-solving covered in full</li>
+            <li>Pseudocode writing and algorithm tracing with model answers</li>
+            <li>Python programming fundamentals for Paper 2 questions</li>
+            <li>Boolean logic, binary and networks explained with exam technique</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=o-level-cs-2210" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 0478 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-cs">IGCSE</span>
+            <span class="course-code">0478</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Computer Science — IGCSE</h3>
+          <p class="course-tagline">Program, trace, score.</p>
+          <ul class="course-outcomes">
+            <li>Paper 1 and Paper 2 fully covered, IGCSE command-word focus</li>
+            <li>Pseudocode and flowchart writing with model solutions</li>
+            <li>Real Cambridge past questions every session</li>
+            <li>Ethics, hardware and networking — theory done systematically</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=igcse-cs-0478" itemprop="url">View full course →</a>
+        </article>
+
+        <!-- 9702 -->
+        <article class="course-card" itemscope itemtype="https://schema.org/Course">
+          <div class="course-head">
+            <span class="course-chip course-chip-alevel">A Level</span>
+            <span class="course-code">9702</span>
+          </div>
+          <h3 class="course-title" itemprop="name">Physics — A Level (AS &amp; A2)</h3>
+          <p class="course-tagline">A Level Physics, the right way — from AS to A2.</p>
+          <ul class="course-outcomes">
+            <li>Paper 1 MCQ, Paper 2 AS theory, Paper 4 A2 structured — all three</li>
+            <li>Quantum, nuclear and medical physics explained from first principles</li>
+            <li>Every exam series past paper topically classified on the platform</li>
+            <li>Timed mock papers and predicted exam focus areas each term</li>
+          </ul>
+          <div class="course-meta">
+            <span>PrepWithTee Tutors</span>
+            <span class="course-avail">Online · Lahore</span>
+          </div>
+          <a class="course-cta" href="course.html?slug=a-level-physics-9702" itemprop="url">View full course →</a>
+        </article>
+
+      </div>
     </section>
 
-    <!-- ============ WHAT'S INCLUDED ============ -->
-    <section class="section">
-      <h2 class="section-title centered">What's actually included?
-        <span style="font-family:'Hanken Grotesk',sans-serif;font-size:1rem;
-             font-weight:500;color:var(--grey)">Well — all of it.</span>
-      </h2>
-      <ul class="incl reveal-stagger">
-        <li class="reveal"><mark>One-on-one lessons</mark> with the same tutor every
-          week, not a rotating panel</li>
-        <li class="reveal"><mark>Topical past papers</mark> built on demand — pick a
-          chapter, get every question Cambridge has set on it</li>
-        <li class="reveal"><mark>Mark schemes</mark> printed right after each question,
-          so you can mark yourself honestly</li>
-        <li class="reveal"><mark>Timed topic tests</mark> with the answers in a separate
-          file, exactly like the real thing</li>
-        <li class="reveal"><mark>The full paper library</mark> — every question paper and
-          mark scheme, 2019 to 2025, readable in your browser</li>
-        <li class="reveal"><mark>Instant doubt solving</mark> — photograph any question
-          and get the full method back in seconds</li>
-      </ul>
+    <!-- Feature comparison table -->
+    <section class="section container" style="padding-top:64px" id="pr-features-section">
+      <h2 class="section-title centered" style="font-size:1.5rem">What each plan includes</h2>
+      <div class="pr-table-wrap">
+        <table class="pr-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Free</th>
+              <th>Solo</th>
+              <th>3 Subjects</th>
+              <th>All Subjects</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="pr-t-cat" colspan="5">Core platform</td></tr>
+            <tr><td>Personalised dashboard</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td>Subject progress tracking</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td>All yearly past papers (browse)</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td>Study tools (calculator, graph, formulas…)</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td>MCQ Live Solver</td><td class="pr-t-no">—</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td class="pr-t-cat" colspan="5">Past papers &amp; test builder</td></tr>
+            <tr><td>Topical past papers — PDF download</td><td class="pr-t-lim">Preview only</td><td class="pr-t-lim">1 subject</td><td class="pr-t-lim">3 subjects</td><td class="pr-t-yes">All subjects</td></tr>
+            <tr><td>Test builder</td><td class="pr-t-lim">×3/month</td><td class="pr-t-yes">Unlimited</td><td class="pr-t-yes">Unlimited</td><td class="pr-t-yes">Unlimited</td></tr>
+            <tr><td class="pr-t-cat" colspan="5">AI features</td></tr>
+            <tr><td>AI Tutor (Ask Tee)</td><td class="pr-t-lim">10/month</td><td class="pr-t-lim">Unlimited · 1 subj</td><td class="pr-t-lim">Unlimited · 3 subj</td><td class="pr-t-yes">Unlimited · all</td></tr>
+            <tr><td>Photo solver</td><td class="pr-t-lim">3/month</td><td class="pr-t-yes">Unlimited</td><td class="pr-t-yes">Unlimited</td><td class="pr-t-yes">Unlimited</td></tr>
+            <tr><td class="pr-t-cat" colspan="5">Study features</td></tr>
+            <tr><td>Flashcards &amp; chapter notes</td><td class="pr-t-no">—</td><td class="pr-t-lim">1 subject</td><td class="pr-t-lim">3 subjects</td><td class="pr-t-yes">All subjects</td></tr>
+            <tr><td>Progress Tracker</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td class="pr-t-cat" colspan="5">Teacher &amp; support</td></tr>
+            <tr><td>Teacher link &amp; homework tracking</td><td class="pr-t-no">—</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td><td class="pr-t-yes">✓</td></tr>
+            <tr><td>Priority support</td><td class="pr-t-no">—</td><td class="pr-t-no">—</td><td class="pr-t-no">—</td><td class="pr-t-yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ FAQ ============ -->
-    <section class="section">
-      <h2 class="section-title centered">Questions parents ask</h2>
-      <div class="faq-wrap">
-        <details class="faq" open>
-          <summary>Can we try before paying anything?</summary>
-          <p>Yes. The first lesson is a free demo — you meet the tutor, see the
-            past-paper material and watch how a lesson actually runs. No card
-            details, no obligation.</p>
+    <!-- FAQ -->
+    <section class="section container" style="padding-top:56px">
+      <h2 class="section-title centered">Common questions</h2>
+      <div class="pr-faq-wrap">
+        <details class="pr-faq" open>
+          <summary>Can I try before paying?</summary>
+          <p>Yes — the Free plan is free forever with no card required. You get the dashboard, yearly past papers, study tools and 10 AI Tutor queries a month. Upgrade only when you're ready.</p>
         </details>
-        <details class="faq">
-          <summary>What if we need to stop mid-term?</summary>
-          <p>Billing is monthly, so you stop at the end of the month you've paid
-            for. There's no annual contract and no cancellation fee.</p>
+        <details class="pr-faq">
+          <summary>What counts as a "subject"?</summary>
+          <p>Each Cambridge syllabus code is one subject — e.g. O Level Maths (4024), IGCSE Physics (0625). Solo lets you pick one; 3 Subjects lets you pick any three from our library.</p>
         </details>
-        <details class="faq">
-          <summary>Are the past papers included, or extra?</summary>
-          <p>Included, entirely. The topical builder, the mark schemes, the topic
-            tests and the full paper library all come with any plan.</p>
+        <details class="pr-faq">
+          <summary>What are the session packages (Oct/Nov, May/Jun)?</summary>
+          <p>One-time lump-sum payments that give you full access until the exam session closes. Great value if you're sitting a specific series — you pay once and revise as much as you need until exam day.</p>
         </details>
-        <details class="faq">
-          <summary>Which boards and subjects are covered?</summary>
-          <p>Cambridge O Level, IGCSE and A Level — Mathematics, Physics and
-            Computer Science. Every course code is listed on the
-            <a href="subjects.html">subjects page</a>.
-          </p>
+        <details class="pr-faq">
+          <summary>Can I change my subject mid-subscription?</summary>
+          <p>Yes, you can change your active subject from your profile page. The change takes effect immediately.</p>
         </details>
-        <details class="faq">
-          <summary>Do lessons happen online or in person?</summary>
-          <p>Online one-on-one, so there's no commute and lessons can be recorded
-            for revision. Message us on WhatsApp if you'd like to discuss in-person
-            options.</p>
+        <details class="pr-faq">
+          <summary>What if I need 1-on-1 tutoring with Tee?</summary>
+          <p>Live lessons with Sir Taahaa are a separate tutoring service. Message us on WhatsApp to book a free demo lesson — there's no commitment until after you've met the tutor.</p>
+        </details>
+        <details class="pr-faq">
+          <summary>Is there a cancellation fee?</summary>
+          <p>No. Monthly plans can be cancelled at any time and you retain access until the end of the billing period. Session packages are one-time purchases and are non-refundable after activation.</p>
         </details>
       </div>
     </section>
 
-    <!-- ============ TESTIMONIALS ============ -->
-    <section class="section">
+    <!-- Testimonials -->
+    <section class="section container" style="padding-top:56px">
       <h2 class="section-title centered">What students say</h2>
-      <div class="tcards reveal-stagger">
-        <div class="tcard tint-blue reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"Sir Taahaa helped me jump from a C to an A* in A Level Maths P3. The topical papers cut straight to what examiners ask."</blockquote>
-          <div class="who tint-ink"><span class="dot">🎓</span> Rayyan K. · A Level Maths (9709)</div>
-        </div>
-        <div class="tcard tint-lav reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"The topic tests after every chapter gave my daughter immense confidence. We could see her exact score breakdowns every week!"</blockquote>
-          <div class="who tint-ink"><span class="dot">👨‍👩‍👧</span> Mrs. Tariq · Parent of IGCSE Student</div>
-        </div>
-        <div class="tcard tint-pink reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"I used to get stuck on Physics 0625 paper 4 calculation steps. The mark scheme breakdowns made method marks super clear."</blockquote>
-          <div class="who tint-ink"><span class="dot">🎓</span> Hamza M. · IGCSE Physics (0625)</div>
-        </div>
-        <div class="tcard tint-yellow reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"One-on-one attention made all the difference. No crowded batch, no skipped doubts. Went from B to A in O Level Maths 4024."</blockquote>
-          <div class="who tint-ink"><span class="dot">🎓</span> Zoha S. · O Level Maths (4024)</div>
-        </div>
-        <div class="tcard tint-green reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"Sir Taahaa’s topical engine is a game changer for past paper revision. Having mark schemes right under each question saves so much time."</blockquote>
-          <div class="who tint-ink"><span class="dot">🎓</span> Bilal A. · A Level Physics (9702)</div>
-        </div>
-        <div class="tcard tint-orange reveal-scale">
-          <div class="mark tint-ink">“</div>
-          <blockquote>"Finally a tutor who follows the exact syllabus code 2210! The structured approach gave us complete peace of mind."</blockquote>
-          <div class="who tint-ink"><span class="dot">👨‍👩‍👦</span> Mr. Usman · Parent of O Level CS Student</div>
-        </div>
+      <div class="pr-tcards">
+        <div class="tcard tint-blue"><div class="mark tint-ink">"</div><blockquote>"Sir Taahaa helped me jump from a C to an A* in A Level Maths P3. The topical papers cut straight to what examiners ask."</blockquote><div class="who tint-ink"><span class="dot">🎓</span> Rayyan K. · A Level Maths (9709)</div></div>
+        <div class="tcard tint-lav"><div class="mark tint-ink">"</div><blockquote>"The topic tests after every chapter gave my daughter immense confidence. We could see her exact score breakdowns every week!"</blockquote><div class="who tint-ink"><span class="dot">👨‍👩‍👧</span> Mrs. Tariq · Parent of IGCSE Student</div></div>
+        <div class="tcard tint-pink"><div class="mark tint-ink">"</div><blockquote>"I used to get stuck on Physics 0625 paper 4 calculation steps. The mark scheme breakdowns made method marks super clear."</blockquote><div class="who tint-ink"><span class="dot">🎓</span> Hamza M. · IGCSE Physics (0625)</div></div>
+        <div class="tcard tint-green"><div class="mark tint-ink">"</div><blockquote>"Sir Taahaa's topical engine is a game changer for past paper revision. Having mark schemes right under each question saves so much time."</blockquote><div class="who tint-ink"><span class="dot">🎓</span> Bilal A. · A Level Physics (9702)</div></div>
       </div>
     </section>
 
-    <section class="confused tint-pink">
-      <div>
-        <h2 class="tint-ink">Still confused? Get in touch.</h2>
-        <p>Get a personalised demo and straight answers to all your questions —
-          no sales pitch.</p>
-      </div>
-      <a class="btn btn-tint" href="" onclick="openBooking();return false;">Book a demo</a>
-    </section>
+    <div class="container" style="padding-bottom:60px">
+      <section class="confused tint-pink">
+        <div>
+          <h2 class="tint-ink">Still unsure which plan?</h2>
+          <p>Message Tee on WhatsApp — get a straight answer in minutes, no sales pitch.</p>
+        </div>
+        <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee%20pricing.">Ask on WhatsApp</a>
+      </section>
+    </div>
   </main>
 
-      <footer class="site-footer">
+  <footer class="site-footer">
     <div class="footer-wa-strip">
       <div class="container footer-wa-inner">
         <div>
@@ -357,11 +1312,8 @@
     </div>
     <div class="container footer-top">
       <div>
-        <a class="footer-brand" href="index.html">
-          <img src="logo.png" alt="PrepWithTee">
-          <span>PrepWithTee</span>
-        </a>
-        <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
+        <a class="footer-brand" href="index.html"><img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee"><span>PrepWithTee</span></a>
+        <p class="footer-tagline">Cambridge O Level, IGCSE &amp; A Level exam prep — real past papers, AI tutor, teacher support.</p>
         <div class="footer-socials">
           <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">✉️</span>nexgentutors6@gmail.com</a>
           <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">📱</span>+92 320 488 4375</a>
@@ -370,24 +1322,24 @@
       <div class="footer-col">
         <h4>Study Tools</h4>
         <a href="papers.html">Past Papers Engine</a>
-        <a href="resources.html">Resources &amp; Notes</a>
         <a href="tutor.html">AI Tutor</a>
-        <a href="guide.html">Revision Study Guide</a>
+        <a href="topical-progress.html">Progress Tracker</a>
+        <a href="calculator.html">Scientific Calculator</a>
+        <a href="formulas.html">Formula Sheets</a>
       </div>
       <div class="footer-col">
-        <h4>What We Teach</h4>
-        <a href="subjects.html#olevel">O Level Maths, Physics &amp; more</a>
-        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; more</a>
-        <a href="subjects.html#alevel">A Level Maths &amp; Physics</a>
-        <a href="subjects.html">Islamiyat &amp; Pakistan Studies</a>
+        <h4>Subjects</h4>
+        <a href="subjects.html#olevel">O Level Maths, Physics &amp; CS</a>
+        <a href="subjects.html#igcse">IGCSE Maths, Physics &amp; CS</a>
+        <a href="subjects.html#alevel">A Level Physics</a>
         <a href="subjects.html" class="footer-link-accent">See all subjects &rarr;</a>
       </div>
       <div class="footer-col">
         <h4>Enrol</h4>
-        <a href="pricing.html">Fees &amp; Pricing</a>
-        <a href="index.html#contact">Book a Free Demo</a>
-        <a href="subjects.html">Find Your Subject</a>
-        <a href="index.html#faq">Questions &amp; Answers</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="login.html">Sign up free</a>
+        <a href="index.html#contact">Book a demo lesson</a>
+        <a href="index.html#faq">FAQs</a>
       </div>
     </div>
     <div class="container footer-bottom">
@@ -396,71 +1348,419 @@
     </div>
   </footer>
 
-  <script src="main.js?v=20260802b"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {"@type":"Course","name":"O Level Mathematics D (4024)","description":"Cambridge O Level Mathematics Paper 1 and Paper 2 — algebra, geometry, trigonometry, statistics and probability. Topical past papers 2020–2025 with mark schemes.","provider":{"@type":"Person","name":"Muhammad Taahaa","url":"https://prepwithtee.com"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en","courseWorkload":"PT2H/week"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"IGCSE Mathematics (0580) Extended","description":"Cambridge IGCSE Mathematics Extended tier — Paper 2 and Paper 4. Vectors, functions, differentiation, statistics. Online tutor in Lahore.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"O Level Physics (5054)","description":"Cambridge O Level Physics Paper 2 structured theory — 25 topics from Motion to Uses of an Oscilloscope. Topical past papers with mark schemes.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"IGCSE Physics (0625) Extended","description":"Cambridge IGCSE Physics Extended — Paper 4 structured theory, 24 topics including Space Physics. Online tutor in Lahore.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"O Level Computer Science (2210)","description":"Cambridge O Level Computer Science — Paper 1 theory and Paper 2 problem-solving. Pseudocode, Python programming, Boolean logic.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"IGCSE Computer Science (0478)","description":"Cambridge IGCSE Computer Science — Paper 1 and Paper 2. Algorithm design, programming, data representation, ethics.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"},
+      {"@type":"Course","name":"A Level Physics (9702)","description":"Cambridge A Level Physics — Paper 1 MCQ, Paper 2 AS structured, Paper 4 A2 structured. Quantum physics, nuclear physics, medical physics. Lahore tutor online.","provider":{"@type":"Person","name":"Muhammad Taahaa"},"hasCourseInstance":{"@type":"CourseInstance","courseMode":"online","inLanguage":"en"},"url":"https://prepwithtee.com/pricing.html#courses"}
+    ]
+  }
+  </script>
+  <script src="main.js?v=20260831a"></script>
+  <script src="tools-core.js?v=20260811d"></script>
+  <!-- Payment modal -->
+  <div id="pay-modal" class="pay-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pay-modal-title">
+    <div class="pay-modal-box">
+      <button class="pay-modal-close" id="pay-modal-close" type="button" aria-label="Close">×</button>
+
+      <!-- Form state -->
+      <div id="pay-form-state">
+        <h2 class="pay-modal-title" id="pay-modal-title">Get <span id="pay-plan-label">Solo</span></h2>
+        <p class="pay-modal-amount">PKR <span id="pay-amount-num">1,000</span><span id="pay-amount-suf"></span></p>
+
+        <p class="pay-step-label">Step 1 — Send your payment</p>
+
+        <div class="pay-tabs" id="pay-tabs">
+          <button type="button" class="pay-tab active" data-method="jazzcash">JazzCash</button>
+          <button type="button" class="pay-tab" data-method="easypaisa">EasyPaisa</button>
+          <button type="button" class="pay-tab" data-method="bank">Bank Transfer</button>
+        </div>
+
+        <div class="pay-panels">
+          <div class="pay-panel active" data-panel="jazzcash">
+            <table class="pay-account-table">
+              <tr><th>Account</th><td>0320-4884375</td></tr>
+              <tr><th>Title</th><td>Muhammad Taahaa</td></tr>
+              <tr class="pay-amount-row"><th>Amount</th><td>PKR <span class="pay-dyn-amount">1,000</span></td></tr>
+            </table>
+          </div>
+          <div class="pay-panel" data-panel="easypaisa">
+            <table class="pay-account-table">
+              <tr><th>Account</th><td>0320-4884375</td></tr>
+              <tr><th>Title</th><td>Muhammad Taahaa</td></tr>
+              <tr class="pay-amount-row"><th>Amount</th><td>PKR <span class="pay-dyn-amount">1,000</span></td></tr>
+            </table>
+          </div>
+          <div class="pay-panel" data-panel="bank">
+            <table class="pay-account-table">
+              <tr><th>Bank</th><td>Meezan Bank</td></tr>
+              <tr><th>Account Title</th><td>Muhammad Taahaa</td></tr>
+              <tr><th>Account No.</th><td>02140102234983</td></tr>
+              <tr class="pay-amount-row"><th>Amount</th><td>PKR <span class="pay-dyn-amount">1,000</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <p class="pay-step-label" style="margin-top:18px">Step 2 — Upload proof</p>
+
+        <form id="pay-proof-form" novalidate>
+          <input type="hidden" id="pay-plan-input">
+          <input type="hidden" id="pay-method-input" value="jazzcash">
+          <input type="hidden" id="pay-amount-input">
+
+          <label class="pay-field-label" for="pay-screenshot">Screenshot or Receipt *</label>
+          <div class="pay-file-area" id="pay-file-area">
+            <input type="file" id="pay-screenshot" accept="image/*,.pdf" required>
+            <span id="pay-file-name">No file chosen</span>
+          </div>
+
+          <label class="pay-field-label" for="pay-txn">Transaction / Reference ID</label>
+          <input type="text" id="pay-txn" class="pay-input" placeholder="e.g. TXN12345">
+
+          <label class="pay-field-label" for="pay-note">Note (optional)</label>
+          <textarea id="pay-note" class="pay-input" rows="2" placeholder="Any extra info…"></textarea>
+
+          <button type="submit" class="pay-submit-btn" id="pay-submit-btn">Submit Proof</button>
+          <p id="pay-err" class="pay-err" hidden></p>
+          <p class="pay-fine-print">Our team reviews proofs within 24 hours and activates your plan immediately after approval.</p>
+        </form>
+      </div>
+
+      <!-- Success state -->
+      <div id="pay-success-state" hidden class="pay-success-state">
+        <div class="pay-check">✓</div>
+        <h3>Proof received!</h3>
+        <p>We'll review and activate your <strong id="pay-success-plan">Solo</strong> plan within 24 hours.</p>
+        <a href="/dashboard.html" class="pay-dash-link">Go to Dashboard →</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/auth.js?v=20260829a"></script>
+  <script src="tools-nav.js?v=20260811d"></script>
+  <script src="tools-dock.js?v=20260810k"></script>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Board Switcher Pricing rates
-      const pricingData = {
-        olevel: {
-          name: "O Level",
-          p1: { price: "PKR 20,000<small> /month</small>", per: "per subject · billed monthly" },
-          p2: { price: "PKR 35,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
-          p3: { price: "PKR 50,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
-        },
-        igcse: {
-          name: "IGCSE",
-          p1: { price: "PKR 20,000<small> /month</small>", per: "per subject · billed monthly" },
-          p2: { price: "PKR 35,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
-          p3: { price: "PKR 50,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
-        },
-        alevel: {
-          name: "A Level",
-          p1: { price: "PKR 25,000<small> /month</small>", per: "per subject · AS & A2 level" },
-          p2: { price: "PKR 45,000<small> /month</small>", per: "for both subjects · saves PKR 5,000" },
-          p3: { price: "PKR 65,000<small> /month</small>", per: "saves PKR 10,000 · full access" }
-        }
-      };
+  (function() {
+    /* ── Pricing data per period ─────────────────────────────────── */
+    var PERIODS = {
+      monthly: {
+        solo:  { num:'1,000', suf:'/mo', sub:'Single subject · billed monthly' },
+        three: { num:'2,000', suf:'/mo', sub:'Three subjects · billed monthly' },
+        all:   { num:'3,000', suf:'/mo', sub:'All subjects · billed monthly' },
+      },
+      octnov: {
+        solo:  { num:'3,000', suf:'',    sub:'One-time · valid until 30 November' },
+        three: { num:'6,000', suf:'',    sub:'One-time · valid until 30 November' },
+        all:   { num:'9,000', suf:'',    sub:'One-time · valid until 30 November' },
+      },
+      mayjun: {
+        solo:  { num:'8,000',  suf:'',   sub:'One-time · valid until 15 June' },
+        three: { num:'15,000', suf:'',   sub:'One-time · valid until 15 June' },
+        all:   { num:'22,000', suf:'',   sub:'One-time · valid until 15 June' },
+      },
+      yearly: {
+        solo:  { num:'800',   suf:'/mo', sub:'1 subject · PKR 9,600 billed yearly · save 20%' },
+        three: { num:'1,600', suf:'/mo', sub:'3 subjects · PKR 19,200 billed yearly · save 20%' },
+        all:   { num:'2,400', suf:'/mo', sub:'All subjects · PKR 28,800 billed yearly · save 20%' },
+      },
+    };
 
-      const boardToggle = document.getElementById("pricing-board-toggle");
+    /* ── Countdown helper ────────────────────────────────────────── */
+    function daysUntil(dateStr) {
+      var target = new Date(dateStr);
+      var now    = new Date();
+      now.setHours(0,0,0,0);
+      return Math.max(0, Math.round((target - now) / 86400000));
+    }
+    document.getElementById('octnov-days').textContent = daysUntil('2026-11-30');
+    document.getElementById('mayjun-days').textContent = daysUntil('2027-06-15');
 
-      if (boardToggle) {
-        boardToggle.querySelectorAll("button").forEach(btn => {
-          btn.addEventListener("click", () => {
-            boardToggle.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const board = btn.dataset.board;
-            const rates = pricingData[board] || pricingData.olevel;
-            
-            // Reset flipped cards back to front face on switch
-            document.querySelectorAll(".flip-card").forEach(c => c.classList.remove("is-flipped"));
-
-            document.getElementById("p1-price").innerHTML = rates.p1.price;
-            document.getElementById("p1-per").textContent = rates.p1.per;
-            document.getElementById("p2-price").innerHTML = rates.p2.price;
-            document.getElementById("p2-per").textContent = rates.p2.per;
-            document.getElementById("p3-price").innerHTML = rates.p3.price;
-            document.getElementById("p3-per").textContent = rates.p3.per;
-
-          });
+    /* ── Clone monthly grid for other periods ────────────────────── */
+    var monthly = document.querySelector('[data-pr-view="monthly"] .pr-grid');
+    ['octnov','mayjun','yearly'].forEach(function(period) {
+      var target = document.getElementById('grid-' + period);
+      target.innerHTML = monthly.innerHTML;
+      var data = PERIODS[period];
+      ['solo','three','all'].forEach(function(key) {
+        var d = data[key];
+        var numEl = target.querySelector('[data-price="' + key + '"]');
+        var sufEl = target.querySelector('[data-suf="'   + key + '"]');
+        var subEl = target.querySelector('[data-sub="'   + key + '"]');
+        if (numEl) numEl.textContent = d.num;
+        if (sufEl) sufEl.textContent = d.suf;
+        if (subEl) subEl.textContent = d.sub;
+      });
+      /* Fix CTA labels for session packages */
+      if (period !== 'yearly') {
+        target.querySelectorAll('.pr-cta-gold').forEach(function(a, i) {
+          if (i === 0) a.textContent = 'Get Solo';
+          if (i === 1) a.textContent = 'Get 3 Subjects';
+          if (i === 2) a.textContent = 'Get All Subjects';
         });
       }
+    });
 
-      // 3D Flip Card handlers — Click anywhere on card to flip
-      document.querySelectorAll(".flip-card-container").forEach(container => {
-        const card = container.querySelector(".flip-card");
+    /* ── Tab switching ───────────────────────────────────────────── */
+    var tabs  = document.querySelectorAll('.pr-tab');
+    var views = document.querySelectorAll('[data-pr-view]');
+    var pills = document.querySelectorAll('[data-pr-pill]');
+    var featSection    = document.getElementById('pr-features-section');
+    var compareWrap    = document.getElementById('pr-compare-btn-wrap');
 
-        container.addEventListener("click", (e) => {
-          // If clicking a link, don't flip
-          if (e.target.closest("a")) {
-            return;
-          }
-          card.classList.toggle("is-flipped");
-        });
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var period = tab.getAttribute('data-period');
+        tabs.forEach(function(t)  { t.classList.remove('active'); });
+        views.forEach(function(v) { v.classList.remove('active'); });
+        pills.forEach(function(p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        var view = document.querySelector('[data-pr-view="' + period + '"]');
+        if (view) view.classList.add('active');
+        var pill = document.querySelector('[data-pr-pill="' + period + '"]');
+        if (pill) pill.classList.add('active');
+        /* Hide feature table + compare button on enterprise */
+        var isEnt = period === 'enterprise';
+        featSection.style.display = isEnt ? 'none' : '';
+        if (compareWrap) compareWrap.style.display = isEnt ? 'none' : '';
       });
     });
+
+    /* ── Custom subject pickers ──────────────────────────────────── */
+    function wireSoloPicker(pickerId) {
+      var picker  = document.getElementById(pickerId);
+      if (!picker) return;
+      var trigger = picker.querySelector('.pr-subj-trigger');
+      var label   = picker.querySelector('.pr-subj-trigger-text');
+      var options = picker.querySelectorAll('.pr-subj-option');
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        picker.classList.toggle('open');
+      });
+      options.forEach(function(opt) {
+        opt.addEventListener('click', function(e) {
+          e.stopPropagation();
+          options.forEach(function(o) { o.classList.remove('selected'); });
+          opt.classList.add('selected');
+          label.textContent = opt.getAttribute('data-val');
+          picker.classList.remove('open');
+        });
+      });
+    }
+
+    function wireThreePicker(pickerId, hintId, max) {
+      var picker  = document.getElementById(pickerId);
+      var hint    = document.getElementById(hintId);
+      if (!picker) return;
+      var trigger = picker.querySelector('.pr-subj-trigger');
+      var label   = picker.querySelector('.pr-subj-trigger-text');
+      var options = picker.querySelectorAll('.pr-subj-option');
+      var selected = [];
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        picker.classList.toggle('open');
+      });
+      options.forEach(function(opt) {
+        opt.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var val = opt.getAttribute('data-val');
+          var idx = selected.indexOf(val);
+          if (idx > -1) {
+            selected.splice(idx, 1);
+            opt.classList.remove('selected');
+          } else if (selected.length < max) {
+            selected.push(val);
+            opt.classList.add('selected');
+          }
+          label.textContent = selected.length ? selected.join(', ') : 'Select subjects…';
+          if (hint) hint.textContent = selected.length + ' of ' + max + ' selected';
+        });
+      });
+    }
+
+    wireSoloPicker('solo-picker');
+    wireThreePicker('three-picker', 'three-hint', 3);
+
+    /* Close pickers when clicking outside */
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.pr-subj-picker.open').forEach(function(p) {
+        p.classList.remove('open');
+      });
+    });
+
+    /* ── Tutoring board toggle ───────────────────────────────────── */
+    var TUT_PRICES = {
+      olevel: { p1:'20,000', p2:'35,000', p3:'50,000' },
+      igcse:  { p1:'20,000', p2:'35,000', p3:'50,000' },
+      alevel: { p1:'25,000', p2:'45,000', p3:'65,000' },
+    };
+    var tutToggle = document.getElementById('tut-board-toggle');
+    if (tutToggle) {
+      tutToggle.addEventListener('click', function(e) {
+        var btn = e.target.closest('button[data-board]');
+        if (!btn) return;
+        tutToggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        var board = btn.getAttribute('data-board');
+        var p = TUT_PRICES[board];
+        var el;
+        el = document.getElementById('tut-p1'); if (el) el.textContent = p.p1;
+        el = document.getElementById('tut-p2'); if (el) el.textContent = p.p2;
+        el = document.getElementById('tut-p3'); if (el) el.textContent = p.p3;
+      });
+    }
+  })();
   </script>
-  <script type="module" src="/auth.js?v=20260802b"></script>
 
+  <script>
+  /* ── Payment modal ────────────────────────────────────────────────────── */
+  (function() {
+    var modal       = document.getElementById('pay-modal');
+    var closeBtn    = document.getElementById('pay-modal-close');
+    var tabs        = document.getElementById('pay-tabs');
+    var form        = document.getElementById('pay-proof-form');
+    var submitBtn   = document.getElementById('pay-submit-btn');
+    var fileInput   = document.getElementById('pay-screenshot');
+    var fileNameEl  = document.getElementById('pay-file-name');
+    var errEl       = document.getElementById('pay-err');
+    var formState   = document.getElementById('pay-form-state');
+    var successState = document.getElementById('pay-success-state');
+
+    var _plan = null;
+    var PLAN_LABELS = { solo: 'Solo', three: '3 Subjects', all: 'All Subjects' };
+
+    /* Open modal on any [data-plan] button click */
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-plan]');
+      if (!btn) return;
+      var plan = btn.dataset.plan;
+      if (!PLAN_LABELS[plan]) return;
+
+      /* Check login; redirect if not */
+      fetch('/auth/me', { credentials: 'include' })
+        .then(function(r) {
+          if (!r.ok) { window.location.href = 'login.html?next=pricing.html'; return; }
+          return r.json().then(function(u) {
+            if (u && u.plan === plan) { alert('You are already on the ' + PLAN_LABELS[plan] + ' plan.'); return; }
+            openModal(btn);
+          });
+        })
+        .catch(function() { window.location.href = 'login.html?next=pricing.html'; });
+    });
+
+    function openModal(btn) {
+      var plan = btn.dataset.plan;
+      _plan = plan;
+
+      /* Read price from the card that was clicked */
+      var card = btn.closest('.pr-card');
+      var priceEl = card && card.querySelector('[data-price="' + plan + '"]');
+      var sufEl   = card && card.querySelector('[data-suf="' + plan + '"]');
+      var amountText = priceEl ? priceEl.textContent.trim() : '';
+      var amountNum  = parseInt(amountText.replace(/,/g, ''), 10) || 0;
+
+      document.getElementById('pay-plan-label').textContent    = PLAN_LABELS[plan];
+      document.getElementById('pay-amount-num').textContent     = amountText;
+      document.getElementById('pay-amount-suf').textContent     = sufEl ? sufEl.textContent.trim() : '';
+      document.getElementById('pay-plan-input').value           = plan;
+      document.getElementById('pay-amount-input').value         = amountNum;
+      document.getElementById('pay-success-plan').textContent   = PLAN_LABELS[plan];
+      document.querySelectorAll('.pay-dyn-amount').forEach(function(el) {
+        el.textContent = amountText;
+      });
+
+      form.reset();
+      fileNameEl.textContent = 'No file chosen';
+      errEl.hidden = true; errEl.textContent = '';
+      submitBtn.disabled = false; submitBtn.textContent = 'Submit Proof';
+      formState.hidden = false; successState.hidden = true;
+      activateTab('jazzcash');
+
+      modal.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+    /* Tab switching */
+    function activateTab(method) {
+      document.querySelectorAll('.pay-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.method === method);
+      });
+      document.querySelectorAll('.pay-panel').forEach(function(p) {
+        p.classList.toggle('active', p.dataset.panel === method);
+      });
+      document.getElementById('pay-method-input').value = method;
+    }
+    tabs.addEventListener('click', function(e) {
+      var tab = e.target.closest('.pay-tab');
+      if (tab) activateTab(tab.dataset.method);
+    });
+
+    /* File name preview */
+    fileInput.addEventListener('change', function() {
+      fileNameEl.textContent = fileInput.files[0] ? fileInput.files[0].name : 'No file chosen';
+    });
+
+    /* Submit */
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!fileInput.files[0]) { showErr('Please attach a payment screenshot.'); return; }
+      submitBtn.disabled = true; submitBtn.textContent = 'Uploading…';
+      errEl.hidden = true;
+
+      var fd = new FormData();
+      fd.append('file', fileInput.files[0]);
+
+      fetch('/api/upload/payment-screenshot', { method:'POST', credentials:'include', body:fd })
+        .then(function(r) {
+          if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Upload failed'); });
+          return r.json();
+        })
+        .then(function(data) {
+          submitBtn.textContent = 'Submitting…';
+          return fetch('/api/payment-proof', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              plan:           _plan,
+              amount_pkr:     parseInt(document.getElementById('pay-amount-input').value, 10) || null,
+              method:         document.getElementById('pay-method-input').value,
+              transaction_id: document.getElementById('pay-txn').value.trim() || null,
+              screenshot_url: data.url,
+              note:           document.getElementById('pay-note').value.trim() || null,
+            }),
+          });
+        })
+        .then(function(r) {
+          if (!r.ok) return r.json().then(function(d) { throw new Error(d.detail || 'Submission failed'); });
+          return r.json();
+        })
+        .then(function() {
+          formState.hidden = true;
+          successState.hidden = false;
+        })
+        .catch(function(err) { showErr(err.message || 'Something went wrong, please try again.'); });
+    });
+
+    function showErr(msg) {
+      errEl.textContent = msg; errEl.hidden = false;
+      submitBtn.disabled = false; submitBtn.textContent = 'Submit Proof';
+    }
+  </script>
 </body>
-
 </html>
+

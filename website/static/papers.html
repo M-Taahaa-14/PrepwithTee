@@ -3,32 +3,85 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Past Papers — PrepWithTee</title>
-<meta name="description" content="Build custom topical past-paper PDFs from real Cambridge questions — sorted by topic, with mark schemes. O Level & IGCSE Maths, Physics, CS.">
+<title>Cambridge Topical Past Papers | Physics, Maths, Computer Science O Level & IGCSE — PrepWithTee</title>
+<meta name="description" content="Free Cambridge topical past papers with mark schemes — Physics 5054 & 0625, Maths 4024 & 0580, Computer Science 2210 & 0478. Filter by topic, year and variant. Download as PDF.">
+<link rel="canonical" href="https://prepwithtee.com/papers.html">
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Cambridge Topical Past Papers | Physics, Maths, Computer Science — PrepWithTee">
+<meta property="og:description" content="Free Cambridge topical past papers with mark schemes — Physics 5054/0625, Maths 4024/0580, Computer Science 2210/0478. Filter by topic, year and variant.">
+<meta property="og:image"       content="https://prepwithtee.com/logo.png">
+<meta property="og:url"         content="https://prepwithtee.com/papers.html">
+<meta name="twitter:card"       content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which Cambridge syllabi are covered by the topical past papers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Physics O Level (5054 P2), Physics IGCSE (0625 P4), Mathematics O Level (4024 P1 & P2), Mathematics IGCSE (0580 P2 & P4), Computer Science (2210 P1 & P2 and 0478 P1 & P2). Papers span 2020–2025, all sessions and variants."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I download topical past papers as a PDF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Choose your subject, topic and year range and click Download PDF to get a booklet of real Cambridge past-paper questions with mark schemes included."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are the mark schemes included with the past papers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Every question in the topical PDF has its Cambridge mark scheme printed immediately after it, so you can check your answers straight away."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How are the topical past papers organised?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Questions are sorted by syllabus topic (e.g. Forces, Electric circuits, Algebra, Probability), making it easy to practise a specific chapter before your Cambridge exam."
+      }
+    }
+  ]
+}
+</script>
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260802b">
-  <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
-  <script src="https://files.bpcontent.cloud/2026/07/28/08/20260728082423-S332ZNP5.js" defer></script>  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
+    rel="preload" as="style" onload="this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=20260831a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<link rel="stylesheet" href="tools.css?v=20260829a">
+
 </head>
 <body>
 
 <header class="site-header">
   <div class="container header-row">
     <a class="brand" href="index.html">
-      <img src="logo.png" alt="PrepWithTee owl logo">
+      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
       <span>PrepWithTee</span>
-    </a>
-    <nav class="header-nav">
-      <a href="index.html" class="nav-link">Home</a>
-      <a href="subjects.html" class="nav-link">Subjects</a>
-      <a href="papers.html" class="nav-link active">Past Papers</a>
-      <a href="resources.html" class="nav-link">Resources</a>
-      <a href="tutor.html" class="nav-link">AI Tutor</a>
-      <a href="pricing.html" class="nav-link">Pricing</a>
-    </nav>
+    </a>      <nav class="header-nav" id="site-nav">
+        <!-- Dashboard mega-menu: all sections in one organised dropdown -->
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
+        <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
+        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </nav>
+      <div class="header-right"></div>
   </div>
 </header>
 
@@ -50,6 +103,7 @@
   <div class="seg-large" id="paper-toggle">
     <button class="active" data-tab="topical">Topical Builder</button>
     <button data-tab="yearly">Yearly Library</button>
+    <button data-tab="mcq">&#x26A1; MCQ Solver</button>
   </div>
 </div>
 
@@ -141,6 +195,9 @@
       <button class="btn btn-dark" id="go" disabled>Generate PDF</button>
       <span class="status" id="status"></span>
     </div>
+    <p id="guest-hint" hidden style="margin-top:10px;font-size:.85rem;color:var(--grey);">
+      🔒 <a href="/login.html?next=/papers.html" style="color:var(--navy);font-weight:600;">Sign in for free</a> to download your paper — it takes 30 seconds.
+    </p>
   </section>
 
   <!-- ── Question preview panel (shown after "Preview questions →" in test mode) ── -->
@@ -199,20 +256,41 @@
   <div class="lib">
     <aside class="lib-panel" id="lib-panel">
       <h3>Browse the archive</h3>
+      <!-- Search first: the tree below is lazy, so finding one known paper by
+           clicking through board → subject → year → session is four clicks. -->
+      <div class="lib-search">
+        <span class="lib-search-ico" aria-hidden="true">&#x1F50D;</span>
+        <input type="search" id="lib-search" class="lib-search-input"
+               placeholder="Search: 0625 2021 p2" autocomplete="off"
+               aria-label="Search the paper archive">
+        <button type="button" class="lib-search-clear" id="lib-search-clear"
+                aria-label="Clear search" hidden>&times;</button>
+      </div>
+      <p class="lib-search-hint" id="lib-search-hint">Subject, code, year, session or paper &mdash; in any order.</p>
+      <div class="lib-results" id="lib-results" hidden></div>
       <div class="tree" id="tree"></div>
     </aside>
 
     <section class="lib-viewer">
       <div class="lib-bar">
-        <div>
-          <b id="lib-title">Pick a paper to start reading</b>
-          <div class="sub" id="lib-sub">Open a subject on the left, then a year</div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button type="button" id="lib-mark-done-btn" class="lib-tick-btn" style="display: none; background: none; border: none; cursor: pointer; padding: 0; outline: none; align-items: center; justify-content: center; width: 28px; height: 28px;" title="Mark as Done">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#888" stroke-width="2" class="tick-circle" style="transition: stroke 0.2s, fill 0.2s;"></circle>
+              <path d="M7 12L10 15L17 8" stroke="transparent" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="tick-check" style="transition: stroke 0.2s;"></path>
+            </svg>
+          </button>
+          <div>
+            <b id="lib-title">Pick a paper to start reading</b>
+            <div class="sub" id="lib-sub">Open a subject on the left, then a year</div>
+          </div>
         </div>
         <div class="lib-actions">
           <span class="seg" id="lib-layout" hidden>
             <button type="button" data-layout="stacked" class="on">Stacked</button>
             <button type="button" data-layout="split">Side by side</button>
           </span>
+          <button type="button" class="btn btn-outline" id="lib-dark-btn" hidden>🌙 Night Mode</button>
           <button type="button" class="btn btn-outline" id="lib-fullscreen-btn" hidden>⛶ Fullscreen</button>
           <a class="btn btn-outline" id="lib-open" hidden target="_blank" rel="noopener">↗ Open</a>
           <a class="btn btn-outline" id="lib-download" hidden download>Download</a>
@@ -239,6 +317,55 @@
   </div>
 </main>
 
+  <!-- ============ MCQ CONTAINER ============ -->
+  <div id="mcq-container" style="display:none; padding-bottom:60px" class="container">
+    <div class="mcq-tab-card">
+      <div>
+        <p class="eyebrow" style="color:var(--gold)">Cambridge MCQ &middot; Physics &amp; Chemistry</p>
+        <h2>MCQ Live Solver</h2>
+        <p>Answer real Cambridge MCQ questions one at a time &mdash; race the clock and get instant
+        <strong style="color:#4ade80">green&nbsp;&checkmark;</strong> /
+        <strong style="color:#f87171">red&nbsp;&times;</strong>
+        feedback with the official mark-scheme answer, directly from the database.</p>
+      </div>
+      <div class="mcq-tab-feats">
+        <span class="mcq-tab-feat gold">&#x26A1; Instant answer check</span>
+        <span class="mcq-tab-feat">&#x23F1; Per-question countdown ring</span>
+        <span class="mcq-tab-feat">&#x2328; A B C D keyboard shortcuts</span>
+        <span class="mcq-tab-feat">&#x1F4CA; Full score breakdown</span>
+        <span class="mcq-tab-feat">&#x23F8; Pause &amp; resume</span>
+      </div>
+      <div class="mcq-tab-actions">
+        <a id="mcq-launch-btn" href="mcq-solver.html" class="btn-mcq">&#x26A1; Start MCQ Session</a>
+        <a id="mcq-config-btn" href="mcq-solver.html" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.3)">Configure session &rarr;</a>
+      </div>
+      <div class="mcq-tab-subjects">
+        <div class="mcq-tab-subjects-title">Syllabi Included</div>
+        <div class="mcq-tab-subjects-grid">
+          <div class="mcq-subject-tag"><span>&#x1F52C; O Level Physics</span> <i>5054 P1</i></div>
+          <div class="mcq-subject-tag"><span>&#x2697;&#xFE0F; O Level Chemistry</span> <i>5070 P1</i></div>
+          <div class="mcq-subject-tag"><span>&#x1F52C; IGCSE Physics</span> <i>0625 P1/P2</i></div>
+          <div class="mcq-subject-tag"><span>&#x2697;&#xFE0F; IGCSE Chemistry</span> <i>0620 P1/P2</i></div>
+          <div class="mcq-subject-tag"><span>&#x269B;&#xFE0F; A Level Physics</span> <i>9702 P1</i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ REVISE NOW STRIP ============ -->
+  <div class="container">
+    <div class="revise-strip">
+      <div class="revise-strip-copy">
+        <h2>Finished a chapter? Revise and test it now.</h2>
+        <p>Mark your confidence, get quizzed instantly, track your streak. The chapter you just practised is the best one to test while it's fresh.</p>
+      </div>
+      <div class="revise-strip-actions">
+        <a class="btn btn-dark" href="topical-progress.html">Go to progress tracker →</a>
+        <a class="btn btn-outline" href="formulas.html">Formula sheets</a>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="footer-wa-strip">
@@ -256,7 +383,7 @@
     <div class="container footer-top">
       <div>
         <a class="footer-brand" href="index.html">
-          <img src="logo.png" alt="PrepWithTee">
+          <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee">
           <span>PrepWithTee</span>
         </a>
         <p class="footer-tagline">One-on-one Cambridge tutoring built on the official syllabus &mdash; real past papers, real progress, one student at a time.</p>
@@ -267,10 +394,14 @@
       </div>
       <div class="footer-col">
         <h4>Study Tools</h4>
+        <a href="tools.html">All Study Tools</a>
+        <a href="calculator.html">Scientific Calculator</a>
+        <a href="formulas.html">Formula Sheets</a>
+        <a href="graph.html">Graph Plotter</a>
+        <a href="periodic-table.html">Periodic Table</a>
+        <a href="bases-logic.html">Bases &amp; Logic</a>
+        <a href="pseudocode.html">Pseudocode Runner</a>
         <a href="papers.html">Past Papers Engine</a>
-        <a href="resources.html">Resources &amp; Notes</a>
-        <a href="tutor.html">AI Tutor</a>
-        <a href="guide.html">Revision Study Guide</a>
       </div>
       <div class="footer-col">
         <h4>What We Teach</h4>
@@ -306,44 +437,64 @@
   </div>
 </div>
 
-<script src="main.js?v=20260802b"></script>
-<script src="app.js?v=20260802b"></script>
-<script src="library.js?v=20260802b"></script>
+<script src="main.js?v=20260831a"></script>
+<script src="app.js?v=20260831a"></script>
+<script src="library.js?v=20260830a"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("paper-toggle");
     const topicalBtn = toggle.querySelector("[data-tab='topical']");
-    const yearlyBtn = toggle.querySelector("[data-tab='yearly']");
+    const yearlyBtn  = toggle.querySelector("[data-tab='yearly']");
+    const mcqBtn     = toggle.querySelector("[data-tab='mcq']");
     const topicalContainer = document.getElementById("topical-container");
-    const yearlyContainer = document.getElementById("yearly-container");
+    const yearlyContainer  = document.getElementById("yearly-container");
+    const mcqContainer     = document.getElementById("mcq-container");
 
     function switchTab(tab) {
+      [topicalBtn, yearlyBtn, mcqBtn].forEach(b => b && b.classList.remove("active"));
+      topicalContainer.style.display = "none";
+      yearlyContainer.style.display  = "none";
+      if (mcqContainer) mcqContainer.style.display = "none";
+
       if (tab === "topical") {
         topicalBtn.classList.add("active");
-        yearlyBtn.classList.remove("active");
         topicalContainer.style.display = "";
-        yearlyContainer.style.display = "none";
-      } else {
+      } else if (tab === "yearly") {
         yearlyBtn.classList.add("active");
-        topicalBtn.classList.remove("active");
         yearlyContainer.style.display = "";
-        topicalContainer.style.display = "none";
+      } else if (tab === "mcq") {
+        mcqBtn && mcqBtn.classList.add("active");
+        if (mcqContainer) {
+          mcqContainer.style.display = "";
+          // Carry the current topical builder filters to the MCQ solver
+          try {
+            const syllabus = document.querySelector(".subject.active")?.dataset?.syllabus || "";
+            const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map(i => i.value);
+            const launch = document.getElementById("mcq-launch-btn");
+            if (launch) {
+              const p = new URLSearchParams();
+              if (syllabus) p.set("syllabus", syllabus);
+              if (topics.length) p.set("topics", topics.join(","));
+              launch.href = "mcq-solver.html" + (p.toString() ? "?" + p.toString() : "");
+            }
+          } catch(e) {}
+        }
       }
     }
 
     topicalBtn.addEventListener("click", () => switchTab("topical"));
-    yearlyBtn.addEventListener("click", () => switchTab("yearly"));
-    
-    const goToTopicalBtn = document.getElementById("go-to-topical");
-    if (goToTopicalBtn) {
-      goToTopicalBtn.addEventListener("click", () => switchTab("topical"));
-    }
+    yearlyBtn.addEventListener("click",  () => switchTab("yearly"));
+    if (mcqBtn) mcqBtn.addEventListener("click", () => switchTab("mcq"));
 
-    // Check url hash/param to deep link
+    const goToTopicalBtn = document.getElementById("go-to-topical");
+    if (goToTopicalBtn) goToTopicalBtn.addEventListener("click", () => switchTab("topical"));
+
+    // Deep-link via ?tab=
     const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get("tab") === "yearly" || location.hash === "#yearly") {
-      switchTab("yearly");
-    }
+    const tabParam = urlParams.get("tab");
+    if (tabParam === "yearly" || location.hash === "#yearly") switchTab("yearly");
+    else if (tabParam === "mcq") switchTab("mcq");
+    else switchTab("topical");
 
     // Mobile: toggle lib-panel drawer
     const panelToggle = document.getElementById("lib-panel-toggle");
@@ -355,9 +506,80 @@
         panelToggle.textContent = open ? "✕ Close browser" : "📂 Browse papers";
       });
     }
+
+    // Intercept clicks on MCQ Solver buttons for unauthenticated users
+    const launchBtn = document.getElementById("mcq-launch-btn");
+    const configBtn = document.getElementById("mcq-config-btn");
+    const handleMcqClick = async (e) => {
+      let authed = false;
+      try {
+        authed = (await fetch("/auth/me", { credentials: "same-origin" })).ok;
+      } catch {}
+      if (!authed) {
+        e.preventDefault();
+        const syllabus = document.querySelector(".subject.active")?.dataset?.syllabus || "";
+        const topics = [...document.querySelectorAll("#topics .topic-cb:checked")].map(i => i.value);
+        const nextUrl = `/mcq-solver.html?syllabus=${syllabus}&topics=${topics.join(",")}`;
+        if (window.showAuthRequiredModal) {
+          window.showAuthRequiredModal({
+            heading: "Sign in to use MCQ Solver",
+            text: "You need a free PrepWithTee account to practice past paper MCQs.",
+            nextUrl: nextUrl,
+            container: "#mcq-container"
+          });
+        }
+      }
+    };
+    if (launchBtn) launchBtn.addEventListener("click", handleMcqClick);
+    if (configBtn) configBtn.addEventListener("click", handleMcqClick);
   });
 </script>
-  <script type="module" src="/auth.js?v=20260802b"></script>
+  <script type="module" src="/auth.js?v=20260829a"></script>
 
+  <script src="tools-core.js?v=20260811d"></script>
+  <script src="tools-nav.js?v=20260811d"></script>
+  <script src="tools-dock.js?v=20260810k"></script>
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+  <script src="tour.js?v=20260829a"></script>
+
+  <!-- Enrollment Gating Modal for Past Papers -->
+  <div class="lib-enroll-modal" id="lib-enroll-gate-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: #1a1512; border: 1px solid #e06b00; border-radius: 8px; padding: 25px; max-width: 400px; width: 90%; text-align: center; color: #f5f5f5; font-family: var(--font-body, sans-serif); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <div style="font-size: 2.5rem; margin-bottom: 10px;">⚠️</div>
+      <h2 style="margin: 0 0 10px; color: #ff7b00; font-family: var(--font-head, sans-serif); font-size: 1.3rem;">Enrollment Required</h2>
+      <p id="lib-enroll-gate-message" style="margin: 15px 0; line-height: 1.5; font-size: 0.95rem;"></p>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+        <button class="btn btn-gold" id="lib-enroll-gate-yes" style="background: #ff7b00; border: none; color: #fff; padding: 8px 18px; border-radius: 4px; font-weight: bold; cursor: pointer;">Enroll now</button>
+        <button class="btn btn-outline" id="lib-enroll-gate-no" style="background: transparent; border: 1px solid #888; color: #ccc; padding: 8px 18px; border-radius: 4px; cursor: pointer;">Dismiss</button>
+      </div>
+      <p id="lib-enroll-gate-status" style="margin-top: 12px; font-size: 0.85rem; color: #aaa; min-height: 1.4em;"></p>
+    </div>
+  </div>
+
+  <!-- Enter Marks Modal for Past Papers -->
+  <div class="lib-enroll-modal" id="lib-marks-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: #1a1512; border: 1px solid #e06b00; border-radius: 8px; padding: 25px; max-width: 400px; width: 90%; text-align: center; color: #f5f5f5; font-family: var(--font-body, sans-serif); box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <h2 style="margin: 0 0 15px; color: #ff7b00; font-family: var(--font-head, sans-serif); font-size: 1.3rem;">Enter Marks</h2>
+      <p id="lib-marks-title" style="margin: 5px 0 15px; color: #ccc; font-size: 0.9rem;"></p>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; text-align: left; margin: 15px 0;">
+        <div>
+          <label style="display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px;">Your Score</label>
+          <input type="number" id="lib-marks-score" style="width: 100%; background: #26201e; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; font-size: 1rem; box-sizing: border-box;" placeholder="e.g. 32">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px;">Max Score</label>
+          <input type="number" id="lib-marks-max" style="width: 100%; background: #26201e; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 4px; font-size: 1rem; box-sizing: border-box;" placeholder="e.g. 40" value="40">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+        <button class="btn btn-gold" id="lib-marks-save-btn" style="background: #ff7b00; border: none; color: #fff; padding: 8px 18px; border-radius: 4px; font-weight: bold; cursor: pointer;">Save</button>
+        <button class="btn btn-outline" id="lib-marks-cancel-btn" style="background: transparent; border: 1px solid #888; color: #ccc; padding: 8px 18px; border-radius: 4px; cursor: pointer;">Cancel</button>
+      </div>
+      <p id="lib-marks-status" style="margin-top: 12px; font-size: 0.85rem; color: #aaa; min-height: 1.4em;"></p>
+    </div>
+  </div>
 </body>
 </html>
+
