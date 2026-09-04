@@ -20,45 +20,27 @@
       ],
       "subtopics": [
         {
-          "name": "Rulers and measuring cylinders to find a length or",
+          "name": "Measuring length and volume",
           "links": [],
-          "detail": "Describe the use of rulers and measuring cylinders to find a length or a volume",
+          "detail": "Using rulers and measuring cylinders to find lengths and volumes; determining small distances or short time intervals by measuring multiples (e.g. pendulum period).",
           "tier": "Core"
         },
         {
-          "name": "Measure a variety of time intervals using clocks and",
+          "name": "Measuring time intervals",
           "links": [],
-          "detail": "Describe how to measure a variety of time intervals using clocks and digital timers",
+          "detail": "Measuring time intervals using clocks and digital timers; determining averages by measuring multiples.",
           "tier": "Core"
         },
         {
-          "name": "Average value for a small distance and for a",
+          "name": "Scalars and vectors",
           "links": [],
-          "detail": "Determine an average value for a small distance and for a short interval of time by measuring multiples (including the period of oscillation of a pendulum) Back to contents page Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Core"
-        },
-        {
-          "name": "Scalar quantity has magnitude",
-          "links": [],
-          "detail": "Understand that a scalar quantity has magnitude (size) only and that a vector quantity has magnitude and direction",
+          "detail": "Difference between scalar (magnitude only) and vector (magnitude + direction) quantities. Scalars: distance, speed, time, mass, energy, temperature. Vectors: force, weight, velocity, acceleration, momentum, electric and gravitational field strength.",
           "tier": "Supplement"
         },
         {
-          "name": "Following quantities are scalars",
+          "name": "Resultant of perpendicular vectors",
           "links": [],
-          "detail": "Know that the following quantities are scalars: distance, speed, time, mass, energy and temperature",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Following quantities are vectors",
-          "links": [],
-          "detail": "Know that the following quantities are vectors: force, weight, velocity, acceleration, momentum, electric field strength and gravitational field strength",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Resultant of two vectors at right angles",
-          "links": [],
-          "detail": "Determine, by calculation or graphically, the resultant of two vectors at right angles, limited to forces or velocities only www.cambridgeinternational.org/igcse 12 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Determining by calculation or graphically the resultant of two vectors at right angles (forces or velocities only).",
           "tier": "Supplement"
         }
       ]
@@ -79,75 +61,39 @@
       ],
       "subtopics": [
         {
-          "name": "Speed as distance travelled per unit time",
+          "name": "Speed and velocity",
           "links": [],
-          "detail": "Define speed as distance travelled per unit time; recall and use the equation v =",
+          "detail": "Speed = distance / time; velocity = speed in a given direction. Average speed = total distance / total time.",
           "tier": "Core"
         },
         {
-          "name": "Velocity as speed in a given direction",
+          "name": "Acceleration and deceleration",
           "links": [],
-          "detail": "Define velocity as speed in a given direction",
+          "detail": "Acceleration = change in velocity / time. Deceleration is negative acceleration. Uniform and non-uniform acceleration.",
           "tier": "Core"
         },
         {
-          "name": "Equation total distance travelled average speed = total time",
+          "name": "Distance-time graphs",
           "links": [],
-          "detail": "Recall and use the equation total distance travelled average speed = total time taken",
+          "detail": "Sketching, plotting and interpreting distance-time graphs. Gradient of a straight-line section gives speed.",
           "tier": "Core"
         },
         {
-          "name": "Distance-time and speed-time graphs",
+          "name": "Speed-time graphs",
           "links": [],
-          "detail": "Sketch, plot and interpret distance-time and speed-time graphs",
+          "detail": "Sketching, plotting and interpreting speed-time graphs. Gradient gives acceleration; area under graph gives distance. Identifying constant and changing acceleration.",
           "tier": "Core"
         },
         {
-          "name": "Speed from the gradient of a straight- line section",
+          "name": "Acceleration of free fall",
           "links": [],
-          "detail": "Calculate speed from the gradient of a straight- line section of a distance-time graph",
+          "detail": "The acceleration of free fall g near Earth's surface is approximately constant (~10 m/s²).",
           "tier": "Core"
         },
         {
-          "name": "Area under a speed-time graph to determine the distance",
+          "name": "Free fall and terminal velocity",
           "links": [],
-          "detail": "Calculate the area under a speed-time graph to determine the distance travelled for motion with constant speed or constant acceleration",
-          "tier": "Core"
-        },
-        {
-          "name": "The acceleration of free fall g for an object",
-          "links": [],
-          "detail": "State that the acceleration of free fall g for an object near to the surface of the Earth is approximately constant and is approximately",
-          "tier": "Core"
-        },
-        {
-          "name": "Acceleration as change in velocity per unit time",
-          "links": [],
-          "detail": "Define acceleration as change in velocity per unit time; recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "From given data or the shape of a speed-time",
-          "links": [],
-          "detail": "Determine from given data or the shape of a speed-time graph when an object is moving with: (a) constant acceleration (b) changing acceleration",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Acceleration from the gradient of a speed-time graph",
-          "links": [],
-          "detail": "Calculate acceleration from the gradient of a speed-time graph",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Deceleration is a negative acceleration and use this in",
-          "links": [],
-          "detail": "Know that a deceleration is a negative acceleration and use this in calculations",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Motion of objects falling in a uniform gravitational field",
-          "links": [],
-          "detail": "Describe the motion of objects falling in a uniform gravitational field with and without air/ liquid resistance, including reference to terminal velocity",
+          "detail": "Motion of objects falling in a uniform gravitational field with and without air/liquid resistance, including terminal velocity.",
           "tier": "Supplement"
         }
       ]
@@ -163,27 +109,15 @@
       ],
       "subtopics": [
         {
-          "name": "Mass is a measure of the quantity of matter",
+          "name": "Mass and weight",
           "links": [],
-          "detail": "State that mass is a measure of the quantity of matter in an object at rest relative to the observer",
+          "detail": "Mass is the quantity of matter; weight is the gravitational force on a mass. Both measured with a balance.",
           "tier": "Core"
         },
         {
-          "name": "Weight is a gravitational force on an object that",
+          "name": "Gravitational field strength",
           "links": [],
-          "detail": "State that weight is a gravitational force on an object that has mass",
-          "tier": "Core"
-        },
-        {
-          "name": "Gravitational field strength as force per unit mass",
-          "links": [],
-          "detail": "Define gravitational field strength as force per unit mass; recall and use the equation g = and know that this is equivalent to the acceleration of free fall",
-          "tier": "Core"
-        },
-        {
-          "name": "Weights",
-          "links": [],
-          "detail": "Know that weights (and masses) may be compared using a balance Back to contents page Subject content",
+          "detail": "g = W/m; equivalent to acceleration of free fall. g ≈ 10 N/kg near Earth's surface.",
           "tier": "Core"
         }
       ]
@@ -201,28 +135,22 @@
       ],
       "subtopics": [
         {
-          "name": "Density as mass per unit volume",
+          "name": "Density definition and equation",
           "links": [],
-          "detail": "Define density as mass per unit volume; recall and use the equation",
+          "detail": "Density = mass / volume (ρ = m/V). Units: kg/m³ or g/cm³.",
           "tier": "Core"
         },
         {
-          "name": "Determine the density of a liquid",
+          "name": "Measuring density experimentally",
           "links": [],
-          "detail": "Describe how to determine the density of a liquid, of a regularly shaped solid and of an irregularly shaped solid which sinks in a liquid (volume by displacement), including appropriate calculations",
+          "detail": "Determining density of a liquid, regularly shaped solid, and irregularly shaped solid (volume by displacement).",
           "tier": "Core"
         },
         {
-          "name": "Whether an object floats based on density data",
+          "name": "Floating and sinking",
           "links": [],
-          "detail": "Determine whether an object floats based on density data",
+          "detail": "Whether an object or liquid floats based on density comparisons (for liquids that do not mix).",
           "tier": "Core"
-        },
-        {
-          "name": "Whether one liquid will float on another liquid based",
-          "links": [],
-          "detail": "Determine whether one liquid will float on another liquid based on density data given that the liquids do not mix",
-          "tier": "Supplement"
         }
       ]
     },
@@ -246,112 +174,52 @@
       ],
       "subtopics": [
         {
-          "name": "Forces may produce changes in the size and shape",
+          "name": "Effects of forces and deformation",
           "links": [],
-          "detail": "Know that forces may produce changes in the size and shape of an object",
+          "detail": "Forces may change size and shape of an object. Load-extension graphs for elastic solids; associated experimental procedures.",
           "tier": "Core"
         },
         {
-          "name": "Load-extension graphs for an elastic solid and describe the",
+          "name": "Hooke's Law and spring constant",
           "links": [],
-          "detail": "Sketch, plot and interpret load-extension graphs for an elastic solid and describe the associated experimental procedures",
-          "tier": "Core"
-        },
-        {
-          "name": "Resultant of two or more forces acting along the",
-          "links": [],
-          "detail": "Determine the resultant of two or more forces acting along the same straight line",
-          "tier": "Core"
-        },
-        {
-          "name": "Object either remains at rest or continues in a",
-          "links": [],
-          "detail": "Know that an object either remains at rest or continues in a straight line at constant speed unless acted on by a resultant force",
-          "tier": "Core"
-        },
-        {
-          "name": "A resultant force may change the velocity of an",
-          "links": [],
-          "detail": "State that a resultant force may change the velocity of an object by changing its direction of motion or its speed Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Spring constant as force per unit extension",
-          "links": [],
-          "detail": "Define the spring constant as force per unit extension; recall and use the equation k =",
+          "detail": "Spring constant k = F/x. Limit of proportionality: where load-extension graph ceases to be straight.",
           "tier": "Supplement"
         },
         {
-          "name": "Term ‘limit of proportionality' for a load-extension graph and",
+          "name": "Resultant forces",
           "links": [],
-          "detail": "Define and use the term ‘limit of proportionality' for a load-extension graph and identify this point on the graph (an understanding of the elastic limit is not required)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation F = ma and know that the force",
-          "links": [],
-          "detail": "Recall and use the equation F = ma and know that the force and the acceleration are in the same direction",
-          "tier": "Supplement"
-        },
-        {
-          "name": "( F = is not required) continued www.cambridgeinternational.",
-          "links": [],
-          "detail": "( F = is not required) continued www.cambridgeinternational.org/igcse 14 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 1.5.1 Effects of forces continued",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Solid friction as the force between two surfaces that",
-          "links": [],
-          "detail": "Describe solid friction as the force between two surfaces that may impede motion and produce heating",
+          "detail": "Resultant of two or more forces along the same straight line; resultant of forces at right angles.",
           "tier": "Core"
         },
         {
-          "name": "Friction",
+          "name": "Newton's Laws of motion",
           "links": [],
-          "detail": "Know that friction (drag) acts on an object moving through a liquid",
+          "detail": "Newton's 1st Law: object stays at rest or uniform motion unless acted on by a resultant force. Newton's 2nd Law: F = ma.",
           "tier": "Core"
         },
         {
-          "name": "Moment of a force as a measure of its",
+          "name": "Friction and drag",
           "links": [],
-          "detail": "Describe the moment of a force as a measure of its turning effect and give everyday examples",
+          "detail": "Solid friction impedes motion and produces heating. Drag (fluid friction) acts on objects moving through a liquid or gas.",
           "tier": "Core"
         },
         {
-          "name": "Moment of a force as moment = force ×",
+          "name": "Moments and turning effects",
           "links": [],
-          "detail": "Define the moment of a force as moment = force × perpendicular distance from the pivot; recall and use this equation",
+          "detail": "Moment = force × perpendicular distance from pivot. Everyday examples of turning effects.",
           "tier": "Core"
         },
         {
-          "name": "Principle of moments to situations with one force each",
+          "name": "Principle of moments",
           "links": [],
-          "detail": "Apply the principle of moments to situations with one force each side of the pivot, including balancing of a beam",
+          "detail": "For a body in equilibrium: sum of clockwise moments = sum of anticlockwise moments. Applied to one or more forces each side of the pivot.",
           "tier": "Core"
         },
         {
-          "name": "What is meant by centre of gravity",
+          "name": "Centre of gravity and equilibrium",
           "links": [],
-          "detail": "State what is meant by centre of gravity",
+          "detail": "Centre of gravity: point where weight acts. Experiment to find it for an irregular lamina. No resultant moment on an object in equilibrium.",
           "tier": "Core"
-        },
-        {
-          "name": "Experiment to determine the position of the centre of",
-          "links": [],
-          "detail": "Describe an experiment to determine the position of the centre of gravity of an irregularly shaped plane lamina",
-          "tier": "Core"
-        },
-        {
-          "name": "Principle of moments to other situations",
-          "links": [],
-          "detail": "Apply the principle of moments to other situations, including those with more than one force each side of the pivot",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experiment to demonstrate that there is no resultant moment",
-          "links": [],
-          "detail": "Describe an experiment to demonstrate that there is no resultant moment on an object in equilibrium www.cambridgeinternational.org/igcse 15 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
         }
       ]
     },
@@ -366,33 +234,21 @@
       ],
       "subtopics": [
         {
-          "name": "Momentum as mass velocity",
+          "name": "Momentum definition",
           "links": [],
-          "detail": "Define momentum as mass velocity; recall and use the equation p = mv",
+          "detail": "Momentum p = mv. Unit: kg m/s.",
           "tier": "Supplement"
         },
         {
-          "name": "Impulse as force time for which force acts",
+          "name": "Conservation of momentum",
           "links": [],
-          "detail": "Define impulse as force time for which force acts; recall and use the equation",
+          "detail": "Principle of conservation of momentum applied to simple one-dimensional collision problems.",
           "tier": "Supplement"
         },
         {
-          "name": "Impulse = F t =",
+          "name": "Impulse and resultant force",
           "links": [],
-          "detail": "impulse = F t = ( mv )",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Principle of the conservation of momentum to solve simple",
-          "links": [],
-          "detail": "Apply the principle of the conservation of momentum to solve simple problems in one dimension",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Resultant force as the change in momentum per unit",
-          "links": [],
-          "detail": "Define resultant force as the change in momentum per unit time; recall and use the equation",
+          "detail": "Impulse = Ft = Δ(mv). Resultant force = rate of change of momentum (F = Δp/Δt).",
           "tier": "Supplement"
         }
       ]
@@ -415,94 +271,46 @@
       ],
       "subtopics": [
         {
-          "name": "Energy may be stored as kinetic",
+          "name": "Energy stores",
           "links": [],
-          "detail": "State that energy may be stored as kinetic, gravitational potential, chemical, elastic (strain), nuclear, electrostatic and internal (thermal)",
+          "detail": "Energy may be stored as kinetic, gravitational potential, chemical, elastic (strain), nuclear, electrostatic and internal (thermal).",
           "tier": "Core"
         },
         {
-          "name": "Energy is transferred between stores during events and processes",
+          "name": "Energy transfers and conservation",
           "links": [],
-          "detail": "Describe how energy is transferred between stores during events and processes, including examples of transfer by forces (mechanical work done), electrical currents (electrical work done), heating, and by electromagnetic, sound and other waves",
+          "detail": "Energy transferred by forces, electrical currents, heating and waves. Principle of conservation of energy; flow diagrams.",
           "tier": "Core"
         },
         {
-          "name": "Principle of the conservation of energy and apply this",
+          "name": "Kinetic and gravitational potential energy",
           "links": [],
-          "detail": "Know the principle of the conservation of energy and apply this principle to simple examples including the interpretation of simple flow diagrams Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for kinetic energy",
-          "links": [],
-          "detail": "Recall and use the equation for kinetic energy",
+          "detail": "Ek = ½mv². Ep = mgh (change in gravitational PE).",
           "tier": "Supplement"
         },
         {
-          "name": "Equation for the change in gravitational potential energy",
+          "name": "Work done",
           "links": [],
-          "detail": "Recall and use the equation for the change in gravitational potential energy",
-          "tier": "Supplement"
-        },
-        {
-          "name": "E = mg h",
-          "links": [],
-          "detail": "E = mg h",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Mechanical or electrical work done is equal to the",
-          "links": [],
-          "detail": "Understand that mechanical or electrical work done is equal to the energy transferred",
+          "detail": "Mechanical and electrical work done equals energy transferred. W = Fd.",
           "tier": "Core"
         },
         {
-          "name": "Equation for mechanical working W = Fd = E",
+          "name": "Energy resources",
           "links": [],
-          "detail": "Recall and use the equation for mechanical working W = Fd = E 1.7.3 Energy resources",
+          "detail": "How useful energy is obtained from fossil fuels, biofuels, water (waves, tides, hydro), geothermal, nuclear, solar cells and solar panels. Advantages and disadvantages: renewability, availability, reliability, scale, environmental impact. Solar radiation is the main source except geothermal, nuclear and tidal; energy released by nuclear fusion in the Sun.",
           "tier": "Core"
         },
         {
-          "name": "Useful energy may be obtained",
+          "name": "Power",
           "links": [],
-          "detail": "Describe how useful energy may be obtained, or electrical power generated, from: (a) chemical energy stored in fossil fuels (b) chemical energy stored in biofuels (c) water, including the energy stored in waves, in tides and in water behind hydroelectric dams (d) geothermal resources (e) nuclear fuel (f) light from the Sun to generate electrical power (solar cells) (g) infrared and other electromagnetic waves from the Sun to heat water (solar panels) and be the source of wind energy including references to a boiler, turbine and generator where they are used",
+          "detail": "Power = work done / time = energy transferred / time. P = W/t = E/t.",
           "tier": "Core"
         },
         {
-          "name": "Advantages and disadvantages of each method",
+          "name": "Efficiency",
           "links": [],
-          "detail": "Describe advantages and disadvantages of each method in terms of renewability, availability, reliability, scale and environmental impact",
-          "tier": "Core"
-        },
-        {
-          "name": "Radiation from the Sun is the main source of",
-          "links": [],
-          "detail": "Know that radiation from the Sun is the main source of energy for all our energy resources except geothermal, nuclear and tidal",
+          "detail": "Efficiency = (useful energy output / total energy input) × 100% or (useful power output / total power input) × 100%.",
           "tier": "Supplement"
-        },
-        {
-          "name": "Energy is released by nuclear fusion in the Sun",
-          "links": [],
-          "detail": "Know that energy is released by nuclear fusion in the Sun",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Research is being carried out to investigate how energy",
-          "links": [],
-          "detail": "Know that research is being carried out to investigate how energy released by nuclear fusion can be used to produce electrical energy on a large scale",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Efficiency as",
-          "links": [],
-          "detail": "Define efficiency as: (a) (useful energy output) (%) efficiency = ( 100%) (total energy input) (b) (useful power output) (%) efficiency = ( 100%) (total power input) recall and use these equations www.cambridgeinternational.org/igcse 17 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 1.7.4 Power",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Power as work done per unit time and also",
-          "links": [],
-          "detail": "Define power as work done per unit time and also as energy transferred per unit time; recall and use the equations (a) P =",
-          "tier": "Core"
         }
       ]
     },
@@ -519,27 +327,15 @@
       ],
       "subtopics": [
         {
-          "name": "Pressure as force per unit area",
+          "name": "Pressure definition and equation",
           "links": [],
-          "detail": "Define pressure as force per unit area; recall and use the equation p =",
+          "detail": "Pressure = force / area (p = F/A). Everyday examples showing how pressure varies with force and area.",
           "tier": "Core"
         },
         {
-          "name": "Pressure varies with force and area in the context",
+          "name": "Pressure in liquids",
           "links": [],
-          "detail": "Describe how pressure varies with force and area in the context of everyday examples",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for the change in pressure beneath the surface",
-          "links": [],
-          "detail": "Recall and use the equation for the change in pressure beneath the surface of a liquid",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Ρ p = g h",
-          "links": [],
-          "detail": "ρ p = g h",
+          "detail": "Pressure in a liquid increases with depth: Δp = ρgh.",
           "tier": "Supplement"
         }
       ]
@@ -561,75 +357,39 @@
       ],
       "subtopics": [
         {
-          "name": "Distinguishing properties of solids",
+          "name": "States of matter",
           "links": [],
-          "detail": "Know the distinguishing properties of solids, liquids and gases",
+          "detail": "Distinguishing properties of solids, liquids and gases. Terms for changes in state (melting, boiling, condensation, solidification).",
           "tier": "Core"
         },
         {
-          "name": "Terms for the changes in state between solids",
+          "name": "Particle model",
           "links": [],
-          "detail": "Know the terms for the changes in state between solids, liquids and gases (gas to solid and solid to gas transfers are not required) Back to contents page Subject content www.cambridgeinternational.org/igcse 18 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 2.1.2 Particle model",
+          "detail": "Arrangement, separation and motion of particles in solids, liquids and gases. Forces and distances between particles affect properties.",
           "tier": "Core"
         },
         {
-          "name": "Particle structure of solids",
+          "name": "Brownian motion",
           "links": [],
-          "detail": "Describe the particle structure of solids, liquids and gases in terms of the arrangement, separation and motion of the particles and represent these states using simple particle diagrams",
+          "detail": "Random motion of microscopic particles in suspension is evidence for the kinetic particle model. Explained by random collisions with gas or liquid molecules.",
           "tier": "Core"
         },
         {
-          "name": "Relationship between the motion of particles and temperature",
+          "name": "Gas pressure and temperature",
           "links": [],
-          "detail": "Describe the relationship between the motion of particles and temperature, including the idea that there is a lowest possible temperature (−273 °C), known as absolute zero, where the particles have least kinetic energy",
+          "detail": "Gas pressure arises from particle collisions with surfaces. Qualitative effect of changing temperature (constant V) or changing volume (constant T).",
           "tier": "Core"
         },
         {
-          "name": "Pressure and the changes in pressure of a gas",
+          "name": "Absolute zero and the Kelvin scale",
           "links": [],
-          "detail": "Describe the pressure and the changes in pressure of a gas in terms of the motion of its particles and their collisions with a surface",
+          "detail": "Absolute zero (−273 °C): particles have minimum kinetic energy. T (K) = θ (°C) + 273.",
           "tier": "Core"
         },
         {
-          "name": "Random motion of microscopic particles in a suspension is",
+          "name": "Boyle's Law",
           "links": [],
-          "detail": "Know that the random motion of microscopic particles in a suspension is evidence for the kinetic particle model of matter",
-          "tier": "Core"
-        },
-        {
-          "name": "This motion",
-          "links": [],
-          "detail": "Describe and explain this motion (sometimes known as Brownian motion) in terms of random collisions between the microscopic particles in a suspension and the particles of the gas or liquid 2.1.3 Gases and the absolute scale of temperature",
-          "tier": "Core"
-        },
-        {
-          "name": "Qualitatively",
-          "links": [],
-          "detail": "Describe qualitatively, in terms of particles, the effect on the pressure of a fixed mass of gas of: (a) a change of temperature at constant volume (b) a change of volume at constant temperature",
-          "tier": "Core"
-        },
-        {
-          "name": "Convert temperatures between kelvin and degrees Celsius",
-          "links": [],
-          "detail": "Convert temperatures between kelvin and degrees Celsius; recall and use the equation T (in K) = θ (in °C) + 273 Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Forces and distances between particles",
-          "links": [],
-          "detail": "Know that the forces and distances between particles (atoms, molecules, ions and electrons) and the motion of the particles affects the properties of solids, liquids and gases",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Microscopic particles may be moved by collisions with light",
-          "links": [],
-          "detail": "Know that microscopic particles may be moved by collisions with light fast-moving molecules and correctly use the terms atoms or molecules as distinct from microscopic particles",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation pV = constant for a fixed mass of",
-          "links": [],
-          "detail": "Recall and use the equation pV = constant for a fixed mass of gas at constant temperature, including a graphical representation of this relationship www.cambridgeinternational.org/igcse 19 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "pV = constant for a fixed mass of gas at constant temperature. Graphical representation.",
           "tier": "Supplement"
         }
       ]
@@ -648,87 +408,33 @@
       ],
       "subtopics": [
         {
-          "name": "Some of the everyday applications and consequences of thermal",
+          "name": "Thermal expansion",
           "links": [],
-          "detail": "Describe some of the everyday applications and consequences of thermal expansion 2.2.2 Specific heat capacity",
+          "detail": "Everyday applications and consequences of thermal expansion.",
           "tier": "Core"
         },
         {
-          "name": "Rise in the temperature of an object increases its",
+          "name": "Specific heat capacity",
           "links": [],
-          "detail": "Know that a rise in the temperature of an object increases its internal energy 2.2.3 Melting, boiling and evaporation",
-          "tier": "Core"
+          "detail": "SHC = energy required per unit mass per unit temperature increase. E = mcθ. Experiments to measure SHC of a solid and a liquid.",
+          "tier": "Supplement"
         },
         {
           "name": "Melting and boiling",
           "links": [],
-          "detail": "Describe melting and boiling in terms of energy input without a change in temperature",
-          "tier": "Core"
-        },
-        {
-          "name": "Melting and boiling temperatures for water at standard atmospheric",
-          "links": [],
-          "detail": "Know the melting and boiling temperatures for water at standard atmospheric pressure",
-          "tier": "Core"
-        },
-        {
-          "name": "Condensation and solidification",
-          "links": [],
-          "detail": "Describe condensation and solidification in terms of particles",
+          "detail": "Melting and boiling involve energy input at constant temperature. Melting point and boiling point of water at standard pressure. Condensation and solidification described in terms of particles.",
           "tier": "Core"
         },
         {
           "name": "Evaporation",
           "links": [],
-          "detail": "Describe evaporation in terms of the escape of more-energetic particles from the surface of a liquid",
+          "detail": "Evaporation: more-energetic particles escape from a liquid surface, causing cooling. Factors affecting evaporation: temperature, surface area, air movement.",
           "tier": "Core"
         },
         {
-          "name": "Evaporation causes cooling of a liquid Back to contents",
+          "name": "Boiling vs. evaporation",
           "links": [],
-          "detail": "Know that evaporation causes cooling of a liquid Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Increase in temperature of an object",
-          "links": [],
-          "detail": "Describe an increase in temperature of an object in terms of an increase in the average kinetic energies of all of the particles in the object",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Specific heat capacity as the energy required per unit",
-          "links": [],
-          "detail": "Define specific heat capacity as the energy required per unit mass per unit temperature increase; recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "E c = m θ",
-          "links": [],
-          "detail": "E c = m θ",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experiments to measure the specific heat capacity of a",
-          "links": [],
-          "detail": "Describe experiments to measure the specific heat capacity of a solid and a liquid",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Differences between boiling and evaporation",
-          "links": [],
-          "detail": "Describe the differences between boiling and evaporation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Temperature",
-          "links": [],
-          "detail": "Describe how temperature, surface area and air movement over a surface affect evaporation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Cooling of an object in contact with an evaporating",
-          "links": [],
-          "detail": "Explain the cooling of an object in contact with an evaporating liquid www.cambridgeinternational.org/igcse 20 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Differences between boiling and evaporation. Cooling of an object in contact with an evaporating liquid.",
           "tier": "Supplement"
         }
       ]
@@ -750,100 +456,40 @@
       ],
       "subtopics": [
         {
-          "name": "Experiments to demonstrate the properties of good thermal conductors",
+          "name": "Conduction",
           "links": [],
-          "detail": "Describe experiments to demonstrate the properties of good thermal conductors and bad thermal conductors (thermal insulators) 2.3.2 Convection",
+          "detail": "Experiments demonstrating good and bad thermal conductors. Conduction in solids: lattice vibrations and free electrons in metals.",
           "tier": "Core"
         },
         {
-          "name": "Convection is an important method of thermal energy transfer",
+          "name": "Convection",
           "links": [],
-          "detail": "Know that convection is an important method of thermal energy transfer in liquids and gases",
+          "detail": "Convection in liquids and gases: density changes drive the current. Experiments to illustrate convection.",
           "tier": "Core"
         },
         {
-          "name": "Convection in liquids and gases",
+          "name": "Radiation (infrared)",
           "links": [],
-          "detail": "Explain convection in liquids and gases in terms of density changes and describe experiments to illustrate convection 2.3.3 Radiation",
+          "detail": "All objects emit infrared radiation. Transfer does not require a medium. Effect of surface colour and texture on emission, absorption and reflection.",
           "tier": "Core"
         },
         {
-          "name": "Thermal radiation is infrared radiation and that all objects",
+          "name": "Good and bad emitters and absorbers",
           "links": [],
-          "detail": "Know that thermal radiation is infrared radiation and that all objects emit this radiation",
+          "detail": "Experiments to distinguish good and bad emitters and absorbers. Rate of emission depends on surface temperature and area.",
+          "tier": "Supplement"
+        },
+        {
+          "name": "Energy balance and Earth's temperature",
+          "links": [],
+          "detail": "Object at constant temperature transfers energy away at the same rate it receives it. Earth's temperature balance between incoming and outgoing radiation.",
+          "tier": "Supplement"
+        },
+        {
+          "name": "Everyday applications",
+          "links": [],
+          "detail": "Basic and complex applications of conduction, convection and radiation: kitchen pans, room heating, car radiator, wood/coal fires.",
           "tier": "Core"
-        },
-        {
-          "name": "Thermal energy transfer by thermal radiation does not require",
-          "links": [],
-          "detail": "Know that thermal energy transfer by thermal radiation does not require a medium",
-          "tier": "Core"
-        },
-        {
-          "name": "Effect of surface colour",
-          "links": [],
-          "detail": "Describe the effect of surface colour (black or white) and texture (dull or shiny) on the emission, absorption and reflection of infrared radiation Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Thermal conduction in all solids",
-          "links": [],
-          "detail": "Describe thermal conduction in all solids in terms of atomic or molecular lattice vibrations and also in terms of the movement of free (delocalised) electrons in metallic conductors",
-          "tier": "Supplement"
-        },
-        {
-          "name": "There are many solids that conduct thermal energy better",
-          "links": [],
-          "detail": "Know that there are many solids that conduct thermal energy better than thermal insulators but do so less well than good thermal conductors",
-          "tier": "Supplement"
-        },
-        {
-          "name": "For an object to be at a constant temperature",
-          "links": [],
-          "detail": "Know that for an object to be at a constant temperature it needs to transfer energy away from the object at the same rate that it receives energy",
-          "tier": "Supplement"
-        },
-        {
-          "name": "What happens to an object if the rate at",
-          "links": [],
-          "detail": "Know what happens to an object if the rate at which it receives energy is less or more than the rate at which it transfers energy away from the object",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The temperature of the Earth is affected by factors",
-          "links": [],
-          "detail": "Know how the temperature of the Earth is affected by factors controlling the balance between incoming radiation and radiation emitted from the Earth's surface continued www.cambridgeinternational.org/igcse 21 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 2.3.3 Radiation continued 2.3.4 Consequences of thermal energy transfer",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Some of the basic everyday applications and consequences of",
-          "links": [],
-          "detail": "Explain some of the basic everyday applications and consequences of conduction, convection and radiation, including: (a) heating objects such as kitchen pans (b) heating a room by convection",
-          "tier": "Core"
-        },
-        {
-          "name": "Experiments to distinguish between good and bad emitters of",
-          "links": [],
-          "detail": "Describe experiments to distinguish between good and bad emitters of infrared radiation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experiments to distinguish between good and bad absorbers of",
-          "links": [],
-          "detail": "Describe experiments to distinguish between good and bad absorbers of infrared radiation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The rate of emission of radiation depends on the",
-          "links": [],
-          "detail": "Describe how the rate of emission of radiation depends on the surface temperature and surface area of an object",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Some of the complex applications and consequences of conduction",
-          "links": [],
-          "detail": "Explain some of the complex applications and consequences of conduction, convection and radiation where more than one type of thermal energy transfer is significant, including: (a) a fire burning wood or coal (b) a radiator in a car",
-          "tier": "Supplement"
         }
       ]
     },
@@ -863,63 +509,39 @@
       ],
       "subtopics": [
         {
-          "name": "Waves transfer energy without transferring matter",
+          "name": "Energy transfer by waves",
           "links": [],
-          "detail": "Know that waves transfer energy without transferring matter",
+          "detail": "Waves transfer energy without transferring matter.",
           "tier": "Core"
         },
         {
-          "name": "What is meant by wave motion as illustrated by",
+          "name": "Wave features",
           "links": [],
-          "detail": "Describe what is meant by wave motion as illustrated by vibrations in ropes and springs, and by experiments using water waves",
+          "detail": "Wavefront, wavelength, frequency, crest, trough, amplitude and wave speed.",
           "tier": "Core"
         },
         {
-          "name": "Features of a wave",
+          "name": "Wave speed equation",
           "links": [],
-          "detail": "Describe the features of a wave in terms of wavefront, wavelength, frequency, crest (peak), trough, amplitude and wave speed",
+          "detail": "v = fλ. Calculating wave speed, frequency or wavelength.",
           "tier": "Core"
         },
         {
-          "name": "Equation for wave speed v = f λ",
+          "name": "Transverse and longitudinal waves",
           "links": [],
-          "detail": "Recall and use the equation for wave speed v = f λ",
+          "detail": "Transverse: vibration perpendicular to propagation (EM waves, water, S-waves). Longitudinal: vibration parallel to propagation (sound, P-waves).",
           "tier": "Core"
         },
         {
-          "name": "For a transverse wave",
+          "name": "Reflection, refraction and diffraction",
           "links": [],
-          "detail": "Know that for a transverse wave, the direction of vibration is at right angles to the direction of propagation and understand that electromagnetic radiation, water waves and seismic S-waves (secondary) can be modelled as transverse Back to contents page Subject content continued www.cambridgeinternational.org/igcse 22 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Waves undergo reflection (plane surface), refraction (change of speed) and diffraction (through a gap or past an edge). Ripple tank experiments.",
           "tier": "Core"
         },
         {
-          "name": "For a longitudinal wave",
+          "name": "Diffraction effects",
           "links": [],
-          "detail": "Know that for a longitudinal wave, the direction of vibration is parallel to the direction of propagation and understand that sound waves and seismic P-waves (primary) can be modelled as longitudinal",
-          "tier": "Core"
-        },
-        {
-          "name": "Waves can undergo",
-          "links": [],
-          "detail": "Describe how waves can undergo: (a) reflection at a plane surface (b) refraction due to a change of speed (c) diffraction through a narrow gap",
-          "tier": "Core"
-        },
-        {
-          "name": "Ripple tank to show",
-          "links": [],
-          "detail": "Describe the use of a ripple tank to show: (a) reflection at a plane surface (b) refraction due to a change in speed caused by a change in depth (c) diffraction due to a gap (d) diffraction due to an edge",
-          "tier": "Core"
-        },
-        {
-          "name": "Wavelength and gap size affects diffraction through a gap",
-          "links": [],
-          "detail": "Describe how wavelength and gap size affects diffraction through a gap",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Wavelength affects diffraction at an edge",
-          "links": [],
-          "detail": "Describe how wavelength affects diffraction at an edge",
+          "detail": "How wavelength and gap size affect diffraction through a gap; how wavelength affects diffraction at an edge.",
           "tier": "Supplement"
         }
       ]
@@ -943,147 +565,51 @@
       ],
       "subtopics": [
         {
-          "name": "Terms normal",
+          "name": "Reflection and plane mirrors",
           "links": [],
-          "detail": "Define and use the terms normal, angle of incidence and angle of reflection",
+          "detail": "Laws of reflection (angle of incidence = angle of reflection). Image in a plane mirror: same size, same distance, virtual. Simple constructions for reflection.",
           "tier": "Core"
         },
         {
-          "name": "Formation of an optical image by a plane mirror",
+          "name": "Refraction of light",
           "links": [],
-          "detail": "Describe the formation of an optical image by a plane mirror and give its characteristics, i.e. same size, same distance from mirror, virtual",
+          "detail": "Experiment showing refraction by transparent blocks. Passage of light through a transparent material at a boundary.",
           "tier": "Core"
         },
         {
-          "name": "For reflection",
+          "name": "Total internal reflection",
           "links": [],
-          "detail": "State that for reflection, the angle of incidence is equal to the angle of reflection; recall and use this relationship Back to contents page Subject content",
+          "detail": "Critical angle; internal reflection and total internal reflection. Everyday examples.",
           "tier": "Core"
         },
         {
-          "name": "Simple constructions",
+          "name": "Optical fibres",
           "links": [],
-          "detail": "Use simple constructions, measurements and calculations for reflection by plane mirrors www.cambridgeinternational.org/igcse 23 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 3.2.2 Refraction of light",
+          "detail": "Use of optical fibres, particularly in telecommunications.",
           "tier": "Supplement"
         },
         {
-          "name": "Experiment to show refraction of light by transparent blocks",
+          "name": "Thin lenses",
           "links": [],
-          "detail": "Describe an experiment to show refraction of light by transparent blocks of different shapes",
+          "detail": "Converging and diverging lenses: focal length, principal axis, principal focus. Ray diagrams for real and virtual images. Image characteristics: enlarged/same size/diminished, upright/inverted, real/virtual.",
           "tier": "Core"
         },
         {
-          "name": "Passage of light through a transparent material",
+          "name": "Magnifying glass and vision correction",
           "links": [],
-          "detail": "Describe the passage of light through a transparent material (limited to the boundaries between two mediums only)",
-          "tier": "Core"
+          "detail": "Single converging lens as a magnifying glass. Converging and diverging lenses to correct long-sightedness and short-sightedness.",
+          "tier": "Supplement"
         },
         {
-          "name": "Meaning of critical angle",
+          "name": "Dispersion and colour",
           "links": [],
-          "detail": "State the meaning of critical angle",
-          "tier": "Core"
-        },
-        {
-          "name": "Internal reflection and total internal reflection using both experimental",
-          "links": [],
-          "detail": "Describe internal reflection and total internal reflection using both experimental and everyday examples 3.2.3 Thin lenses",
-          "tier": "Core"
-        },
-        {
-          "name": "Action of thin converging and thin diverging lenses on",
-          "links": [],
-          "detail": "Describe the action of thin converging and thin diverging lenses on a parallel beam of light",
-          "tier": "Core"
-        },
-        {
-          "name": "Terms focal length",
-          "links": [],
-          "detail": "Define and use the terms focal length, principal axis and principal focus (focal point)",
-          "tier": "Core"
-        },
-        {
-          "name": "Ray diagrams for the formation of a real image",
-          "links": [],
-          "detail": "Draw and use ray diagrams for the formation of a real image by a converging lens",
-          "tier": "Core"
-        },
-        {
-          "name": "Characteristics of an image using the terms enlarged/same size/diminished",
-          "links": [],
-          "detail": "Describe the characteristics of an image using the terms enlarged/same size/diminished, upright/inverted and real/virtual",
-          "tier": "Core"
-        },
-        {
-          "name": "Virtual image is formed when diverging rays are extrapolated",
-          "links": [],
-          "detail": "Know that a virtual image is formed when diverging rays are extrapolated backwards and does not form a visible projection on a screen 3.2.4 Dispersion of light",
-          "tier": "Core"
-        },
-        {
-          "name": "Dispersion of light as illustrated by the refraction of",
-          "links": [],
-          "detail": "Describe the dispersion of light as illustrated by the refraction of white light by a glass prism",
-          "tier": "Core"
-        },
-        {
-          "name": "Traditional seven colours of the visible spectrum in order",
-          "links": [],
-          "detail": "Know the traditional seven colours of the visible spectrum in order of frequency and in order of wavelength Back to contents page Subject content",
+          "detail": "Dispersion of white light by a glass prism. Seven colours of the visible spectrum in order of frequency and wavelength. Monochromatic light.",
           "tier": "Core"
         },
         {
           "name": "Refractive index",
           "links": [],
-          "detail": "Define refractive index, n , as the ratio of the speeds of a wave in two different regions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation sin i n = sin r",
-          "links": [],
-          "detail": "Recall and use the equation sin i n = sin r",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation",
-          "links": [],
-          "detail": "Recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "N = sin c",
-          "links": [],
-          "detail": "n = sin c",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Optical fibres",
-          "links": [],
-          "detail": "Describe the use of optical fibres, particularly in telecommunications",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Ray diagrams for the formation of a virtual image",
-          "links": [],
-          "detail": "Draw and use ray diagrams for the formation of a virtual image by a converging lens",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Single lens as a magnifying glass",
-          "links": [],
-          "detail": "Describe the use of a single lens as a magnifying glass",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Converging and diverging lenses to correct long-sightedness and short",
-          "links": [],
-          "detail": "Describe the use of converging and diverging lenses to correct long-sightedness and short- sightedness",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Visible light of a single frequency is described as",
-          "links": [],
-          "detail": "Recall that visible light of a single frequency is described as monochromatic www.cambridgeinternational.org/igcse 24 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "n = speed in medium 1 / speed in medium 2. Snell's law: n = sin i / sin r. Relationship to critical angle: n = 1/sin c.",
           "tier": "Supplement"
         }
       ]
@@ -1103,69 +629,33 @@
       ],
       "subtopics": [
         {
-          "name": "Main regions of the electromagnetic spectrum in order of",
+          "name": "Regions of the EM spectrum",
           "links": [],
-          "detail": "Know the main regions of the electromagnetic spectrum in order of frequency and in order of wavelength",
+          "detail": "Main regions in order of frequency (and wavelength): radio, microwave, infrared, visible, ultraviolet, X-ray, gamma. All travel at the same speed in a vacuum (~3.0 × 10⁸ m/s).",
           "tier": "Core"
         },
         {
-          "name": "All electromagnetic waves travel at the same high speed",
+          "name": "Uses of EM radiation",
           "links": [],
-          "detail": "Know that all electromagnetic waves travel at the same high speed in a vacuum",
+          "detail": "Radio: radio/TV/astronomy/RFID. Microwave: satellite TV, mobile phones, ovens. Infrared: grills, remote controls, thermal imaging, optical fibres. Visible: vision, photography. UV: security marking, detecting fake notes, sterilising water. X-rays: medical scanning, security. Gamma: sterilising food/equipment, cancer detection and treatment.",
           "tier": "Core"
         },
         {
-          "name": "Typical uses of the different regions of the electromagnetic",
+          "name": "Harmful effects of EM radiation",
           "links": [],
-          "detail": "Describe typical uses of the different regions of the electromagnetic spectrum including: (a) radio waves; radio and television transmissions, astronomy, radio frequency identification (RFID) (b) microwaves; satellite television, mobile phones (cell phones), microwave ovens (c) infrared; electric grills, short range communications such as remote controllers for televisions, intruder alarms, thermal imaging, optical fibres (d) visible light; vision, photography, illumination (e) ultraviolet; security marking, detecting fake bank notes, sterilising water (f) X-rays; medical scanning, security scanners (g) gamma rays; sterilising food and medical equipment, detection of cancer and its treatment",
+          "detail": "Microwaves: internal heating of cells. Infrared: skin burns. UV: skin cancer, eye damage. X-rays and gamma: cell mutation or damage.",
           "tier": "Core"
         },
         {
-          "name": "Harmful effects on people of excessive exposure to electromagnetic",
+          "name": "Communication systems",
           "links": [],
-          "detail": "Describe the harmful effects on people of excessive exposure to electromagnetic radiation, including: (a) microwaves; internal heating of body cells (b) infrared; skin burns (c) ultraviolet; damage to surface cells and eyes, leading to skin cancer and eye conditions (d) X-rays and gamma rays; mutation or damage to cells in the body Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Speed of electromagnetic",
-          "links": [],
-          "detail": "Know that the speed of electromagnetic",
+          "detail": "Satellite communication mainly by microwaves (low-orbit and geostationary). Mobile phones and wireless internet: microwaves. Bluetooth: radio waves. Optical fibres (visible light or infrared): cable TV and broadband.",
           "tier": "Supplement"
         },
         {
-          "name": "Waves in a vacuum is 3.0 10 m /",
+          "name": "Digital vs. analogue signals",
           "links": [],
-          "detail": "waves in a vacuum is 3.0 10 m / s and is approximately the same in air continued www.cambridgeinternational.org/igcse 25 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Communication with artificial satellites is mainly by microwaves",
-          "links": [],
-          "detail": "Know that communication with artificial satellites is mainly by microwaves: (a) some satellite phones use low orbit artificial satellites (b) some satellite phones and direct broadcast satellite television use geostationary satellites",
-          "tier": "Core"
-        },
-        {
-          "name": "Many important systems of communications rely on electromagnetic radiation",
-          "links": [],
-          "detail": "Know that many important systems of communications rely on electromagnetic radiation including: (a) mobile phones (cell phones) and wireless internet use microwaves because microwaves can penetrate some walls and only require a short aerial for transmission and reception (b) Bluetooth uses radio waves because radio waves pass through walls but the signal is weakened on doing so (c) optical fibres (visible light or infrared) are used for cable television and high-speed broadband because glass is transparent to visible light and some infrared; visible light and short wavelength infrared can carry high rates of data",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Difference between a digital and analogue signal",
-          "links": [],
-          "detail": "Know the difference between a digital and analogue signal",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Sound can be transmitted as a digital or analogue",
-          "links": [],
-          "detail": "Know that a sound can be transmitted as a digital or analogue signal",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Benefits of digital signalling",
-          "links": [],
-          "detail": "Explain the benefits of digital signalling including increased rate of transmission of data and increased range due to accurate signal regeneration",
+          "detail": "Difference between digital and analogue signals. Sound can be transmitted as either. Benefits of digital signalling: higher data rate, greater range due to accurate signal regeneration.",
           "tier": "Supplement"
         }
       ]
@@ -1186,69 +676,33 @@
       ],
       "subtopics": [
         {
-          "name": "Production of sound by vibrating sources",
+          "name": "Production and nature of sound",
           "links": [],
-          "detail": "Describe the production of sound by vibrating sources",
+          "detail": "Sound produced by vibrating sources. Sound is a longitudinal wave requiring a medium. Compressions and rarefactions.",
           "tier": "Core"
         },
         {
-          "name": "Longitudinal nature of sound waves",
+          "name": "Speed of sound",
           "links": [],
-          "detail": "Describe the longitudinal nature of sound waves",
+          "detail": "Speed of sound in air ≈ 330–350 m/s. Method: measuring distance and time. Sound travels faster in denser media.",
           "tier": "Core"
         },
         {
-          "name": "Approximate range of frequencies audible to humans as 20",
+          "name": "Loudness, pitch and amplitude",
           "links": [],
-          "detail": "State the approximate range of frequencies audible to humans as 20 Hz to 20 000 Hz",
+          "detail": "Amplitude affects loudness; frequency affects pitch. Audible range: 20 Hz to 20 000 Hz.",
           "tier": "Core"
         },
         {
-          "name": "Medium is needed to transmit sound waves",
+          "name": "Echoes",
           "links": [],
-          "detail": "Know that a medium is needed to transmit sound waves",
+          "detail": "Echo = reflection of sound waves.",
           "tier": "Core"
         },
         {
-          "name": "Speed of sound in air is approximately 330-350 m",
+          "name": "Ultrasound",
           "links": [],
-          "detail": "Know that the speed of sound in air is approximately 330-350 m / s Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Compression and rarefaction",
-          "links": [],
-          "detail": "Describe compression and rarefaction",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Method involving a measurement of distance and time for",
-          "links": [],
-          "detail": "Describe a method involving a measurement of distance and time for determining the speed of sound in air",
-          "tier": "Core"
-        },
-        {
-          "name": "Changes in amplitude and frequency affect the loudness and",
-          "links": [],
-          "detail": "Describe how changes in amplitude and frequency affect the loudness and pitch of sound waves",
-          "tier": "Core"
-        },
-        {
-          "name": "Echo as the reflection of sound waves",
-          "links": [],
-          "detail": "Describe an echo as the reflection of sound waves",
-          "tier": "Core"
-        },
-        {
-          "name": "Ultrasound as sound with a frequency higher than 20",
-          "links": [],
-          "detail": "Define ultrasound as sound with a frequency higher than 20 kHz",
-          "tier": "Core"
-        },
-        {
-          "name": "Uses of ultrasound in non- destructive testing of materials",
-          "links": [],
-          "detail": "Describe the uses of ultrasound in non- destructive testing of materials, medical scanning of soft tissue and sonar including calculation of depth or distance from time and wave speed",
+          "detail": "Ultrasound: frequency > 20 kHz. Uses: non-destructive material testing, medical scanning of soft tissue, sonar (depth/distance calculations).",
           "tier": "Supplement"
         }
       ]
@@ -1269,69 +723,33 @@
       ],
       "subtopics": [
         {
-          "name": "Forces between magnetic poles and between magnets and magnetic",
+          "name": "Magnetic poles and forces",
           "links": [],
-          "detail": "Describe the forces between magnetic poles and between magnets and magnetic materials, including the use of the terms north pole (N pole), south pole (S pole), attraction and repulsion, magnetised and unmagnetised",
+          "detail": "Like poles repel; unlike poles attract. Force between magnets and magnetic materials. Induced magnetism.",
           "tier": "Core"
         },
         {
-          "name": "Induced magnetism",
+          "name": "Magnetic and non-magnetic materials",
           "links": [],
-          "detail": "Describe induced magnetism",
+          "detail": "Magnetic materials include iron, steel, nickel, cobalt. Non-magnetic materials do not experience magnetic forces.",
           "tier": "Core"
         },
         {
-          "name": "Differences between the properties of temporary magnets",
+          "name": "Temporary and permanent magnets",
           "links": [],
-          "detail": "State the differences between the properties of temporary magnets (made of soft iron) and the properties of permanent magnets (made of steel",
+          "detail": "Soft iron: temporary magnets. Steel: permanent magnets. Uses of each.",
           "tier": "Core"
         },
         {
-          "name": "Difference between magnetic and non-magnetic materials",
+          "name": "Magnetic fields and field lines",
           "links": [],
-          "detail": "State the difference between magnetic and non-magnetic materials",
+          "detail": "Magnetic field: region where a magnetic pole experiences a force. Drawing and plotting field lines around a bar magnet; direction = force on N pole. Field line spacing represents relative strength.",
           "tier": "Core"
         },
         {
-          "name": "Magnetic field as a region in which a magnetic",
+          "name": "Uses of magnets and electromagnets",
           "links": [],
-          "detail": "Describe a magnetic field as a region in which a magnetic pole experiences a force",
-          "tier": "Core"
-        },
-        {
-          "name": "Pattern and direction of magnetic field lines around a",
-          "links": [],
-          "detail": "Draw the pattern and direction of magnetic field lines around a bar magnet",
-          "tier": "Core"
-        },
-        {
-          "name": "The direction of a magnetic field at a point",
-          "links": [],
-          "detail": "State that the direction of a magnetic field at a point is the direction of the force on the N pole of a magnet at that point",
-          "tier": "Core"
-        },
-        {
-          "name": "Plotting of magnetic field lines with a compass or",
-          "links": [],
-          "detail": "Describe the plotting of magnetic field lines with a compass or iron filings and the use of a compass to determine the direction of the magnetic field",
-          "tier": "Core"
-        },
-        {
-          "name": "Uses of permanent magnets and electromagnets Back to contents",
-          "links": [],
-          "detail": "Describe the uses of permanent magnets and electromagnets Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Magnetic forces are due to interactions between magnetic fields",
-          "links": [],
-          "detail": "Explain that magnetic forces are due to interactions between magnetic fields",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Relative strength of a magnetic field is represented by",
-          "links": [],
-          "detail": "Know that the relative strength of a magnetic field is represented by the spacing of the magnetic field lines www.cambridgeinternational.org/igcse 27 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Applications of permanent magnets and electromagnets. Magnetic forces arise from interactions between magnetic fields.",
           "tier": "Supplement"
         }
       ]
@@ -1355,190 +773,52 @@
       ],
       "subtopics": [
         {
-          "name": "There are positive and negative charges",
+          "name": "Electric charge and static electricity",
           "links": [],
-          "detail": "State that there are positive and negative charges",
+          "detail": "Positive and negative charges; like charges repel, unlike attract. Production of electrostatic charges by friction (transfer of electrons only). Detecting charges.",
           "tier": "Core"
         },
         {
-          "name": "Positive charges repel other positive charges",
+          "name": "Conductors and insulators",
           "links": [],
-          "detail": "State that positive charges repel other positive charges, negative charges repel other negative charges, but positive charges attract negative charges",
+          "detail": "Experiment to distinguish conductors and insulators. Electron model: free electrons in conductors; bound electrons in insulators.",
           "tier": "Core"
         },
         {
-          "name": "Simple experiments to show the production of electrostatic charges",
+          "name": "Electric fields",
           "links": [],
-          "detail": "Describe simple experiments to show the production of electrostatic charges by friction and to show the detection of electrostatic charges",
-          "tier": "Core"
-        },
-        {
-          "name": "Charging of solids by friction involves only a transfer",
-          "links": [],
-          "detail": "Explain that charging of solids by friction involves only a transfer of negative charge (electrons)",
-          "tier": "Core"
-        },
-        {
-          "name": "Experiment to distinguish between electrical conductors and insulators",
-          "links": [],
-          "detail": "Describe an experiment to distinguish between electrical conductors and insulators",
-          "tier": "Core"
-        },
-        {
-          "name": "Simple electron model to explain the difference between electrical",
-          "links": [],
-          "detail": "Recall and use a simple electron model to explain the difference between electrical conductors and insulators and give typical examples 4.2.2 Electric current",
-          "tier": "Core"
-        },
-        {
-          "name": "Electric current is related to the flow of charge",
-          "links": [],
-          "detail": "Know that electric current is related to the flow of charge",
-          "tier": "Core"
-        },
-        {
-          "name": "Ammeters",
-          "links": [],
-          "detail": "Describe the use of ammeters (analogue and digital) with different ranges",
-          "tier": "Core"
-        },
-        {
-          "name": "Electrical conduction in metals",
-          "links": [],
-          "detail": "Describe electrical conduction in metals in terms of the movement of free electrons",
-          "tier": "Core"
-        },
-        {
-          "name": "Difference between direct current",
-          "links": [],
-          "detail": "Know the difference between direct current (d.c.) and alternating current (a.c.) Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Charge is measured in coulombs",
-          "links": [],
-          "detail": "State that charge is measured in coulombs",
+          "detail": "Electric field: region where an electric charge experiences a force. Direction = force on a positive charge. Field patterns: around a point charge, a charged sphere, between parallel plates.",
           "tier": "Supplement"
         },
         {
-          "name": "Electric field as a region in which an electric",
+          "name": "Electric current",
           "links": [],
-          "detail": "Describe an electric field as a region in which an electric charge experiences a force",
+          "detail": "Current = charge / time (I = Q/t). Direct (d.c.) and alternating (a.c.) current. Conventional current from + to −; electron flow from − to +. Using ammeters (analogue and digital).",
+          "tier": "Core"
+        },
+        {
+          "name": "Electromotive force and potential difference",
+          "links": [],
+          "detail": "e.m.f. = electrical work done by a source per unit charge around a complete circuit. p.d. = work done per unit charge through a component. Both measured in volts (V).",
+          "tier": "Core"
+        },
+        {
+          "name": "Resistance and Ohm's Law",
+          "links": [],
+          "detail": "R = V/I. Experiment to determine resistance using voltmeter and ammeter. Current-voltage graphs for constant resistor, filament lamp and diode.",
+          "tier": "Core"
+        },
+        {
+          "name": "Resistance and dimensions",
+          "links": [],
+          "detail": "For a metallic conductor: resistance ∝ length; resistance ∝ 1/cross-sectional area.",
           "tier": "Supplement"
         },
         {
-          "name": "The direction of an electric field at a point",
+          "name": "Electrical power and energy",
           "links": [],
-          "detail": "State that the direction of an electric field at a point is the direction of the force on a positive charge at that point",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Simple electric field patterns",
-          "links": [],
-          "detail": "Describe simple electric field patterns, including the direction of the field: (a) around a point charge (b) around a charged conducting sphere (c) between two oppositely charged parallel conducting plates (end effects will not be examined)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Electric current as the charge passing a point per",
-          "links": [],
-          "detail": "Define electric current as the charge passing a point per unit time; recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Conventional current is from positive to negative and that",
-          "links": [],
-          "detail": "State that conventional current is from positive to negative and that the flow of free electrons is from negative to positive www.cambridgeinternational.org/igcse 28 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 4.2.3 Electromotive force and potential difference",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Electromotive force",
-          "links": [],
-          "detail": "Define electromotive force (e.m.f.) as the electrical work done by a source in moving a unit charge around a complete circuit",
+          "detail": "P = IV; E = IVt. Kilowatt-hour: kWh. Cost of electrical energy. Transfer of energy from source through circuit to surroundings.",
           "tier": "Core"
-        },
-        {
-          "name": "E.m.f. is measured in volts",
-          "links": [],
-          "detail": "Know that e.m.f. is measured in volts (V)",
-          "tier": "Core"
-        },
-        {
-          "name": "Potential difference",
-          "links": [],
-          "detail": "Define potential difference (p.d.) as the work done by a unit charge passing through a component",
-          "tier": "Core"
-        },
-        {
-          "name": "P.d. between two points is measured in volts",
-          "links": [],
-          "detail": "Know that the p.d. between two points is measured in volts (V)",
-          "tier": "Core"
-        },
-        {
-          "name": "Voltmeters",
-          "links": [],
-          "detail": "Describe the use of voltmeters (analogue and digital) with different ranges 4.2.4 Resistance",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for resistance R =",
-          "links": [],
-          "detail": "Recall and use the equation for resistance R =",
-          "tier": "Core"
-        },
-        {
-          "name": "Experiment to determine resistance using a voltmeter and an",
-          "links": [],
-          "detail": "Describe an experiment to determine resistance using a voltmeter and an ammeter and do the appropriate calculations",
-          "tier": "Core"
-        },
-        {
-          "name": "Electric circuits transfer energy from a source of electrical",
-          "links": [],
-          "detail": "Understand that electric circuits transfer energy from a source of electrical energy, such as an electrical cell or mains supply, to the circuit components and then into the surroundings",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for electrical power P = I V",
-          "links": [],
-          "detail": "Recall and use the equation for electrical power P = I V",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for electrical energy E = Vt",
-          "links": [],
-          "detail": "Recall and use the equation for electrical energy E = Vt",
-          "tier": "Core"
-        },
-        {
-          "name": "Kilowatt-hour",
-          "links": [],
-          "detail": "Define the kilowatt-hour (kW h) and calculate the cost of using electrical appliances where the energy unit is the kW h Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation for e.m.f. E =",
-          "links": [],
-          "detail": "Recall and use the equation for e.m.f. E =",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation for p.d. V =",
-          "links": [],
-          "detail": "Recall and use the equation for p.d. V =",
-          "tier": "Supplement"
-        },
-        {
-          "name": "And explain the current-voltage graphs for a resistor of",
-          "links": [],
-          "detail": "Sketch and explain the current-voltage graphs for a resistor of constant resistance, a filament lamp and a diode",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Following relationship for a metallic electrical conductor",
-          "links": [],
-          "detail": "Recall and use the following relationship for a metallic electrical conductor: (a) resistance is directly proportional to length (b) resistance is inversely proportional to cross-sectional area www.cambridgeinternational.org/igcse 29 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
         }
       ]
     },
@@ -1563,87 +843,33 @@
       ],
       "subtopics": [
         {
-          "name": "And interpret circuit diagrams containing cells",
+          "name": "Circuit symbols and components",
           "links": [],
-          "detail": "Draw and interpret circuit diagrams containing cells, batteries, power supplies, generators, potential dividers, switches, resistors (fixed and variable), heaters, thermistors (NTC only), light- dependent resistors (LDRs), lamps, motors, bells, ammeters, voltmeters, magnetising coils, transformers, fuses and relays and know how these components behave in the circuit 4.3.2 Series and parallel circuits",
+          "detail": "Drawing and interpreting circuit diagrams: cells, batteries, switches, resistors (fixed and variable), thermistors, LDRs, lamps, motors, bells, ammeters, voltmeters, transformers, fuses, relays, diodes, LEDs. Component behaviour.",
           "tier": "Core"
         },
         {
-          "name": "Current at every point in a series circuit is",
+          "name": "Series circuits",
           "links": [],
-          "detail": "Know that the current at every point in a series circuit is the same",
+          "detail": "Current is the same at every point in a series circuit. Total e.m.f. is the sum of individual e.m.f.s. Total p.d. = sum of individual p.d.s. Combined series resistance = R₁ + R₂ + …",
           "tier": "Core"
         },
         {
-          "name": "To construct and use series and parallel circuits",
+          "name": "Parallel circuits",
           "links": [],
-          "detail": "Know how to construct and use series and parallel circuits",
+          "detail": "Sum of currents into a junction = sum of currents leaving. p.d. is the same across all branches. Combined resistance of two parallel resistors is less than either alone. Advantages of parallel lamp circuits.",
           "tier": "Core"
         },
         {
-          "name": "Combined e.m.f. of several sources in series",
+          "name": "Combining resistance",
           "links": [],
-          "detail": "Calculate the combined e.m.f. of several sources in series",
-          "tier": "Core"
-        },
-        {
-          "name": "Combined resistance of two or more resistors in series",
-          "links": [],
-          "detail": "Calculate the combined resistance of two or more resistors in series",
-          "tier": "Core"
-        },
-        {
-          "name": "The combined resistance of two resistors in parallel is",
-          "links": [],
-          "detail": "State that the combined resistance of two resistors in parallel is less than that of either resistor by itself",
-          "tier": "Core"
-        },
-        {
-          "name": "Advantages of connecting lamps in parallel in a lighting",
-          "links": [],
-          "detail": "State the advantages of connecting lamps in parallel in a lighting circuit Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "And interpret circuit diagrams containing diodes and light-emitting diodes",
-          "links": [],
-          "detail": "Draw and interpret circuit diagrams containing diodes and light-emitting diodes (LEDs) and know how these components behave in the circuit",
+          "detail": "Combined resistance for resistors in series and in parallel (including calculation for two in parallel).",
           "tier": "Supplement"
         },
         {
-          "name": "In calculations",
+          "name": "Potential divider",
           "links": [],
-          "detail": "Recall and use in calculations, the fact that: (a) the sum of the currents entering a junction in a parallel circuit is equal to the sum of the currents that leave the junction (b) the total p.d. across the components in a series circuit is equal to the sum of the individual p.d.s across each component (c) the p.d. across an arrangement of parallel resistances is the same as the p.d. across one branch in the arrangement of the parallel resistances",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The sum of the currents into a junction is",
-          "links": [],
-          "detail": "Explain that the sum of the currents into a junction is the same as the sum of the currents out of the junction",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Combined resistance of two resistors in parallel www.cambridgeinternational.org/igcse 30",
-          "links": [],
-          "detail": "Calculate the combined resistance of two resistors in parallel www.cambridgeinternational.org/igcse 30 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 4.3.3 Action and use of circuit components",
-          "tier": "Supplement"
-        },
-        {
-          "name": "P.d. across an electrical conductor increases as its resistance",
-          "links": [],
-          "detail": "Know that the p.d. across an electrical conductor increases as its resistance increases for a constant current",
-          "tier": "Core"
-        },
-        {
-          "name": "Action of a variable potential divider",
-          "links": [],
-          "detail": "Describe the action of a variable potential divider",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation for two resistors used as a potential divider",
-          "links": [],
-          "detail": "Recall and use the equation for two resistors used as a potential divider R V",
+          "detail": "How a variable potential divider works. Equation for two resistors as a potential divider: V₁/V₂ = R₁/R₂. p.d. across a conductor increases with resistance at constant current.",
           "tier": "Supplement"
         }
       ]
@@ -1665,33 +891,27 @@
       ],
       "subtopics": [
         {
-          "name": "Hazards of",
+          "name": "Electrical hazards",
           "links": [],
-          "detail": "State the hazards of: (a) damaged insulation (b) overheating cables (c) damp conditions (d) excess current from overloading of plugs, extension leads, single and multiple sockets when using a mains supply",
+          "detail": "Hazards: damaged insulation, overheating cables, damp conditions, overloading of plugs and extension leads.",
           "tier": "Core"
         },
         {
-          "name": "Mains circuit consists of a live wire",
+          "name": "Mains wiring",
           "links": [],
-          "detail": "Know that a mains circuit consists of a live wire (line wire), a neutral wire and an earth wire and explain why a switch must be connected to the live wire for the circuit to be switched off safely",
+          "detail": "Mains circuit: live wire, neutral wire and earth wire. Switch must be on the live side for safe disconnection.",
           "tier": "Core"
         },
         {
-          "name": "Use and operation of trip switches and fuses and",
+          "name": "Fuses and circuit breakers",
           "links": [],
-          "detail": "Explain the use and operation of trip switches and fuses and choose appropriate fuse ratings and trip switch settings",
+          "detail": "Operation of fuses and trip switches (circuit breakers). Choosing appropriate fuse ratings and trip settings.",
           "tier": "Core"
         },
         {
-          "name": "The outer casing of an electrical appliance must be",
+          "name": "Double insulation and earthing",
           "links": [],
-          "detail": "Explain why the outer casing of an electrical appliance must be either non-conducting (double-insulated) or earthed",
-          "tier": "Core"
-        },
-        {
-          "name": "A fuse without an earth wire protects the circuit",
-          "links": [],
-          "detail": "State that a fuse without an earth wire protects the circuit and the cabling for a double- insulated appliance Back to contents page Subject content www.cambridgeinternational.org/igcse 31 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Outer casing must be non-conducting (double-insulated) or earthed. A fuse without an earth wire protects the cable for a double-insulated appliance.",
           "tier": "Core"
         }
       ]
@@ -1715,154 +935,52 @@
       ],
       "subtopics": [
         {
-          "name": "Conductor moving across a magnetic field or a changing",
+          "name": "Electromagnetic induction",
           "links": [],
-          "detail": "Know that a conductor moving across a magnetic field or a changing magnetic field linking with a conductor can induce an e.m.f. in the conductor",
+          "detail": "A conductor moving through a magnetic field, or a changing magnetic field linking a conductor, induces an e.m.f. Direction of induced e.m.f. opposes the change (Lenz's Law). Relative directions of force, field and induced current.",
           "tier": "Core"
         },
         {
-          "name": "Experiment to demonstrate electromagnetic induction",
+          "name": "Factors affecting induced e.m.f.",
           "links": [],
-          "detail": "Describe an experiment to demonstrate electromagnetic induction",
+          "detail": "Magnitude of induced e.m.f. affected by speed of movement, strength of field and number of turns.",
           "tier": "Core"
         },
         {
-          "name": "Factors affecting the magnitude of an induced e.m.f. 4.5.2",
+          "name": "The AC generator",
           "links": [],
-          "detail": "State the factors affecting the magnitude of an induced e.m.f. 4.5.2 The a.c. generator 4.5.3 Magnetic effect of a current",
-          "tier": "Core"
-        },
-        {
-          "name": "Pattern and direction of the magnetic field due to",
-          "links": [],
-          "detail": "Describe the pattern and direction of the magnetic field due to currents in straight wires and in solenoids",
-          "tier": "Core"
-        },
-        {
-          "name": "Experiment to identify the pattern of the magnetic field",
-          "links": [],
-          "detail": "Describe an experiment to identify the pattern of the magnetic field (including direction) due to currents in straight wires and in solenoids",
-          "tier": "Core"
-        },
-        {
-          "name": "The magnetic effect of a current is used in",
-          "links": [],
-          "detail": "Describe how the magnetic effect of a current is used in relays and loudspeakers and give examples of their application Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Direction of an induced e.m.f. opposes the change causing",
-          "links": [],
-          "detail": "Know that the direction of an induced e.m.f. opposes the change causing it",
+          "detail": "Simple a.c. generator (rotating coil or magnet); slip rings and brushes. e.m.f. vs. time graph; relating coil position to peaks, troughs and zeros.",
           "tier": "Supplement"
         },
         {
-          "name": "Relative directions of force",
+          "name": "Magnetic field of a current",
           "links": [],
-          "detail": "State and use the relative directions of force, field and induced current",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Simple form of a.c. generator",
-          "links": [],
-          "detail": "Describe a simple form of a.c. generator (rotating coil or rotating magnet) and the use of slip rings and brushes where needed",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Graphs of e.m.f. against time for simple a.c. generators",
-          "links": [],
-          "detail": "Sketch and interpret graphs of e.m.f. against time for simple a.c. generators and relate the position of the generator coil to the peaks, troughs and zeros of the e.m.f.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Qualitative variation of the strength of the magnetic field",
-          "links": [],
-          "detail": "State the qualitative variation of the strength of the magnetic field around straight wires and solenoids",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Effect on the magnetic field around straight wires and",
-          "links": [],
-          "detail": "Describe the effect on the magnetic field around straight wires and solenoids of changing the magnitude and direction of the current www.cambridgeinternational.org/igcse 32 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 4.5.4 Force on a current-carrying conductor",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experiment to show that a force acts on a",
-          "links": [],
-          "detail": "Describe an experiment to show that a force acts on a current-carrying conductor in a magnetic field, including the effect of reversing: (a) the current (b) the direction of the field 4.5.5 The d.c. motor",
+          "detail": "Pattern and direction of magnetic field around straight wires and solenoids. Experiments to map fields. Qualitative variation of field strength; effect of changing current direction/magnitude. Applications: relays and loudspeakers.",
           "tier": "Core"
         },
         {
-          "name": "Current-carrying coil in a magnetic field may experience a",
+          "name": "Force on a current-carrying conductor",
           "links": [],
-          "detail": "Know that a current-carrying coil in a magnetic field may experience a turning effect and that the turning effect is increased by increasing: (a) the number of turns on the coil (b) the current (c) the strength of the magnetic field 4.5.6 The transformer",
+          "detail": "Experiment showing force on a current in a magnetic field; effect of reversing current or field. Force on beams of charged particles in a magnetic field.",
           "tier": "Core"
         },
         {
-          "name": "Construction of a simple transformer with a soft-iron core",
+          "name": "The DC motor",
           "links": [],
-          "detail": "Describe the construction of a simple transformer with a soft-iron core, as used for voltage transformations",
+          "detail": "Current-carrying coil in a field experiences a turning effect, increased by more turns, larger current or stronger field. DC motor operation: split-ring commutator and brushes.",
+          "tier": "Supplement"
+        },
+        {
+          "name": "Transformers and voltage transformation",
+          "links": [],
+          "detail": "Construction: soft-iron core, primary and secondary coils. Step-up and step-down. Turns ratio equation: Vₚ/Vₛ = Nₚ/Nₛ. Transformer efficiency: VₚIₚ = VₛIₛ. P = I²R to explain why high voltage means lower power loss.",
           "tier": "Core"
         },
         {
-          "name": "Terms primary",
+          "name": "High-voltage electricity transmission",
           "links": [],
-          "detail": "Use the terms primary, secondary, step-up and step-down",
+          "detail": "Use of transformers in high-voltage transmission. Advantages: lower current reduces power loss in cables (P = I²R).",
           "tier": "Core"
-        },
-        {
-          "name": "Equation V N p p V N s s",
-          "links": [],
-          "detail": "Recall and use the equation V N p p V N s s where p and s refer to primary and secondary",
-          "tier": "Core"
-        },
-        {
-          "name": "Transformers in high- voltage transmission of electricity",
-          "links": [],
-          "detail": "Describe the use of transformers in high- voltage transmission of electricity",
-          "tier": "Core"
-        },
-        {
-          "name": "Advantages of high-voltage transmission Back to contents page Subject",
-          "links": [],
-          "detail": "State the advantages of high-voltage transmission Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Direction of the force on beams of charged particles",
-          "links": [],
-          "detail": "Determine the direction of the force on beams of charged particles in a magnetic field",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Operation of an electric motor",
-          "links": [],
-          "detail": "Describe the operation of an electric motor, including the action of a split-ring commutator and brushes",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Principle of operation of a simple iron-cored transformer",
-          "links": [],
-          "detail": "Explain the principle of operation of a simple iron-cored transformer",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation for 100% efficiency in a transformer I I",
-          "links": [],
-          "detail": "Recall and use the equation for 100% efficiency in a transformer I I V = V p p s s where p and s refer to primary and secondary",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation",
-          "links": [],
-          "detail": "Recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "P = I R to explain why power losses",
-          "links": [],
-          "detail": "P = I R to explain why power losses in cables are smaller when the voltage is greater www.cambridgeinternational.org/igcse 33 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
         }
       ]
     },
@@ -1882,69 +1000,39 @@
       ],
       "subtopics": [
         {
-          "name": "Structure of an atom",
+          "name": "Atomic structure",
           "links": [],
-          "detail": "Describe the structure of an atom in terms of a positively charged nucleus and negatively charged electrons in orbit around the nucleus",
+          "detail": "Atom: positively charged nucleus surrounded by orbiting electrons. Nucleus contains protons and neutrons.",
           "tier": "Core"
         },
         {
-          "name": "Atoms may form positive ions by losing electrons or",
+          "name": "Protons, neutrons and electrons",
           "links": [],
-          "detail": "Know how atoms may form positive ions by losing electrons or form negative ions by gaining electrons 5.1.2 The nucleus",
+          "detail": "Relative charges: proton +1, neutron 0, electron −1. Atoms form ions by gaining or losing electrons.",
           "tier": "Core"
         },
         {
-          "name": "Composition of the nucleus",
+          "name": "Proton number and nucleon number",
           "links": [],
-          "detail": "Describe the composition of the nucleus in terms of protons and neutrons",
+          "detail": "Proton (atomic) number Z; nucleon (mass) number A. Number of neutrons = A − Z. Nuclide notation ᴬZ X.",
           "tier": "Core"
         },
         {
-          "name": "Relative charges of protons",
+          "name": "Isotopes",
           "links": [],
-          "detail": "State the relative charges of protons, neutrons and electrons as +1, 0 and -1 respectively",
+          "detail": "Isotopes: atoms of the same element with the same proton number but different nucleon numbers.",
           "tier": "Core"
         },
         {
-          "name": "Terms proton number",
+          "name": "Alpha particle scattering",
           "links": [],
-          "detail": "Define the terms proton number (atomic number) Z and nucleon number (mass number) A and be able to calculate the number of neutrons in a nucleus",
-          "tier": "Core"
-        },
-        {
-          "name": "Nuclide notation X",
-          "links": [],
-          "detail": "Use the nuclide notation X",
-          "tier": "Core"
-        },
-        {
-          "name": "What is meant by an isotope and state that",
-          "links": [],
-          "detail": "Explain what is meant by an isotope and state that an element may have more than one isotope Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "The scattering of alpha",
-          "links": [],
-          "detail": "Describe how the scattering of alpha ( ) particles by a sheet of thin metal supports the nuclear model of the atom, by providing evidence for: (a) a very small nucleus surrounded by mostly empty space (b) a nucleus containing most of the mass of the atom (c) a nucleus that is positively charged",
+          "detail": "Scattering of α particles by a thin metal sheet provides evidence for a very small, dense, positively charged nucleus surrounded by mostly empty space.",
           "tier": "Supplement"
         },
         {
-          "name": "Processes of nuclear fission and nuclear fusion as the",
+          "name": "Nuclear fission and fusion",
           "links": [],
-          "detail": "Describe the processes of nuclear fission and nuclear fusion as the splitting or joining of nuclei, to include the nuclide equation and qualitative description of mass and energy changes without values",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Relationship between the proton number and the relative charge",
-          "links": [],
-          "detail": "Know the relationship between the proton number and the relative charge on a nucleus",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Relationship between the nucleon number and the relative mass",
-          "links": [],
-          "detail": "Know the relationship between the nucleon number and the relative mass of a nucleus www.cambridgeinternational.org/igcse 34 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
+          "detail": "Fission: splitting of a heavy nucleus into smaller nuclei, releasing energy. Fusion: joining of light nuclei, releasing energy. Nuclide equations; qualitative mass-energy changes.",
           "tier": "Supplement"
         }
       ]
@@ -1967,118 +1055,46 @@
       ],
       "subtopics": [
         {
-          "name": "What is meant by background radiation",
+          "name": "Background radiation",
           "links": [],
-          "detail": "Know what is meant by background radiation",
+          "detail": "Sources: radon gas, rocks and buildings, food and drink, cosmic rays. Measuring background and using it to correct count rates.",
           "tier": "Core"
         },
         {
-          "name": "Sources that make a significant contribution to background radiation",
+          "name": "Types of nuclear emission",
           "links": [],
-          "detail": "Know the sources that make a significant contribution to background radiation including: (a) radon gas (in the air) (b) rocks and buildings (c) food and drink (d) cosmic rays",
+          "detail": "Alpha (α), beta (β) and gamma (γ) radiation. Emission is spontaneous and random in direction.",
           "tier": "Core"
         },
         {
-          "name": "Ionising nuclear radiation can be measured using a detector",
+          "name": "Properties of radiation",
           "links": [],
-          "detail": "Know that ionising nuclear radiation can be measured using a detector connected to a counter",
-          "tier": "Core"
-        },
-        {
-          "name": "Count rate measured in counts / s or counts",
-          "links": [],
-          "detail": "Use count rate measured in counts / s or counts / minute 5.2.2 The three types of nuclear emission",
-          "tier": "Core"
-        },
-        {
-          "name": "Emission of radiation from a nucleus as spontaneous and",
-          "links": [],
-          "detail": "Describe the emission of radiation from a nucleus as spontaneous and random in direction α β γ",
-          "tier": "Core"
-        },
-        {
-          "name": "Measurements of background radiation to determine a corrected count",
-          "links": [],
-          "detail": "Use measurements of background radiation to determine a corrected count rate",
+          "detail": "Deflection of α, β and γ in electric and magnetic fields. Relative ionising effects (kinetic energy and charge).",
           "tier": "Supplement"
         },
         {
-          "name": "Deflection of -particles",
+          "name": "Radioactive decay",
           "links": [],
-          "detail": "Describe the deflection of -particles, β γ -particles and -radiation in electric fields and magnetic fields",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Their relative ionising effects with reference to",
-          "links": [],
-          "detail": "Explain their relative ionising effects with reference to: (a) kinetic energy (b) electric charge www.cambridgeinternational.org/igcse 35 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 5.2.3 Radioactive decay",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Radioactive decay is a change in an unstable nucleus",
-          "links": [],
-          "detail": "Know that radioactive decay is a change in an unstable nucleus that can result in the emission α β γ of -particles or -particles and/or -radiation and know that these changes are spontaneous and random α β",
+          "detail": "Decay is a spontaneous, random change in an unstable nucleus. α or β emission changes the element. Decay equations using nuclide notation.",
           "tier": "Core"
         },
         {
-          "name": "During -decay or -decay",
+          "name": "Half-life",
           "links": [],
-          "detail": "State that during -decay or -decay, the nucleus changes to that of a different element 5.2.4 Half-life",
+          "detail": "Half-life: time for half the nuclei of an isotope in any sample to decay. Simple calculations using tables or decay curves.",
           "tier": "Core"
         },
         {
-          "name": "Half-life of a particular isotope as the time taken",
+          "name": "Uses of radioactive isotopes",
           "links": [],
-          "detail": "Define the half-life of a particular isotope as the time taken for half the nuclei of that isotope in any sample to decay; recall and use this definition in simple calculations, which might involve information in tables or decay curves (calculations will not include background radiation) Back to contents page Subject content",
+          "detail": "Smoke alarms, food irradiation, equipment sterilisation, thickness gauging, cancer diagnosis and treatment. Choice of isotope depends on radiation type and half-life.",
+          "tier": "Supplement"
+        },
+        {
+          "name": "Radiation safety",
+          "links": [],
+          "detail": "Effects on living things: cell death, mutation, cancer. Safe handling, storage and transport of radioactive materials. Precautions: reduce exposure time, increase distance, use shielding.",
           "tier": "Core"
-        },
-        {
-          "name": "Isotopes of an element may be radioactive due to",
-          "links": [],
-          "detail": "Know that isotopes of an element may be radioactive due to an excess of neutrons in the nucleus and/or the nucleus being too heavy α β",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Effect of -decay",
-          "links": [],
-          "detail": "Describe the effect of -decay, -decay and -emissions on the nucleus, including an increase in stability and a reduction in the number of excess neutrons; the following change in the nucleus occurs during -emission neutron proton + electron",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Decay equations",
-          "links": [],
-          "detail": "Use decay equations, using nuclide notation, α β to show the emission of -particles, -particles and -radiation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Half-life from data or decay curves from which background",
-          "links": [],
-          "detail": "Calculate half-life from data or decay curves from which background radiation has not been subtracted",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The type of radiation emitted and the half-life of",
-          "links": [],
-          "detail": "Explain how the type of radiation emitted and the half-life of an isotope determine which isotope is used for applications including: (a) household fire (smoke) alarms (b) irradiating food to kill bacteria (c) sterilisation of equipment using gamma rays (d) measuring and controlling thicknesses of materials with the choice of radiations used linked to penetration and absorption (e) diagnosis and treatment of cancer using gamma rays www.cambridgeinternational.org/igcse 36 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 5.2.5 Safety precautions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Effects of ionising nuclear radiations on living things",
-          "links": [],
-          "detail": "State the effects of ionising nuclear radiations on living things, including cell death, mutations and cancer",
-          "tier": "Core"
-        },
-        {
-          "name": "Radioactive materials are moved",
-          "links": [],
-          "detail": "Describe how radioactive materials are moved, used and stored in a safe way",
-          "tier": "Core"
-        },
-        {
-          "name": "Safety precautions for all ionising radiation",
-          "links": [],
-          "detail": "Explain safety precautions for all ionising radiation in terms of reducing exposure time, increasing distance between source and living tissue and using shielding to absorb radiation",
-          "tier": "Supplement"
         }
       ]
     },
@@ -2098,87 +1114,39 @@
       ],
       "subtopics": [
         {
-          "name": "Earth is a planet that rotates on its axis",
+          "name": "Earth's rotation and day/night",
           "links": [],
-          "detail": "Know that the Earth is a planet that rotates on its axis, which is tilted, once in approximately 24 hours, and use this to explain observations of the apparent daily motion of the Sun and the periodic cycle of day and night",
+          "detail": "Earth rotates on its tilted axis approximately once every 24 hours, explaining apparent daily motion of the Sun and the cycle of day and night.",
           "tier": "Core"
         },
         {
-          "name": "Earth orbits the Sun once in approximately 365 days",
+          "name": "Earth's orbit and the seasons",
           "links": [],
-          "detail": "Know that the Earth orbits the Sun once in approximately 365 days and use this to explain the periodic nature of the seasons",
+          "detail": "Earth orbits the Sun in approximately 365 days; the tilt explains the periodic cycle of seasons.",
           "tier": "Core"
         },
         {
-          "name": "It takes approximately one month for the Moon to",
+          "name": "The Moon's orbit and phases",
           "links": [],
-          "detail": "Know that it takes approximately one month for the Moon to orbit the Earth and use this to explain the periodic nature of the Moon's cycle of phases Back to contents page Subject content",
+          "detail": "The Moon orbits Earth in approximately one month, explaining the periodic cycle of lunar phases.",
           "tier": "Core"
         },
         {
-          "name": "Average orbital speed from the equation",
+          "name": "The Solar System",
           "links": [],
-          "detail": "Define average orbital speed from the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "R v = where r is the average radius",
-          "links": [],
-          "detail": "r v = where r is the average radius of the orbit and T is the orbital period; recall and use this equation www.cambridgeinternational.org/igcse 37 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 6.1.2 The Solar System",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Solar System as containing",
-          "links": [],
-          "detail": "Describe the Solar System as containing: (a) one star, the Sun (b) the eight named planets and know their order from the Sun (c) minor planets that orbit the Sun, including dwarf planets such as Pluto and asteroids in the asteroid belt (d) moons, that orbit the planets (e) smaller Solar System bodies, including comets and natural satellites",
+          "detail": "The Solar System contains the Sun, eight named planets (and their order), dwarf planets, asteroids (asteroid belt), moons, comets and other natural satellites. Orbits are elliptical; the Sun is not at the centre of an ellipse.",
           "tier": "Core"
         },
         {
-          "name": "Planets",
+          "name": "Gravitational fields in the Solar System",
           "links": [],
-          "detail": "Know that planets, minor planets and comets have elliptical orbits, and recall that the Sun is not at the centre of the elliptical orbit, except when the orbit is approximately circular",
-          "tier": "Supplement"
-        },
-        {
-          "name": "And interpret planetary data about orbital distance",
-          "links": [],
-          "detail": "Analyse and interpret planetary data about orbital distance, orbital duration, density, surface temperature and uniform gravitational field strength at the planet's surface continued www.cambridgeinternational.org/igcse 38 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 6.1.2 The Solar System continued",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Strength of the gravitational field",
-          "links": [],
-          "detail": "Know that the strength of the gravitational field (a) at the surface of a planet depends on the mass of the planet (b) around a planet decreases as the distance from the planet increases",
+          "detail": "Sun contains most of the Solar System's mass; gravity keeps planets in orbit. Gravitational field strength at a planet's surface depends on its mass; field decreases with distance. Orbital speeds decrease with distance from the Sun. Objects in elliptical orbits travel faster when closer to the Sun (conservation of energy).",
           "tier": "Core"
         },
         {
-          "name": "Time it takes light to travel a significant distance",
+          "name": "Orbital speed and light travel time",
           "links": [],
-          "detail": "Calculate the time it takes light to travel a significant distance such as between objects in the Solar System",
-          "tier": "Core"
-        },
-        {
-          "name": "Sun contains most of the mass of the Solar",
-          "links": [],
-          "detail": "Know that the Sun contains most of the mass of the Solar System and this explains why the planets orbit the Sun",
-          "tier": "Core"
-        },
-        {
-          "name": "Force that keeps an object in orbit around the",
-          "links": [],
-          "detail": "Know that the force that keeps an object in orbit around the Sun is the gravitational attraction of the Sun",
-          "tier": "Core"
-        },
-        {
-          "name": "Strength of the Sun's gravitational field decreases and that",
-          "links": [],
-          "detail": "Know that the strength of the Sun's gravitational field decreases and that the orbital speeds of the planets decrease as the distance from the Sun increases",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Object in an elliptical orbit travels faster when closer",
-          "links": [],
-          "detail": "Know that an object in an elliptical orbit travels faster when closer to the Sun and explain this using the conservation of energy",
+          "detail": "Average orbital speed: v = 2πr/T. Calculating time for light to travel between Solar System objects.",
           "tier": "Supplement"
         }
       ]
@@ -2201,915 +1169,39 @@
       ],
       "subtopics": [
         {
-          "name": "Sun is a star of medium size",
+          "name": "The Sun as a star",
           "links": [],
-          "detail": "Know that the Sun is a star of medium size, consisting mostly of hydrogen and helium, and that it radiates most of its energy in the infrared, visible light and ultraviolet regions of the electromagnetic spectrum Back to contents page Subject content",
+          "detail": "The Sun is a medium-sized star, mostly hydrogen and helium, radiating most energy as infrared, visible and ultraviolet. Stars are powered by nuclear fusion (hydrogen → helium).",
           "tier": "Core"
-        },
-        {
-          "name": "Stars are powered by nuclear reactions that release energy",
-          "links": [],
-          "detail": "Know that stars are powered by nuclear reactions that release energy and that in stable stars the nuclear reactions involve the fusion of hydrogen into helium www.cambridgeinternational.org/igcse 39 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 6.2.2 Stars",
-          "tier": "Supplement"
-        },
-        {
-          "name": "One light-year is equal to 9.5 10 m",
-          "links": [],
-          "detail": "Know that one light-year is equal to 9.5 10 m",
-          "tier": "Supplement"
         },
         {
           "name": "Life cycle of a star",
           "links": [],
-          "detail": "Describe the life cycle of a star: (a) a star is formed from interstellar clouds of gas and dust that contain hydrogen (b) a protostar is an interstellar cloud collapsing and increasing in temperature as a result of its internal gravitational attraction (c) a protostar becomes a stable star when the inward force of gravitational attraction is balanced by an outward force due to the high temperature in the centre of the star (d) all stars eventually run out of hydrogen as fuel for the nuclear reaction (e) most stars expand to form red giants and more massive stars expand to form red supergiants when most of the hydrogen in the centre of the star has been converted to helium (f) a red giant from a less massive star forms a planetary nebula with a white dwarf star at its centre (g) a red supergiant explodes as a supernova, forming a nebula containing hydrogen and new heavier elements, leaving behind a neutron star or a black hole at its centre (h) the nebula from a supernova may form new stars with orbiting planets www.cambridgeinternational.org/igcse 40 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 6.2.3 The Universe",
+          "detail": "Interstellar cloud → protostar → stable star (gravity balanced by outward thermal pressure) → red giant or red supergiant → planetary nebula/white dwarf (less massive) or supernova/neutron star/black hole (more massive). Supernova nebulae may form new star systems.",
           "tier": "Supplement"
         },
         {
-          "name": "Milky Way is one of many billions of galaxies",
+          "name": "Scale of the Universe",
           "links": [],
-          "detail": "Know that the Milky Way is one of many billions of galaxies making up the Universe and that the diameter of the Milky Way is approximately 100 000 light-years",
+          "detail": "One light-year = 9.5 × 10¹⁵ m. The Milky Way is one of billions of galaxies; diameter ≈ 100 000 light-years.",
           "tier": "Core"
         },
         {
-          "name": "Redshift as an increase in the observed wavelength of",
+          "name": "Redshift and the expanding Universe",
           "links": [],
-          "detail": "Describe redshift as an increase in the observed wavelength of electromagnetic radiation emitted from receding stars and galaxies",
+          "detail": "Redshift: increase in observed wavelength from receding stars/galaxies. Light from distant galaxies is redshifted. This is evidence that the Universe is expanding and supports the Big Bang Theory.",
           "tier": "Core"
         },
         {
-          "name": "Light emitted from distant galaxies appears redshifted in comparison",
+          "name": "Cosmic microwave background radiation",
           "links": [],
-          "detail": "Know that the light emitted from distant galaxies appears redshifted in comparison with light emitted on the Earth",
-          "tier": "Core"
-        },
-        {
-          "name": "Redshift in the light from distant galaxies is evidence",
-          "links": [],
-          "detail": "Know that redshift in the light from distant galaxies is evidence that the Universe is expanding and supports the Big Bang Theory Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Microwave radiation of a specific frequency is observed at",
-          "links": [],
-          "detail": "Know that microwave radiation of a specific frequency is observed at all points in space around us and is known as cosmic microwave background radiation (CMBR)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The CMBR was produced shortly after the Universe was",
-          "links": [],
-          "detail": "Explain that the CMBR was produced shortly after the Universe was formed and that this radiation has been expanded into the microwave region of the electromagnetic spectrum as the Universe expanded",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Speed v at which a galaxy is moving away",
-          "links": [],
-          "detail": "Know that the speed v at which a galaxy is moving away from the Earth can be found from the change in wavelength of the galaxy's starlight due to redshift",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Distance d of a far galaxy can be determined",
-          "links": [],
-          "detail": "Know that the distance d of a far galaxy can be determined using the brightness of a supernova in that galaxy",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Hubble constant H as the ratio of",
-          "links": [],
-          "detail": "Define the Hubble constant H as the ratio of",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Speed at which the galaxy is moving away from",
-          "links": [],
-          "detail": "the speed at which the galaxy is moving away from the Earth to its distance from the Earth; recall and use the equation H =",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Current estimate for H is",
-          "links": [],
-          "detail": "Know that the current estimate for H is",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation d = 1 v H",
-          "links": [],
-          "detail": "Know that the equation d = 1 v H",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Represents an estimate for the age of the Universe",
-          "links": [],
-          "detail": "represents an estimate for the age of the Universe and that this is evidence for the idea that all the matter in the Universe was present at a single point www.cambridgeinternational.org/igcse 41 4 Details of the assessment All candidates take three papers. Candidates who have studied the Core subject content, or who are expected to achieve a grade D or below should be entered for Paper 1, Paper 3 and either Paper 5 or Paper 6. These candidates will be eligible for grades C to G. Candidates who have studied the Extended subject content (Core and Supplement), and who are expected to achieve a grade C or above should be entered for Paper 2, Paper 4 and either Paper 5 or Paper 6. These candidates will be eligible for grades A* to G. Core assessment Core candidates take the following papers. The questions are based on the Core subject content only. Paper 1: Multiple Choice (Core) 45 minutes 40 marks 40 compulsory multiple-choice items of the four- choice type. AND This paper tests assessment objectives AO1 and AO2 This paper assesses grades C to G Externally assessed Extended assessment Extended candidates take the following papers. The questions are based on the Core and Supplement subject content. Paper 2: Multiple Choice (Extended) 45 minutes 40 marks 40 compulsory multiple-choice items of the four- choice type AND This paper tests assessment objectives AO1 and AO2 This paper assesses grades A* to G Externally assessed Back to contents page Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Paper 3: Theory (Core) 1 hour 15 minutes 80 marks Compulsory short-answer and structured questions This paper tests assessment objectives AO1 and AO2 This paper assesses grades C to G Externally assessed Paper 4: Theory (Extended) 1 hour 15 minutes 80 marks Compulsory short-answer and structured questions This paper tests assessment objectives AO1 and AO2 This paper assesses grades A* to G Externally assessed www.cambridgeinternational.org/igcse 42 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Practical assessment All candidates take one practical paper from a choice of two. Paper 5: Practical Test 1 hour 15 minutes 40 marks All items are compulsory This paper tests assessment objective AO3 Candidates will be required to do experiments in a laboratory as part of this test Externally assessed Questions in the practical papers are structured to assess performance across the full grade range. The Practical Test and Alternative to Practical:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Require the same experimental skills to be developed and",
-          "links": [],
-          "detail": "require the same experimental skills to be developed and learned",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Require an understanding of the same experimental contexts",
-          "links": [],
-          "detail": "require an understanding of the same experimental contexts",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Test the same assessment objective",
-          "links": [],
-          "detail": "test the same assessment objective, AO3. Candidates are expected to be familiar with and may be asked questions using the following experimental contexts: measurement of physical quantities such as length, volume or force measurement of small distances or short intervals of time",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Determining a derived quantity",
-          "links": [],
-          "detail": "determining a derived quantity such as the extension per unit load for a spring, the value of a known resistance or the acceleration of an object",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Testing and identifying the relationship between two variables",
-          "links": [],
-          "detail": "testing and identifying the relationship between two variables such as between the potential difference across a wire and its length",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Comparing measured quantities",
-          "links": [],
-          "detail": "comparing measured quantities such as angles of reflection",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Comparing derived quantities",
-          "links": [],
-          "detail": "comparing derived quantities such as density cooling and heating, including measurement of temperature experiments using springs and balances",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Timing motion or oscillations",
-          "links": [],
-          "detail": "timing motion or oscillations",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Electric circuits",
-          "links": [],
-          "detail": "electric circuits, including the connection and reconnection of these circuits, and the measurement of current and potential difference",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Optics experiments using equipment",
-          "links": [],
-          "detail": "optics experiments using equipment such as optics pins, mirrors, prisms, lenses, glass or Perspex blocks (both rectangular and semicircular), including the use of transparent, translucent and opaque substances to investigate the transmission of light procedures using simple apparatus, in situations where the method may not be familiar to the candidate. Back to contents page Details of the assessment Paper 6: Alternative to Practical 1 hour 40 marks All items are compulsory This paper tests assessment objective AO3 Candidates will not be required to do experiments as part of this test Externally assessed www.cambridgeinternational.org/igcse 43 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Candidates may be required to do the following:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Knowledge of how to select and safely use techniques",
-          "links": [],
-          "detail": "demonstrate knowledge of how to select and safely use techniques, apparatus and materials (including following a sequence of instructions where appropriate):",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Apparatus from diagrams or descriptions",
-          "links": [],
-          "detail": "identify apparatus from diagrams or descriptions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Select the most appropriate apparatus or method for the",
-          "links": [],
-          "detail": "select the most appropriate apparatus or method for the task and justify the choice made",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Hazards and identify safety precautions",
-          "links": [],
-          "detail": "describe and explain hazards and identify safety precautions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Techniques used to ensure the accuracy of observations and",
-          "links": [],
-          "detail": "describe and explain techniques used to ensure the accuracy of observations and data",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Plan experiments and investigations",
-          "links": [],
-          "detail": "plan experiments and investigations:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Independent variable and dependent variable",
-          "links": [],
-          "detail": "identify the independent variable and dependent variable",
-          "tier": "Supplement"
-        },
-        {
-          "name": "And explain why variables should be controlled",
-          "links": [],
-          "detail": "describe how and explain why variables should be controlled",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Suggest an appropriate number and range of values for",
-          "links": [],
-          "detail": "suggest an appropriate number and range of values for the independent variable",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Suggest the most appropriate apparatus or technique and justify",
-          "links": [],
-          "detail": "suggest the most appropriate apparatus or technique and justify the choice made",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experimental procedures",
-          "links": [],
-          "detail": "describe experimental procedures",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Risks and suggest appropriate safety precautions",
-          "links": [],
-          "detail": "identify risks and suggest appropriate safety precautions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Record the results of an experiment",
-          "links": [],
-          "detail": "describe how to record the results of an experiment",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Process the results of an experiment to form a",
-          "links": [],
-          "detail": "describe how to process the results of an experiment to form a conclusion or to evaluate a prediction",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Make reasoned predictions of expected results",
-          "links": [],
-          "detail": "make reasoned predictions of expected results",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Make and record observations",
-          "links": [],
-          "detail": "make and record observations, measurements and estimates:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Take readings from apparatus",
-          "links": [],
-          "detail": "take readings from apparatus (analogue and digital) or from diagrams of apparatus",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Take readings with appropriate precision",
-          "links": [],
-          "detail": "take readings with appropriate precision, reading to the nearest half-scale division where required",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Correct for zero errors where required",
-          "links": [],
-          "detail": "correct for zero errors where required",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Make observations",
-          "links": [],
-          "detail": "make observations, measurements or estimates that are in agreement with expected results or values",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Take sufficient observations or measurements to be reliable",
-          "links": [],
-          "detail": "take sufficient observations or measurements to be reliable",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Repeat observations or measurements where appropriate",
-          "links": [],
-          "detail": "repeat observations or measurements where appropriate",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Record qualitative observations from tests",
-          "links": [],
-          "detail": "record qualitative observations from tests",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Record observations and measurements systematically",
-          "links": [],
-          "detail": "record observations and measurements systematically, for example in a suitable table, to an appropriate degree of precision and using appropriate units interpret and evaluate experimental observations and data:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Process data",
-          "links": [],
-          "detail": "process data, including for use in further calculations or for graph plotting, using a calculator as appropriate",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Present data graphically",
-          "links": [],
-          "detail": "present data graphically, including the use of best-fit lines where appropriate",
-          "tier": "Supplement"
-        },
-        {
-          "name": "And interpret observations and data",
-          "links": [],
-          "detail": "analyse and interpret observations and data, including data presented graphically",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Interpolation and extrapolation graphically to determine a gradient or",
-          "links": [],
-          "detail": "use interpolation and extrapolation graphically to determine a gradient or intercept",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Form conclusions justified by reference to observations and data",
-          "links": [],
-          "detail": "form conclusions justified by reference to observations and data and with appropriate explanation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Evaluate the quality of observations and data",
-          "links": [],
-          "detail": "evaluate the quality of observations and data, identifying any anomalous results and taking appropriate action",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Comment on and explain whether results are equal within",
-          "links": [],
-          "detail": "comment on and explain whether results are equal within the limits of experimental accuracy (assumed to be ± 10% at this level of study) Back to contents page Details of the assessment www.cambridgeinternational.org/igcse 44 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Evaluate methods and suggest possible improvements",
-          "links": [],
-          "detail": "evaluate methods and suggest possible improvements:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Evaluate experimental arrangements",
-          "links": [],
-          "detail": "evaluate experimental arrangements, methods and techniques, including the control of variables",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Sources of error",
-          "links": [],
-          "detail": "identify sources of error, including measurement error, random error and systematic error",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Possible causes of uncertainty in data or in a",
-          "links": [],
-          "detail": "identify possible causes of uncertainty in data or in a conclusion",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Suggest possible improvements to the apparatus",
-          "links": [],
-          "detail": "suggest possible improvements to the apparatus, experimental arrangements, methods or techniques Language of measurement The following definitions have been taken or adapted from the Association for Science Education (ASE). www.ase.org.uk The definitions in the table below should be used by teachers during the course to encourage students to use the terminology correctly and consistently. Candidates will not be required to recall the specific definition of these terms in the examinations. true value the value that would be obtained in an ideal measurement measurement error the difference between a measured value and the true value of a quantity accuracy a measurement result is described as accurate if it is close to the true value precision how close the measured values of a quantity are to each other repeatability a measurement is repeatable if the same or similar result is obtained when the measurement is repeated under the same conditions, using the same method, within the same experiment reproducibility a measurement is reproducible if the same or similar result is obtained when the measurement is made under either different conditions or by a different method or in a different experiment validity of experimental design an experiment is valid if the experiment tests what it says it will test. The experiment must be a fair test where only the independent variable and dependent variable may change, and controlled variables are kept constant range the maximum and minimum value of the independent or dependent variables anomaly an anomaly is a value in a set of results that appears to be outside the general pattern of the results, i.e. an extreme value that is either very high or very low in comparison to others independent variable independent variables are the variables that are changed in a scientific experiment by the scientist. Changing an independent variable may cause a change in the dependent variable dependent variable dependent variables are the variables that are observed or measured in a scientific experiment. Dependent variables may change based on changes made to the independent variables Back to contents page Details of the assessment The Language of Measurement (2010), a guide from www.cambridgeinternational.org/igcse 45 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Apparatus These lists give items that candidates should be familiar with using, whether they are taking the Practical Test or the Alternative to Practical. These items should be available for use in the Practical Test. These lists are not exhaustive and we may also require other items to be sourced for specific examinations. The Confidential Instructions we send before the Practical Test will give the detailed requirements for the examination. Every effort is made to minimise the cost to and resources required by centres. Experiments will be designed around basic apparatus and materials which should be available in most school laboratories or are easily obtainable. Appropriate safety equipment must be provided to students and should at least include eye protection. The following suggested equipment has been categorised, but equipment can be used in any topic. General",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Adhesive putty",
-          "links": [],
-          "detail": "adhesive putty (e.g. Patafix, Blu Tack ) adhesive tape (e.g. Sellotape ) card",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Dropping pipette",
-          "links": [],
-          "detail": "dropping pipette (2.5 cm ) or small plastic syringe (e.g. 5 cm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "S-hook",
-          "links": [],
-          "detail": "S-hook",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Scissors set square string",
-          "links": [],
-          "detail": "scissors set square string",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Thread",
-          "links": [],
-          "detail": "thread",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Top-pan",
-          "links": [],
-          "detail": "top-pan (electronic) balance to measure up to 500 g, with precision of at least 0.1 g",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Tracing paper",
-          "links": [],
-          "detail": "tracing paper",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Wooden board",
-          "links": [],
-          "detail": "wooden board, rigid, 150 cm 20 cm 1.5 cm Mechanics",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Expendable steel springs",
-          "links": [],
-          "detail": "expendable steel springs, with spring constant of approx. 0.25 N / cm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Force meter",
-          "links": [],
-          "detail": "force meter, with maximum reading or full scale deflection of between 1.0 N and 3.0 N",
-          "tier": "Supplement"
-        },
-        {
-          "name": "G-clamp",
-          "links": [],
-          "detail": "G-clamp",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Glass ball",
-          "links": [],
-          "detail": "glass ball (marble), ball bearing (approx. 10 mm in diameter) and table tennis ball half-metre ruler, graduated in mm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Masses",
-          "links": [],
-          "detail": "masses, 10 10 g, 10 100 g, including holders",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Metre ruler",
-          "links": [],
-          "detail": "metre ruler, graduated in mm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Modelling clay",
-          "links": [],
-          "detail": "modelling clay (e.g. Plasticine )",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Pendulum bob",
-          "links": [],
-          "detail": "pendulum bob",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Pivots",
-          "links": [],
-          "detail": "pivots (e.g. 15 cm nails, triangular wooden blocks) retort stand, boss and clamp stop-watch, reading to 0.1 s or better Back to contents page Details of the assessment",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Www.cambridgeinternational.org/igcse 46 Cambridge IGCSE Physics 0625 syllabus for 2026",
-          "links": [],
-          "detail": "www.cambridgeinternational.org/igcse 46 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Thermal physics",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Beakers",
-          "links": [],
-          "detail": "beakers, glass (borosilicate), 100 cm , 250 cm , 400 cm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Boiling tube",
-          "links": [],
-          "detail": "boiling tube, approx. 150 mm 25 mm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Measuring cylinders",
-          "links": [],
-          "detail": "measuring cylinders, constant diameter, 50 cm , 100 cm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Plastic or polystyrene cup",
-          "links": [],
-          "detail": "plastic or polystyrene cup, approx. 200 cm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Thermometer",
-          "links": [],
-          "detail": "thermometer, -10 °C to +110 °C, with 1 °C graduations Optics",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Converging lens",
-          "links": [],
-          "detail": "converging lens, spherical, +10D ( f = 10 cm) converging lens, spherical, +6.7D ( f = 15 cm) diverging lens, spherical, -6.7D ( f = -15 cm)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Lens holders",
-          "links": [],
-          "detail": "lens holders",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Glass or Perspex 60° prism",
-          "links": [],
-          "detail": "glass or Perspex 60° prism",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Glass or Perspex blocks",
-          "links": [],
-          "detail": "glass or Perspex blocks, rectangular and semicircular",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Optics pins",
-          "links": [],
-          "detail": "optics pins, minimum length 75 mm",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Plane mirror",
-          "links": [],
-          "detail": "plane mirror, approx. 75 mm 25 mm pin board",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Protractor Electricity Candidates or centres may need to join",
-          "links": [],
-          "detail": "protractor Electricity Candidates or centres may need to join components, meters and cells together to make circuits. Connectors used will be 3.5 mm or 4 mm in diameter. ammeter, with full-scale deflection 1 A or 1.5 A and precision of at least 0.05 A (analogue, dedicated digital or multimeter) voltmeter, with full-scale deflection 5 V and precision of at least 0.1 V (analogue, dedicated digital or multimeter) cells, 1.5 V and holders to enable several cells to be joined",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Connecting leads",
-          "links": [],
-          "detail": "connecting leads, 3.5 mm or 4 mm connectors",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Crocodile clips",
-          "links": [],
-          "detail": "crocodile clips",
-          "tier": "Supplement"
-        },
-        {
-          "name": "D.c. power supply",
-          "links": [],
-          "detail": "d.c. power supply, variable to 12 V diodes filament lamps, low voltage (e.g. 2.5 V) and holders",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Filament lamp",
-          "links": [],
-          "detail": "filament lamp, 12 V, 24 W and holder",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Push switch",
-          "links": [],
-          "detail": "push switch",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Selection of resistors",
-          "links": [],
-          "detail": "selection of resistors, values within range 5-50 , power rating of 1-2 W thermistors (NTC only) wire, constantan (eureka), 0.38 mm diameter (28 swg), 0.32 mm diameter (30 swg) wire, nichrome, 0.38 mm diameter (28 swg), 0.32 mm diameter (30 swg) Back to contents page Details of the assessment",
-          "tier": "Supplement"
-        },
-        {
-          "name": "2 area A m",
-          "links": [],
-          "detail": "2 area A m , cm",
-          "tier": "Core"
-        },
-        {
-          "name": "3 3 volume V m",
-          "links": [],
-          "detail": "3 3 volume V m , cm , dm weight W N mass m, M kg, g time t h, min, s",
-          "tier": "Core"
-        },
-        {
-          "name": "3 density ρ g / cm",
-          "links": [],
-          "detail": "3 density ρ g / cm , kg / m speed u , v km / h, m / s, cm / s",
-          "tier": "Core"
-        },
-        {
-          "name": "Acceleration a m / s",
-          "links": [],
-          "detail": "acceleration a m / s",
-          "tier": "Core"
-        },
-        {
-          "name": "Acceleration of g m / s free fall force",
-          "links": [],
-          "detail": "acceleration of g m / s free fall force F N gravitational field g N / kg strength moment of a force N m work done W J, kJ, MJ energy E J, kJ, MJ, kW h power P W, kW, MW",
-          "tier": "Core"
-        },
-        {
-          "name": "2 pressure p N / m",
-          "links": [],
-          "detail": "2 pressure p N / m , N / cm temperature °C, K , T Back to contents page Details of the assessment micro, n nano Quantity Usual Usual unit symbol mass m, M mg time t ms, s spring constant k N / m, N / cm momentum p kg m / s impulse N s pressure p Pa www.cambridgeinternational.org/igcse 50 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Quantity Usual Usual unit symbol frequency f Hz, kHz wavelength m, cm focal length f m, cm angle of incidence i degree (°) angle of reflection r degree (°) angle of refraction r degree (°) critical angle c degree (°) potential difference/ V V, mV, kV voltage current I A, mA e.m.f. E V resistance R counts / s, count rate counts / min s, min, h, days, half-life weeks, years Back to contents page Details of the assessment Quantity Usual Usual unit symbol specific heat c J / (g °C), J / (kg °C) capacity wavelength nm refractive index n charge Q C Hubble constant H s",
-          "tier": "Core"
-        },
-        {
-          "name": "Www.cambridgeinternational.org/igcse 51 Cambridge IGCSE Physics 0625 syllabus for 2026",
-          "links": [],
-          "detail": "www.cambridgeinternational.org/igcse 51 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Mathematical requirements It is expected that these requirements will be covered as part of a mathematics curriculum at this level of study. Calculators may be used in all parts of the examination. Numerical answers should be written as decimals (or percentages if appropriate). Number",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Symbols",
-          "links": [],
-          "detail": "understand and use the symbols: =, <, >",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Meaning of sum",
-          "links": [],
-          "detail": "understand the meaning of sum, difference and product",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Standard form",
-          "links": [],
-          "detail": "use standard form (scientific notation)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Only the final answer in a calculation should be",
-          "links": [],
-          "detail": "understand that only the final answer in a calculation should be rounded use decimal places and significant figures appropriately make approximations and estimates to obtain reasonable answers Algebra",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Positive",
-          "links": [],
-          "detail": "use positive, whole number indices in algebraic expressions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Substitute values of quantities into equations",
-          "links": [],
-          "detail": "substitute values of quantities into equations, using consistent units solve simple algebraic equations for any one term when the other terms are known recognise and use direct and inverse proportion",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Set up simple algebraic equations as mathematical models of",
-          "links": [],
-          "detail": "set up simple algebraic equations as mathematical models of physical situations and to represent information given in words",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Use (delta) in algebraic expressions and equations to repres",
-          "links": [],
-          "detail": "use (delta) in algebraic expressions and equations to represent changes in a variable Geometry and trigonometry understand the meaning of angle, curve, circle, radius, diameter, circumference, square, parallelogram, rectangle and diagonal recall and use the equation for the circumference of a circle",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equations for the area of a rectangle",
-          "links": [],
-          "detail": "recall and use the equations for the area of a rectangle, area of a triangle and area of a circle",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equations for the volume of a rectangular block and",
-          "links": [],
-          "detail": "recall and use the equations for the volume of a rectangular block and volume of a cylinder",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Scale diagrams",
-          "links": [],
-          "detail": "use scale diagrams",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Pythagoras' theorem to the calculation of a side of",
-          "links": [],
-          "detail": "apply Pythagoras' theorem to the calculation of a side of a right-angled triangle understand that a right angle is 90° and that the sum of the angles on a straight line is 180° use trigonometric functions (sine, cosine, tangent and their inverses)*",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Mathematical instruments",
-          "links": [],
-          "detail": "use mathematical instruments (ruler, compasses, protractor, set square)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Recognise and use the points of the compass",
-          "links": [],
-          "detail": "recognise and use the points of the compass (N, S, E, W) and clockwise and anticlockwise directions",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Convert between metric units",
-          "links": [],
-          "detail": "convert between metric units, e.g. cm and m ; mg, g and kg * Extended candidates only Back to contents page Details of the assessment www.cambridgeinternational.org/igcse 52 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Graphs, charts and statistics",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Graphs and charts from data",
-          "links": [],
-          "detail": "draw graphs and charts from data",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Graphs and charts",
-          "links": [],
-          "detail": "interpret graphs and charts, including interpolation and extrapolation of data determine the gradient (slope) of a line on a graph, including* by drawing a tangent to a curved line determine the intercept of the line on a graph, extending the line graphically (extrapolating) where appropriate",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Select suitable scales and axes for graphs",
-          "links": [],
-          "detail": "select suitable scales and axes for graphs",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Y = mx + c represents a linear relationship",
-          "links": [],
-          "detail": "understand that y = mx + c represents a linear relationship",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Recognise direct proportionality from a graph",
-          "links": [],
-          "detail": "recognise direct proportionality from a graph",
-          "tier": "Supplement"
-        },
-        {
-          "name": "And use the average",
-          "links": [],
-          "detail": "calculate and use the average (mean) for a set of data * Extended candidates only Presentation of data Taking readings",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Data values should be read from an instrument to",
-          "links": [],
-          "detail": "Data values should be read from an instrument to an accuracy of one half of one of the smallest divisions on the scale.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Interpolation between scale divisions should be to an accuracy",
-          "links": [],
-          "detail": "Interpolation between scale divisions should be to an accuracy of one half of a division. That is, where a reading lies between two scale marks, it should be interpolated to the nearest half division. Recording readings Data should be recorded so as to reflect the precision of the measuring instrument, i.e. the smallest difference that can reliably be detected on the measuring instrument scale should be reflected by the number of decimal places and unit given in the measurement. A measurement or calculated quantity must be accompanied by a correct unit, where appropriate.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Each column of a table should be headed with",
-          "links": [],
-          "detail": "Each column of a table should be headed with the name or symbol of the measured or calculated quantity and the appropriate unit, e.g. time / s. The solidus (/) is to be used for separating the quantity and the unit in tables, graphs and charts.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Units should not be included with data in the",
-          "links": [],
-          "detail": "Units should not be included with data in the body of a table.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Each reading should be repeated",
-          "links": [],
-          "detail": "Each reading should be repeated, where appropriate, and recorded. The number of significant figures given for measured quantities should be appropriate to the measuring instrument used. The number of significant figures given for calculated quantities should be the same as the least number of significant figures in the raw data used in that specific calculation.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Ratio should be expressed as x",
-          "links": [],
-          "detail": "A ratio should be expressed as x : y . Drawing and analysing graphs",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Column headings of a table can be directly transferred",
-          "links": [],
-          "detail": "The column headings of a table can be directly transferred to the axes of a constructed graph. A graph should be drawn with a sharp pencil. The axes should be labelled with the name or symbol of the measured or calculated quantity and the appropriate unit, e.g. time / s. Back to contents page Details of the assessment www.cambridgeinternational.org/igcse 53 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Unless instructed otherwise, the scales for the axes should allow more than half of the graph grid to be used in both directions, and be based on sensible ratios, e.g. 2 cm on the graph grid representing 1, 2 or 5 units of the variable (or 10, 20 or 50, etc.)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Points on the graph should be clearly marked as",
-          "links": [],
-          "detail": "Points on the graph should be clearly marked as plus signs (+), crosses ( appropriate size.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Each data point should be plotted to an accuracy",
-          "links": [],
-          "detail": "Each data point should be plotted to an accuracy of one half of one of the smallest squares on the grid.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Best-fit line",
-          "links": [],
-          "detail": "A best-fit line (trend line) should be a single, thin, smooth, straight line or curve, drawn by inspection. The line does not need to coincide exactly with any of the points; where there is scatter evident in the data, examiners would expect a roughly even distribution of points either side of the line over its entire length. Points that are clearly anomalous and identified by the candidate should be ignored when drawing the best- fit line. Candidates should be able to take readings from the graph by extrapolation or interpolation. Data values should be read from a line on a graph to an accuracy of one half of one of the smallest squares on the grid. The same accuracy should be used in reading off an intercept.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Gradient of a straight line should be taken using",
-          "links": [],
-          "detail": "The gradient of a straight line should be taken using a triangle whose hypotenuse extends over at least half the length of the candidate's best-fit line, and this triangle should be marked on the graph.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Calculation of the gradient should be to two or",
-          "links": [],
-          "detail": "Calculation of the gradient should be to two or three significant figures.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "The gradient or intercept of a graph is used",
-          "links": [],
-          "detail": "When the gradient or intercept of a graph is used in subsequent calculations, it will be assumed to have units consistent with the graph axes. Conventions (e.g. signs, symbols, terminology and nomenclature) Candidates are expected to be familiar with the nomenclature used in the syllabus. The syllabus and question papers conform with accepted international practice. In particular, the following document, produced by the Association for Science Education (ASE), should be used as a guideline. Signs, Symbols and Systematics: The ASE Companion to 16-19 Science Decimal markers In accordance with current ASE convention, decimal markers in examination papers will be a single dot on the line. Candidates are expected to follow this convention in their answers. Numbers Numbers from 1000 to 9999 will be printed without commas or spaces. Numbers greater than or equal to 10 000 will be printed without commas. A space will be left between each group of three digits, e.g. 4 256 789. Units To avoid any confusion concerning the symbol for litre, the equivalent quantity, the cubic decimetre (dm used in place of l or litre. In practical work, candidates will be expected to use SI units or, where appropriate, units approved by the BIPM for use with the SI (e.g. minute). A list of SI units and units approved for use with the SI may be found in the SI brochure at www.bipm.org . The use of imperial/customary units such as the inch and degree Fahrenheit are not acceptable and should be discouraged. In all examinations, where data is supplied for use in questions, candidates will be expected to use units that are consistent with the units supplied and should not attempt conversion to other systems of units unless this is a requirement of the question. Back to contents page Details of the assessment",
-          "tier": "Supplement"
-        },
-        {
-          "name": ") or encircled dots",
-          "links": [],
-          "detail": ") or encircled dots ( ) of (2000).",
-          "tier": "Supplement"
-        },
-        {
-          "name": ") will be www.cambridgeinternational.org/igcse 54 Cambridge IGCSE Physics 0625",
-          "links": [],
-          "detail": ") will be www.cambridgeinternational.org/igcse 54 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Command words Command words and their meanings help candidates know what is expected from them in the exams. The table below includes command words used in the assessment for this syllabus. The use of the command word will relate to the subject context. Command word What it means Calculate work out from given facts, figures or information Comment give an informed opinion Compare identify/comment on similarities and/or differences Deduce conclude from available information Define give precise meaning Describe state the points of a topic / give characteristics and main features Determine establish an answer using the information available Explain set out purposes or reasons / make the relationships between things clear / say why and/or how and support with relevant evidence Give produce an answer from a given source or recall/memory Identify name/select/recognise Justify support a case with evidence/argument Predict suggest what may happen based on available information Sketch make a simple freehand drawing showing the key features, taking care over proportions State express in clear terms Suggest apply knowledge and understanding to situations where there are a range of valid responses in order to make proposals / put forward considerations Back to contents page Details of the assessment www.cambridgeinternational.org/igcse 55 5 What else you need to know This section is an overview of other information you need to know about this syllabus. It will help to share the administrative information with your exams officer so they know when you will need their support. Find more information about our administrative processes at www.cambridgeinternational.org/eoguide Before you start Previous study We recommend that learners starting this course should have studied a broad curriculum such as the Cambridge Lower Secondary programme or equivalent national educational framework. Guided learning hours We design Cambridge IGCSE syllabuses to require about 130 guided learning hours for each subject. This is for guidance only. The number of hours a learner needs to achieve the qualification may vary according to each school and the learners' previous experience of the subject. Availability and timetables All Cambridge schools are allocated to one of six administrative zones. Each zone has a specific timetable. Find your administrative zone at www.cambridgeinternational.org/adminzone You can view the timetable for your administrative zone at You can enter candidates in the June and November exam series. If your school is in India, you can also enter your candidates in the March exam series. Check you are using the syllabus for the year the candidate is taking the exam. Private candidates can enter for this syllabus. For more information, please refer to the Making Entries . Combining with other syllabuses Candidates can take this syllabus alongside other Cambridge International syllabuses in a single exam series. The only exceptions are: Cambridge O Level Physics (5054) Cambridge IGCSE (9-1) Physics (0972)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Cambridge IGCSE Physical Science",
-          "links": [],
-          "detail": "Cambridge IGCSE Physical Science (0652)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Cambridge IGCSE Combined Science",
-          "links": [],
-          "detail": "Cambridge IGCSE Combined Science (0653)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Cambridge IGCSE Co-ordinated Sciences",
-          "links": [],
-          "detail": "Cambridge IGCSE Co-ordinated Sciences (Double Award) (0654)",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Cambridge IGCSE",
-          "links": [],
-          "detail": "Cambridge IGCSE (9-1) Co-ordinated Sciences (Double Award) (0973) Cambridge O Level Combined Science (5129) syllabuses with the same title at the same level. Cambridge IGCSE, Cambridge IGCSE (9-1) and Cambridge O Level syllabuses are at the same level. Back to contents page Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. www.cambridgeinternational.org/timetables Cambridge Guide to www.cambridgeinternational.org/igcse 56 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Group awards: Cambridge ICE Cambridge ICE (International Certificate of Education) is a group award for Cambridge IGCSE. It encourages schools to offer a broad and balanced curriculum by recognising the achievements of learners who pass exams in a range of different subjects. Learn more about Cambridge ICE at www.cambridgeinternational.org/cambridgeice Making entries Exams officers are responsible for submitting entries to Cambridge International. We encourage them to work closely with you to make sure they enter the right number of candidates for the right combination of syllabus components. Entry option codes and instructions for submitting entries are in the Entries . Your exams officer has access to this guide. Exam administration To keep our exams secure, we produce question papers for different areas of the world, known as administrative zones. We allocate all Cambridge schools to an administrative zone determined by their location. Each zone has a specific timetable. Some of our syllabuses offer candidates different assessment options. An entry option code is used to identify the components the candidate will take relevant to the administrative zone and the available assessment options. Support for exams officers We know how important exams officers are to the successful running of exams. We provide them with the support they need to make entries on time. Your exams officer will find this support, and guidance for all other phases of the Cambridge Exams Cycle, at www.cambridgeinternational.org/eoguide Retakes Candidates can retake the whole qualification as many times as they want to. Information on retake entries is at www.cambridgeinternational.org/retakes Language This syllabus and the related assessment materials are available in English only. Accessibility and equality Syllabus and assessment design At Cambridge International, we work to avoid direct or indirect discrimination in our syllabuses and assessment materials. We aim to maximise inclusivity for candidates of all national, cultural or social backgrounds and candidates with protected characteristics, which include special educational needs and disability, religion and belief, and characteristics related to gender and identity. We also aim to make our materials as accessible as possible by using accessible language and applying accessible design principles. This gives all candidates the fairest possible opportunity to demonstrate their knowledge, skills and understanding and helps to minimise the requirement to make reasonable adjustments during the assessment process. Back to contents page What else you need to know Cambridge Guide to Making www.cambridgeinternational.org/igcse 57 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Access arrangements Access arrangements (including modified papers) are the principal way in which Cambridge International complies with our duty, as guided by the UK Equality Act (2010), to make ‘reasonable adjustments' for candidates with special educational needs (SEN), disability, illness or injury. Where a candidate would otherwise be at a substantial disadvantage in comparison to a candidate with no SEN, disability, illness or injury, we may be able to agree pre-examination access arrangements. These arrangements help a candidate by minimising accessibility barriers and maximising their opportunity to demonstrate their knowledge, skills and understanding in an assessment. Important: Requested access arrangements should be based on evidence of the candidate's barrier to assessment and should also reflect their normal way of working at school. This is explained in the www.cambridgeinternational.org/eoguide",
-          "tier": "Supplement"
-        },
-        {
-          "name": "For Cambridge International to approve an access arrangement",
-          "links": [],
-          "detail": "For Cambridge International to approve an access arrangement, we will need to agree that it constitutes a reasonable adjustment, involves reasonable cost and timeframe and does not affect the security and integrity of the assessment.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Availability of access arrangements should be checked by centres",
-          "links": [],
-          "detail": "Availability of access arrangements should be checked by centres at the start of the course. Details of our standard access arrangements and modified question papers are available in www.cambridgeinternational.org/eoguide",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Please contact us at the start of the course",
-          "links": [],
-          "detail": "Please contact us at the start of the course to find out if we are able to approve an arrangement that is not included in the list of standard access arrangements.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Candidates who cannot access parts of the assessment may",
-          "links": [],
-          "detail": "Candidates who cannot access parts of the assessment may be able to receive an award based on the parts they have completed. After the exam Grading and reporting Grades A*, A, B, C, D, E, F or G indicate the standard a candidate achieved at Cambridge IGCSE. A* is the highest and G is the lowest. ‘Ungraded' means that the candidate's performance did not meet the standard required for grade G. ‘Ungraded' is reported on the statement of results but not on the certificate. In specific circumstances your candidates may see one of the following letters on their statement of results:",
-          "tier": "Supplement"
-        },
-        {
-          "name": "To measure learning and achievement The assessment confirms achievement",
-          "links": [],
-          "detail": "to measure learning and achievement The assessment confirms achievement and performance in relation to the knowledge, understanding and skills specified in the syllabus.",
+          "detail": "CMBR: microwave radiation observed at all points in space, produced shortly after the Big Bang and stretched into the microwave region as the Universe expanded. Further evidence for the Big Bang.",
           "tier": "Supplement"
         },
         {
-          "name": "To show likely future success The outcomes help predict",
+          "name": "The Hubble constant and age of the Universe",
           "links": [],
-          "detail": "to show likely future success The outcomes help predict which students are well prepared for a particular course or career and/or which students are more likely to be successful. The outcomes help students choose the most suitable course or career. Back to contents page What else you need to know www.cambridgeinternational.org/igcse 59 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. Changes to this syllabus for 2026, 2027 and 2028 The syllabus has been updated. This is version 2, published December 2025. You must read the whole syllabus before planning your teaching programme. syllabuses regularly to make sure they continue to meet the needs of our schools. In updating this syllabus, we have made it easier for teachers and students to understand, keeping the familiar features that teachers and schools value. There are no significant changes which affect teaching. Changes to version 2 of the syllabus, published December 2025 Other changes The weblink on page 56 has been updated. Any textbooks endorsed to support the syllabus for examination from 2023 use with this syllabus. You should take account of the changes described above when using these textbooks. Back to contents page What else you need to know We review our are still suitable for www.cambridgeinternational.org/igcse 60 School feedback: ‘While studying Cambridge IGCSE and Cambridge International A Levels, students broaden their horizons through a global perspective and develop a lasting passion for learning.' Feedback from: Zhai Xiaoning, Deputy Principal, The High School Affiliated to Renmin University of China We are committed to making our documents accessible in accordance with the WCAG 2.1 Standard. We are always looking to improve the accessibility of our documents. If you find any problems or you think we are not meeting accessibility requirements, contact us at info@cambridgeinternational.org with the subject heading: Digital accessibility. If you need this document in a different format, contact us and supply your name, email address and requirements and we will respond within 15 working days. Cambridge Assessment International Education, The Triangle Building, Shaftesbury Road, Cambridge, CB2 8EA, United Kingdom t : +44 (0)1223 553554 email : info@cambridgeinternational.org © Cambridge University Press & Assessment September 2023 www.cambridgeinternational.org",
+          "detail": "Speed v of a galaxy found from its redshift. Distance d found from supernova brightness. Hubble constant H = v/d. 1/H estimates the age of the Universe — evidence that all matter was once at a single point.",
           "tier": "Supplement"
         }
       ]
@@ -3138,154 +1230,46 @@
       "note": "Old 0625 syllabus topic (dropped from 2026-2028 syllabus). Present in 2020-2024 papers.",
       "subtopics": [
         {
-          "name": "Conductor moving across a magnetic field or a changing",
+          "name": "Analogue and digital signals",
           "links": [],
-          "detail": "Know that a conductor moving across a magnetic field or a changing magnetic field linking with a conductor can induce an e.m.f. in the conductor",
+          "detail": "Difference between analogue and digital signals. Sound can be transmitted as either. Benefits of digital: higher data rate, greater range.",
           "tier": "Core"
         },
         {
-          "name": "Experiment to demonstrate electromagnetic induction",
+          "name": "Logic gates: AND, OR, NOT",
           "links": [],
-          "detail": "Describe an experiment to demonstrate electromagnetic induction",
+          "detail": "Action of AND, OR and NOT gates; constructing truth tables for each.",
           "tier": "Core"
         },
         {
-          "name": "Factors affecting the magnitude of an induced e.m.f. 4.5.2",
+          "name": "NAND and NOR gates",
           "links": [],
-          "detail": "State the factors affecting the magnitude of an induced e.m.f. 4.5.2 The a.c. generator 4.5.3 Magnetic effect of a current",
-          "tier": "Core"
-        },
-        {
-          "name": "Pattern and direction of the magnetic field due to",
-          "links": [],
-          "detail": "Describe the pattern and direction of the magnetic field due to currents in straight wires and in solenoids",
-          "tier": "Core"
-        },
-        {
-          "name": "Experiment to identify the pattern of the magnetic field",
-          "links": [],
-          "detail": "Describe an experiment to identify the pattern of the magnetic field (including direction) due to currents in straight wires and in solenoids",
-          "tier": "Core"
-        },
-        {
-          "name": "The magnetic effect of a current is used in",
-          "links": [],
-          "detail": "Describe how the magnetic effect of a current is used in relays and loudspeakers and give examples of their application Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Direction of an induced e.m.f. opposes the change causing",
-          "links": [],
-          "detail": "Know that the direction of an induced e.m.f. opposes the change causing it",
+          "detail": "Action of NAND and NOR gates; truth tables.",
           "tier": "Supplement"
         },
         {
-          "name": "Relative directions of force",
+          "name": "Combining logic gates",
           "links": [],
-          "detail": "State and use the relative directions of force, field and induced current",
+          "detail": "Producing truth tables for combinations of logic gates.",
           "tier": "Supplement"
         },
         {
-          "name": "Simple form of a.c. generator",
+          "name": "Transistor as a switch",
           "links": [],
-          "detail": "Describe a simple form of a.c. generator (rotating coil or rotating magnet) and the use of slip rings and brushes where needed",
+          "detail": "NPN transistor as a switch. Drawing and interpreting transistor switching circuits.",
           "tier": "Supplement"
         },
         {
-          "name": "Graphs of e.m.f. against time for simple a.c. generators",
+          "name": "Input sensors",
           "links": [],
-          "detail": "Sketch and interpret graphs of e.m.f. against time for simple a.c. generators and relate the position of the generator coil to the peaks, troughs and zeros of the e.m.f.",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Qualitative variation of the strength of the magnetic field",
-          "links": [],
-          "detail": "State the qualitative variation of the strength of the magnetic field around straight wires and solenoids",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Effect on the magnetic field around straight wires and",
-          "links": [],
-          "detail": "Describe the effect on the magnetic field around straight wires and solenoids of changing the magnitude and direction of the current www.cambridgeinternational.org/igcse 32 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028. 4.5.4 Force on a current-carrying conductor",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Experiment to show that a force acts on a",
-          "links": [],
-          "detail": "Describe an experiment to show that a force acts on a current-carrying conductor in a magnetic field, including the effect of reversing: (a) the current (b) the direction of the field 4.5.5 The d.c. motor",
+          "detail": "Light-dependent resistor (LDR) as a light sensor; thermistor (NTC) as a temperature sensor in electronic circuits.",
           "tier": "Core"
         },
         {
-          "name": "Current-carrying coil in a magnetic field may experience a",
+          "name": "Output devices",
           "links": [],
-          "detail": "Know that a current-carrying coil in a magnetic field may experience a turning effect and that the turning effect is increased by increasing: (a) the number of turns on the coil (b) the current (c) the strength of the magnetic field 4.5.6 The transformer",
+          "detail": "Output devices include LEDs, buzzers, relays and electric motors.",
           "tier": "Core"
-        },
-        {
-          "name": "Construction of a simple transformer with a soft-iron core",
-          "links": [],
-          "detail": "Describe the construction of a simple transformer with a soft-iron core, as used for voltage transformations",
-          "tier": "Core"
-        },
-        {
-          "name": "Terms primary",
-          "links": [],
-          "detail": "Use the terms primary, secondary, step-up and step-down",
-          "tier": "Core"
-        },
-        {
-          "name": "Equation V N p p V N s s",
-          "links": [],
-          "detail": "Recall and use the equation V N p p V N s s where p and s refer to primary and secondary",
-          "tier": "Core"
-        },
-        {
-          "name": "Transformers in high- voltage transmission of electricity",
-          "links": [],
-          "detail": "Describe the use of transformers in high- voltage transmission of electricity",
-          "tier": "Core"
-        },
-        {
-          "name": "Advantages of high-voltage transmission Back to contents page Subject",
-          "links": [],
-          "detail": "State the advantages of high-voltage transmission Back to contents page Subject content",
-          "tier": "Core"
-        },
-        {
-          "name": "Direction of the force on beams of charged particles",
-          "links": [],
-          "detail": "Determine the direction of the force on beams of charged particles in a magnetic field",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Operation of an electric motor",
-          "links": [],
-          "detail": "Describe the operation of an electric motor, including the action of a split-ring commutator and brushes",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Principle of operation of a simple iron-cored transformer",
-          "links": [],
-          "detail": "Explain the principle of operation of a simple iron-cored transformer",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation for 100% efficiency in a transformer I I",
-          "links": [],
-          "detail": "Recall and use the equation for 100% efficiency in a transformer I I V = V p p s s where p and s refer to primary and secondary",
-          "tier": "Supplement"
-        },
-        {
-          "name": "Equation",
-          "links": [],
-          "detail": "Recall and use the equation",
-          "tier": "Supplement"
-        },
-        {
-          "name": "P = I R to explain why power losses",
-          "links": [],
-          "detail": "P = I R to explain why power losses in cables are smaller when the voltage is greater www.cambridgeinternational.org/igcse 33 Cambridge IGCSE Physics 0625 syllabus for 2026, 2027 and 2028.",
-          "tier": "Supplement"
         }
       ]
     }
