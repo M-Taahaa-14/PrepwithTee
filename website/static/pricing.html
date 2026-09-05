@@ -268,6 +268,13 @@
     /* Multi-hint: white on dark recommended card, grey on light dark card */
     .pr-multi-hint { font-size:.72rem; color:var(--grey); margin:2px 0 10px; }
     .pr-recommended .pr-multi-hint { color:rgba(255,255,255,.45); }
+    /* Selection state — "todo" while the plan's subject quota is unmet.
+       Scoped to .pr-card so these outrank the per-card colour rules
+       (.pr-amber .pr-multi-hint etc.) that come further down. */
+    .pr-card .pr-multi-hint.is-todo  { color:#b07d14; font-weight:700; }
+    .pr-card .pr-multi-hint.is-ready { color:#15803d; font-weight:700; }
+    .pr-card.pr-recommended .pr-multi-hint.is-todo  { color:#c9a227; }
+    .pr-card.pr-recommended .pr-multi-hint.is-ready { color:#6ee7a0; }
 
     /* AMBER card (SOLO) overrides */
     .pr-amber .pr-plan-name  { color:#92610a; }
@@ -361,6 +368,13 @@
       background:#fff; color:#1a2340; border:none;
     }
     .pr-cta-white:hover { background:#f0f0f0; }
+
+    /* Locked CTA — the plan's subjects haven't been chosen yet. The hint
+       directly above the button says what is still missing. */
+    .pr-cta:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+    .pr-cta-gold:disabled:hover   { background:#c9a227; }
+    .pr-cta-navy:disabled:hover   { background:var(--purple,#1a2340); }
+    .pr-cta-purple:disabled:hover { background:#7c3aed; }
 
     /* Enterprise view */
     .pr-enterprise {
@@ -776,6 +790,12 @@
       padding:6px 8px 6px 0; width:44%; vertical-align:top;
     }
     .pay-account-table td { font-size:.87rem; font-weight:600; padding:6px 0; }
+    /* Account and IBAN numbers: monospace so digits are easy to read back,
+       and breakable so a 24-char IBAN can't widen the modal. */
+    .pay-acct-num {
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      letter-spacing:.01em; word-break:break-all; user-select:all;
+    }
     .pay-field-label {
       display:block; font-size:.78rem; font-weight:700; color:#555;
       margin:14px 0 5px;
@@ -908,6 +928,12 @@
     html[data-theme="dark"] .pr-card.pr-purple {
       background:#2a1a5e; border-color:#8b5cf6;
     }
+    html[data-theme="dark"] .pr-card .pr-multi-hint.is-todo  { color:var(--pr-gold); }
+    html[data-theme="dark"] .pr-card .pr-multi-hint.is-ready { color:#5dde96; }
+    html[data-theme="dark"] .pr-card.pr-amber .pr-multi-hint.is-todo  { color:var(--pr-gold); }
+    html[data-theme="dark"] .pr-card.pr-amber .pr-multi-hint.is-ready { color:#5dde96; }
+    html[data-theme="dark"] .pr-cta-gold:disabled:hover   { background:var(--pr-gold); }
+    html[data-theme="dark"] .pr-cta-navy:disabled:hover   { background:var(--pr-deep-2); }
     html[data-theme="dark"] .pr-badge { background:var(--pr-gold); color:#1a1206; }
     html[data-theme="dark"] .pr-divider { border-color:var(--pr-line); }
     html[data-theme="dark"] .pr-feat-icon { background:rgba(240,180,41,.16); }
@@ -1058,7 +1084,8 @@
 </head>
 
 <body>
-  <header class="site-header">
+  <!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
+<header class="site-header">
     <div class="container header-row">
       <a class="brand" href="index.html">
         <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
@@ -1070,11 +1097,13 @@
         <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="teachers.html" class="nav-link nav-group-link">Teach</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="teachers.html" class="nav-drop-item"><span class="ndi ndi-blue">🎓</span><span class="ndi-text"><b>Meet our teachers</b><span>Our expert tutors</span></span></a><a href="teacher-apply.html" class="nav-drop-item"><span class="ndi ndi-green">✏️</span><span class="ndi-text"><b>Teach with Us</b><span>Join our team</span></span></a></div></div>
+        <a href="/blog" class="nav-link">Blog</a>
         <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
       <div class="header-right"></div>
     </div>
   </header>
+<!--NAV:END-->
 
   <main>
     <!-- Hero -->
@@ -1202,7 +1231,7 @@
           <p class="pr-price-sub" data-sub="solo">Single subject · billed monthly</p>
           <hr class="pr-divider">
           <span class="pr-subject-label">Choose your subject:</span>
-          <div class="pr-subj-picker" id="solo-picker">
+          <div class="pr-subj-picker" data-pr-picker data-max="1">
             <button type="button" class="pr-subj-trigger">
               <span class="pr-subj-trigger-text">Select subject…</span>
               <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1220,6 +1249,7 @@
               <div class="pr-subj-option" data-val="Physics (9702)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (9702)</div>
             </div>
           </div>
+          <p class="pr-multi-hint is-todo" data-pr-hint>Choose a subject to continue</p>
           <ul class="pr-features">
             <li class="pr-feat" style="font-size:.82rem;color:rgba(255,255,255,.5);font-weight:600">Everything in Free, plus:</li>
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>Unlimited · 1 subject</span></div></li>
@@ -1228,7 +1258,7 @@
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Flashcards &amp; Notes</strong><span>1 subject</span></div></li>
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Teacher Link &amp; Homework</strong></div></li>
           </ul>
-          <button type="button" class="pr-cta pr-cta-gold" data-plan="solo">Get Solo</button>
+          <button type="button" class="pr-cta pr-cta-gold" data-plan="solo" disabled>Get Solo</button>
         </div>
 
         <!-- 3 SUBJECTS -->
@@ -1243,7 +1273,7 @@
           <p class="pr-price-sub" data-sub="three">Three subjects · billed monthly</p>
           <hr class="pr-divider">
           <span class="pr-subject-label">Choose your 3 subjects:</span>
-          <div class="pr-subj-picker" id="three-picker">
+          <div class="pr-subj-picker" data-pr-picker data-max="3">
             <button type="button" class="pr-subj-trigger">
               <span class="pr-subj-trigger-text">Select subjects…</span>
               <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1261,7 +1291,7 @@
               <div class="pr-subj-option" data-val="Physics (9702)"><span class="pr-subj-check"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3l2 2 4-4" stroke="#1a2340" stroke-width="1.5" stroke-linecap="round"/></svg></span>Physics (9702)</div>
             </div>
           </div>
-          <p class="pr-multi-hint" id="three-hint">0 of 3 selected</p>
+          <p class="pr-multi-hint is-todo" data-pr-hint>Choose 3 subjects to continue</p>
           <ul class="pr-features">
             <li class="pr-feat" style="font-size:.82rem;color:rgba(255,255,255,.5);font-weight:600">Everything in Solo, plus:</li>
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Test Builder</strong><span>Unlimited · 3 subjects</span></div></li>
@@ -1270,7 +1300,7 @@
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>Flashcards &amp; Notes</strong><span>3 subjects</span></div></li>
             <li class="pr-feat"><span class="pr-feat-icon"><svg width="10" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><div class="pr-feat-body"><strong>MCQ Live Solver</strong><span>All subjects included</span></div></li>
           </ul>
-          <button type="button" class="pr-cta pr-cta-gold" data-plan="three">Get 3 Subjects</button>
+          <button type="button" class="pr-cta pr-cta-gold" data-plan="three" disabled>Get 3 Subjects</button>
         </div>
 
         <!-- ALL SUBJECTS -->
@@ -1875,9 +1905,10 @@
           </div>
           <div class="pay-panel" data-panel="bank">
             <table class="pay-account-table">
-              <tr><th>Bank</th><td>Meezan Bank</td></tr>
+              <tr><th>Bank</th><td>UBL (United Bank Limited)</td></tr>
               <tr><th>Account Title</th><td>Muhammad Taahaa</td></tr>
-              <tr><th>Account No.</th><td>02140102234983</td></tr>
+              <tr><th>Account No.</th><td class="pay-acct-num">0736336727561</td></tr>
+              <tr><th>IBAN</th><td class="pay-acct-num">PK43UNIL0109000336727561</td></tr>
               <tr class="pay-amount-row"><th>Amount</th><td>PKR <span class="pay-dyn-amount">1,000</span></td></tr>
             </table>
           </div>
@@ -2008,40 +2039,60 @@
       });
     });
 
-    /* ── Custom subject pickers ──────────────────────────────────── */
-    function wireSoloPicker(pickerId) {
-      var picker  = document.getElementById(pickerId);
-      if (!picker) return;
-      var trigger = picker.querySelector('.pr-subj-trigger');
-      var label   = picker.querySelector('.pr-subj-trigger-text');
-      var options = picker.querySelectorAll('.pr-subj-option');
-      trigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        picker.classList.toggle('open');
-      });
-      options.forEach(function(opt) {
-        opt.addEventListener('click', function(e) {
-          e.stopPropagation();
-          options.forEach(function(o) { o.classList.remove('selected'); });
-          opt.classList.add('selected');
-          label.textContent = opt.getAttribute('data-val');
-          picker.classList.remove('open');
-        });
-      });
+    /* ── Custom subject pickers ──────────────────────────────────────
+       Every plan card carries its own picker (data-max = how many
+       subjects the plan covers), its own hint and its own CTA. The
+       Oct/Nov, May/Jun and Yearly grids are innerHTML clones of the
+       monthly one, so these must be wired per element — an id lookup
+       finds four copies and only ever wires the first, which is why the
+       pickers on those three tabs used to do nothing.
+
+       The CTA stays disabled until the quota is met, and the hint says
+       what is still outstanding. */
+    function subjectHint(chosen, max) {
+      if (chosen === 0) {
+        return max === 1 ? 'Choose a subject to continue'
+                         : 'Choose ' + max + ' subjects to continue';
+      }
+      if (chosen < max) {
+        var left = max - chosen;
+        return 'Add ' + left + ' more subject' + (left === 1 ? '' : 's') +
+               ' — ' + chosen + ' of ' + max + ' selected';
+      }
+      return max === 1 ? 'Subject selected' : chosen + ' of ' + max + ' selected';
     }
 
-    function wireThreePicker(pickerId, hintId, max) {
-      var picker  = document.getElementById(pickerId);
-      var hint    = document.getElementById(hintId);
-      if (!picker) return;
-      var trigger = picker.querySelector('.pr-subj-trigger');
-      var label   = picker.querySelector('.pr-subj-trigger-text');
-      var options = picker.querySelectorAll('.pr-subj-option');
+    function wirePicker(picker) {
+      var card = picker.closest('.pr-card');
+      if (!card) return;
+      var max      = parseInt(picker.getAttribute('data-max'), 10) || 1;
+      var trigger  = picker.querySelector('.pr-subj-trigger');
+      var label    = picker.querySelector('.pr-subj-trigger-text');
+      var options  = picker.querySelectorAll('.pr-subj-option');
+      var hint     = card.querySelector('[data-pr-hint]');
+      var cta      = card.querySelector('[data-plan]');
       var selected = [];
+
+      function render() {
+        var done = selected.length === max;
+        label.textContent = selected.length ? selected.join(', ')
+          : (max === 1 ? 'Select subject…' : 'Select subjects…');
+        if (hint) {
+          hint.textContent = subjectHint(selected.length, max);
+          hint.classList.toggle('is-todo',  !done);
+          hint.classList.toggle('is-ready',  done);
+        }
+        if (cta) {
+          cta.disabled = !done;
+          cta.title = done ? '' : subjectHint(selected.length, max);
+        }
+      }
+
       trigger.addEventListener('click', function(e) {
         e.stopPropagation();
         picker.classList.toggle('open');
       });
+
       options.forEach(function(opt) {
         opt.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -2050,18 +2101,23 @@
           if (idx > -1) {
             selected.splice(idx, 1);
             opt.classList.remove('selected');
+          } else if (max === 1) {
+            selected = [val];
+            options.forEach(function(o) { o.classList.remove('selected'); });
+            opt.classList.add('selected');
           } else if (selected.length < max) {
             selected.push(val);
             opt.classList.add('selected');
           }
-          label.textContent = selected.length ? selected.join(', ') : 'Select subjects…';
-          if (hint) hint.textContent = selected.length + ' of ' + max + ' selected';
+          if (max === 1) picker.classList.remove('open');
+          render();
         });
       });
+
+      render();
     }
 
-    wireSoloPicker('solo-picker');
-    wireThreePicker('three-picker', 'three-hint', 3);
+    document.querySelectorAll('.pr-subj-picker').forEach(wirePicker);
 
     /* Close pickers when clicking outside */
     document.addEventListener('click', function() {
