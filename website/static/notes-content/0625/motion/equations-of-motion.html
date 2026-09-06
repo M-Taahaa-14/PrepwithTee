@@ -1,0 +1,87 @@
+<div class="note-tier note-tier-supplement" style="margin-bottom:1.2rem">Extended (Supplement) tier</div>
+
+<h2 id="suvat">The four SUVAT equations</h2>
+
+<div class="note-def">
+  For an object moving with <strong>uniform (constant) acceleration</strong>, four equations relate the five variables:
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Variable</th><th>Symbol</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>Displacement</td><td>\( s \)</td><td>m</td></tr>
+      <tr><td>Initial velocity</td><td>\( u \)</td><td>m/s</td></tr>
+      <tr><td>Final velocity</td><td>\( v \)</td><td>m/s</td></tr>
+      <tr><td>Acceleration</td><td>\( a \)</td><td>m/s²</td></tr>
+      <tr><td>Time</td><td>\( t \)</td><td>s</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-key">
+  <strong>The four equations:</strong>
+  \[ v = u + at \tag{1} \]
+  \[ s = \tfrac{1}{2}(u + v)\,t \tag{2} \]
+  \[ s = ut + \tfrac{1}{2}at^2 \tag{3} \]
+  \[ v^2 = u^2 + 2as \tag{4} \]
+  Each equation uses four of the five variables. Pick the equation that contains your three known quantities and the one unknown.
+</div>
+
+<h2 id="strategy">How to choose the right equation</h2>
+
+<div class="note-key">
+  <ol style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li>List the five variables: \( s,\; u,\; v,\; a,\; t \).</li>
+    <li>Write down what you know (given or implied — e.g. "starts from rest" means \( u = 0 \)).</li>
+    <li>Identify the unknown you are solving for.</li>
+    <li>Pick the equation that contains your three knowns and the one unknown (no extra unknowns).</li>
+    <li>Substitute and solve, keeping units consistent.</li>
+  </ol>
+</div>
+
+<details class="note-example">
+  <summary>Example 1 — find final velocity (no distance given)</summary>
+  <div>
+    <p>A train accelerates uniformly from 5 m/s at 2 m/s² for 8 s. Find the final velocity.</p>
+    <p>Known: \( u = 5\,\text{m/s},\quad a = 2\,\text{m/s}^2,\quad t = 8\,\text{s} \). Unknown: \( v \).</p>
+    <p>Use equation (1): \( v = u + at = 5 + (2)(8) = 5 + 16 = 21\,\text{m/s} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find displacement (no final velocity given)</summary>
+  <div>
+    <p>A ball rolls from rest and accelerates at 3 m/s² for 4 s. How far does it travel?</p>
+    <p>Known: \( u = 0,\quad a = 3\,\text{m/s}^2,\quad t = 4\,\text{s} \). Unknown: \( s \).</p>
+    <p>Use equation (3): \( s = ut + \tfrac{1}{2}at^2 = (0)(4) + \tfrac{1}{2}(3)(4)^2 = 0 + 24 = 24\,\text{m} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 3 — no time given (use equation 4)</summary>
+  <div>
+    <p>A car brakes from 30 m/s to rest with deceleration 6 m/s². Find the braking distance.</p>
+    <p>Known: \( u = 30,\quad v = 0,\quad a = -6\,\text{m/s}^2 \). Unknown: \( s \).</p>
+    <p>Use equation (4): \( v^2 = u^2 + 2as \)</p>
+    <p>\( 0 = 30^2 + 2(-6)s \Rightarrow 0 = 900 - 12s \Rightarrow s = \dfrac{900}{12} = 75\,\text{m} \)</p>
+  </div>
+</details>
+
+<h2 id="sign-convention">Sign convention</h2>
+
+<div class="note-key">
+  Always choose a positive direction at the start and stick to it.
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Motion in the positive direction: \( s > 0,\quad v > 0,\quad a > 0 \) (if accelerating).</li>
+    <li>Deceleration means \( a \) is <em>opposite</em> to the direction of motion — write it as negative.</li>
+    <li>"Comes to rest" means \( v = 0 \).</li>
+    <li>"Starts from rest" means \( u = 0 \).</li>
+    <li>"Falls freely" or "thrown upward" — take downward as positive (or upward — be consistent).</li>
+  </ul>
+</div>
+
+<div class="note-tip">
+  Equation (4) is the one to reach for when <strong>time is not given and not wanted</strong>. It connects initial velocity, final velocity, acceleration and displacement with no \( t \) — perfect for braking-distance and projectile questions.
+</div>
+
+<div class="note-warn">
+  These equations only apply when acceleration is <strong>constant (uniform)</strong>. If the v-t graph is a curve (not a straight line), acceleration is changing and SUVAT does not apply — use the area and gradient approach instead.
+</div>

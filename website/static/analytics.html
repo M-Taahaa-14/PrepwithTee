@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -9,628 +9,427 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
-  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260831a">
-  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260907a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260906a">
   <link rel="stylesheet" href="tools.css?v=20260829a">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 
   <style>
-    /* ── My Planner / Analytics Premium Styling System ────────────── */
+    /* ── Color tokens ─────────────────────────────────────────── */
     :root {
-      --color-revision-text: #6d55b4;
-      --color-revision-bg: #f5f2fc;
-      --color-revision-border: #ded7f5;
-      
-      --color-pastpapers-text: #a07a2a;
-      --color-pastpapers-bg: #fcf7eb;
-      --color-pastpapers-border: #f2e4c9;
-      
-      --color-notes-text: #3d805b;
-      --color-notes-bg: #f0f9f4;
-      --color-notes-border: #ceecd9;
-      
-      --color-task-text: #4a7bb4;
-      --color-task-bg: #f2f6fc;
-      --color-task-border: #d4e3f5;
-      
-      --color-goal-text: #b45b55;
-      --color-goal-bg: #fcf3f2;
-      --color-goal-border: #f5d6d4;
+      --color-revision-text:#6d55b4;--color-revision-bg:#f5f2fc;--color-revision-border:#ded7f5;
+      --color-pastpapers-text:#a07a2a;--color-pastpapers-bg:#fcf7eb;--color-pastpapers-border:#f2e4c9;
+      --color-notes-text:#3d805b;--color-notes-bg:#f0f9f4;--color-notes-border:#ceecd9;
+      --color-task-text:#4a7bb4;--color-task-bg:#f2f6fc;--color-task-border:#d4e3f5;
+      --color-goal-text:#b45b55;--color-goal-bg:#fcf3f2;--color-goal-border:#f5d6d4;
     }
-
     html[data-theme="dark"] {
-      --color-revision-text: #c5b5fa;
-      --color-revision-bg: #1a1333;
-      --color-revision-border: #483a75;
-      
-      --color-pastpapers-text: #f2d594;
-      --color-pastpapers-bg: #2e2211;
-      --color-pastpapers-border: #664f25;
-      
-      --color-notes-text: #98ddb5;
-      --color-notes-bg: #112e1e;
-      --color-notes-border: #256641;
-      
-      --color-task-text: #95c1fa;
-      --color-task-bg: #132238;
-      --color-task-border: #2b476e;
-      
-      --color-goal-text: #faa29b;
-      --color-goal-bg: #381613;
-      --color-goal-border: #7a3630;
+      --color-revision-text:#c5b5fa;--color-revision-bg:#1a1333;--color-revision-border:#483a75;
+      --color-pastpapers-text:#f2d594;--color-pastpapers-bg:#2e2211;--color-pastpapers-border:#664f25;
+      --color-notes-text:#98ddb5;--color-notes-bg:#112e1e;--color-notes-border:#256641;
+      --color-task-text:#95c1fa;--color-task-bg:#132238;--color-task-border:#2b476e;
+      --color-goal-text:#faa29b;--color-goal-bg:#381613;--color-goal-border:#7a3630;
     }
 
-    .planner-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .planner-breadcrumb a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-    .planner-breadcrumb a:hover {
-      text-decoration: underline;
-    }
+    /* ── Hero ─────────────────────────────────────────────────── */
+    .an-hero { padding:2rem 0 1.25rem; border-bottom:1.5px solid var(--line); }
+    .an-hero h1 { font-family:"Playfair Display",serif; font-size:clamp(1.8rem,4vw,2.4rem); font-weight:800; color:var(--text); margin:.2rem 0 .35rem; }
+    .an-hero-sub { font-size:.93rem; color:var(--muted); margin:0; }
 
-    /* ── Hero Section ────────────────────────────────────────── */
-    .an-hero {
-      padding: 2rem 0 1.5rem;
-      border-bottom: 1.5px solid var(--line);
-    }
-    .an-hero h1 {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(2rem, 4vw, 2.6rem);
-      font-weight: 800;
-      color: var(--text);
-      margin: 0.2rem 0 0.4rem;
-    }
-    .an-hero-sub {
-      font-size: 0.95rem;
-      color: var(--muted);
-      margin: 0;
-    }
+    /* ── Subject selector ─────────────────────────────────────── */
+    .an-subject-selector-wrap { margin:1.25rem 0 0; }
+    .an-subject-selector-title { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.5rem; }
+    .an-subject-cards-row { display:flex; gap:.65rem; overflow-x:auto; padding-bottom:.5rem; scrollbar-width:thin; }
+    .an-sub-card { background:var(--white); border:1.5px solid var(--line); border-radius:14px; padding:.6rem 1rem; display:flex; align-items:center; gap:.55rem; cursor:pointer; white-space:nowrap; transition:all .18s; user-select:none; flex-shrink:0; }
+    .an-sub-card:hover { transform:translateY(-1px); border-color:var(--navy); }
+    .an-sub-card.active { background:var(--color-task-bg); border-color:var(--color-task-border); color:var(--color-task-text); font-weight:700; }
+    html[data-theme="dark"] .an-sub-card { background:rgba(255,255,255,.02); border-color:rgba(255,255,255,.08); color:var(--text); }
+    html[data-theme="dark"] .an-sub-card.active { background:var(--color-task-bg); border-color:var(--color-task-border); color:var(--color-task-text); }
+    .an-sub-icon { font-size:1.05rem; line-height:1; }
+    .an-sub-name { font-size:.84rem; }
 
-    /* ── Subject Card Selector ───────────────────────────────── */
-    .an-subject-selector-wrap {
-      margin: 1.5rem 0 0.5rem;
-    }
-    .an-subject-selector-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
-    }
-    .an-subject-cards-row {
-      display: flex;
-      gap: 0.75rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-      scrollbar-width: thin;
-    }
-    .an-sub-card {
-      background: var(--white);
-      border: 1.5px solid var(--line);
-      border-radius: 14px;
-      padding: 0.65rem 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.18s ease;
-      user-select: none;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    }
-    .an-sub-card:hover {
-      transform: translateY(-1px);
-      border-color: var(--navy);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-    }
-    .an-sub-card.active {
-      background: var(--color-task-bg);
-      border-color: var(--color-task-border);
-      color: var(--color-task-text);
-      font-weight: 700;
-    }
-    html[data-theme="dark"] .an-sub-card {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-    }
-    html[data-theme="dark"] .an-sub-card.active {
-      background: var(--color-task-bg);
-      border-color: var(--color-task-border);
-      color: var(--color-task-text);
-    }
-    .an-sub-icon {
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-    .an-sub-name {
-      font-size: 0.86rem;
-    }
+    /* ── Tab nav ──────────────────────────────────────────────── */
+    .an-tabs-nav { display:flex; gap:4px; margin:1.4rem 0 0; background:var(--page); border:1.5px solid var(--line); border-radius:16px; padding:5px; }
+    .an-tab-btn { flex:1; padding:9px 14px; border:none; background:transparent; border-radius:11px; font-family:"Hanken Grotesk",sans-serif; font-size:.85rem; font-weight:700; color:var(--muted); cursor:pointer; transition:all .18s; white-space:nowrap; }
+    .an-tab-btn.active { background:var(--white); color:var(--navy); box-shadow:0 2px 10px rgba(0,0,0,.07); }
+    html[data-theme="dark"] .an-tab-btn.active { background:rgba(255,255,255,.07); color:var(--text); }
+    .an-tab-panel { display:none; padding:1.6rem 0 4rem; }
+    .an-tab-panel.active { display:block; }
 
-    /* ── Main Dashboard Scaffold ─────────────────────────────── */
-    .an-wrap {
-      padding: 1.5rem 0 4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
-    }
+    /* ── Stat cards ───────────────────────────────────────────── */
+    .an-stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:1rem; margin-bottom:1.6rem; }
+    .an-stat-card { background:var(--white); border:1.5px solid var(--line); border-radius:18px; padding:1.2rem 1.3rem; display:flex; flex-direction:column; gap:.3rem; box-shadow:0 3px 10px rgba(0,0,0,.02); transition:transform .2s,box-shadow .2s; }
+    .an-stat-card:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.05); }
+    html[data-theme="dark"] .an-stat-card { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .an-stat-icon { font-size:1.35rem; margin-bottom:2px; }
+    .an-stat-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+    .an-stat-value { font-family:"Archivo",sans-serif; font-weight:900; font-size:1.9rem; color:var(--text); line-height:1.1; }
+    .an-stat-sub { font-size:.76rem; color:var(--muted); }
 
-    /* ── Stat Cards Grid ─────────────────────────────────────── */
-    .an-stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    .an-stat-card {
-      background: var(--white);
-      border: 1.5px solid var(--line);
-      border-radius: 18px;
-      padding: 1.25rem 1.4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .an-stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-    }
-    html[data-theme="dark"] .an-stat-card {
-      background: rgba(255, 255, 255, 0.01);
-      border-color: rgba(255, 255, 255, 0.06);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .an-stat-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-    }
-    .an-stat-value {
-      font-family: "Archivo", sans-serif;
-      font-weight: 900;
-      font-size: 2rem;
-      color: var(--text);
-      line-height: 1.1;
-    }
-    .an-stat-sub {
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
+    /* ── Section cards ────────────────────────────────────────── */
+    .an-card { background:var(--white); border:1.5px solid var(--line); border-radius:20px; padding:1.4rem 1.5rem; box-shadow:0 3px 12px rgba(0,0,0,.02); margin-bottom:1.5rem; }
+    html[data-theme="dark"] .an-card { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .an-card-title { font-family:"Playfair Display",serif; font-weight:700; font-size:1.2rem; color:var(--text); margin:0 0 1.1rem; display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
+    .an-card-badge { font-family:"Hanken Grotesk",sans-serif; font-size:.72rem; font-weight:700; background:var(--cream); padding:3px 10px; border-radius:20px; color:var(--muted); white-space:nowrap; }
+    .an-section-head { font-size:.7rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.07em; margin-bottom:.65rem; }
 
-    /* ── Section Cards ───────────────────────────────────────── */
-    .an-card {
-      background: var(--white);
-      border: 1.5px solid var(--line);
-      border-radius: 20px;
-      padding: 1.5rem 1.6rem;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
-    }
-    html[data-theme="dark"] .an-card {
-      background: rgba(255, 255, 255, 0.01);
-      border-color: rgba(255, 255, 255, 0.06);
-    }
-    .an-card-title {
-      font-family: "Playfair Display", serif;
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: var(--text);
-      margin: 0 0 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .an-card-badge {
-      font-family: "Hanken Grotesk", sans-serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      background: var(--cream);
-      padding: 3px 10px;
-      border-radius: 20px;
-      color: var(--muted);
-    }
+    /* ── Two-col ──────────────────────────────────────────────── */
+    .an-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.5rem; }
 
-    /* ── 2-Column Grid Layouts ──────────────────────────────── */
-    .an-two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
+    /* ── Radial progress ──────────────────────────────────────── */
+    .radial-widget-container { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+    .radial-chart { position:relative; width:110px; height:110px; flex-shrink:0; }
+    .radial-chart svg { width:110px; height:110px; transform:rotate(-90deg); }
+    .radial-chart circle { fill:none; stroke-width:10; stroke-linecap:round; }
+    .radial-bg { stroke:var(--line); }
+    .radial-fill { stroke:var(--navy); transition:stroke-dashoffset .8s ease; }
+    .radial-center { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .radial-center-pct { font-family:"Archivo",sans-serif; font-weight:900; font-size:1.4rem; color:var(--text); line-height:1; }
+    .radial-center-lbl { font-size:.62rem; color:var(--muted); font-weight:700; text-transform:uppercase; margin-top:2px; }
+    .radial-details { flex:1; min-width:0; display:flex; flex-direction:column; gap:.55rem; }
 
-    /* ── Radial Progress Cards ──────────────────────────────── */
-    .radial-widget-container {
-      display: flex;
-      align-items: center;
-      gap: 1.75rem;
-      flex-wrap: wrap;
-    }
-    .radial-chart {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      flex-shrink: 0;
-    }
-    .radial-chart svg {
-      width: 120px;
-      height: 120px;
-      transform: rotate(-90deg);
-    }
-    .radial-chart circle {
-      fill: none;
-      stroke-width: 10;
-      stroke-linecap: round;
-    }
-    .radial-bg {
-      stroke: var(--line);
-    }
-    .radial-fill {
-      stroke: var(--navy);
-      transition: stroke-dashoffset 0.8s ease;
-    }
-    .radial-center {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .radial-center-pct {
-      font-family: "Archivo", sans-serif;
-      font-weight: 900;
-      font-size: 1.6rem;
-      color: var(--text);
-      line-height: 1;
-    }
-    .radial-center-lbl {
-      font-size: 0.65rem;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-    .radial-details {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
+    /* ── Remaining topics ─────────────────────────────────────── */
+    .remaining-topics-list { display:flex; flex-direction:column; gap:.45rem; margin-top:.85rem; max-height:200px; overflow-y:auto; }
+    .remaining-topic-item { background:var(--page); border:1.5px solid var(--line); border-radius:12px; padding:.55rem .8rem; display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+    html[data-theme="dark"] .remaining-topic-item { background:rgba(255,255,255,.02); }
+    .remaining-topic-name { font-size:.83rem; font-weight:600; color:var(--text); }
+    .remaining-topic-sub { font-size:.7rem; color:var(--muted); }
 
-    /* ── Remaining Topics List ──────────────────────────────── */
-    .remaining-topics-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .remaining-topic-item {
-      background: var(--page);
-      border: 1.5px solid var(--line);
-      border-radius: 12px;
-      padding: 0.6rem 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.6rem;
-    }
-    html[data-theme="dark"] .remaining-topic-item {
-      background: rgba(255, 255, 255, 0.02);
-    }
-    .remaining-topic-name {
-      font-size: 0.84rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .remaining-topic-sub {
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
+    /* ── Heatmap ──────────────────────────────────────────────── */
+    .heatmap-scroll { overflow-x:auto; padding-bottom:4px; }
+    .heatmap-inner { display:inline-block; }
+    .hm-months { display:flex; gap:0; font-size:.63rem; color:var(--muted); font-family:"Archivo",sans-serif; margin-bottom:4px; padding-left:20px; }
+    .hm-row { display:flex; gap:2px; align-items:flex-start; }
+    .hm-days { display:flex; flex-direction:column; gap:2px; font-size:.6rem; color:var(--muted); margin-right:4px; padding-top:1px; }
+    .hm-days span { height:12px; line-height:12px; }
+    .hm-weeks { display:flex; gap:2px; }
+    .hm-week { display:flex; flex-direction:column; gap:2px; }
+    .hm-cell { width:12px; height:12px; border-radius:3px; background:var(--line); flex-shrink:0; }
+    .hm-cell.l1 { background:#d1fae5; } .hm-cell.l2 { background:#6ee7b7; } .hm-cell.l3 { background:#10b981; } .hm-cell.l4 { background:#047857; }
+    .hm-legend { display:flex; align-items:center; gap:6px; font-size:.66rem; color:var(--muted); margin-top:10px; justify-content:flex-end; }
+    .hm-legend-cells { display:flex; gap:2px; }
+    .hm-legend-cell { width:12px; height:12px; border-radius:3px; }
 
-    /* ── Heatmap ─────────────────────────────────────────────── */
-    .heatmap-scroll { overflow-x: auto; padding-bottom: 4px; }
-    .heatmap-inner { display: inline-block; }
-    .hm-months {
-      display: flex; gap: 0;
-      font-size: 0.65rem; color: var(--muted); font-family: "Archivo", sans-serif;
-      margin-bottom: 4px; padding-left: 20px;
-    }
-    .hm-row { display: flex; gap: 2px; align-items: flex-start; }
-    .hm-days {
-      display: flex; flex-direction: column; gap: 2px;
-      font-size: 0.62rem; color: var(--muted);
-      margin-right: 4px; padding-top: 1px;
-    }
-    .hm-days span { height: 12px; line-height: 12px; }
-    .hm-weeks { display: flex; gap: 2px; }
-    .hm-week { display: flex; flex-direction: column; gap: 2px; }
-    .hm-cell {
-      width: 12px; height: 12px; border-radius: 3px;
-      background: var(--line); flex-shrink: 0;
-    }
-    .hm-cell.l1 { background: #d1fae5; }
-    .hm-cell.l2 { background: #6ee7b7; }
-    .hm-cell.l3 { background: #10b981; }
-    .hm-cell.l4 { background: #047857; }
+    /* ── Subject bars ─────────────────────────────────────────── */
+    .subj-bar-list { display:flex; flex-direction:column; gap:.85rem; }
+    .subj-bar-meta { display:flex; justify-content:space-between; margin-bottom:3px; }
+    .subj-bar-name { font-size:.86rem; font-weight:700; color:var(--text); }
+    .subj-bar-pct  { font-size:.86rem; font-weight:800; color:var(--text); font-family:"Archivo",sans-serif; }
+    .subj-bar-track { width:100%; height:8px; background:var(--line); border-radius:99px; overflow:hidden; }
+    .subj-bar-fill { height:100%; border-radius:99px; transition:width .7s ease; }
+    .subj-bar-detail { font-size:.72rem; color:var(--muted); margin-top:3px; }
 
-    .hm-legend {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.68rem; color: var(--muted); margin-top: 10px;
-      justify-content: flex-end;
-    }
-    .hm-legend-cells { display: flex; gap: 2px; }
-    .hm-legend-cell { width: 12px; height: 12px; border-radius: 3px; }
+    /* ── Quiz history ─────────────────────────────────────────── */
+    .quiz-hist-list { display:flex; flex-direction:column; gap:.55rem; }
+    .quiz-hist-item { display:flex; align-items:center; gap:.8rem; padding:.7rem .95rem; background:var(--page); border:1.5px solid var(--line); border-radius:13px; }
+    html[data-theme="dark"] .quiz-hist-item { background:rgba(255,255,255,.02); }
+    .quiz-hist-score { font-family:"Archivo",sans-serif; font-weight:900; font-size:1.05rem; color:var(--text); min-width:3ch; }
+    .quiz-hist-score.good { color:#10b981; } .quiz-hist-score.bad { color:#ef4444; }
+    .quiz-hist-info { flex:1; min-width:0; }
+    .quiz-hist-topic { font-size:.84rem; font-weight:700; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .quiz-hist-meta  { font-size:.72rem; color:var(--muted); }
+    .quiz-hist-date  { font-size:.72rem; color:var(--muted); flex-shrink:0; }
 
-    /* ── Subject Mastery Bars ────────────────────────────────── */
-    .subj-bar-list { display: flex; flex-direction: column; gap: 1rem; }
-    .subj-bar-meta { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .subj-bar-name { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-    .subj-bar-pct  { font-size: 0.88rem; font-weight: 800; color: var(--text); font-family: "Archivo", sans-serif; }
-    .subj-bar-track { width: 100%; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
-    .subj-bar-fill { height: 100%; border-radius: 99px; transition: width 0.7s ease; }
-    .subj-bar-detail { font-size: 0.74rem; color: var(--muted); margin-top: 4px; }
+    /* ── FC streak card ───────────────────────────────────────── */
+    .fcp-streak { background:linear-gradient(135deg,#ffe0b2 0%,#ffebee 100%); border:1.5px solid #fcd34d; border-radius:18px; padding:1.35rem 1.75rem; display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap; margin-bottom:1.4rem; }
+    html[data-theme="dark"] .fcp-streak { background:linear-gradient(135deg,#2e1d05 0%,#1e1138 100%); border-color:rgba(245,158,11,.18); }
+    .fcp-streak-flame { font-size:2.5rem; line-height:1; }
+    .fcp-streak-body { flex:1; min-width:0; }
+    .fcp-streak-num { font-size:2.4rem; font-weight:900; color:#f59e0b; line-height:1; font-family:"Archivo",sans-serif; }
+    .fcp-streak-label { font-size:.9rem; color:var(--text); margin-top:.15rem; }
+    .fcp-streak-meta { font-size:.74rem; color:var(--muted); margin-top:.3rem; }
 
-    /* ── Quiz & Session History Lists ───────────────────────── */
-    .quiz-hist-list { display: flex; flex-direction: column; gap: 0.6rem; }
-    .quiz-hist-item {
-      display: flex; align-items: center; gap: 0.85rem;
-      padding: 0.75rem 1rem; background: var(--page);
-      border: 1.5px solid var(--line); border-radius: 14px;
-    }
-    html[data-theme="dark"] .quiz-hist-item { background: rgba(255,255,255,0.02); }
-    .quiz-hist-score {
-      font-family: "Archivo", sans-serif; font-weight: 900;
-      font-size: 1.1rem; color: var(--text); min-width: 3ch;
-    }
-    .quiz-hist-score.good { color: #10b981; }
-    .quiz-hist-score.bad  { color: #ef4444; }
-    .quiz-hist-info { flex: 1; min-width: 0; }
-    .quiz-hist-topic { font-size: 0.86rem; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .quiz-hist-meta  { font-size: 0.74rem; color: var(--muted); }
-    .quiz-hist-date  { font-size: 0.74rem; color: var(--muted); flex-shrink: 0; }
+    /* ── FC weak topics ───────────────────────────────────────── */
+    .fcp-weak-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.9rem; }
+    .fcp-weak-card { background:var(--white); border:1.5px solid var(--line); border-left:4px solid #ef4444; border-radius:14px; padding:1.1rem 1.2rem; display:flex; flex-direction:column; gap:.35rem; }
+    html[data-theme="dark"] .fcp-weak-card { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); border-left-color:#ef4444; }
+    .fcp-weak-chapter { font-size:.92rem; font-weight:700; color:var(--text); }
+    .fcp-weak-sub { font-size:.74rem; color:var(--muted); }
+    .fcp-weak-pct { font-size:1.6rem; font-weight:800; color:#ef4444; font-family:"Archivo",sans-serif; margin:.15rem 0; }
 
-    .an-empty { text-align: center; padding: 2rem 0; color: var(--muted); font-size: 0.88rem; }
+    /* ── FC mastery list ──────────────────────────────────────── */
+    .fcp-filter { display:flex; gap:.55rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .fcp-filter select { padding:.45rem .9rem; border:1.5px solid var(--line); border-radius:11px; font-size:.86rem; background:var(--white); color:var(--text); font-family:inherit; outline:none; cursor:pointer; }
+    html[data-theme="dark"] .fcp-filter select { background:#0d0922; border-color:rgba(255,255,255,.08); }
+    .fcp-mastery-list { display:flex; flex-direction:column; gap:.65rem; }
+    .fcp-chapter { background:var(--white); border:1.5px solid var(--line); border-radius:14px; padding:1.1rem 1.3rem; transition:transform .15s,box-shadow .15s; }
+    .fcp-chapter:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(0,0,0,.04); }
+    html[data-theme="dark"] .fcp-chapter { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .fcp-chapter-top { display:flex; justify-content:space-between; align-items:flex-start; gap:.7rem; margin-bottom:.5rem; }
+    .fcp-chapter-name { font-size:.92rem; font-weight:700; color:var(--text); }
+    .fcp-chapter-sub { font-size:.73rem; color:var(--muted); margin-top:.15rem; }
+    .fcp-chapter-pct { font-size:1.05rem; font-weight:800; color:var(--text); flex-shrink:0; font-family:"Archivo",sans-serif; }
+    .fcp-bar { height:7px; background:var(--cream); border-radius:5px; overflow:hidden; }
+    html[data-theme="dark"] .fcp-bar { background:rgba(255,255,255,.06); }
+    .fcp-bar-fill { height:100%; border-radius:5px; transition:width .5s ease; }
+    .fill-none { background:var(--line); } .fill-low { background:#ef4444; } .fill-mid { background:#f59e0b; } .fill-high { background:#10b981; }
+    .fcp-tags { display:flex; gap:.35rem; flex-wrap:wrap; margin-top:.65rem; }
+    .fcp-tag { font-size:.68rem; padding:2px 7px; border-radius:7px; font-weight:700; border:1px solid transparent; }
+    .tag-new { background:var(--color-task-bg); color:var(--color-task-text); border-color:var(--color-task-border); }
+    .tag-learning { background:var(--color-goal-bg); color:var(--color-goal-text); border-color:var(--color-goal-border); }
+    .tag-review { background:var(--color-revision-bg); color:var(--color-revision-text); border-color:var(--color-revision-border); }
+    .tag-mastered { background:var(--color-notes-bg); color:var(--color-notes-text); border-color:var(--color-notes-border); }
 
-    @media (max-width:900px) {
-      .an-stats-row { grid-template-columns: repeat(2, 1fr); }
-      .an-two-col   { grid-template-columns: 1fr; }
-    }
-    @media (max-width:480px) {
-      .an-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .an-hero { padding: 1.5rem 0 1rem; }
-    }
+    /* ── FC session history ───────────────────────────────────── */
+    .fcp-session-list { display:flex; flex-direction:column; gap:.55rem; }
+    .fcp-session { background:var(--white); border:1.5px solid var(--line); border-radius:13px; padding:1rem 1.3rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.7rem; }
+    html[data-theme="dark"] .fcp-session { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .fcp-session-date { font-size:.86rem; font-weight:700; color:var(--text); }
+    .fcp-session-scope { font-size:.73rem; color:var(--muted); margin-top:.15rem; }
+    .fcp-session-stats { display:flex; gap:1.2rem; align-items:center; }
+    .fcp-session-stat { font-size:.82rem; color:var(--muted); }
+    .fcp-session-stat b { color:var(--text); font-weight:700; }
+
+    /* ── Achievements: level card ─────────────────────────────── */
+    .ach-level-card { background:linear-gradient(135deg,var(--navy) 0%,#3b1f6b 100%); border-radius:20px; padding:1.5rem 1.75rem; color:#fff; display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.4rem; }
+    .ach-level-badge { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#E8913A,#f9c260); display:flex; align-items:center; justify-content:center; font-size:1.8rem; box-shadow:0 4px 18px rgba(232,145,58,.4); flex-shrink:0; }
+    .ach-level-info { flex:1; min-width:0; }
+    .ach-level-num { font-family:"Archivo",sans-serif; font-weight:900; font-size:1.6rem; line-height:1; }
+    .ach-level-label { font-size:.78rem; opacity:.6; text-transform:uppercase; letter-spacing:.07em; margin-top:2px; }
+    .ach-xp-bar-wrap { margin-top:.75rem; }
+    .ach-xp-bar-labels { display:flex; justify-content:space-between; font-size:.7rem; opacity:.65; margin-bottom:5px; }
+    .ach-xp-bar-track { width:100%; height:9px; background:rgba(255,255,255,.2); border-radius:99px; overflow:hidden; }
+    .ach-xp-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#E8913A,#f9c260); transition:width .6s ease; }
+    .ach-xp-total { font-size:.78rem; opacity:.55; margin-top:5px; }
+
+    /* ── Achievements: streak row ─────────────────────────────── */
+    .ach-streak-row { display:flex; gap:.85rem; margin-bottom:1.4rem; }
+    .ach-streak-card { flex:1; background:var(--white); border:1.5px solid var(--line); border-radius:18px; padding:1.1rem 1.3rem; display:flex; align-items:center; gap:.9rem; }
+    html[data-theme="dark"] .ach-streak-card { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .ach-streak-ico { font-size:1.9rem; flex-shrink:0; }
+    .ach-streak-num { font-family:"Archivo",sans-serif; font-weight:900; font-size:1.5rem; color:var(--text); line-height:1.1; }
+    .ach-streak-lbl { font-size:.75rem; color:var(--muted); }
+
+    /* ── Achievements: badges ─────────────────────────────────── */
+    .badge-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+    .badge-card { background:var(--white); border:1.5px solid var(--line); border-radius:16px; padding:1.1rem .9rem; text-align:center; display:flex; flex-direction:column; align-items:center; gap:7px; position:relative; transition:box-shadow .2s,transform .2s; }
+    .badge-card:hover { box-shadow:0 5px 20px rgba(0,0,0,.07); transform:translateY(-2px); }
+    .badge-card.locked { opacity:.4; filter:grayscale(.9); }
+    html[data-theme="dark"] .badge-card { background:rgba(255,255,255,.015); border-color:rgba(255,255,255,.06); }
+    .badge-ico { font-size:1.8rem; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--page); border:2px solid var(--line); }
+    .badge-card.earned .badge-ico { background:color-mix(in srgb,var(--b-color,var(--gold)) 14%,transparent); border-color:color-mix(in srgb,var(--b-color,var(--gold)) 35%,transparent); }
+    .badge-name { font-family:"Archivo",sans-serif; font-weight:800; font-size:.76rem; color:var(--text); line-height:1.2; }
+    .badge-desc { font-size:.68rem; color:var(--muted); line-height:1.4; }
+    .badge-earned-tag { font-size:.6rem; font-weight:800; font-family:"Archivo",sans-serif; color:#fff; background:var(--b-color,var(--gold)); border-radius:99px; padding:2px 7px; position:absolute; top:9px; right:9px; display:none; }
+    .badge-card.earned .badge-earned-tag { display:block; }
+
+    /* ── XP log ───────────────────────────────────────────────── */
+    .xp-log-list { display:flex; flex-direction:column; gap:5px; }
+    .xp-log-item { display:flex; align-items:center; gap:9px; padding:7px 11px; background:var(--page); border:1px solid var(--line); border-radius:10px; }
+    .xp-log-ico { font-size:.95rem; flex-shrink:0; }
+    .xp-log-text { flex:1; font-size:.8rem; color:var(--text); }
+    .xp-log-xp { font-family:"Archivo",sans-serif; font-weight:800; font-size:.8rem; color:#16a34a; }
+    .xp-log-date { font-size:.68rem; color:var(--muted); }
+
+    /* ── Misc ─────────────────────────────────────────────────── */
+    .an-empty { text-align:center; padding:1.75rem 0; color:var(--muted); font-size:.86rem; }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media(max-width:900px) { .an-stats-row { grid-template-columns:repeat(2,1fr); } .an-two-col { grid-template-columns:1fr; } }
+    @media(max-width:580px) { .an-stats-row { grid-template-columns:repeat(2,1fr); gap:10px; } .an-tabs-nav { flex-wrap:wrap; } .an-tab-btn { font-size:.78rem; padding:8px 10px; } .ach-streak-row { flex-direction:column; } }
   </style>
 </head>
 <body>
 
-  <header class="site-header">
+  <!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
+<header class="site-header">
     <div class="container header-row">
       <a class="brand" href="index.html">
         <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
         <span>PrepWithTee</span>
       </a>      <nav class="header-nav" id="site-nav">
         <!-- Dashboard mega-menu: all sections in one organised dropdown -->
-        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
-        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Stats, flashcards &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a></div></div></div></div>
+        <div class="nav-group nav-mega nav-mega-notes"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><div class="nav-mega-cols" style="grid-template-columns:1fr 1fr"><div class="nav-mega-col"><div class="nav-mega-head">Content</div><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Workspace</div><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">✏️</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><div class="nav-mega-head" style="margin-top:.5rem">Reference</div><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a></div></div></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
-        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <div class="nav-group"><div class="nav-group-header"><a href="teachers.html" class="nav-link nav-group-link">Teach</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="teachers.html" class="nav-drop-item"><span class="ndi ndi-blue">🎓</span><span class="ndi-text"><b>Meet our teachers</b><span>Our expert tutors</span></span></a><a href="teacher-apply.html" class="nav-drop-item"><span class="ndi ndi-green">✏️</span><span class="ndi-text"><b>Teach with Us</b><span>Join our team</span></span></a></div></div>
+        <a href="/blog" class="nav-link">Blog</a>
         <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
       <div class="header-right"></div>
     </div>
   </header>
+<!--NAV:END-->
 
-  <div class="page-back-bar">
-    <a href="dashboard.html" class="page-back-link">Dashboard</a>
-  </div>
+  <div class="page-back-bar"><a href="dashboard.html" class="page-back-link">Dashboard</a></div>
 
-  <main class="container" style="padding-bottom:3rem">
-
-    <!-- Breadcrumb -->
-    <div class="planner-breadcrumb" style="margin-bottom:12px;">
-      <a href="dashboard.html">Dashboard</a>
-      <span>&gt;</span>
-      <span>Analytics</span>
-    </div>
+  <main class="container" style="padding-bottom:1rem">
 
     <!-- Hero -->
     <div class="an-hero">
-      <p class="eyebrow">Insights & Performance</p>
+      <p class="eyebrow">Insights &amp; Performance</p>
       <h1>My Analytics</h1>
-      <p class="an-hero-sub">Comprehensive view of your study time, topical mastery, yearly past paper scores, and streak data.</p>
-      
-      <!-- Subject Cards Dropdown / Selector -->
-      <div class="an-subject-selector-wrap">
-        <div class="an-subject-selector-title">Select Subject Filter</div>
+      <p class="an-hero-sub">Study time, topical mastery, past paper scores, flashcard progress and achievements — all in one place.</p>
+      <div class="an-subject-selector-wrap" id="an-subject-selector-wrap">
+        <div class="an-subject-selector-title">Filter by subject</div>
         <div class="an-subject-cards-row" id="an-subject-picker">
-          <div class="an-sub-card active" data-syllabus="">
-            <span class="an-sub-icon">🌐</span>
-            <span class="an-sub-name">All Subjects</span>
-          </div>
-          <!-- Dynamic subject cards injected here -->
+          <div class="an-sub-card active" data-syllabus=""><span class="an-sub-icon">🌐</span><span class="an-sub-name">All Subjects</span></div>
         </div>
       </div>
     </div>
 
-    <div class="an-wrap">
+    <!-- Tab nav -->
+    <div class="an-tabs-nav" role="tablist">
+      <button class="an-tab-btn active" data-tab="overview"      role="tab">📊 Overview</button>
+      <button class="an-tab-btn"        data-tab="flashcards"   role="tab">🗂️ Flashcards</button>
+      <button class="an-tab-btn"        data-tab="achievements" role="tab">🏆 Achievements</button>
+    </div>
 
-      <!-- Top stats strip -->
+    <!-- ══ TAB 1: OVERVIEW ══════════════════════════════════════════ -->
+    <div id="tab-overview" class="an-tab-panel active">
+
       <div class="an-stats-row">
-        <div class="an-stat-card">
-          <div class="an-stat-label">Current streak</div>
-          <div class="an-stat-value" id="an-streak">—</div>
-          <div class="an-stat-sub">days in a row</div>
-        </div>
-        <div class="an-stat-card">
-          <div class="an-stat-label">Total XP</div>
-          <div class="an-stat-value" id="an-xp">—</div>
-          <div class="an-stat-sub">experience points</div>
-        </div>
-        <div class="an-stat-card">
-          <div class="an-stat-label">Flashcards mastered</div>
-          <div class="an-stat-value" id="an-fc-mastered">—</div>
-          <div class="an-stat-sub" id="an-fc-total-sub">of — total</div>
-        </div>
-        <div class="an-stat-card">
-          <div class="an-stat-label">Days studied</div>
-          <div class="an-stat-value" id="an-days">—</div>
-          <div class="an-stat-sub">unique active days</div>
-        </div>
+        <div class="an-stat-card"><div class="an-stat-icon">🔥</div><div class="an-stat-label">Current streak</div><div class="an-stat-value" id="an-streak">—</div><div class="an-stat-sub">days in a row</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">⚡</div><div class="an-stat-label">Total XP</div><div class="an-stat-value" id="an-xp">—</div><div class="an-stat-sub">experience points</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">🗂️</div><div class="an-stat-label">Flashcards mastered</div><div class="an-stat-value" id="an-fc-mastered">—</div><div class="an-stat-sub" id="an-fc-total-sub">of — total</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">📅</div><div class="an-stat-label">Days studied</div><div class="an-stat-value" id="an-days">—</div><div class="an-stat-sub">unique active days</div></div>
       </div>
 
-      <!-- Radical Progress Section: Topical & Yearly Progress Circles -->
       <div class="an-two-col">
-
-        <!-- Topical Progress Widget -->
+        <!-- Topical -->
         <div class="an-card">
-          <div class="an-card-title">
-            Topical Chapter Progress
-            <span class="an-card-badge" id="an-topical-badge">Syllabus Progress</span>
-          </div>
+          <div class="an-card-title">Topical Chapter Progress <span class="an-card-badge" id="an-topical-badge">Syllabus</span></div>
           <div class="radial-widget-container">
             <div class="radial-chart">
-              <svg viewBox="0 0 120 120">
-                <circle class="radial-bg" cx="60" cy="60" r="50"></circle>
-                <circle class="radial-fill" id="an-topical-circle" cx="60" cy="60" r="50" stroke-dasharray="314.15" stroke-dashoffset="314.15"></circle>
-              </svg>
-              <div class="radial-center">
-                <div class="radial-center-pct" id="an-topical-pct">0%</div>
-                <div class="radial-center-lbl">Completed</div>
-              </div>
+              <svg viewBox="0 0 120 120"><circle class="radial-bg" cx="60" cy="60" r="50"></circle><circle class="radial-fill" id="an-topical-circle" cx="60" cy="60" r="50" stroke-dasharray="314.15" stroke-dashoffset="314.15"></circle></svg>
+              <div class="radial-center"><div class="radial-center-pct" id="an-topical-pct">0%</div><div class="radial-center-lbl">Done</div></div>
             </div>
             <div class="radial-details">
-              <div style="font-size:0.88rem; font-weight:700; color:var(--text);" id="an-topical-summary">0 of 0 chapters completed</div>
-              <div style="font-size:0.78rem; color:var(--muted);" id="an-topical-sub">Keep practicing chapters to reach 100% mastery!</div>
-              <a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px; font-size:0.75rem; padding:6px 14px; font-weight:700; align-self:flex-start; margin-top:4px;">Topical Progress →</a>
+              <div style="font-size:.86rem;font-weight:700;color:var(--text)" id="an-topical-summary">0 of 0 chapters</div>
+              <div style="font-size:.76rem;color:var(--muted)" id="an-topical-sub">Keep practicing!</div>
+              <a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px;font-size:.73rem;padding:6px 14px;font-weight:700;align-self:flex-start;margin-top:4px">Topical Progress →</a>
             </div>
           </div>
-
-          <!-- Remaining Topics List -->
-          <div style="margin-top:1.25rem;">
-            <div style="font-size:0.74rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:0.06em;">Topics To Do / In Progress</div>
-            <div class="remaining-topics-list" id="an-remaining-topics">
-              <div class="an-empty">Loading topics…</div>
-            </div>
-          </div>
+          <div style="margin-top:1.1rem"><div class="an-section-head">Topics to do / in progress</div><div class="remaining-topics-list" id="an-remaining-topics"><div class="an-empty">Loading…</div></div></div>
         </div>
 
-        <!-- Yearly Past Paper Progress Widget -->
+        <!-- Yearly -->
         <div class="an-card">
-          <div class="an-card-title">
-            Yearly Past Paper Progress
-            <span class="an-card-badge" id="an-yearly-badge">Paper Scores</span>
-          </div>
+          <div class="an-card-title">Yearly Past Paper Progress <span class="an-card-badge" id="an-yearly-badge">Paper Scores</span></div>
           <div class="radial-widget-container">
             <div class="radial-chart">
-              <svg viewBox="0 0 120 120">
-                <circle class="radial-bg" cx="60" cy="60" r="50"></circle>
-                <circle class="radial-fill" id="an-yearly-circle" cx="60" cy="60" r="50" stroke="#f59e0b" stroke-dasharray="314.15" stroke-dashoffset="314.15"></circle>
-              </svg>
-              <div class="radial-center">
-                <div class="radial-center-pct" id="an-yearly-pct">0%</div>
-                <div class="radial-center-lbl">Attempted</div>
-              </div>
+              <svg viewBox="0 0 120 120"><circle class="radial-bg" cx="60" cy="60" r="50"></circle><circle class="radial-fill" id="an-yearly-circle" cx="60" cy="60" r="50" stroke="#f59e0b" stroke-dasharray="314.15" stroke-dashoffset="314.15"></circle></svg>
+              <div class="radial-center"><div class="radial-center-pct" id="an-yearly-pct">0%</div><div class="radial-center-lbl">Attempted</div></div>
             </div>
             <div class="radial-details">
-              <div style="font-size:0.88rem; font-weight:700; color:var(--text);" id="an-yearly-summary">0 past papers solved</div>
-              <div style="font-size:0.78rem; color:var(--muted);" id="an-yearly-grade-est">Predicted Grade: —</div>
-              <a href="yearly-progress.html" class="btn btn-dark" style="border-radius:20px; font-size:0.75rem; padding:6px 14px; font-weight:700; align-self:flex-start; margin-top:4px;">Yearly Papers →</a>
+              <div style="font-size:.86rem;font-weight:700;color:var(--text)" id="an-yearly-summary">0 papers attempted</div>
+              <div style="font-size:.76rem;color:var(--muted)" id="an-yearly-grade-est">Predicted Grade: —</div>
+              <a href="yearly-progress.html" class="btn btn-dark" style="border-radius:20px;font-size:.73rem;padding:6px 14px;font-weight:700;align-self:flex-start;margin-top:4px">Yearly Papers →</a>
             </div>
           </div>
-
-          <!-- Recent Paper Scores List -->
-          <div style="margin-top:1.25rem;">
-            <div style="font-size:0.74rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:0.06em;">Recent Paper Scores</div>
-            <div class="remaining-topics-list" id="an-recent-papers">
-              <div class="an-empty">No past papers logged yet</div>
-            </div>
-          </div>
+          <div style="margin-top:1.1rem"><div class="an-section-head">Recent paper scores</div><div class="remaining-topics-list" id="an-recent-papers"><div class="an-empty">No past papers logged yet</div></div></div>
         </div>
-
       </div>
 
-      <!-- Study Time Tracker -->
+      <!-- Study time -->
       <div class="an-card">
-        <div class="an-card-title">Study Time Tracker — Last 7 Days</div>
-        <div style="display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center;">
-          <div style="display: flex; gap: 16px; align-items: flex-end; height: 160px; padding-bottom: 20px; border-bottom: 1.5px solid var(--line);">
-            <div id="an-time-chart" style="display: flex; justify-content: space-around; width: 100%; height: 100%; align-items: flex-end;">
-              <p class="dash-loading">Loading study hours...</p>
-            </div>
+        <div class="an-card-title">Study Time — Last 7 Days</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center">
+          <div style="display:flex;gap:16px;align-items:flex-end;height:150px;padding-bottom:20px;border-bottom:1.5px solid var(--line)">
+            <div id="an-time-chart" style="display:flex;justify-content:space-around;width:100%;height:100%;align-items:flex-end"><p class="dash-loading">Loading…</p></div>
           </div>
-          <div style="background: var(--page); padding: 20px; border-radius: 16px; border: 1.5px solid var(--line); min-width: 220px;">
-            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em;">Total Time Spent</div>
-            <div style="font-size: 2rem; font-weight: 900; color: var(--text); margin-top: 4px;" id="an-time-total">—</div>
-            <div style="font-size: 0.82rem; color: var(--muted); margin-top: 2px;">in the last 7 days</div>
+          <div style="background:var(--page);padding:18px;border-radius:16px;border:1.5px solid var(--line);min-width:180px">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.08em">Total this week</div>
+            <div style="font-size:1.9rem;font-weight:900;color:var(--text);margin-top:4px" id="an-time-total">—</div>
+            <div style="font-size:.8rem;color:var(--muted);margin-top:2px">last 7 days</div>
           </div>
         </div>
       </div>
 
-      <!-- Activity Heatmap -->
+      <!-- Heatmap -->
       <div class="an-card">
         <div class="an-card-title">Activity — Last 12 Months</div>
-        <div class="heatmap-scroll">
-          <div class="heatmap-inner">
-            <div class="hm-months" id="hm-months"></div>
-            <div class="hm-row">
-              <div class="hm-days">
-                <span>Mon</span><span></span><span>Wed</span>
-                <span></span><span>Fri</span><span></span><span>Sun</span>
-              </div>
-              <div class="hm-weeks" id="hm-weeks"></div>
-            </div>
+        <div class="heatmap-scroll"><div class="heatmap-inner">
+          <div class="hm-months" id="hm-months"></div>
+          <div class="hm-row">
+            <div class="hm-days"><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span>Sun</span></div>
+            <div class="hm-weeks" id="hm-weeks"></div>
           </div>
-        </div>
-        <div class="hm-legend">
-          Less
-          <div class="hm-legend-cells">
-            <div class="hm-legend-cell" style="background:var(--line)"></div>
-            <div class="hm-legend-cell" style="background:#d1fae5"></div>
-            <div class="hm-legend-cell" style="background:#6ee7b7"></div>
-            <div class="hm-legend-cell" style="background:#10b981"></div>
-            <div class="hm-legend-cell" style="background:#047857"></div>
-          </div>
-          More
-        </div>
+        </div></div>
+        <div class="hm-legend">Less<div class="hm-legend-cells"><div class="hm-legend-cell" style="background:var(--line)"></div><div class="hm-legend-cell" style="background:#d1fae5"></div><div class="hm-legend-cell" style="background:#6ee7b7"></div><div class="hm-legend-cell" style="background:#10b981"></div><div class="hm-legend-cell" style="background:#047857"></div></div>More</div>
       </div>
 
-      <!-- Flashcard Mastery & Quiz History -->
+      <!-- FC bars + quiz -->
       <div class="an-two-col">
-        <div class="an-card">
-          <div class="an-card-title">Flashcard Mastery by Subject</div>
-          <div class="subj-bar-list" id="an-subj-bars">
-            <div class="an-empty">Loading…</div>
-          </div>
-        </div>
+        <div class="an-card"><div class="an-card-title">Flashcard Mastery by Subject</div><div class="subj-bar-list" id="an-subj-bars"><div class="an-empty">Loading…</div></div></div>
+        <div class="an-card"><div class="an-card-title">Recent Quiz Scores</div><div class="quiz-hist-list" id="an-quiz-hist"><div class="an-empty">Loading…</div></div></div>
+      </div>
 
-        <div class="an-card">
-          <div class="an-card-title">Recent Quiz Scores</div>
-          <div class="quiz-hist-list" id="an-quiz-hist">
-            <div class="an-empty">Loading…</div>
+    </div><!-- /tab-overview -->
+
+    <!-- ══ TAB 2: FLASHCARDS ═════════════════════════════════════════ -->
+    <div id="tab-flashcards" class="an-tab-panel">
+
+      <div class="an-stats-row" style="margin-top:0">
+        <div class="an-stat-card"><div class="an-stat-icon">🗂️</div><div class="an-stat-label">Reviews today</div><div class="an-stat-value" id="fc-today">—</div><div class="an-stat-sub">cards reviewed</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">📅</div><div class="an-stat-label">This week</div><div class="an-stat-value" id="fc-week">—</div><div class="an-stat-sub">cards reviewed</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">📦</div><div class="an-stat-label">All time</div><div class="an-stat-value" id="fc-alltime">—</div><div class="an-stat-sub">total reviews</div></div>
+        <div class="an-stat-card"><div class="an-stat-icon">🏅</div><div class="an-stat-label">Chapters mastered</div><div class="an-stat-value" id="fc-chapters-mastered">—</div><div class="an-stat-sub">≥ 80% mastery</div></div>
+      </div>
+
+      <div class="fcp-streak">
+        <div class="fcp-streak-flame">🔥</div>
+        <div class="fcp-streak-body">
+          <div class="fcp-streak-num" id="fc-streak-num">0</div>
+          <div class="fcp-streak-label">day streak &nbsp;·&nbsp; Longest: <b id="fc-streak-longest">0</b> days</div>
+          <div class="fcp-streak-meta" id="fc-streak-meta"></div>
+        </div>
+        <a href="study.html" class="btn btn-dark" style="border-radius:28px;padding:8px 22px;font-weight:700;font-size:.82rem">Study now →</a>
+      </div>
+
+      <div id="fc-weak-section" hidden style="margin-bottom:1.4rem">
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem">Needs Work <span class="an-card-badge" id="fc-weak-count">0 chapters</span></div>
+        <div class="fcp-weak-grid" id="fc-weak-grid"></div>
+      </div>
+
+      <div class="an-card" id="fc-mastery-card">
+        <div class="an-card-title">Mastery by Chapter <span class="an-card-badge" id="fc-mastery-count">0 chapters</span></div>
+        <div class="fcp-filter"><select id="fcp-sub-filter"><option value="">All subjects</option></select></div>
+        <div class="fcp-mastery-list" id="fc-mastery-list"><div class="an-empty">Loading flashcard data…</div></div>
+      </div>
+
+      <div class="an-card" id="fc-sessions-card" hidden>
+        <div class="an-card-title">Recent Sessions</div>
+        <div class="fcp-session-list" id="fc-session-list"></div>
+      </div>
+
+    </div><!-- /tab-flashcards -->
+
+    <!-- ══ TAB 3: ACHIEVEMENTS ═══════════════════════════════════════ -->
+    <div id="tab-achievements" class="an-tab-panel">
+
+      <div class="ach-level-card">
+        <div class="ach-level-badge" id="ach-level-badge">⭐</div>
+        <div class="ach-level-info">
+          <div class="ach-level-num" id="ach-level-num">Level 1</div>
+          <div class="ach-level-label">PrepWithTee Learner</div>
+          <div class="ach-xp-bar-wrap">
+            <div class="ach-xp-bar-labels"><span id="ach-xp-cur">0 XP</span><span id="ach-xp-nxt">100 XP to next level</span></div>
+            <div class="ach-xp-bar-track"><div class="ach-xp-bar-fill" id="ach-xp-bar" style="width:0%"></div></div>
           </div>
+          <div class="ach-xp-total">Total: <strong id="ach-xp-total">0 XP</strong></div>
         </div>
       </div>
 
-    </div>
+      <div class="ach-streak-row">
+        <div class="ach-streak-card"><div class="ach-streak-ico">🔥</div><div><div class="ach-streak-num"><span id="ach-streak">0</span> day streak</div><div class="ach-streak-lbl">Keep it going!</div></div></div>
+        <div class="ach-streak-card"><div class="ach-streak-ico">🏅</div><div><div class="ach-streak-num"><span id="ach-longest">0</span> days</div><div class="ach-streak-lbl">Longest streak</div></div></div>
+        <div class="ach-streak-card"><div class="ach-streak-ico">📅</div><div><div class="ach-streak-num"><span id="ach-days-studied">0</span> days</div><div class="ach-streak-lbl">Total days studied</div></div></div>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-title">Badges <span class="an-card-badge" id="ach-badges-earned">0 earned</span></div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+
+      <div class="an-card">
+        <div class="an-card-title">Recent XP Gains</div>
+        <div class="xp-log-list" id="xp-log-list"><div class="an-empty">Start studying to earn XP!</div></div>
+      </div>
+
+    </div><!-- /tab-achievements -->
+
   </main>
 
   <script type="module" src="/auth.js?v=20260829a"></script>
@@ -638,84 +437,71 @@
     import { requireProfile, api } from "/auth.js";
     const _anUser = await requireProfile();
 
-    /* ── Guard: clear stale XP data from a different account ── */
     if (_anUser) {
       const storedUid = localStorage.getItem("pwt_uid");
       if (storedUid && storedUid !== _anUser.id) {
-        ["pwt_xp_total","pwt_xp_log","pwt_badges","pwt_missions",
-         "pwt_focus","pwt_streak","pwt_streak_max"].forEach(k => {
+        ["pwt_xp_total","pwt_xp_log","pwt_badges","pwt_missions","pwt_focus","pwt_streak","pwt_streak_max"].forEach(k => {
           try { localStorage.removeItem(k); } catch {}
         });
       }
       try { localStorage.setItem("pwt_uid", _anUser.id); } catch {}
     }
 
-    function esc(s) {
-      return String(s ?? '').replace(/[&<>"']/g, c =>
-        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function ls(k, def) { try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } }
+    function fmtDate(iso) { if (!iso) return '—'; return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+
+    /* ── Tab switching ────────────────────────────────────────── */
+    const tabBtns   = document.querySelectorAll('.an-tab-btn');
+    const tabPanels = document.querySelectorAll('.an-tab-panel');
+    const subjectWrap = document.getElementById('an-subject-selector-wrap');
+
+    function activateTab(name) {
+      tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+      tabPanels.forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+      subjectWrap.style.display = name === 'overview' ? '' : 'none';
+      history.replaceState(null, '', `?tab=${name}`);
     }
-    function ls(k, def) {
-      try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }
-      catch { return def; }
-    }
+    tabBtns.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+    const initTab = new URLSearchParams(location.search).get('tab') || 'overview';
+    if (['overview','flashcards','achievements'].includes(initTab)) activateTab(initTab);
 
-    let activeSyllabusFilter = "";
+    /* ── Hydrate server stats ─────────────────────────────────── */
+    try {
+      const srv = await api("/api/stats");
+      if (srv && (srv.xp_total > 0 || srv.badges?.length > 0)) {
+        const _lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+        _lsSet("pwt_xp_total", srv.xp_total);
+        if (srv.xp_log?.length) _lsSet("pwt_xp_log", srv.xp_log);
+        _lsSet("pwt_badges", srv.badges || []);
+        _lsSet("pwt_streak", srv.streak || 0);
+        if (srv.streak_max > 0) _lsSet("pwt_streak_max", srv.streak_max);
+      }
+    } catch {}
 
-    // Caches
-    let cachedDashboard = null;
-    let allTopicProgress = [];  // aggregated topic_progress rows across syllabuses
-    let allPaperProgress = [];  // aggregated paper_progress rows
-    let enrolledList = [];      // [{syllabus, name}]
+    const streakVal   = ls('pwt_streak', 0);
+    const totalXPVal  = ls('pwt_xp_total', 0);
+    const xpLogVal    = ls('pwt_xp_log', []);
+    const longestVal  = ls('pwt_streak_max', streakVal);
+    const badges      = new Set(ls('pwt_badges', []));
+    const daysStudied = new Set(xpLogVal.map(e => e.date).filter(Boolean)).size;
 
-    /* ── Local stats ────────────────────────────────────────── */
-    const streak   = ls('pwt_streak', 0);
-    const totalXP  = ls('pwt_xp_total', 0);
-    const xpLog    = ls('pwt_xp_log', []);
+    document.getElementById('an-streak').textContent = streakVal;
+    document.getElementById('an-xp').textContent     = totalXPVal;
+    document.getElementById('an-days').textContent   = daysStudied;
 
-    document.getElementById('an-streak').textContent = streak;
-    document.getElementById('an-xp').textContent     = totalXP;
-
-    const daysStudied = new Set(xpLog.map(e => e.date).filter(Boolean)).size;
-    document.getElementById('an-days').textContent = daysStudied;
-
-    /* ── Subject Cards Dropdown Builder ────────────────────── */
-    const SYLLABUS_ICONS = {
-      '5054': '🔬', '0625': '🔬', '9702': '⚡',
-      '4024': '📐', '0580': '📐', '9709': '📊',
-      '2210': '💻', '0478': '💻', '9618': '🖥️',
-      '5070': '🧪', '0620': '🧪', '9701': '⚗️',
-      '2058': '🕌', '2059': '🇵🇰'
-    };
+    /* ── Subject picker ───────────────────────────────────────── */
+    const SYLLABUS_ICONS = {'5054':'🔬','0625':'🔬','9702':'⚡','4024':'📐','0580':'📐','9709':'📊','2210':'💻','0478':'💻','9618':'🖥️','5070':'🧪','0620':'🧪','9701':'⚗️','2058':'🕌','2059':'🇵🇰'};
+    let activeSyllabusFilter = "", cachedDashboard = null, allTopicProgress = [], allPaperProgress = [], enrolledList = [];
 
     function buildSubjectPicker(enrollments) {
       const picker = document.getElementById('an-subject-picker');
-      if (!enrollments || !enrollments.length) {
-        picker.innerHTML = `<div class="an-sub-card active" data-syllabus="">
-          <span class="an-sub-icon">🌐</span>
-          <span class="an-sub-name">All Subjects</span>
-        </div>
-        <div class="an-sub-card" onclick="window.location='profile.html'" style="border-style:dashed;">
-          <span class="an-sub-icon">➕</span>
-          <span class="an-sub-name">Enroll in a subject</span>
-        </div>`;
+      if (!enrollments?.length) {
+        picker.innerHTML = `<div class="an-sub-card active" data-syllabus=""><span class="an-sub-icon">🌐</span><span class="an-sub-name">All Subjects</span></div><div class="an-sub-card" onclick="location='profile.html'" style="border-style:dashed"><span class="an-sub-icon">➕</span><span class="an-sub-name">Enroll in a subject</span></div>`;
         return;
       }
-
-      const items = [{ code: '', name: 'All Subjects', icon: '🌐' }];
-      enrollments.forEach(s => {
-        const code = String(s.syllabus || s.code || s);
-        const name = s.name || `Syllabus ${code}`;
-        const icon = SYLLABUS_ICONS[code] || '📖';
-        items.push({ code, name, icon });
-      });
-
-      picker.innerHTML = items.map(item => `
-        <div class="an-sub-card ${activeSyllabusFilter === item.code ? 'active' : ''}" data-syllabus="${esc(item.code)}">
-          <span class="an-sub-icon">${item.icon}</span>
-          <span class="an-sub-name">${esc(item.name)}</span>
-        </div>
-      `).join('');
-
+      const items = [{ code:'', name:'All Subjects', icon:'🌐' }, ...enrollments.map(s => ({ code: String(s.syllabus || s.code || s), name: s.name || `Syllabus ${s.syllabus || s.code || s}`, icon: SYLLABUS_ICONS[String(s.syllabus || s.code || s)] || '📖' }))];
+      picker.innerHTML = items.map(item => `<div class="an-sub-card${activeSyllabusFilter === item.code ? ' active' : ''}" data-syllabus="${esc(item.code)}"><span class="an-sub-icon">${item.icon}</span><span class="an-sub-name">${esc(item.name)}</span></div>`).join('');
       picker.querySelectorAll('.an-sub-card').forEach(card => {
         card.addEventListener('click', () => {
           picker.querySelectorAll('.an-sub-card').forEach(c => c.classList.remove('active'));
@@ -727,331 +513,248 @@
       });
     }
 
-    /* ── Radial SVG Progress Renderer ────────────────────────── */
-    function setRadialProgress(circleId, pctId, percent) {
+    /* ── Radial helper ────────────────────────────────────────── */
+    function setRadial(circleId, pctId, percent) {
       const pct = Math.min(Math.max(Math.round(percent), 0), 100);
-      const circle = document.getElementById(circleId);
-      const text = document.getElementById(pctId);
-      if (text) text.textContent = `${pct}%`;
-      if (circle) {
-        const circumference = 2 * Math.PI * 50; // 314.15
-        circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
-      }
+      const el = document.getElementById(pctId); if (el) el.textContent = `${pct}%`;
+      const c  = document.getElementById(circleId); if (c) c.style.strokeDashoffset = 314.15 - (pct / 100) * 314.15;
     }
 
-    /* ── Render Topical Progress (uses progress_summary from /api/dashboard) ── */
+    /* ── Topical progress ─────────────────────────────────────── */
     function renderTopicalProgress(sylFilter) {
       const summary = cachedDashboard?.progress_summary || {};
-      let totalChapters = 0, confidentChapters = 0, learningChapters = 0;
-      const remaining = [];
-
-      const syllabuses = sylFilter ? [sylFilter] : Object.keys(summary);
-      for (const syl of syllabuses) {
-        const s = summary[syl];
-        if (!s) continue;
-        totalChapters += s.total || 0;
-        confidentChapters += s.confident || 0;
-        learningChapters += s.learning || 0;
+      let total = 0, done = 0, learning = 0;
+      (sylFilter ? [sylFilter] : Object.keys(summary)).forEach(syl => {
+        const s = summary[syl]; if (!s) return;
+        total += s.total || 0; done += s.confident || 0; learning += s.learning || 0;
+      });
+      if (!total) {
+        const chapters = (sylFilter ? allTopicProgress.filter(p => String(p.syllabus) === String(sylFilter)) : allTopicProgress).filter(p => !p.subtopic);
+        total = chapters.length; done = chapters.filter(p => p.status === 'confident').length;
       }
-
-      // Also build remaining from allTopicProgress
-      const filtered = sylFilter
-        ? allTopicProgress.filter(p => String(p.syllabus) === String(sylFilter))
-        : allTopicProgress;
-
-      // Only chapter-level rows (no subtopic)
-      const chapters = filtered.filter(p => !p.subtopic);
-      const todo = chapters.filter(p => p.status !== 'confident');
-
-      // Use the summary counts if available, otherwise fall back to row counts
-      const total = totalChapters || chapters.length;
-      const done = confidentChapters || chapters.filter(p => p.status === 'confident').length;
       const pct = total ? Math.round((done / total) * 100) : 0;
+      setRadial('an-topical-circle', 'an-topical-pct', pct);
+      document.getElementById('an-topical-summary').textContent = `${done} of ${total} chapters completed`;
+      document.getElementById('an-topical-sub').textContent = learning ? `${learning} chapters in progress` : 'Keep practicing!';
 
-      setRadialProgress('an-topical-circle', 'an-topical-pct', pct);
-      document.getElementById('an-topical-summary').textContent =
-        `${done} of ${total} chapters completed`;
-      document.getElementById('an-topical-sub').textContent =
-        learningChapters ? `${learningChapters} chapters in progress` : 'Keep practicing to increase your mastery!';
-
+      const filtered = (sylFilter ? allTopicProgress.filter(p => String(p.syllabus) === String(sylFilter)) : allTopicProgress).filter(p => !p.subtopic && p.status !== 'confident');
       const el = document.getElementById('an-remaining-topics');
-      if (total === 0) {
-        el.innerHTML = `<div class="an-empty">
-          <p>No topical progress tracked yet.</p>
-          <a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px; font-size:0.8rem; padding:8px 18px; margin-top:8px; display:inline-block;">Start Tracking Progress →</a>
-        </div>`;
-      } else if (!todo.length && total > 0) {
+      if (!total) {
+        el.innerHTML = `<div class="an-empty"><a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Start Tracking →</a></div>`;
+      } else if (!filtered.length) {
         el.innerHTML = '<div class="an-empty">🎉 All chapters completed!</div>';
       } else {
-        el.innerHTML = todo.slice(0, 6).map(t => {
-          const subjectName = enrolledList.find(e => e.syllabus === t.syllabus)?.name || t.syllabus;
-          const statusLabel = t.status === 'learning' ? '🟡 Learning' : '⚪ Not Started';
-          return `<div class="remaining-topic-item">
-            <div>
-              <div class="remaining-topic-name">${esc(t.topic || 'Chapter')}</div>
-              <div class="remaining-topic-sub">${esc(subjectName)} · ${statusLabel}</div>
-            </div>
-            <a href="topical-progress.html?syllabus=${esc(t.syllabus)}" class="btn btn-dark" style="border-radius:12px; font-size:0.7rem; padding:4px 10px;">Practice →</a>
-          </div>`;
+        el.innerHTML = filtered.slice(0, 5).map(t => {
+          const sn = enrolledList.find(e => e.syllabus === t.syllabus)?.name || t.syllabus;
+          const sl = t.status === 'learning' ? '🟡 Learning' : '⚪ Not started';
+          return `<div class="remaining-topic-item"><div><div class="remaining-topic-name">${esc(t.topic || 'Chapter')}</div><div class="remaining-topic-sub">${esc(sn)} · ${sl}</div></div><a href="topical-progress.html?syllabus=${esc(t.syllabus)}" class="btn btn-dark" style="border-radius:11px;font-size:.68rem;padding:4px 9px">Go →</a></div>`;
         }).join('');
       }
     }
 
-    /* ── Render Yearly Paper Progress ────────────────────────── */
+    /* ── Yearly papers ────────────────────────────────────────── */
     function renderYearlyProgress(sylFilter) {
-      const filtered = sylFilter
-        ? allPaperProgress.filter(p => String(p.syllabus) === String(sylFilter))
-        : allPaperProgress;
-
+      const filtered = sylFilter ? allPaperProgress.filter(p => String(p.syllabus) === String(sylFilter)) : allPaperProgress;
       const total = filtered.length;
-      const done = filtered.filter(p =>
-        p.status === 'confident' || p.status === 'learning' || p.score != null || p.marks != null
-      ).length;
-      const pct = total ? Math.round((done / total) * 100) : (done > 0 ? 100 : 0);
-
-      setRadialProgress('an-yearly-circle', 'an-yearly-pct', pct);
+      const done  = filtered.filter(p => p.status === 'confident' || p.status === 'learning' || p.score != null || p.marks != null).length;
+      const pct   = total ? Math.round((done / total) * 100) : (done > 0 ? 100 : 0);
+      setRadial('an-yearly-circle', 'an-yearly-pct', pct);
       document.getElementById('an-yearly-summary').textContent = `${done} past papers attempted`;
-
-      // Grade estimate from most recent papers
       const grades = filtered.map(p => p.grade).filter(Boolean);
-      document.getElementById('an-yearly-grade-est').textContent =
-        grades.length ? `Recent Grade: ${grades[0]}` : (done > 0 ? 'Grades available after marking' : 'No papers attempted yet');
-
+      document.getElementById('an-yearly-grade-est').textContent = grades.length ? `Recent Grade: ${grades[0]}` : (done > 0 ? 'Grades available after marking' : 'No papers attempted yet');
       const el = document.getElementById('an-recent-papers');
       if (!filtered.length) {
-        el.innerHTML = `<div class="an-empty">
-          <p>No past papers logged yet.</p>
-          <a href="yearly-progress.html" class="btn btn-dark" style="border-radius:20px; font-size:0.8rem; padding:8px 18px; margin-top:8px; display:inline-block;">Track Past Papers →</a>
-        </div>`;
+        el.innerHTML = `<div class="an-empty"><a href="yearly-progress.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Track Past Papers →</a></div>`;
       } else {
-        el.innerHTML = filtered.slice(0, 6).map(p => {
-          const subjectName = enrolledList.find(e => e.syllabus === p.syllabus)?.name || p.syllabus;
-          const scoreText = p.score != null ? `${p.score}/${p.max_score || '?'}` : (p.marks != null ? p.marks : '—');
-          return `<div class="remaining-topic-item">
-            <div>
-              <div class="remaining-topic-name">${esc(subjectName)} · ${esc(p.year || '')} ${esc((p.session || '').toUpperCase())} P${esc(p.paper || '1')}V${esc(p.variant || '1')}</div>
-              <div class="remaining-topic-sub">Score: ${scoreText} · Grade: <b>${esc(p.grade || '—')}</b></div>
-            </div>
-            <span class="an-card-badge" style="font-size:0.7rem;">${esc(p.grade || p.status || '—')}</span>
-          </div>`;
+        el.innerHTML = filtered.slice(0, 5).map(p => {
+          const sn = enrolledList.find(e => e.syllabus === p.syllabus)?.name || p.syllabus;
+          const st = p.score != null ? `${p.score}/${p.max_score || '?'}` : (p.marks ?? '—');
+          return `<div class="remaining-topic-item"><div><div class="remaining-topic-name">${esc(sn)} · ${esc(p.year || '')} ${esc((p.session || '').toUpperCase())} P${esc(p.paper || '1')}V${esc(p.variant || '1')}</div><div class="remaining-topic-sub">Score: ${st} · Grade: <b>${esc(p.grade || '—')}</b></div></div><span class="an-card-badge">${esc(p.grade || p.status || '—')}</span></div>`;
         }).join('');
       }
     }
 
-    /* ── Activity Heatmap ────────────────────────────────────── */
+    /* ── Heatmap ──────────────────────────────────────────────── */
     (function buildHeatmap() {
       const byDate = {};
-      xpLog.forEach(e => { if (e.date) byDate[e.date] = (byDate[e.date] || 0) + (e.xp || 1); });
-
-      const today = new Date();
-      const end   = new Date(today);
+      xpLogVal.forEach(e => { if (e.date) byDate[e.date] = (byDate[e.date] || 0) + (e.xp || 1); });
+      const today = new Date(), end = new Date(today);
       end.setDate(end.getDate() + (7 - end.getDay()) % 7);
-      const start = new Date(end);
-      start.setDate(start.getDate() - 52 * 7 + 1);
-
-      const weeks = [];
-      const monthLabels = [];
-      let cur = new Date(start);
-      const off = (cur.getDay() + 6) % 7;
-      cur.setDate(cur.getDate() - off);
-
-      let lastMonth = -1;
+      const start = new Date(end); start.setDate(start.getDate() - 52 * 7 + 1);
+      const weeks = [], monthLabels = [];
+      let cur = new Date(start), lastMonth = -1;
+      cur.setDate(cur.getDate() - (cur.getDay() + 6) % 7);
       while (cur <= end) {
         const week = [];
         for (let d = 0; d < 7; d++) {
           const key = cur.toISOString().slice(0, 10);
-          const xp  = byDate[key] || 0;
-          const lv  = xp === 0 ? '' : xp <= 5 ? 'l1' : xp <= 15 ? 'l2' : xp <= 30 ? 'l3' : 'l4';
-          const inRange = cur >= start && cur <= today;
-          week.push({ key, lv, inRange });
-          if (cur.getMonth() !== lastMonth && d === 0) {
-            monthLabels.push({ week: weeks.length, label: cur.toLocaleString('default',{month:'short'}) });
-            lastMonth = cur.getMonth();
-          }
+          const xp = byDate[key] || 0;
+          const lv = xp === 0 ? '' : xp <= 5 ? 'l1' : xp <= 15 ? 'l2' : xp <= 30 ? 'l3' : 'l4';
+          week.push({ key, lv, inRange: cur >= start && cur <= today });
+          if (cur.getMonth() !== lastMonth && d === 0) { monthLabels.push({ week: weeks.length, label: cur.toLocaleString('default',{month:'short'}) }); lastMonth = cur.getMonth(); }
           cur.setDate(cur.getDate() + 1);
         }
         weeks.push(week);
       }
-
-      const monthsEl = document.getElementById('hm-months');
-      let col = 0;
-      monthLabels.forEach(m => {
-        const gap = m.week - col;
-        if (gap > 0) monthsEl.insertAdjacentHTML('beforeend',
-          `<span style="width:${gap * 14}px;display:inline-block"></span>`);
-        monthsEl.insertAdjacentHTML('beforeend', `<span>${m.label}</span>`);
-        col = m.week + 1;
-      });
-
-      const weeksEl = document.getElementById('hm-weeks');
-      weeks.forEach(week => {
-        const wEl = document.createElement('div');
-        wEl.className = 'hm-week';
-        week.forEach(({ key, lv, inRange }) => {
-          const cell = document.createElement('div');
-          cell.className = 'hm-cell' + (lv && inRange ? ` ${lv}` : '');
-          cell.title = key;
-          wEl.appendChild(cell);
-        });
-        weeksEl.appendChild(wEl);
-      });
+      const mEl = document.getElementById('hm-months'); let col = 0;
+      monthLabels.forEach(m => { const gap = m.week - col; if (gap > 0) mEl.insertAdjacentHTML('beforeend', `<span style="width:${gap * 14}px;display:inline-block"></span>`); mEl.insertAdjacentHTML('beforeend', `<span>${m.label}</span>`); col = m.week + 1; });
+      const wEl = document.getElementById('hm-weeks');
+      weeks.forEach(week => { const wDiv = document.createElement('div'); wDiv.className = 'hm-week'; week.forEach(({ key, lv, inRange }) => { const cell = document.createElement('div'); cell.className = 'hm-cell' + (lv && inRange ? ` ${lv}` : ''); cell.title = key; wDiv.appendChild(cell); }); wEl.appendChild(wDiv); });
     })();
 
-    /* ── Main data loader ───────────────────────────────────── */
+    /* ── Main dashboard loader ────────────────────────────────── */
     (async function loadAllData() {
       try {
-        // 1. Fetch dashboard (enrollments, progress_summary, recent_quizzes, paper_summary)
         const dash = await api('/api/dashboard');
-        cachedDashboard = dash;
-        enrolledList = dash.enrollments || [];
+        cachedDashboard = dash; enrolledList = dash.enrollments || [];
         buildSubjectPicker(enrolledList);
-
-        // 2. Fetch detailed topic progress for each enrolled subject
-        const progressPromises = enrolledList.map(e =>
-          api(`/api/progress?syllabus=${encodeURIComponent(e.syllabus)}`)
-            .then(r => r.progress || [])
-            .catch(() => [])
-        );
-        const progressArrays = await Promise.all(progressPromises);
-        allTopicProgress = progressArrays.flat();
-
-        // 3. Fetch paper progress
-        try {
-          const pp = await api('/api/papers-progress');
-          allPaperProgress = pp.papers || [];
-        } catch { allPaperProgress = []; }
-
-        // 4. Render topical & yearly widgets
+        const arrs = await Promise.all(enrolledList.map(e => api(`/api/progress?syllabus=${encodeURIComponent(e.syllabus)}`).then(r => r.progress || []).catch(() => [])));
+        allTopicProgress = arrs.flat();
+        try { const pp = await api('/api/papers-progress'); allPaperProgress = pp.papers || []; } catch { allPaperProgress = []; }
         renderTopicalProgress(activeSyllabusFilter);
         renderYearlyProgress(activeSyllabusFilter);
-
-        // 5. Render quiz history from dashboard data (avoid duplicate call)
         renderQuizHistory(dash.recent_quizzes || []);
-
-      } catch (err) {
-        console.error('Analytics load error:', err);
-      }
+      } catch(err) { console.error('Analytics load error:', err); }
     })();
 
-    /* ── Quiz History Renderer ───────────────────────────────── */
+    /* ── Quiz history ─────────────────────────────────────────── */
     function renderQuizHistory(quizzes) {
-      const histEl = document.getElementById('an-quiz-hist');
-      if (!quizzes.length) {
-        histEl.innerHTML = `<div class="an-empty">
-          <p style="margin:0 0 10px">No quiz scores yet.</p>
-          <a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px; font-size:0.8rem; padding:8px 18px; display:inline-block;">Take a Quiz →</a>
-        </div>`;
-        return;
-      }
-      histEl.innerHTML = quizzes.slice(0, 8).map(q => {
-        const pct   = Math.round((q.score / Math.max(q.total, 1)) * 100);
-        const cls   = pct >= 70 ? 'good' : pct < 40 ? 'bad' : '';
-        const dateS = (q.created_at || q.taken_at)
-          ? new Date(q.created_at || q.taken_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})
-          : '';
-        const subjectName = enrolledList.find(e => e.syllabus === q.syllabus)?.name || '';
-        return `<div class="quiz-hist-item">
-          <div class="quiz-hist-score ${cls}">${pct}%</div>
-          <div class="quiz-hist-info">
-            <div class="quiz-hist-topic">${esc(q.topic || q.subject_name || subjectName || 'Quiz')}</div>
-            <div class="quiz-hist-meta">${q.score}/${q.total} correct</div>
-          </div>
-          <div class="quiz-hist-date">${dateS}</div>
-        </div>`;
+      const el = document.getElementById('an-quiz-hist');
+      if (!quizzes.length) { el.innerHTML = `<div class="an-empty"><a href="topical-progress.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Take a Quiz →</a></div>`; return; }
+      el.innerHTML = quizzes.slice(0, 8).map(q => {
+        const pct = Math.round((q.score / Math.max(q.total, 1)) * 100);
+        const cls = pct >= 70 ? 'good' : pct < 40 ? 'bad' : '';
+        const ds  = (q.created_at || q.taken_at) ? new Date(q.created_at || q.taken_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+        const sn  = enrolledList.find(e => e.syllabus === q.syllabus)?.name || '';
+        return `<div class="quiz-hist-item"><div class="quiz-hist-score ${cls}">${pct}%</div><div class="quiz-hist-info"><div class="quiz-hist-topic">${esc(q.topic || q.subject_name || sn || 'Quiz')}</div><div class="quiz-hist-meta">${q.score}/${q.total} correct</div></div><div class="quiz-hist-date">${ds}</div></div>`;
       }).join('');
     }
 
-    /* ── Flashcard Stats ────────────────────────────────────── */
+    /* ── FC data (overview + flashcards tab) ──────────────────── */
     (async function() {
       try {
         const d  = await api('/api/fc/progress');
-        const st = d.stats || {};
+        const st = d.stats || {}, r = d.reviews || { today:0,week:0,all_time:0 };
+        const mastery = d.mastery || [], weak = d.weak_topics || [], sessions = d.sessions || [];
+        const sStreak = d.streak || {};
+
+        // Overview
         document.getElementById('an-fc-mastered').textContent  = st.mastered ?? '—';
         document.getElementById('an-fc-total-sub').textContent = `of ${st.total ?? '?'} total`;
-
         const barsEl = document.getElementById('an-subj-bars');
         const subjects = (d.subjects || []).filter(s => s.total > 0);
         if (!subjects.length) {
-          barsEl.innerHTML = `<div class="an-empty">
-            <p style="margin:0 0 10px">No flashcard data yet.</p>
-            <a href="flashcards.html" class="btn btn-dark" style="border-radius:20px; font-size:0.8rem; padding:8px 18px; display:inline-block;">Start Flashcards →</a>
-          </div>`;
+          barsEl.innerHTML = `<div class="an-empty"><a href="flashcards.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Start Flashcards →</a></div>`;
         } else {
-          const gradients = [
-            'linear-gradient(90deg,#7c4dff,#e040fb)',
-            'linear-gradient(90deg,#10b981,#3b82f6)',
-            'linear-gradient(90deg,#f59e0b,#ef4444)',
-            'linear-gradient(90deg,#06b6d4,#8b5cf6)',
-          ];
-          barsEl.innerHTML = subjects.map((s, i) => {
-            const pct = Math.round((s.mastered / Math.max(s.total, 1)) * 100);
-            return `<div class="subj-bar-item">
-              <div class="subj-bar-meta">
-                <span class="subj-bar-name">${esc(s.name)}</span>
-                <span class="subj-bar-pct">${pct}%</span>
-              </div>
-              <div class="subj-bar-track">
-                <div class="subj-bar-fill" style="width:${pct}%; background:${gradients[i % gradients.length]}"></div>
-              </div>
-              <div class="subj-bar-detail">${s.mastered} mastered · ${s.learning ?? 0} learning · ${s.total} total</div>
-            </div>`;
-          }).join('');
+          const g = ['linear-gradient(90deg,#7c4dff,#e040fb)','linear-gradient(90deg,#10b981,#3b82f6)','linear-gradient(90deg,#f59e0b,#ef4444)','linear-gradient(90deg,#06b6d4,#8b5cf6)'];
+          barsEl.innerHTML = subjects.map((s, i) => { const p = Math.round((s.mastered / Math.max(s.total,1)) * 100); return `<div class="subj-bar-item"><div class="subj-bar-meta"><span class="subj-bar-name">${esc(s.name)}</span><span class="subj-bar-pct">${p}%</span></div><div class="subj-bar-track"><div class="subj-bar-fill" style="width:${p}%;background:${g[i%g.length]}"></div></div><div class="subj-bar-detail">${s.mastered} mastered · ${s.learning??0} learning · ${s.total} total</div></div>`; }).join('');
+        }
+
+        // Flashcards tab
+        document.getElementById('fc-today').textContent            = r.today    || 0;
+        document.getElementById('fc-week').textContent             = r.week     || 0;
+        document.getElementById('fc-alltime').textContent          = r.all_time || 0;
+        document.getElementById('fc-chapters-mastered').textContent = mastery.filter(m => m.pct >= 80).length;
+        document.getElementById('fc-streak-num').textContent       = sStreak.current_streak || 0;
+        document.getElementById('fc-streak-longest').textContent   = sStreak.longest_streak || 0;
+        if (sStreak.last_active_date) document.getElementById('fc-streak-meta').textContent = `Last active: ${sStreak.last_active_date}`;
+
+        if (weak.length) {
+          document.getElementById('fc-weak-section').hidden = false;
+          document.getElementById('fc-weak-count').textContent = `${weak.length} chapter${weak.length > 1 ? 's' : ''}`;
+          document.getElementById('fc-weak-grid').innerHTML = weak.slice(0, 8).map(w => `<div class="fcp-weak-card"><div class="fcp-weak-chapter">${esc(w.chapter_name)}</div><div class="fcp-weak-sub">${esc(w.subject)} · ${esc(w.paper_code)}</div><div class="fcp-weak-pct">${w.pct}%</div><a href="study.html?chapter_ids=${w.chapter_id}" class="btn btn-dark" style="border-radius:18px;font-size:.73rem;padding:5px 13px;font-weight:700;margin-top:6px">Study →</a></div>`).join('');
+        }
+
+        document.getElementById('fc-mastery-count').textContent = `${mastery.length} chapters`;
+        const subMap = [...new Map(mastery.map(m => [m.subject_code, m.subject])).entries()];
+        const filterSel = document.getElementById('fcp-sub-filter');
+        filterSel.innerHTML = `<option value="">All subjects</option>` + subMap.map(([c, n]) => `<option value="${esc(c)}">${esc(n)} (${esc(c)})</option>`).join('');
+        const mastEl = document.getElementById('fc-mastery-list');
+        if (!mastery.length) {
+          mastEl.innerHTML = `<div class="an-empty"><a href="study.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Start your first session →</a></div>`;
+        } else {
+          mastEl.innerHTML = mastery.map(m => { const fc = m.pct===0?'fill-none':m.pct<40?'fill-low':m.pct<75?'fill-mid':'fill-high'; return `<div class="fcp-chapter" data-subject="${esc(m.subject_code)}"><div class="fcp-chapter-top"><div><div class="fcp-chapter-name">${esc(m.chapter_name)}</div><div class="fcp-chapter-sub">${esc(m.subject)} · ${esc(m.paper_code)}</div></div><div class="fcp-chapter-pct">${m.pct}%</div></div><div class="fcp-bar"><div class="fcp-bar-fill ${fc}" style="width:${m.pct}%"></div></div><div class="fcp-tags">${m.new?`<span class="fcp-tag tag-new">${m.new} new</span>`:''}${m.learning?`<span class="fcp-tag tag-learning">${m.learning} learning</span>`:''}${m.in_review?`<span class="fcp-tag tag-review">${m.in_review} review</span>`:''}${m.mastered?`<span class="fcp-tag tag-mastered">${m.mastered} mastered</span>`:''}</div></div>`; }).join('');
+          filterSel.addEventListener('change', () => { const v = filterSel.value; document.querySelectorAll('.fcp-chapter').forEach(r => { r.style.display = (!v || r.dataset.subject === v) ? '' : 'none'; }); });
+        }
+
+        if (sessions.length) {
+          document.getElementById('fc-sessions-card').hidden = false;
+          document.getElementById('fc-session-list').innerHTML = sessions.map(s => { const acc = s.cards_reviewed ? Math.round((s.cards_aced / s.cards_reviewed) * 100) : 0; let scope = ''; try { scope = JSON.parse(s.scope_json || '{}').label || ''; } catch {} return `<div class="fcp-session"><div><div class="fcp-session-date">${fmtDate(s.started_at)}</div>${scope ? `<div class="fcp-session-scope">${esc(scope)}</div>` : ''}</div><div class="fcp-session-stats"><span class="fcp-session-stat"><b>${s.cards_reviewed}</b> cards</span><span class="fcp-session-stat"><b>${acc}%</b> accuracy</span></div></div>`; }).join('');
         }
       } catch {
-        document.getElementById('an-subj-bars').innerHTML = `<div class="an-empty">
-          <p style="margin:0 0 10px">Could not load flashcard data.</p>
-          <a href="flashcards.html" class="btn btn-dark" style="border-radius:20px; font-size:0.8rem; padding:8px 18px; display:inline-block;">Go to Flashcards →</a>
-        </div>`;
+        document.getElementById('an-subj-bars').innerHTML = `<div class="an-empty"><a href="flashcards.html" class="btn btn-dark" style="border-radius:20px;font-size:.8rem;padding:8px 18px;display:inline-block">Go to Flashcards →</a></div>`;
       }
     })();
 
-    /* ── Time Spent Analytics ────────────────────────────────── */
+    /* ── Study time chart ─────────────────────────────────────── */
     (async function() {
-      const chartEl = document.getElementById('an-time-chart');
-      const totalEl = document.getElementById('an-time-total');
+      const chartEl = document.getElementById('an-time-chart'), totalEl = document.getElementById('an-time-total');
       try {
-        const d = await api('/api/analytics/time');
-        const weekly = d.weekly_time || [];
-
-        const days = [];
+        const d = await api('/api/analytics/time'), weekly = d.weekly_time || [];
         const today = new Date();
-        for (let i = 6; i >= 0; i--) {
-          const dt = new Date(today);
-          dt.setDate(today.getDate() - i);
-          const key = dt.toISOString().slice(0, 10);
-          const match = weekly.find(w => w.date === key);
-          days.push({
-            dateStr: dt.toLocaleDateString('en-US', { weekday: 'short' }),
-            seconds: match ? match.seconds : 0
-          });
-        }
-
-        const totalSec = days.reduce((sum, d) => sum + d.seconds, 0);
-        const hrs = Math.floor(totalSec / 3600);
-        const mins = Math.round((totalSec % 3600) / 60);
+        const days = Array.from({length:7}, (_, i) => { const dt = new Date(today); dt.setDate(today.getDate() - (6 - i)); const key = dt.toISOString().slice(0,10); const match = weekly.find(w => w.date === key); return { dateStr: dt.toLocaleDateString('en-US',{weekday:'short'}), seconds: match ? match.seconds : 0 }; });
+        const totalSec = days.reduce((s, d) => s + d.seconds, 0);
+        const hrs = Math.floor(totalSec / 3600), mins = Math.round((totalSec % 3600) / 60);
         totalEl.textContent = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
-
         const maxSec = Math.max(...days.map(d => d.seconds), 60);
-        chartEl.innerHTML = days.map(d => {
-          const pct = Math.min(Math.round((d.seconds / maxSec) * 100), 100);
-          const m = Math.round(d.seconds / 60);
-          return `
-            <div style="display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end;">
-              <span style="font-size: 0.72rem; color: var(--text); font-weight: 700; margin-bottom: 4px;">${m}m</span>
-              <div style="width: 26px; height: ${Math.max(pct, 2)}%; background: linear-gradient(180deg, #10b981, #059669); border-radius: 6px 6px 0 0; transition: height 0.5s ease;"></div>
-              <span style="font-size: 0.72rem; color: var(--muted); margin-top: 8px; font-weight: 600;">${d.dateStr}</span>
-            </div>`;
+        chartEl.innerHTML = days.map(d => { const pct = Math.min(Math.round((d.seconds / maxSec) * 100), 100); const m = Math.round(d.seconds / 60); return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end"><span style="font-size:.7rem;color:var(--text);font-weight:700;margin-bottom:4px">${m}m</span><div style="width:26px;height:${Math.max(pct,2)}%;background:linear-gradient(180deg,#10b981,#059669);border-radius:6px 6px 0 0;transition:height .5s ease"></div><span style="font-size:.7rem;color:var(--muted);margin-top:8px;font-weight:600">${d.dateStr}</span></div>`; }).join('');
+      } catch { chartEl.innerHTML = '<div class="an-empty">Could not load study time data</div>'; }
+    })();
+
+    /* ── Achievements tab ─────────────────────────────────────── */
+    (function() {
+      const XP_PER_LVL = 100;
+      const level = Math.floor(totalXPVal / XP_PER_LVL) + 1;
+      const xpInLvl = totalXPVal % XP_PER_LVL;
+      const pct = Math.min(100, Math.round((xpInLvl / XP_PER_LVL) * 100));
+      const ICONS = ['⭐','🌟','💫','🏅','🥉','🥈','🥇','🏆','👑','💎'];
+      document.getElementById('ach-level-badge').textContent = ICONS[Math.min(level-1, ICONS.length-1)];
+      document.getElementById('ach-level-num').textContent   = `Level ${level}`;
+      document.getElementById('ach-xp-cur').textContent      = `${xpInLvl} XP`;
+      document.getElementById('ach-xp-nxt').textContent      = `${XP_PER_LVL - xpInLvl} XP to next level`;
+      document.getElementById('ach-xp-bar').style.width      = pct + '%';
+      document.getElementById('ach-xp-total').textContent    = `${totalXPVal} XP`;
+      document.getElementById('ach-streak').textContent      = streakVal;
+      document.getElementById('ach-longest').textContent     = longestVal;
+      document.getElementById('ach-days-studied').textContent = daysStudied;
+
+      const logEl = document.getElementById('xp-log-list');
+      const recent = [...xpLogVal].reverse().slice(0, 10);
+      if (recent.length) {
+        logEl.innerHTML = recent.map(e => {
+          const ds  = e.date ? new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
+          const ico = e.reason?.includes('quiz') ? '⚡' : e.reason?.includes('flash') ? '🗂️' : e.reason?.includes('streak') ? '🔥' : '✅';
+          return `<div class="xp-log-item"><span class="xp-log-ico">${ico}</span><span class="xp-log-text">${esc(e.reason || 'Study session')}</span><span class="xp-log-xp">+${e.xp ?? 0} XP</span><span class="xp-log-date">${ds}</span></div>`;
         }).join('');
-      } catch {
-        chartEl.innerHTML = '<div class="an-empty">Could not load study time data</div>';
       }
+
+      const BADGES = [
+        { id:'first_quiz', ico:'⚡', name:'First Spark',    desc:'Complete your first quiz',       color:'#e74c3c' },
+        { id:'streak_3',   ico:'🔥', name:'3-Day Streak',   desc:'Study 3 days in a row',          color:'#E8913A' },
+        { id:'streak_7',   ico:'🏅', name:'Week Warrior',   desc:'Study 7 days in a row',          color:'#f39c12' },
+        { id:'streak_30',  ico:'👑', name:'Monthly Master', desc:'Study 30 days in a row',         color:'#7c4dff' },
+        { id:'cards_10',   ico:'🗂️', name:'Card Starter',  desc:'Review 10 flashcards',           color:'#00b8a9' },
+        { id:'cards_100',  ico:'📦', name:'Card Collector', desc:'Review 100 flashcards',          color:'#2196f3' },
+        { id:'cards_500',  ico:'🎴', name:'Card Master',    desc:'Review 500 flashcards',          color:'#3f51b5' },
+        { id:'quiz_90',    ico:'🏆', name:'Quiz Champion',  desc:'Score 90%+ on any quiz',         color:'#f39c12' },
+        { id:'hw_hero',    ico:'📝', name:'Homework Hero',  desc:'Submit 5 homework assignments',  color:'#43a047' },
+        { id:'rev_master', ico:'📖', name:'Revision Master',desc:'Complete a full revision set',   color:'#43a047' },
+        { id:'ai_convo',   ico:'🤖', name:'AI Explorer',    desc:'Have your first AI Tutor chat',  color:'#E8913A' },
+      ];
+      const grid = document.getElementById('badge-grid');
+      let earnedCount = 0;
+      BADGES.forEach(b => {
+        const earned = badges.has(b.id) || (b.id === 'streak_3' && streakVal >= 3) || (b.id === 'streak_7' && streakVal >= 7) || (b.id === 'streak_30' && streakVal >= 30);
+        if (earned) earnedCount++;
+        grid.insertAdjacentHTML('beforeend', `<div class="badge-card${earned ? ' earned' : ' locked'}" style="--b-color:${b.color}"><div class="badge-earned-tag">✓</div><div class="badge-ico">${b.ico}</div><div class="badge-name">${esc(b.name)}</div><div class="badge-desc">${esc(b.desc)}</div></div>`);
+      });
+      document.getElementById('ach-badges-earned').textContent = `${earnedCount} earned`;
     })();
   </script>
+
   <script src="tools-core.js?v=20260811d"></script>
   <script src="tools-nav.js?v=20260811d"></script>
   <script src="tools-dock.js?v=20260810k"></script>
-  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
-  <script src="tour.js?v=20260829a"></script>
   <script defer src="chatbot-widget.js?v=20260830a"></script>
 </body>
 </html>

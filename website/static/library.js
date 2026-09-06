@@ -334,6 +334,8 @@ async function render() {
   $("#panes").innerHTML =
     paneHTML("qp", s.qp, "Question paper") + paneHTML("ms", s.ms, "Mark scheme");
 
+  renderThresholds(s);
+
   const dl = $("#lib-download");
   const openBtn = $("#lib-open");
   const primary = s.qp || s.ms;
@@ -344,6 +346,91 @@ async function render() {
     dl.setAttribute("download", primary.filename);
     openBtn.href = `/api/library/pdf/${primary.id}`;
   }
+}
+
+/* ---------- grade thresholds ------------------------------------------- */
+
+const GT_SESSION_FULL = { s: "May/June", w: "Oct/Nov", m: "Feb/March" };
+
+const escGt = (v) => String(v ?? "").replace(/[&<>"']/g,
+  (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function gtChips(t) {
+  if (!t) return `<span class="lib-th-none">Not published for this component.</span>`;
+  const c = [];
+  if (t.grade_astar != null) c.push(`<span class="pm-tch grade-Astar">A* ${t.grade_astar}</span>`);
+  [["a", "A"], ["b", "B"], ["c", "C"], ["d", "D"], ["e", "E"]].forEach(([k, g]) => {
+    if (t["grade_" + k] != null) c.push(`<span class="pm-tch grade-${g}">${g} ${t["grade_" + k]}</span>`);
+  });
+  if (t.grade_f != null) c.push(`<span class="pm-tch grade-E">F ${t.grade_f}</span>`);
+  if (t.grade_g != null) c.push(`<span class="pm-tch grade-E">G ${t.grade_g}</span>`);
+  return `<div class="pm-tch-row">${c.join("")}</div>`;
+}
+
+async function renderThresholds(s) {
+  const box = $("#lib-thresholds");
+  if (!box) return;
+  box.hidden = false;
+  const when = `${GT_SESSION_FULL[s.session] || s.sessionName} ${s.year}`;
+  box.innerHTML =
+    `<div class="lib-th-head"><b>📊 Grade thresholds</b><span>${escGt(when)}</span></div>
+     <p class="lib-th-none" style="padding:8px 2px">Loading official boundaries…</p>`;
+
+  state.gt = state.gt || {};
+  const syl = state.syllabus;
+  if (!state.gt[syl]) {
+    try {
+      const [th, op] = await Promise.all([
+        get(`/api/grade-thresholds?syllabus=${encodeURIComponent(syl)}`),
+        get(`/api/grade-options?syllabus=${encodeURIComponent(syl)}`).catch(() => ({ options: [] })),
+      ]);
+      state.gt[syl] = { thresholds: th.thresholds || [], options: op.options || [] };
+    } catch (err) {
+      box.innerHTML =
+        `<div class="lib-th-head"><b>📊 Grade thresholds</b></div>
+         <p class="lib-th-none" style="padding:8px 2px">Grade thresholds are unavailable for this paper.</p>`;
+      return;
+    }
+  }
+  // The user may have clicked another paper while we were loading.
+  if (state.selected !== s) return;
+
+  const { thresholds, options } = state.gt[syl];
+  const V = String(s.variant || "");
+
+  const comp = thresholds.find(t => t.year === s.year && t.session === s.session &&
+    String(t.paper) === String(s.paper) && String(t.variant || "") === V);
+
+  const sessOpts = options.filter(o => o.year === s.year && o.session === s.session &&
+    o.max_mark > 0 && (!V ||
+    (o.components || "").split(/[\s,]+/).filter(Boolean)
+      .every(c => c.length >= 2 && c.slice(-1) === V)));
+
+  let html =
+    `<div class="lib-th-head"><b>📊 Grade thresholds</b>
+       <span>${escGt(when)} · official Cambridge</span></div>`;
+
+  html +=
+    `<div class="lib-th-block">
+       <div class="lib-th-label">This component — Paper ${escGt(s.paper)}${V ? " v" + escGt(V) : ""}${comp ? " · out of " + comp.max_mark : ""}</div>
+       ${gtChips(comp)}
+     </div>`;
+
+  if (sessOpts.length) {
+    html +=
+      `<div class="lib-th-block">
+         <div class="lib-th-label">Overall grade — weighted total (this combination of papers)</div>
+         ${sessOpts.map(o => `
+           <div class="lib-th-opt">
+             <span class="lib-th-opt-code">${escGt(o.option_code)}</span>
+             <span class="lib-th-opt-comp">${escGt(o.components)} · out of ${o.max_mark}</span>
+             ${gtChips(o)}
+           </div>`).join("")}
+         <p class="lib-th-note">Cambridge scales each paper to a fixed share of the total before comparing to these overall boundaries.
+           See the <a href="grade-calculator.html">Grade Calculator</a> to predict your grade.</p>
+       </div>`;
+  }
+  box.innerHTML = html;
 }
 
 document.querySelectorAll("#lib-layout button").forEach((b) => {

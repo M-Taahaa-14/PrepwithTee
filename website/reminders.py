@@ -26,7 +26,7 @@ import json
 import os
 from datetime import date, datetime, timedelta
 
-from . import users_db as _udb
+import users_db as _udb
 
 def _public_base() -> str:
     """Base URL for links that leave the server — emails, calendar feeds.

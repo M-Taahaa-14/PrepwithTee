@@ -372,11 +372,16 @@
           ${parts.length ? `<span class="fc">${parts.join(' · ')}</span>` : ''}`;
         li.addEventListener('click', () => { navStack.push(node); renderDir(); });
       } else {
+        const fileUrl = '/api/resources/file?rel=' + encodeURIComponent(node.rel);
         li.className = 'res-file';
         li.innerHTML = `<span class="fi">${EXT_ICON[node.ext] || '📄'}</span>
           <span class="fn">${esc(node.title)}</span>
-          <span class="fm">${node.ext.toUpperCase()} · ${fmtSize(node.size)}</span>`;
-        li.addEventListener('click', () => openFile(node, li));
+          <span class="fm">${node.ext.toUpperCase()} · ${fmtSize(node.size)}</span>
+          <a class="res-newtab" href="${fileUrl}" target="_blank" rel="noopener" title="Open in new tab">↗</a>`;
+        li.addEventListener('click', e => {
+          if (e.target.closest('.res-newtab')) return;
+          openFile(node, li);
+        });
       }
       fileList.appendChild(li);
     });
@@ -407,11 +412,16 @@
 
     files.forEach(({ file, path }) => {
       const li = document.createElement('li');
+      const fileUrl = '/api/resources/file?rel=' + encodeURIComponent(file.rel);
       li.className = 'res-file';
       li.innerHTML = `<span class="fi">${EXT_ICON[file.ext] || '📄'}</span>
         <span class="fn">${esc(file.title)}</span>
-        ${path.length > 1 ? `<span class="fm res-search-path">${esc(path.slice(1).join(' › '))}</span>` : ''}`;
-      li.addEventListener('click', () => openFile(file, li));
+        ${path.length > 1 ? `<span class="fm res-search-path">${esc(path.slice(1).join(' › '))}</span>` : ''}
+        <a class="res-newtab" href="${fileUrl}" target="_blank" rel="noopener" title="Open in new tab">↗</a>`;
+      li.addEventListener('click', e => {
+        if (e.target.closest('.res-newtab')) return;
+        openFile(file, li);
+      });
       fileList.appendChild(li);
     });
   }

@@ -1,0 +1,107 @@
+<span class="note-tier-supplement">Extended (Supplement)</span>
+
+<h2 id="impulse-def">Impulse</h2>
+
+<div class="note-def">
+  <strong>Impulse</strong> is the product of a force and the time for which it acts. It equals the change in momentum of the object.
+  \[ \text{Impulse} = F \times \Delta t = \Delta p = mv - mu \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Quantity</th><th>Symbol</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>Impulse</td><td>\( F\Delta t \)</td><td>N·s &nbsp;(≡ kg·m/s)</td></tr>
+      <tr><td>Force</td><td>\( F \)</td><td>N</td></tr>
+      <tr><td>Time of contact</td><td>\( \Delta t \)</td><td>s</td></tr>
+      <tr><td>Change in momentum</td><td>\( \Delta p \)</td><td>kg·m/s</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-key">
+  From Newton's Second Law:
+  \[ F = \frac{\Delta p}{\Delta t} \quad \Longrightarrow \quad F \cdot \Delta t = \Delta p \]
+  A <strong>large force</strong> over a <strong>short time</strong> can produce the same change in momentum as a <strong>small force</strong> over a <strong>long time</strong>. This is the key insight behind crash safety design.
+</div>
+
+<h2 id="ft-graph">Force–time graph</h2>
+
+<div class="note-def">
+  The <strong>area under a force–time graph</strong> equals the impulse (and therefore the change in momentum).
+  \[ \text{Impulse} = \text{area under } F\text{–}t \text{ graph} \]
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Force–time graph for a collision. The shaded area (a triangle here) = impulse = Δp. A real collision has a curved F–t profile; area still = impulse.">
+  <div style="padding:.6rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 280 170" width="280" height="170" aria-label="Force-time graph">
+      <!-- axes -->
+      <line x1="40" y1="150" x2="260" y2="150" stroke="#5A5A72" stroke-width="1.5"/>
+      <line x1="40" y1="150" x2="40"  y2="20"  stroke="#5A5A72" stroke-width="1.5"/>
+      <text x="150" y="166" font-size="10" fill="#5A5A72" text-anchor="middle">Time / s</text>
+      <text x="13"  y="85"  font-size="10" fill="#5A5A72" text-anchor="middle" transform="rotate(-90,13,85)">Force / N</text>
+      <!-- shaded triangle (impulse area) -->
+      <polygon points="60,150 180,150 120,55" fill="rgba(76,46,114,.18)"/>
+      <!-- triangle outline -->
+      <polyline points="60,150 120,55 180,150" fill="none" stroke="#4C2E72" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- axis ticks -->
+      <line x1="60"  y1="150" x2="60"  y2="155" stroke="#5A5A72" stroke-width="1"/>
+      <line x1="180" y1="150" x2="180" y2="155" stroke="#5A5A72" stroke-width="1"/>
+      <text x="60"  y="164" font-size="8" fill="#5A5A72" text-anchor="middle">t₁</text>
+      <text x="180" y="164" font-size="8" fill="#5A5A72" text-anchor="middle">t₂</text>
+      <line x1="35"  y1="55"  x2="40"  y2="55"  stroke="#5A5A72" stroke-width="1"/>
+      <text x="29"  y="58"   font-size="8" fill="#5A5A72" text-anchor="end">F_max</text>
+      <!-- area label -->
+      <text x="120" y="130" font-size="9" fill="#4C2E72" font-weight="700" text-anchor="middle">Area = impulse</text>
+      <text x="120" y="141" font-size="8" fill="#4C2E72" text-anchor="middle">= Δp</text>
+      <!-- origin -->
+      <text x="27" y="157" font-size="9" fill="#5A5A72">O</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="applications">Why longer contact time matters — safety applications</h2>
+
+<div class="note-key">
+  For a fixed change in momentum (e.g. stopping a car), increasing the contact time \( \Delta t \) <em>reduces</em> the force \( F \):
+  \[ F = \frac{\Delta p}{\Delta t} \quad \text{— larger } \Delta t \Rightarrow \text{smaller } F \]
+  This is the engineering principle behind many safety features:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Crumple zones</strong> in cars — extend the collision time, reducing peak force on passengers.</li>
+    <li><strong>Airbags</strong> — inflate to increase the time over which a passenger decelerates.</li>
+    <li><strong>Cushioned landing mats</strong> in gymnastics — extend the time of impact with the ground.</li>
+    <li><strong>Catching a cricket ball</strong> — pulling the hands back increases \( \Delta t \) and reduces \( F \).</li>
+    <li><strong>Helmets</strong> — foam liner compresses, extending the time of impact on the skull.</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Example 1 — find average force during collision</summary>
+  <div>
+    <p>A 0.15 kg cricket ball is moving at 30 m/s when it is caught and brought to rest in 0.050 s. Find the average force on the ball.</p>
+    <p>Change in momentum: \( \Delta p = mv - mu = 0.15 \times 0 - 0.15 \times 30 = -4.5\,\text{kg·m/s} \)</p>
+    <p>Magnitude of impulse = 4.5 N·s</p>
+    <p>\( F = \dfrac{\Delta p}{\Delta t} = \dfrac{4.5}{0.050} = 90\,\text{N} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — crumple zone reduces force</summary>
+  <div>
+    <p>A 1200 kg car decelerates from 25 m/s to rest. Without a crumple zone, contact time = 0.080 s. With a crumple zone, contact time = 0.40 s. Compare the forces.</p>
+    <p>\( \Delta p = 1200 \times 25 = 30\,000\,\text{kg·m/s} \)</p>
+    <p>Without crumple zone: \( F = 30\,000 / 0.080 = 375\,000\,\text{N} \)</p>
+    <p>With crumple zone: \( F = 30\,000 / 0.40 = 75\,000\,\text{N} \)</p>
+    <p>The crumple zone reduces the force by a factor of 5.</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 3 — find change in momentum from F–t graph</summary>
+  <div>
+    <p>A force–time graph shows a triangular pulse with peak force 600 N over 0.010 s. Find the change in momentum.</p>
+    <p>Area of triangle = \( \dfrac{1}{2} \times \text{base} \times \text{height} = \dfrac{1}{2} \times 0.010 \times 600 = 3.0\,\text{N·s} \)</p>
+    <p>Impulse = 3.0 N·s = change in momentum = 3.0 kg·m/s.</p>
+  </div>
+</details>
+
+<div class="note-tip">
+  "Explain how an airbag reduces injury" is a 3-mark answer: (1) airbag increases the time over which the passenger decelerates; (2) same change in momentum but larger \( \Delta t \); (3) therefore smaller force acts on the passenger.
+</div>

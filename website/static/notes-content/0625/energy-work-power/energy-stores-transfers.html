@@ -1,0 +1,96 @@
+<h2 id="stores">Energy stores</h2>
+
+<div class="note-def">
+  Energy is the ability to do work. It cannot be created or destroyed — only transferred from one store to another. This is the <strong>principle of conservation of energy</strong>.
+  <br><br>
+  SI unit of energy: the <strong>joule (J)</strong>. 1 J = 1 N·m = 1 kg·m²/s².
+</div>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>Energy store</th><th>Description</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Gravitational potential energy (GPE)</strong></td><td>Stored due to an object's height above a reference level</td><td>Book on a shelf, water in a reservoir</td></tr>
+      <tr><td><strong>Kinetic energy (KE)</strong></td><td>Stored due to an object's motion</td><td>Moving car, rolling ball</td></tr>
+      <tr><td><strong>Chemical energy</strong></td><td>Stored in chemical bonds, released by reactions</td><td>Fuel, food, batteries</td></tr>
+      <tr><td><strong>Thermal energy (internal energy)</strong></td><td>Stored in the random motion of particles</td><td>Hot water, a warm room</td></tr>
+      <tr><td><strong>Elastic (strain) energy</strong></td><td>Stored due to deformation of a stretched or compressed object</td><td>Compressed spring, stretched elastic band</td></tr>
+      <tr><td><strong>Nuclear energy</strong></td><td>Stored in atomic nuclei, released by fission or fusion</td><td>Nuclear reactor, the Sun</td></tr>
+      <tr><td><strong>Electromagnetic energy</strong></td><td>Energy carried by electromagnetic waves (light, infrared, etc.)</td><td>Sunlight, radio waves</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="transfers">Energy transfers</h2>
+
+<div class="note-key">
+  Energy is transferred between stores by:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Mechanical work</strong> — a force moves an object (e.g. pushing a box)</li>
+    <li><strong>Heating</strong> — thermal energy flows from hotter to cooler (conduction, convection, radiation)</li>
+    <li><strong>Electrical work</strong> — charge flows through a component</li>
+    <li><strong>Radiation</strong> — electromagnetic waves carry energy (light, infrared)</li>
+  </ul>
+</div>
+
+<div class="note-key">
+  <strong>Common energy transfer chains:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Falling object: GPE → KE (→ thermal on impact)</li>
+    <li>Burning fuel in car: Chemical → Thermal → KE (+ thermal waste)</li>
+    <li>Solar panel: Electromagnetic → Electrical</li>
+    <li>Stretched spring released: Elastic → KE</li>
+    <li>Pendulum: KE ⇌ GPE (back and forth, slowly losing to thermal)</li>
+    <li>Nuclear power station: Nuclear → Thermal → KE (steam) → Electrical</li>
+  </ul>
+</div>
+
+<h2 id="sankey">Sankey diagrams</h2>
+
+<div class="note-key">
+  A <strong>Sankey diagram</strong> shows the flow of energy through a system:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Energy enters from the left as a single wide arrow.</li>
+    <li>Arrows branch off to show useful output and wasted energy.</li>
+    <li>The <strong>width</strong> of each arrow is proportional to the amount of energy it represents.</li>
+    <li>The total width is conserved (energy is conserved overall).</li>
+  </ul>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Sankey diagram for a petrol car engine (25% efficient). 100 J input (chemical); 25 J useful KE output; 75 J wasted as thermal energy (exhaust heat and friction).">
+  <div style="padding:.5rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 300 120" width="300" height="120" aria-label="Sankey diagram car engine">
+      <!-- input arrow (100 J wide = 80px) -->
+      <rect x="20"  y="20"  width="80" height="80" fill="rgba(76,46,114,.18)" rx="2"/>
+      <text x="60"  y="65"  font-size="10" fill="#4C2E72" text-anchor="middle" font-weight="700">100 J</text>
+      <text x="60"  y="77"  font-size="9"  fill="#5A5A72" text-anchor="middle">Chemical</text>
+      <!-- arrow body -->
+      <rect x="100" y="20"  width="60" height="80" fill="rgba(76,46,114,.12)"/>
+      <!-- useful KE (25 J = 20px) -->
+      <rect x="160" y="45" width="80" height="20" fill="rgba(26,107,74,.25)" rx="2"/>
+      <text x="200" y="58" font-size="9" fill="#1A6B4A" font-weight="700" text-anchor="middle">25 J — KE (useful)</text>
+      <!-- wasted thermal (75 J = 60px) -->
+      <rect x="160" y="65" width="80" height="55" fill="rgba(232,145,58,.22)" rx="2"/>
+      <text x="200" y="92" font-size="9" fill="#B05000" font-weight="700" text-anchor="middle">75 J — Thermal</text>
+      <text x="200" y="104" font-size="8" fill="#B05000" text-anchor="middle">(wasted)</text>
+      <!-- labels -->
+      <text x="60"  y="12" font-size="8" fill="#5A5A72" text-anchor="middle">Input</text>
+      <text x="220" y="12" font-size="8" fill="#5A5A72" text-anchor="middle">Output</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="conservation">Conservation of energy</h2>
+
+<div class="note-def">
+  <strong>Principle of conservation of energy:</strong> Energy cannot be created or destroyed. The total energy of a closed system remains constant — it is only converted from one form to another.
+  \[ \text{Total energy in} = \text{Useful energy out} + \text{Wasted energy} \]
+</div>
+
+<div class="note-warn">
+  "Energy is lost" is imprecise language. Energy is never destroyed — it is merely transferred to a less useful store (usually thermal energy due to friction, air resistance, or heating). Always say energy is <em>transferred to thermal energy</em>, not that it "disappears."
+</div>
+
+<div class="note-tip">
+  To describe an energy transfer: state the starting store, the energy transfer process, and the final store(s). For example: "The chemical energy in the battery is transferred electrically to the bulb, where it is converted to light and thermal energy."
+</div>

@@ -1,0 +1,115 @@
+<div class="note-key" style="margin-bottom:1.2rem">
+  <strong>Full interactive graphs guide:</strong> This note gives you the quick-reference summary for all graph shapes. For in-depth worked examples, transformations and graph-reading exercises, open the full guide:
+  <a href="/graphs-guide.html" target="_blank" style="display:inline-flex;align-items:center;gap:.35rem;margin-top:.5rem;padding:.38rem .85rem;border-radius:8px;border:1.5px solid var(--gold);background:#FFFBF0;color:var(--navy);font-weight:700;font-size:.85rem;text-decoration:none">
+    📈 Open full Graphs Guide →
+  </a>
+</div>
+
+<h2 id="linear">Linear graphs — \( y = mx + c \)</h2>
+
+<div class="note-def">
+  <strong>Shape:</strong> Straight line<br>
+  <strong>Key features:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>\( m \) = gradient (slope). Positive \( m \): rises left to right. Negative \( m \): falls left to right. \( m = 0 \): horizontal line.</li>
+    <li>\( c \) = y-intercept (where the line crosses the y-axis).</li>
+    <li>x-intercept: set \( y = 0 \), solve for \( x = -c/m \).</li>
+  </ul>
+</div>
+
+<h2 id="quadratic">Quadratic graphs — \( y = ax^2 + bx + c \)</h2>
+
+<div class="note-def">
+  <strong>Shape:</strong> Parabola (U-shape if \( a > 0 \); ∩-shape if \( a < 0 \))<br>
+  <strong>Key features:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>y-intercept:</strong> \( (0, c) \)</li>
+    <li><strong>x-intercepts (roots):</strong> solve \( ax^2 + bx + c = 0 \) by factorisation or the quadratic formula.</li>
+    <li><strong>Line of symmetry:</strong> \( x = -\dfrac{b}{2a} \)</li>
+    <li><strong>Vertex (turning point):</strong> substitute \( x = -\dfrac{b}{2a} \) into the equation to find the y-coordinate.</li>
+    <li><strong>Discriminant:</strong> \( b^2 - 4ac > 0 \): two roots; \( = 0 \): one repeated root (touches x-axis); \( < 0 \): no real roots.</li>
+  </ul>
+</div>
+
+<h2 id="cubic">Cubic graphs — \( y = ax^3 \) and beyond</h2>
+
+<div class="note-def">
+  <strong>Shape:</strong> S-shaped curve<br>
+  <strong>Key features:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>\( y = x^3 \): passes through origin (0,0), always increasing; rotational symmetry about origin.</li>
+    <li>\( a > 0 \): bottom-left to top-right. \( a < 0 \): top-left to bottom-right.</li>
+    <li>A cubic can have up to <strong>3 roots</strong> (crosses x-axis up to 3 times) and up to <strong>2 turning points</strong>.</li>
+    <li>\( y = ax^3 + bx^2 + cx + d \): y-intercept at \( (0, d) \); shape depends on sign of \( a \).</li>
+  </ul>
+</div>
+
+<h2 id="reciprocal">Reciprocal graphs — \( y = \dfrac{k}{x} \) and \( y = \dfrac{k}{x^2} \)</h2>
+
+<div class="note-def">
+  <strong>\( y = k/x \) — Shape:</strong> Hyperbola (two curves, one in each of the opposite quadrants)<br>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Asymptotes:</strong> \( x = 0 \) (y-axis) and \( y = 0 \) (x-axis) — the curve never touches either axis.</li>
+    <li>\( k > 0 \): curves in Q1 (top-right) and Q3 (bottom-left). \( k < 0 \): curves in Q2 and Q4.</li>
+    <li>No x-intercepts, no y-intercepts.</li>
+  </ul>
+  <strong>\( y = k/x^2 \) — Shape:</strong> Both branches are in the <em>same</em> two quadrants (both above or both below the x-axis).<br>
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li>Asymptotes: same as \( y = k/x \) — both axes.</li>
+    <li>\( k > 0 \): both branches above x-axis (Q1 and Q2). \( k < 0 \): both below.</li>
+  </ul>
+</div>
+
+<div class="note-warn">
+  The most common sketching error on reciprocal graphs is drawing the curve <em>touching</em> the asymptote. The curve approaches the axis but <strong>never reaches it</strong>. Mark the asymptote as a dashed line and label it.
+</div>
+
+<h2 id="exponential">Exponential graphs — \( y = ab^x \)</h2>
+
+<div class="note-def">
+  <strong>Shape:</strong> Rapidly increasing or decreasing curve<br>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>y-intercept always at</strong> \( (0, a) \) — since \( b^0 = 1 \), so \( y = a \cdot 1 = a \).</li>
+    <li>\( b > 1 \): <strong>exponential growth</strong> — curve rises steeply to the right.</li>
+    <li>\( 0 < b < 1 \): <strong>exponential decay</strong> — curve falls, approaching the x-axis as \( x \to \infty \).</li>
+    <li><strong>Asymptote:</strong> \( y = 0 \) (the x-axis) — the curve never crosses it (stays positive for \( a > 0 \)).</li>
+    <li>No x-intercepts (when \( a > 0 \) and \( b > 0 \)).</li>
+  </ul>
+</div>
+
+<h2 id="other">Other standard curves</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead>
+      <tr><th>Equation</th><th>Shape</th><th>Key features</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>\( y = x^{1/2} = \sqrt{x} \)</td><td>Half-parabola, rising</td><td>Starts at (0,0); defined only for \( x \geq 0 \); always positive</td></tr>
+      <tr><td>\( y = |x| \)</td><td>V-shape</td><td>Vertex at origin; left arm: \( y = -x \); right arm: \( y = x \)</td></tr>
+      <tr><td>\( y = x^0 = 1 \)</td><td>Horizontal line</td><td>Constant function; gradient = 0</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="summary">Quick summary table</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead>
+      <tr><th>Type</th><th>Equation</th><th>Shape</th><th>Asymptotes?</th><th>y-intercept</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Linear</td><td>\( mx + c \)</td><td>Straight line</td><td>None</td><td>\( (0, c) \)</td></tr>
+      <tr><td>Quadratic</td><td>\( ax^2 + bx + c \)</td><td>Parabola (U or ∩)</td><td>None</td><td>\( (0, c) \)</td></tr>
+      <tr><td>Cubic</td><td>\( ax^3 + \ldots \)</td><td>S-curve</td><td>None</td><td>\( (0, d) \)</td></tr>
+      <tr><td>Reciprocal</td><td>\( k/x \)</td><td>Hyperbola</td><td>\( x=0,\; y=0 \)</td><td>None</td></tr>
+      <tr><td>Reciprocal²</td><td>\( k/x^2 \)</td><td>Two branches, same side</td><td>\( x=0,\; y=0 \)</td><td>None</td></tr>
+      <tr><td>Exponential</td><td>\( ab^x \)</td><td>J-curve (growth/decay)</td><td>\( y = 0 \)</td><td>\( (0, a) \)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-tip">
+  When asked to "sketch" — always: (1) draw the correct shape, (2) label the y-intercept as a coordinate, (3) mark any asymptotes as dashed lines with their equations, (4) if roots exist, mark them on the x-axis. These four steps cover most of the available marks.
+</div>

@@ -9,7 +9,7 @@
   <script>
     window.location.replace("papers.html?tab=yearly");
   </script>
-  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <link rel="stylesheet" href="tools.css?v=20260829a">
 </head>
 <body>

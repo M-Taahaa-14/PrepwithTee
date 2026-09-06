@@ -1,0 +1,1240 @@
+{
+  "syllabus": "9709",
+  "subject": "Mathematics A Level",
+  "note": "Cambridge International AS & A Level Mathematics 9709, 2026-2027 syllabus. Topic names and the `papers` scoping follow the official Content overview (syllabus p9): section 1 Pure Mathematics 1 = Paper 1, 3 Pure Mathematics 3 = Paper 3, 4 Mechanics = Paper 4, 5 Probability & Statistics 1 = Paper 5. Paper 2 (Pure 2, a subset of Pure 3) and Paper 6 (Probability & Statistics 2) are out of scope. Trigonometry, Differentiation and Integration appear in both Pure 1 and Pure 3 with different content, so they carry a paper suffix. Keywords use plain text as it appears in extracted Cambridge PDF text, not LaTeX: note that theta often extracts as the digit 1 or the letter i, so complex-number keywords avoid bare numeric-plus-i patterns.",
+  "topics": [
+    {
+      "name": "Quadratics",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "quadratic",
+        "discriminant",
+        "completing the square",
+        "roots of the equation",
+        "b squared minus 4ac",
+        "b2 - 4ac",
+        "parabola",
+        "vertex",
+        "minimum value",
+        "maximum value",
+        "quadratic formula",
+        "factorising",
+        "turning point",
+        "real and distinct roots",
+        "equal roots",
+        "no real roots",
+        "ax2 + bx + c"
+      ],
+      "subtopics": [
+        {
+          "name": "Carry out the process of completing the square",
+          "links": [],
+          "detail": "carry out the process of completing the square"
+        },
+        {
+          "name": "Ax + bx + c for a quadratic polynomial",
+          "links": [],
+          "detail": "ax + bx + c for a quadratic polynomial and use a completed square form find the discriminant of a quadratic polynomial"
+        },
+        {
+          "name": "Ax + bx + c and use the discriminant",
+          "links": [],
+          "detail": "ax + bx + c and use the discriminant"
+        },
+        {
+          "name": "Quadratic equations",
+          "links": [],
+          "detail": "solve quadratic equations, and quadratic inequalities, in one unknown"
+        },
+        {
+          "name": "By substitution a pair of simultaneous equations of which",
+          "links": [],
+          "detail": "solve by substitution a pair of simultaneous equations of which one is linear and one is quadratic recognise and solve equations in which are quadratic in some function of ."
+        }
+      ]
+    },
+    {
+      "name": "Functions",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "domain",
+        "range",
+        "function f",
+        "composite function",
+        "inverse function",
+        "one-to-one",
+        "many-to-one",
+        "mapping",
+        "f(x)",
+        "gf(x)",
+        "fg(x)",
+        "modulus function",
+        "piecewise",
+        "even function",
+        "odd function",
+        "f is a function",
+        "state the range",
+        "state the domain"
+      ],
+      "subtopics": [
+        {
+          "name": "Terms function",
+          "links": [],
+          "detail": "understand the terms function, domain, range, one-one function, inverse function and composition of functions identify the range of a given function in simple cases, and find the composition of two given functions"
+        },
+        {
+          "name": "Whether or not a given function is one-one",
+          "links": [],
+          "detail": "determine whether or not a given function is one-one, and find the inverse of a one-one function in simple cases"
+        },
+        {
+          "name": "Illustrate in graphical terms the relation between a one-one",
+          "links": [],
+          "detail": "illustrate in graphical terms the relation between a one-one function and its inverse"
+        },
+        {
+          "name": "Transformations of the y f",
+          "links": [],
+          "detail": "understand and use the transformations of the y f( x ) graph of = given by y f( x a y f( x + a ) = ) + , = , y a f( x ) y f( ax = , = ) and simple combinations of these. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Coordinate geometry",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "gradient",
+        "equation of the line",
+        "midpoint",
+        "perpendicular bisector",
+        "y = mx + c",
+        "distance between",
+        "point of intersection",
+        "equation of the circle",
+        "centre and radius",
+        "tangent to the circle",
+        "chord",
+        "normal to the circle",
+        "x2 + y2",
+        "passes through the point",
+        "perpendicular to"
+      ],
+      "subtopics": [
+        {
+          "name": "And use any of the forms",
+          "links": [],
+          "detail": "interpret and use any of the forms , y y m ( x x ) ax + by + c = 0 = , in solving"
+        },
+        {
+          "name": "1 problems",
+          "links": [],
+          "detail": "1 problems"
+        },
+        {
+          "name": "Equation",
+          "links": [],
+          "detail": "understand that the equation"
+        },
+        {
+          "name": "Algebraic methods to solve problems involving lines and circles",
+          "links": [],
+          "detail": "use algebraic methods to solve problems involving lines and circles"
+        },
+        {
+          "name": "Relationship between a graph and its associated algebraic equation",
+          "links": [],
+          "detail": "understand the relationship between a graph and its associated algebraic equation, and use the relationship between points of intersection of graphs and solutions of equations."
+        }
+      ]
+    },
+    {
+      "name": "Circular measure",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "radian",
+        "arc length",
+        "sector area",
+        "angle subtended",
+        "minor arc",
+        "major sector",
+        "perimeter of sector",
+        "area of segment",
+        "angle in radians",
+        "convert degrees to radians",
+        "sector of a circle",
+        "shaded region",
+        "area of triangle OAB"
+      ],
+      "subtopics": [
+        {
+          "name": "Definition of a radian",
+          "links": [],
+          "detail": "understand the definition of a radian, and use the relationship between radians and degrees"
+        },
+        {
+          "name": "S r and A r use the formulae =",
+          "links": [],
+          "detail": "s r and A r use the formulae = = i i"
+        },
+        {
+          "name": "In solving problems concerning the arc length and sector",
+          "links": [],
+          "detail": "in solving problems concerning the arc length and sector area of a circle. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Trigonometry (P1)",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "trigonometric equation",
+        "sine rule",
+        "cosine rule",
+        "exact value",
+        "trigonometric identity",
+        "sin squared",
+        "cos squared",
+        "sketch the graph of",
+        "period",
+        "amplitude",
+        "principal value",
+        "solving sin",
+        "solving cos",
+        "angle between 0 and 360",
+        "sin theta",
+        "cos theta",
+        "tan theta",
+        "show that sin",
+        "prove that tan",
+        "sin 1",
+        "cos 1",
+        "tan 1",
+        "sin1",
+        "cos1",
+        "tan1",
+        "solve the equation sin",
+        "solve the equation cos",
+        "solve the equation tan",
+        "for 0",
+        "for -180",
+        "for 0 360"
+      ],
+      "subtopics": [
+        {
+          "name": "45 60 tangent of °",
+          "links": [],
+          "detail": "45 60 tangent of °, °, °, and related angles -1 -1 -1 sin x cos­ x tan x"
+        },
+        {
+          "name": "Notations",
+          "links": [],
+          "detail": "use the notations , , to denote the principal values of the inverse trigonometric relations sin tan"
+        },
+        {
+          "name": "Identities and cos",
+          "links": [],
+          "detail": "use the identities and cos"
+        },
+        {
+          "name": "2 sin cos 1 i i /",
+          "links": [],
+          "detail": "2 sin cos 1 i i /"
+        },
+        {
+          "name": "Find all the solutions of simple trigonometrical equations lying",
+          "links": [],
+          "detail": "find all the solutions of simple trigonometrical equations lying in a specified interval (general forms of solution are not included)."
+        }
+      ]
+    },
+    {
+      "name": "Series",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "arithmetic progression",
+        "common difference",
+        "geometric progression",
+        "common ratio",
+        "sum to infinity",
+        "convergent",
+        "binomial expansion",
+        "binomial theorem",
+        "nCr",
+        "sigma notation",
+        "nth term",
+        "sum of the series",
+        "arithmetic series",
+        "geometric series",
+        "term of the expansion",
+        "coefficient of x",
+        "find the sum of the first",
+        "last term"
+      ],
+      "subtopics": [
+        {
+          "name": "Recognise arithmetic and geometric progressions",
+          "links": [],
+          "detail": "recognise arithmetic and geometric progressions"
+        },
+        {
+          "name": "Formulae for the th term and for the sum",
+          "links": [],
+          "detail": "use the formulae for the th term and for the sum of the first terms to solve problems involving arithmetic or geometric progressions"
+        },
+        {
+          "name": "Condition for the convergence of a geometric progression",
+          "links": [],
+          "detail": "use the condition for the convergence of a geometric progression, and the formula for the sum to infinity of a convergent geometric progression. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Differentiation (P1)",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "dy/dx",
+        "differentiate",
+        "gradient of the curve",
+        "stationary point",
+        "maximum point",
+        "minimum point",
+        "point of inflection",
+        "rate of change",
+        "normal to the curve",
+        "tangent to the curve",
+        "second derivative",
+        "d2y/dx2",
+        "chain rule",
+        "increasing function",
+        "decreasing function",
+        "find the value of x for which",
+        "nature of the stationary point"
+      ],
+      "subtopics": [
+        {
+          "name": "D y d y f ′",
+          "links": [],
+          "detail": "d y d y f ′( x ) f ″( x ) , , , and for first and second d x"
+        },
+        {
+          "name": "D x derivatives xn n",
+          "links": [],
+          "detail": "d x derivatives xn n"
+        },
+        {
+          "name": "Derivative of",
+          "links": [],
+          "detail": "use the derivative of (for any rational ), together with constant multiples, sums and differences of functions, and of composite functions using the chain rule apply differentiation to gradients, tangents and normals, increasing and decreasing functions and rates of change locate stationary points and determine their nature, and use information about stationary points in sketching graphs."
+        }
+      ]
+    },
+    {
+      "name": "Integration (P1)",
+      "papers": [
+        1
+      ],
+      "keywords": [
+        "integrate",
+        "indefinite integral",
+        "definite integral",
+        "area under the curve",
+        "constant of integration",
+        "trapezium rule",
+        "area between curves",
+        "area bounded by",
+        "evaluate the integral",
+        "find the exact value of the area",
+        "find the area of the region",
+        "with respect to x"
+      ],
+      "subtopics": [
+        {
+          "name": "Integration as the reverse process",
+          "links": [],
+          "detail": "understand integration as the reverse process ( + ) ax b of differentiation, and integrate (for any rational except -1), together with constant multiples, sums and differences"
+        },
+        {
+          "name": "Problems involving the evaluation of a constant of integration",
+          "links": [],
+          "detail": "solve problems involving the evaluation of a constant of integration"
+        },
+        {
+          "name": "Evaluate definite integrals use definite integration to find",
+          "links": [],
+          "detail": "evaluate definite integrals use definite integration to find"
+        },
+        {
+          "name": "Area of a region bounded by a curve and",
+          "links": [],
+          "detail": "the area of a region bounded by a curve and lines parallel to the axes, or between a curve and a line or between two curves"
+        },
+        {
+          "name": "Volume of revolution about one of the axes. Back",
+          "links": [],
+          "detail": "a volume of revolution about one of the axes. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Algebra",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "partial fractions",
+        "polynomial division",
+        "remainder theorem",
+        "factor theorem",
+        "improper fraction",
+        "long division of polynomials",
+        "repeated factor",
+        "decompose into partial fractions",
+        "(ax + b)(cx + d)",
+        "express in partial fractions",
+        "remainder when divided",
+        "is a factor of",
+        "find the quotient",
+        "quotient when",
+        "when divided by",
+        "|ax + b|",
+        "solve the equation |",
+        "solve the inequality |",
+        "sketch the graph of y = |",
+        "modulus of the expression",
+        "expansion of (1 + x)",
+        "ascending powers of x",
+        "for which the expansion is valid",
+        "set of values of x for which",
+        "where n is rational"
+      ],
+      "subtopics": [
+        {
+          "name": "Appropriate form for expressing rational functions in partial fractions",
+          "links": [],
+          "detail": "recall an appropriate form for expressing rational functions in partial fractions, and carry out the decomposition, in cases where the denominator is no more complicated than ( ax + b )( cx + d )( ex + f )"
+        },
+        {
+          "name": "( ax + b )( cx + d )",
+          "links": [],
+          "detail": "( ax + b )( cx + d )"
+        },
+        {
+          "name": "( ax + b )( cx + d ) (1 + x ) n use the expansion of , where",
+          "links": [],
+          "detail": "( ax + b )( cx + d ) (1 + x ) n use the expansion of , where is a x 1 rational number and ."
+        },
+        {
+          "name": "Back to contents page Cambridge International AS & A",
+          "links": [],
+          "detail": "Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Logarithmic and exponential functions",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "logarithm",
+        "ln x",
+        "natural logarithm",
+        "exponential function",
+        "log base",
+        "laws of logarithms",
+        "exponential growth",
+        "exponential decay",
+        "graph of y = e",
+        "graph of y = ln",
+        "solve the equation giving your answer in terms of",
+        "express as a single logarithm",
+        "a^x",
+        "e^x",
+        "modulus graph",
+        "y = ln("
+      ],
+      "subtopics": [
+        {
+          "name": "Definition and properties of ln x and",
+          "links": [],
+          "detail": "understand the definition and properties of ln x and , including their relationship as inverse functions and their graphs"
+        },
+        {
+          "name": "Logarithms to solve equations and inequalities in which the",
+          "links": [],
+          "detail": "use logarithms to solve equations and inequalities in which the unknown appears in indices use logarithms to transform a given relationship to linear form, and hence determine unknown constants by considering the gradient and/or intercept."
+        }
+      ]
+    },
+    {
+      "name": "Trigonometry (P3)",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "addition formula",
+        "compound angle",
+        "double angle formula",
+        "sin(A+B)",
+        "cos(A+B)",
+        "tan(A+B)",
+        "sin 2A",
+        "cos 2A",
+        "R sin",
+        "R cos",
+        "harmonic form",
+        "auxiliary angle",
+        "sec",
+        "cosec",
+        "cot",
+        "reciprocal trigonometric",
+        "solve the equation for all values",
+        "prove the identity",
+        "express in the form R sin",
+        "secant",
+        "cosecant",
+        "cotangent"
+      ],
+      "subtopics": [
+        {
+          "name": "Relationship of the secant",
+          "links": [],
+          "detail": "understand the relationship of the secant, cosecant and cotangent functions to cosine, sine and tangent, and use properties and graphs of all six trigonometric functions for angles of any magnitude"
+        },
+        {
+          "name": "Trigonometrical identities for the simplification and exact evaluation of",
+          "links": [],
+          "detail": "use trigonometrical identities for the simplification and exact evaluation of expressions, and in the course of solving equations, and select an identity or identities appropriate to the context, showing familiarity in particular with the use of"
+        },
+        {
+          "name": "2 2 2 sec 1 tan cosec 1 cot",
+          "links": [],
+          "detail": "2 2 2 sec 1 tan cosec 1 cot"
+        },
+        {
+          "name": "+ and + i / i i / i",
+          "links": [],
+          "detail": "+ and + i / i i / i sin( A ± B ) cos( A ± B )"
+        },
+        {
+          "name": "Expansions of",
+          "links": [],
+          "detail": "the expansions of , tan( A ± B ) and sin 2 A cos 2 A tan 2 A"
+        },
+        {
+          "name": "Formulae for",
+          "links": [],
+          "detail": "the formulae for , and a sin b cos"
+        },
+        {
+          "name": "Expression of + in the i i ^ h",
+          "links": [],
+          "detail": "the expression of + in the i i ^ h ^ h R sin R cos forms and . i ! i ! a a Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Differentiation (P3)",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "implicit differentiation",
+        "parametric differentiation",
+        "product rule",
+        "quotient rule",
+        "d/dx of ln",
+        "d/dx of sin",
+        "related rates",
+        "dy/dx in terms of t",
+        "find dy/dx given",
+        "curve is defined parametrically",
+        "find the equation of the tangent at the point where t",
+        "implicit equation",
+        "differentiate with respect to x"
+      ]
+    },
+    {
+      "name": "Integration (P3)",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "integration by parts",
+        "integration by substitution",
+        "let u =",
+        "du/dx",
+        "trapezium rule",
+        "integrate sin squared",
+        "integrate cos squared",
+        "integrate using partial fractions",
+        "volume of revolution",
+        "rotate about the x-axis",
+        "volume generated",
+        "integrate by substitution",
+        "use the substitution",
+        "find the exact value of the integral"
+      ],
+      "subtopics": [
+        {
+          "name": "Ax + b include the integration of",
+          "links": [],
+          "detail": "ax + b include the integration of , , ax b"
+        },
+        {
+          "name": "Trigonometrical relationships in carrying out integration integrate rational functions",
+          "links": [],
+          "detail": "use trigonometrical relationships in carrying out integration integrate rational functions by means of decomposition into partial fractions ^ h k f x"
+        },
+        {
+          "name": "^ h recognise an integrand of the form",
+          "links": [],
+          "detail": "^ h recognise an integrand of the form , and f x integrate such functions"
+        },
+        {
+          "name": "Recognise when an integrand can usefully be regarded as",
+          "links": [],
+          "detail": "recognise when an integrand can usefully be regarded as a product, and use integration by parts use a given substitution to simplify and evaluate either a definite or an indefinite integral. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Numerical solution of equations",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "iteration",
+        "iterative formula",
+        "change of sign",
+        "root in the interval",
+        "Newton-Raphson",
+        "convergence",
+        "find a root correct to",
+        "show there is a root between",
+        "interval bisection",
+        "decimal search",
+        "show that the equation has a root",
+        "starting value",
+        "successive iterations"
+      ],
+      "subtopics": [
+        {
+          "name": "Idea of",
+          "links": [],
+          "detail": "understand the idea of, and use the notation for, a sequence of approximations which converges to a root of an equation"
+        },
+        {
+          "name": "A given simple iterative formula = F",
+          "links": [],
+          "detail": "understand how a given simple iterative formula = F( ) x x of the form relates to the equation n + 1 n being solved, and use a given iteration, or an iteration based on a given rearrangement of an equation, to determine a root to a prescribed degree of accuracy."
+        }
+      ]
+    },
+    {
+      "name": "Vectors",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "position vector",
+        "scalar product",
+        "dot product",
+        "angle between vectors",
+        "unit vector",
+        "direction vector",
+        "vector equation of the line",
+        "point on the line",
+        "parallel vectors",
+        "perpendicular vectors",
+        "magnitude of vector",
+        "column vector",
+        "skew lines",
+        "normal to the plane",
+        "i + j + k",
+        "OA",
+        "AB",
+        "find a vector parallel to"
+      ],
+      "subtopics": [
+        {
+          "name": "Standard notations for vectors",
+          "links": [],
+          "detail": "use standard notations for vectors, i.e. f x p f x p i + j y i + j + k a x y x y z AB , , , , , carry out addition and subtraction of vectors and multiplication of a vector by a scalar, and interpret these operations in geometrical terms"
+        },
+        {
+          "name": "Magnitude of a vector",
+          "links": [],
+          "detail": "calculate the magnitude of a vector, and use unit vectors, displacement vectors and position vectors understand the significance of all the symbols used when the equation of a straight line is r = a + t b expressed in the form , and find the equation of a line, given sufficient information"
+        },
+        {
+          "name": "Whether two lines are parallel",
+          "links": [],
+          "detail": "determine whether two lines are parallel, intersect or are skew, and find the point of intersection of two lines when it exists"
+        },
+        {
+          "name": "Formulae to calculate the scalar product of two vectors",
+          "links": [],
+          "detail": "use formulae to calculate the scalar product of two vectors, and use scalar products in problems involving lines and points. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Differential equations",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "differential equation",
+        "separable variables",
+        "rate of increase",
+        "rate of decrease",
+        "proportional to",
+        "solve the differential equation",
+        "particular solution",
+        "general solution of the differential",
+        "integrating factor",
+        "formulate a differential equation",
+        "population grows",
+        "dN/dt",
+        "dP/dt",
+        "dV/dt",
+        "given that when x = 0"
+      ],
+      "subtopics": [
+        {
+          "name": "Find by integration a general form of solution for",
+          "links": [],
+          "detail": "find by integration a general form of solution for a first order differential equation in which the variables are separable"
+        },
+        {
+          "name": "Initial condition to find a particular solution",
+          "links": [],
+          "detail": "use an initial condition to find a particular solution"
+        },
+        {
+          "name": "Solution of a differential equation in the context of",
+          "links": [],
+          "detail": "interpret the solution of a differential equation in the context of a problem being modelled by the equation."
+        }
+      ]
+    },
+    {
+      "name": "Complex numbers",
+      "papers": [
+        3
+      ],
+      "keywords": [
+        "complex number",
+        "Argand diagram",
+        "imaginary part",
+        "real part",
+        "Im(z)",
+        "Re(z)",
+        "modulus of z",
+        "argument of z",
+        "arg z",
+        "arg(z",
+        "x + iy",
+        "a + bi",
+        "conjugate",
+        "z*",
+        "square roots of",
+        "locus of z",
+        "z1z2",
+        "modulus-argument",
+        "exponential form",
+        "geometric effect",
+        "z satisfies",
+        "complex numbers z",
+        "Cartesian form",
+        "polar form",
+        "non-real roots",
+        "conjugate pairs",
+        "purely imaginary",
+        "roots occur in conjugate pairs",
+        "in the form x + iy"
+      ],
+      "subtopics": [
+        {
+          "name": "Result that",
+          "links": [],
+          "detail": "use the result that, for a polynomial equation with real coefficients, any non-real roots occur in conjugate pairs"
+        },
+        {
+          "name": "Complex numbers geometrically by means of an Argand diagram",
+          "links": [],
+          "detail": "represent complex numbers geometrically by means of an Argand diagram carry out operations of multiplication and division of two complex numbers expressed in ^ h r cos i sin r e polar form + / i i i find the two square roots of a complex number"
+        },
+        {
+          "name": "In simple terms the geometrical effects of conjugating a",
+          "links": [],
+          "detail": "understand in simple terms the geometrical effects of conjugating a complex number and of adding, subtracting, multiplying and dividing two complex numbers"
+        },
+        {
+          "name": "Illustrate simple equations and inequalities involving complex numbers by",
+          "links": [],
+          "detail": "illustrate simple equations and inequalities involving complex numbers by means of loci in an Argand diagram Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Forces and equilibrium",
+      "papers": [
+        4
+      ],
+      "keywords": [
+        "resultant force",
+        "equilibrium",
+        "resolve",
+        "friction",
+        "coefficient of friction",
+        "tension",
+        "normal reaction",
+        "inclined plane",
+        "angle of inclination",
+        "limiting equilibrium",
+        "smooth surface",
+        "rough surface",
+        "horizontal component",
+        "vertical component",
+        "particle is in equilibrium",
+        "find the magnitude of the force",
+        "three forces",
+        "coplanar forces"
+      ],
+      "subtopics": [
+        {
+          "name": "Principle that",
+          "links": [],
+          "detail": "use the principle that, when a particle is in equilibrium, the vector sum of the forces acting is zero, or equivalently, that the sum of the components in any direction is zero"
+        },
+        {
+          "name": "Contact force between two surfaces can be represented by",
+          "links": [],
+          "detail": "understand that a contact force between two surfaces can be represented by two components, the normal component and the frictional component use the model of a ‘smooth' contact, and understand the limitations of this model"
+        },
+        {
+          "name": "Concepts of limiting friction and limiting equilibrium",
+          "links": [],
+          "detail": "understand the concepts of limiting friction and limiting equilibrium, recall the definition of coefficient of friction, and use the relationship F R F R or , as appropriate n n"
+        },
+        {
+          "name": "Newton's third law. Back to contents page Cambridge International",
+          "links": [],
+          "detail": "use Newton's third law. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Kinematics of motion in a straight line",
+      "papers": [
+        4
+      ],
+      "keywords": [
+        "velocity",
+        "acceleration",
+        "displacement",
+        "v = u + at",
+        "s = ut",
+        "v2 = u2 + 2as",
+        "velocity-time graph",
+        "distance-time graph",
+        "constant acceleration",
+        "uniform acceleration",
+        "deceleration",
+        "particle moves in a straight line",
+        "speed at time t",
+        "find the distance",
+        "projectile",
+        "time of flight",
+        "maximum height",
+        "horizontal motion",
+        "particle is projected"
+      ],
+      "subtopics": [
+        {
+          "name": "Displacement-time graphs and velocity-time graphs",
+          "links": [],
+          "detail": "sketch and interpret displacement-time graphs and velocity-time graphs, and in particular appreciate that"
+        },
+        {
+          "name": "Area under a velocity-time graph represents displacement",
+          "links": [],
+          "detail": "the area under a velocity-time graph represents displacement,"
+        },
+        {
+          "name": "Gradient of a displacement-time graph represents velocity",
+          "links": [],
+          "detail": "the gradient of a displacement-time graph represents velocity,"
+        },
+        {
+          "name": "Gradient of a velocity-time graph represents acceleration use differentiation",
+          "links": [],
+          "detail": "the gradient of a velocity-time graph represents acceleration use differentiation and integration with respect to time to solve simple problems concerning displacement, velocity and acceleration"
+        },
+        {
+          "name": "Appropriate formulae for motion with constant acceleration in a",
+          "links": [],
+          "detail": "use appropriate formulae for motion with constant acceleration in a straight line."
+        }
+      ]
+    },
+    {
+      "name": "Momentum",
+      "papers": [
+        4
+      ],
+      "keywords": [
+        "momentum",
+        "impulse",
+        "conservation of momentum",
+        "collision",
+        "coalesce",
+        "coefficient of restitution",
+        "rebound",
+        "impact",
+        "change in momentum",
+        "mv - mu",
+        "total momentum",
+        "elastic collision",
+        "inelastic collision",
+        "particle collides",
+        "speed after collision",
+        "two particles collide"
+      ],
+      "subtopics": [
+        {
+          "name": "Definition of linear momentum and show understanding of its",
+          "links": [],
+          "detail": "use the definition of linear momentum and show understanding of its vector nature"
+        },
+        {
+          "name": "Conservation of linear momentum to solve problems that may",
+          "links": [],
+          "detail": "use conservation of linear momentum to solve problems that may be modelled as the direct impact of two bodies. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Newton's laws of motion",
+      "papers": [
+        4
+      ],
+      "keywords": [
+        "Newton's second law",
+        "F = ma",
+        "net force",
+        "connected particles",
+        "pulley",
+        "string",
+        "acceleration of the system",
+        "tension in the string",
+        "block on a table",
+        "particle on a slope",
+        "magnitude of the force on",
+        "two particles",
+        "light inextensible string",
+        "passes over a smooth pulley"
+      ],
+      "subtopics": [
+        {
+          "name": "Relationship between mass and weight solve simple problems which",
+          "links": [],
+          "detail": "use the relationship between mass and weight solve simple problems which may be modelled as the motion of a particle moving vertically or on an inclined plane with constant acceleration"
+        },
+        {
+          "name": "Simple problems which may be modelled as the motion",
+          "links": [],
+          "detail": "solve simple problems which may be modelled as the motion of connected particles."
+        }
+      ]
+    },
+    {
+      "name": "Energy, work and power",
+      "papers": [
+        4
+      ],
+      "keywords": [
+        "kinetic energy",
+        "potential energy",
+        "work done",
+        "power",
+        "efficiency",
+        "work-energy principle",
+        "conservation of energy",
+        "gravitational potential energy",
+        "1/2 mv",
+        "mgh",
+        "joule",
+        "watt",
+        "energy transferred",
+        "driving force",
+        "resistance to motion",
+        "work done against friction",
+        "speed at the bottom"
+      ],
+      "subtopics": [
+        {
+          "name": "Concept of the work done by a force",
+          "links": [],
+          "detail": "understand the concept of the work done by a force, and calculate the work done by a constant force when its point of application undergoes a displacement not necessarily parallel to the force"
+        },
+        {
+          "name": "Concepts of gravitational potential energy and kinetic energy",
+          "links": [],
+          "detail": "understand the concepts of gravitational potential energy and kinetic energy, and use appropriate formulae understand and use the relationship between the change in energy of a system and the work done by the external forces, and use in appropriate cases the principle of conservation of energy"
+        },
+        {
+          "name": "Definition of power as the rate at which a",
+          "links": [],
+          "detail": "use the definition of power as the rate at which a force does work, and use the relationship between power, force and velocity for a force acting in the direction of motion"
+        },
+        {
+          "name": "Problems involving",
+          "links": [],
+          "detail": "solve problems involving, for example, the instantaneous acceleration of a car moving on a hill against a resistance. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Representation of data",
+      "papers": [
+        5
+      ],
+      "keywords": [
+        "histogram",
+        "frequency density",
+        "stem-and-leaf",
+        "box-and-whisker",
+        "cumulative frequency",
+        "median",
+        "quartile",
+        "interquartile range",
+        "mean",
+        "variance",
+        "standard deviation",
+        "outlier",
+        "skewness",
+        "mode",
+        "class width",
+        "frequency polygon",
+        "grouped data",
+        "discrete data",
+        "continuous data",
+        "calculate the mean"
+      ],
+      "subtopics": [
+        {
+          "name": "And interpret stem-and-leaf diagrams",
+          "links": [],
+          "detail": "draw and interpret stem-and-leaf diagrams, box-and-whisker plots, histograms and cumulative frequency graphs"
+        },
+        {
+          "name": "Different measures of central tendency",
+          "links": [],
+          "detail": "understand and use different measures of central tendency (mean, median, mode) and variation (range, interquartile range, standard deviation)"
+        },
+        {
+          "name": "Cumulative frequency graph calculate and use the mean and",
+          "links": [],
+          "detail": "use a cumulative frequency graph calculate and use the mean and standard deviation of a set of data (including grouped data) either from the data itself or from given ^ h"
+        },
+        {
+          "name": "/ x / x / x a totals and",
+          "links": [],
+          "detail": "/ x / x / x a totals and , or coded totals ^ h"
+        },
+        {
+          "name": "/ x a and",
+          "links": [],
+          "detail": "/ x a and , and use such totals in solving problems which may involve up to two data sets."
+        }
+      ]
+    },
+    {
+      "name": "Permutations and combinations",
+      "papers": [
+        5
+      ],
+      "keywords": [
+        "permutation",
+        "combination",
+        "factorial",
+        "arrangements",
+        "selections",
+        "choose",
+        "in how many ways",
+        "distinct arrangements",
+        "identical items",
+        "circular arrangement",
+        "at least one",
+        "restriction",
+        "number of ways of arranging",
+        "selected from",
+        "if repetition is not allowed"
+      ],
+      "subtopics": [
+        {
+          "name": "Problems about arrangements of objects in a line",
+          "links": [],
+          "detail": "solve problems about arrangements of objects in a line, including those involving"
+        },
+        {
+          "name": "Repetition",
+          "links": [],
+          "detail": "repetition (e.g. the number of ways of arranging the letters of the word ‘NEEDLESS')"
+        },
+        {
+          "name": "Restriction",
+          "links": [],
+          "detail": "restriction (e.g. the number of ways several people can stand in a line if two particular people must, or must not, stand next to each other). Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "Probability",
+      "papers": [
+        5
+      ],
+      "keywords": [
+        "probability",
+        "P(A)",
+        "conditional probability",
+        "independent events",
+        "mutually exclusive",
+        "tree diagram",
+        "Venn diagram",
+        "addition rule",
+        "multiplication rule",
+        "sample space",
+        "exhaustive",
+        "P(A and B)",
+        "P(A or B)",
+        "P(B | A)",
+        "given that the event",
+        "the probability that",
+        "find P("
+      ],
+      "subtopics": [
+        {
+          "name": "Addition and multiplication of probabilities",
+          "links": [],
+          "detail": "use addition and multiplication of probabilities, as appropriate, in simple cases"
+        },
+        {
+          "name": "Meaning of exclusive and independent events",
+          "links": [],
+          "detail": "understand the meaning of exclusive and independent events, including determination A B of whether events and are independent ^ h P A B by comparing the values of and ^ h ^ h P A P B calculate and use conditional probabilities in simple cases."
+        }
+      ]
+    },
+    {
+      "name": "Discrete random variables",
+      "papers": [
+        5
+      ],
+      "keywords": [
+        "random variable X",
+        "probability distribution",
+        "E(X)",
+        "Var(X)",
+        "expected value",
+        "binomial distribution",
+        "B(n, p)",
+        "P(X = r)",
+        "binomial probability",
+        "mean of binomial",
+        "variance of binomial",
+        "geometric distribution",
+        "probability mass function",
+        "X has the distribution",
+        "find E(X)",
+        "find Var(X)"
+      ],
+      "subtopics": [
+        {
+          "name": "Up a probability distribution table relating to a given",
+          "links": [],
+          "detail": "draw up a probability distribution table relating to a given situation involving a discrete random X E( X ) Var( X ) variable , and calculate and"
+        },
+        {
+          "name": "Formulae for probabilities for the binomial and geometric distributions",
+          "links": [],
+          "detail": "use formulae for probabilities for the binomial and geometric distributions, and recognise practical situations where these distributions are suitable models use formulae for the expectation and variance of the binomial distribution and for the expectation of the geometric distribution. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    },
+    {
+      "name": "The normal distribution",
+      "papers": [
+        5
+      ],
+      "keywords": [
+        "normal distribution",
+        "standard normal",
+        "Z-score",
+        "symmetry of normal",
+        "standardise",
+        "inverse normal",
+        "area under normal curve",
+        "normal approximation to binomial",
+        "continuity correction",
+        "percentage point",
+        "P(X < a)",
+        "P(X >",
+        "find the value of mu",
+        "find the value of sigma",
+        "N(mu",
+        "N(sigma",
+        "the weights are normally distributed"
+      ],
+      "subtopics": [
+        {
+          "name": "Problems concerning a variable",
+          "links": [],
+          "detail": "solve problems concerning a variable , where _ i"
+        },
+        {
+          "name": "Finding the value of",
+          "links": [],
+          "detail": "finding the value of , or a related"
+        },
+        {
+          "name": "Probability",
+          "links": [],
+          "detail": "probability, given the values of , , . n v"
+        },
+        {
+          "name": "Finding a relationship between",
+          "links": [],
+          "detail": "finding a relationship between , and n v"
+        },
+        {
+          "name": "P X x given the value of or a",
+          "links": [],
+          "detail": "P X x given the value of or a related"
+        },
+        {
+          "name": "Probability recall conditions under which the normal distribution can",
+          "links": [],
+          "detail": "probability recall conditions under which the normal distribution can be used as an approximation to the binomial distribution, and use this approximation, with a continuity correction, in solving problems. Back to contents page Cambridge International AS & A Level Mathematics 9709 syllabus for 2026 and 2027."
+        }
+      ]
+    }
+  ]
+}

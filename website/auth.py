@@ -26,7 +26,7 @@ import bcrypt
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
-from . import users_db as _udb
+import users_db as _udb
 
 router = APIRouter()
 
@@ -446,9 +446,13 @@ def send_welcome_email(user: dict) -> bool:
       <a href="{base}" style="color:#C9BDF0;text-decoration:none">{base}</a>
       &nbsp;·&nbsp;
       <a href="mailto:nexgentutors6@gmail.com" style="color:#C9BDF0;text-decoration:none">nexgentutors6@gmail.com</a>
+      &nbsp;·&nbsp;
+      <a href="https://wa.me/923204884375" style="color:#C9BDF0;text-decoration:none">WhatsApp</a>
     </p>
     <p style="margin:8px 0 0;color:#7B6F98;font-size:.68rem">
-      You received this because you created a PrepWithTee account.<br>
+      Have a question or want 1-on-1 tutoring?
+      <a href="https://wa.me/923204884375" style="color:#7B6F98;text-decoration:underline">Chat with us on WhatsApp</a>.<br>
+      You received this because you created a PrepWithTee account.
       If this wasn't you, you can safely ignore this email.
     </p>
   </td></tr>
@@ -461,7 +465,7 @@ def send_welcome_email(user: dict) -> bool:
 </body></html>"""
 
     try:
-        from .app import _notify
+        from app import _notify
         return _notify(subject, body, to=email, html_override=html)
     except Exception as exc:
         print(f"[welcome_email] failed to notify {email}: {exc}", flush=True)

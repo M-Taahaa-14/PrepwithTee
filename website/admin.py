@@ -29,7 +29,7 @@ from fastapi import (APIRouter, Cookie, Depends, File, Form, Header,
 from jose import JWTError, jwt as _jwt
 from pydantic import BaseModel
 
-from . import users_db as _udb
+import users_db as _udb
 
 router = APIRouter(prefix="/api/admin")
 
@@ -401,7 +401,7 @@ VALID_PLANS = {"free", "solo", "three", "all"}
 @router.patch("/students/{user_id}/plan")
 def set_student_plan(user_id: str, req: PlanUpdate, _: bool = _Admin):
     from datetime import datetime, timedelta, timezone
-    from .access import TRIAL_DAYS, BILLING_CYCLE_DAYS
+    from access import TRIAL_DAYS, BILLING_CYCLE_DAYS
 
     if req.plan not in VALID_PLANS:
         raise HTTPException(400, f"plan must be one of: {', '.join(sorted(VALID_PLANS))}")
@@ -747,8 +747,8 @@ def add_assignment(user_id: str, req: AssignmentWrite, notify: bool = True,
     # tutor has finished putting the assignment together.
     emailed = False
     if notify:
-        from .app import _notify
-        from . import reminders
+        from app import _notify
+        import reminders
         emailed = reminders.send_assigned_email(user, row, _notify)
     return {"assignment": row, "emailed": emailed}
 
@@ -786,8 +786,8 @@ def remove_assignment(assignment_id: int, _: bool = _Admin):
 def remind_student(user_id: str, _: bool = _Admin):
     """Nudge a student about everything still outstanding, on demand."""
     user = _student_or_404(user_id)
-    from .app import _notify
-    from . import reminders
+    from app import _notify
+    import reminders
 
     items = reminders.open_homework(user_id)
     if not items:
@@ -809,7 +809,7 @@ def remind_student(user_id: str, _: bool = _Admin):
 
 def _wa_reminder_link(user: dict, items: list[dict]) -> str | None:
     import urllib.parse
-    from . import reminders
+    import reminders
     digits = "".join(ch for ch in (user.get("phone") or "") if ch.isdigit())
     if not digits:
         return None
@@ -830,7 +830,7 @@ def _wa_reminder_link(user: dict, items: list[dict]) -> str | None:
 def student_calendar_url(user_id: str, _: bool = _Admin):
     """The subscribe-once feed URL to hand a student."""
     _student_or_404(user_id)
-    from . import reminders
+    import reminders
     return {"url": reminders.calendar_url(user_id)}
 
 
@@ -884,7 +884,7 @@ async def upload_assignment_file(assignment_id: int,
 def download_student_submission(assignment_id: int, idx: int, _: bool = _Admin):
     """Serve a student's submission to the administrator."""
     from fastapi.responses import FileResponse
-    from .admin import UPLOADS_DIR
+    from admin import UPLOADS_DIR
     row = _udb.get_assignment(assignment_id)
     if row is None:
         raise HTTPException(404, "No such assignment")
@@ -950,7 +950,7 @@ class ApproveReq(BaseModel):
 
 @router.post("/teacher-applications/{app_id}/approve")
 def approve_application(app_id: int, req: ApproveReq, _: bool = _Admin):
-    from .auth import hash_password as _hash_pw
+    from auth import hash_password as _hash_pw
     application = _udb.get_teacher_application(app_id)
     if application is None:
         raise HTTPException(404, "No such application")
@@ -1362,7 +1362,7 @@ def admin_review_proof(proof_id: int, req: ProofReview, _: bool = _Admin):
 
     if req.status == "approved":
         from datetime import datetime, timedelta, timezone
-        from .access import BILLING_CYCLE_DAYS
+        from access import BILLING_CYCLE_DAYS
         now = datetime.now(timezone.utc)
         expires = (now + timedelta(days=BILLING_CYCLE_DAYS)).isoformat()
         _udb.update_user_plan(
@@ -1450,13 +1450,13 @@ class _BlogPostPatch(BaseModel):
 
 @router.get("/blog")
 def admin_blog_list(_: bool = _Admin):
-    from . import blog as _blog
+    import blog as _blog
     return {"posts": _blog.get_all_posts_admin()}
 
 
 @router.post("/blog")
 def admin_blog_create(post: _BlogPostIn, _: bool = _Admin):
-    from . import blog as _blog
+    import blog as _blog
     if not re.match(r"^[a-z0-9-]+$", post.slug):
         raise HTTPException(400, "Slug must contain only lowercase letters, numbers and hyphens")
     _blog.ensure_table()
@@ -1480,7 +1480,7 @@ def admin_blog_create(post: _BlogPostIn, _: bool = _Admin):
 
 @router.patch("/blog/{post_id}")
 def admin_blog_update(post_id: int, data: _BlogPostPatch, _: bool = _Admin):
-    from . import blog as _blog
+    import blog as _blog
     fields = data.model_dump(exclude_unset=True)
     if not fields:
         return {"ok": True}
@@ -1508,7 +1508,7 @@ def admin_blog_update(post_id: int, data: _BlogPostPatch, _: bool = _Admin):
 
 @router.delete("/blog/{post_id}")
 def admin_blog_delete(post_id: int, _: bool = _Admin):
-    from . import blog as _blog
+    import blog as _blog
     _blog.ensure_table()
     con = _blog._con()
     try:
@@ -1517,6 +1517,32 @@ def admin_blog_delete(post_id: int, _: bool = _Admin):
     finally:
         con.close()
     return {"ok": True}
+
+
+# Blog images (covers + inline) are stored under data/uploads/blog, which the
+# app serves at /uploads/blog/<name> via the persistent /uploads static mount.
+BLOG_UPLOADS_DIR = ROOT / "data" / "uploads" / "blog"
+ALLOWED_BLOG_IMG_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+MAX_BLOG_IMG_BYTES = 8 * 1024 * 1024
+
+
+@router.post("/blog/upload")
+async def admin_blog_upload_image(file: UploadFile = File(...), _: bool = _Admin):
+    """Store an uploaded blog image and return its stable public URL.
+
+    The stored name is generated server-side, never the client's, so an
+    uploaded filename can't be used to traverse or clobber anything.
+    """
+    ext = Path(file.filename or "").suffix.lower()
+    if ext not in ALLOWED_BLOG_IMG_EXTS:
+        raise HTTPException(400, "Please upload a PNG, JPG, WEBP or GIF image.")
+    data = await file.read(MAX_BLOG_IMG_BYTES + 1)
+    if len(data) > MAX_BLOG_IMG_BYTES:
+        raise HTTPException(413, "Image is too large (max 8 MB).")
+    BLOG_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    rel = f"{_uuid.uuid4().hex}{ext}"
+    (BLOG_UPLOADS_DIR / rel).write_bytes(data)
+    return {"url": f"/uploads/blog/{rel}"}
 
 
 # ── Newsletter Admin ──────────────────────────────────────────────────────────
@@ -1560,7 +1586,7 @@ def admin_broadcast_newsletter(req: NewsletterBroadcastReq, _: bool = _Admin):
     if not subs:
         return {"ok": True, "sent": 0, "total": 0}
 
-    from .app import _notify
+    from app import _notify
     sent_count = 0
     # Batch processing in chunks of 100
     batch_size = 100

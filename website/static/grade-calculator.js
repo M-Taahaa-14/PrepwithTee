@@ -25,6 +25,83 @@ const SUBJECTS = [
 
 const SESSION_LABEL = { s: "May/Jun", w: "Oct/Nov", m: "Feb/Mar" };
 
+/* ── Official Cambridge component weightings ─────────────────────
+ *
+ * Each paper contributes a fixed PERCENTAGE of the qualification total,
+ * regardless of its raw mark. e.g. IGCSE Physics (0625): the multiple-choice
+ * paper is worth 30%, the theory paper 50%, the practical 20% — even though
+ * their raw marks are 40, 80 and 40 (which only sum to 160, not 200).
+ *
+ * A raw component mark is converted to its weighted contribution with
+ *     weighted = raw × (weightPct/100 × optionMax / componentRawMax)
+ * so the weighted components of an option always sum to the option max mark
+ * (200 for these subjects). Both optionMax and componentRawMax are read from
+ * the official grade-threshold data, so the split self-corrects year to year.
+ */
+const WEIGHTINGS = {
+  "0625": { 1: 30, 2: 30, 3: 50, 4: 50, 5: 20, 6: 20 }, // MCQ / Theory / Practical
+  "5054": { 1: 30, 2: 50, 3: 20, 4: 20 },
+  "4024": { 1: 50, 2: 50 },
+  "0580": { 1: 50, 2: 50, 3: 50, 4: 50 },
+  "2210": { 1: 50, 2: 50 },
+  "0478": { 1: 50, 2: 50 },
+  "9702": { 1: 15.5, 2: 23, 3: 11.5, 4: 38.5, 5: 11.5 },
+};
+
+/* Human labels for each paper, used in the weighting cards. */
+const COMP_HINTS = {
+  "0625": { 1: "Multiple choice", 2: "Multiple choice", 3: "Theory", 4: "Theory", 5: "Practical", 6: "Alt. to practical" },
+  "5054": { 1: "Multiple choice", 2: "Theory", 3: "Practical", 4: "Alt. to practical" },
+  "4024": { 1: "Paper 1 (non-calc)", 2: "Paper 2 (calc)" },
+  "0580": { 1: "Paper 1", 2: "Paper 2", 3: "Paper 3", 4: "Paper 4" },
+  "2210": { 1: "Theory", 2: "Problem-solving" },
+  "0478": { 1: "Theory", 2: "Problem-solving" },
+  "9702": { 1: "Multiple choice", 2: "AS structured", 3: "AS practical", 4: "A2 structured", 5: "A2 planning" },
+};
+
+function weightPct(syllabus, paper) {
+  const w = WEIGHTINGS[syllabus];
+  return w && w[Number(paper)] != null ? w[Number(paper)] : null;
+}
+
+function compHint(syllabus, paper) {
+  const h = COMP_HINTS[syllabus];
+  return (h && h[Number(paper)]) || `Paper ${paper}`;
+}
+
+/* Raw max mark for a specific component, straight from the threshold rows.
+ * Prefer the exact year/session row; fall back to any matching paper+variant. */
+function rawMaxFor(paper, variant, year, session) {
+  const P = String(paper), V = String(variant || "");
+  // Exact year/session match wins.
+  if (year != null) {
+    const exact = state._allThresholds.find(t =>
+      String(t.paper) === P && String(t.variant || "") === V &&
+      t.year === year && (session == null || t.session === session));
+    if (exact) return exact.max_mark;
+  }
+  // Otherwise take the most recent matching row — component max marks change
+  // across syllabus revisions (e.g. 0625 Paper 2 was 80 pre-2016, 40 since).
+  const matches = state._allThresholds
+    .filter(t => String(t.paper) === P && String(t.variant || "") === V)
+    .sort((a, b) => b.year - a.year);
+  if (matches.length) return matches[0].max_mark;
+  const anyPaper = state._allThresholds
+    .filter(t => String(t.paper) === P)
+    .sort((a, b) => b.year - a.year);
+  return anyPaper.length ? anyPaper[0].max_mark : null;
+}
+
+/* Weighting factor for one component within an option.
+ * Uses the official percentage where known, otherwise scales the option's raw
+ * marks proportionally so they still total the option max. */
+function componentFactor(paper, rawMax, optionMax, sumRaw) {
+  const pct = weightPct(state.syllabus, paper);
+  if (pct != null && rawMax) return (pct / 100) * optionMax / rawMax;
+  if (sumRaw) return optionMax / sumRaw;           // proportional fallback
+  return 1.0;
+}
+
 /* ── State ───────────────────────────────────────────────────── */
 
 let state = {
@@ -43,6 +120,7 @@ const selVariant = document.getElementById("gc-variant");
 const bodyEl     = document.getElementById("gc-body");
 const tableEl    = document.getElementById("gc-table-wrap");
 const summEl     = document.getElementById("gc-summary");
+const weightEl   = document.getElementById("gc-weighting");
 const emptyEl    = document.getElementById("gc-empty");
 
 // Populate subject dropdown
@@ -141,6 +219,7 @@ async function onSyllabusChange() {
       state.variant = "";
       processAverages();
       renderComponentTable();
+      renderWeightingReference();
       updateOverallGrade();
     }
   } catch (err) {
@@ -161,6 +240,7 @@ function onVariantChange() {
     emptyEl.hidden = true;
     processAverages();
     renderComponentTable();
+    renderWeightingReference();
     updateOverallGrade();
   }
 }
@@ -181,6 +261,8 @@ function processAverages() {
         paper: p,
         variant: t.variant || "",
         max_mark: t.max_mark || 0,
+        _max_year: t.year || 0,
+        _max_session: t.session || "",
         grade_astar_sum: 0, grade_astar_cnt: 0,
         grade_a_sum: 0, grade_a_cnt: 0,
         grade_b_sum: 0, grade_b_cnt: 0,
@@ -201,7 +283,15 @@ function processAverages() {
     if (t.grade_e != null) { pg.grade_e_sum += t.grade_e; pg.grade_e_cnt++; }
     if (t.grade_f != null) { pg.grade_f_sum += t.grade_f; pg.grade_f_cnt++; }
     if (t.grade_g != null) { pg.grade_g_sum += t.grade_g; pg.grade_g_cnt++; }
-    if (t.max_mark > pg.max_mark) pg.max_mark = t.max_mark;
+    // Use the MOST RECENT max_mark (not the historical maximum) so a reduced
+    // mark scheme (e.g. 0580 P4 dropped from 130→100) shows the current value.
+    const tYear = t.year || 0;
+    const tSess = t.session || "";
+    if (tYear > pg._max_year || (tYear === pg._max_year && tSess > pg._max_session)) {
+      pg.max_mark = t.max_mark;
+      pg._max_year = tYear;
+      pg._max_session = tSess;
+    }
   });
 
   state.thresholds = Object.values(paperGroups).map(pg => {
@@ -300,12 +390,20 @@ function renderComponentTable() {
 function onMarkInput(input) {
   const mKey = input.dataset.mkey;
   const max = Number(input.dataset.max);
-  const val = input.value.trim();
+  const raw = input.value.trim();
 
-  if (val === "") {
+  if (raw === "") {
     delete state.marks[mKey];
   } else {
-    state.marks[mKey] = Math.min(max, Math.max(0, Number(val)));
+    const num = parseFloat(raw);
+    if (isNaN(num)) {
+      input.value = "";
+      delete state.marks[mKey];
+    } else {
+      const clamped = Math.min(max, Math.max(0, Math.round(num)));
+      if (clamped !== num) input.value = clamped;  // snap visual back to valid range
+      state.marks[mKey] = clamped;
+    }
   }
 
   // Find average threshold record
@@ -329,33 +427,124 @@ function onMarkInput(input) {
 
 /* ── Overall grade calculation ───────────────────────────────── */
 
-function getScalingFactor(syllabus, paper, year) {
-  if (syllabus === "5054") {
-    if (paper === 1) return 1.5;             // MCQ: 40 -> 60
-    if (paper === 2) return 4 / 3;           // Theory: 75 -> 100
-    if (paper === 3 || paper === 4) return 4 / 3; // Practical/ATP: 30 -> 40
+/* ── Weighting reference + A* targets ────────────────────────────
+ *
+ * Picks the extended (A*-bearing) option that matches the chosen variant and
+ * has the most historical sessions, then shows how each of its papers is
+ * weighted and what mark you'd need in each paper to reach an A*.
+ */
+function primaryOption() {
+  const byCode = {};
+  for (const opt of state._allOptions) {
+    if (!opt.max_mark || opt.max_mark <= 0) continue;      // skip stale rows
+    if (opt.grade_astar == null) continue;                 // extended only
+    const codes = opt.components.split(/[\s,]+/).filter(Boolean);
+    // Skip options where an explicit variant digit contradicts the selected variant.
+    // Single-digit codes (bare paper number) are variant-agnostic — allow them.
+    if (state.variant && !codes.every(c =>
+      c.length < 2 || c.slice(-1) === state.variant)) continue;
+    (byCode[opt.option_code] = byCode[opt.option_code] || []).push(opt);
   }
-  if (syllabus === "0625") {
-    if (paper === 1 || paper === 2) return 1.5;  // MCQ: 40 -> 60
-    if (paper === 3 || paper === 4) return 1.25; // Theory: 80 -> 100
-    if (paper === 5 || paper === 6) return 1.0;  // Practical/ATP: 40 -> 40
+  // Prefer the option with more components (e.g. full A Level > A2-only).
+  // Break ties by session count (more historical data = better averages).
+  let best = null, bestN = 0, bestComps = 0;
+  for (const rows of Object.values(byCode)) {
+    const compCount = rows[0].components.split(/[\s,]+/).filter(Boolean).length;
+    if (compCount > bestComps || (compCount === bestComps && rows.length > bestN)) {
+      bestComps = compCount; bestN = rows.length; best = rows;
+    }
   }
-  if (syllabus === "4024") {
-    if (paper === 1) return 1.25; // Paper 1: 80 -> 100
-    if (paper === 2) return 1.0;  // Paper 2: 100 -> 100
+  return best;   // array of option rows sharing one code, or null
+}
+
+/* Break an option into its per-component weighting, using averaged raw maxes. */
+function optionBreakdown(rows) {
+  // Use the most recent session of this option as the reference structure.
+  const sorted = [...rows].sort((a, b) => b.year - a.year ||
+    String(b.session).localeCompare(String(a.session)));
+  const opt = sorted[0];
+  const optionMax = opt.max_mark;
+  const codes = opt.components.split(/[\s,]+/).filter(Boolean);
+  const comps = codes.map(code => {
+    // Codes are either "42" (paper 4 variant 2) or bare "4" (variant-agnostic).
+    const paper   = code.length >= 2 ? parseInt(code.slice(0, code.length - 1), 10) : parseInt(code, 10);
+    const variant = code.length >= 2 ? code.slice(-1) : (state.variant || "");
+    const rawMax = rawMaxFor(paper, variant, opt.year, opt.session) || 0;
+    return { code, paper, variant, rawMax };
+  });
+  const sumRaw = comps.reduce((s, c) => s + c.rawMax, 0);
+  comps.forEach(c => {
+    c.factor = componentFactor(c.paper, c.rawMax, optionMax, sumRaw);
+    c.weightedMax = c.rawMax * c.factor;
+    c.pct = weightPct(state.syllabus, c.paper);
+    if (c.pct == null && optionMax) c.pct = Math.round(c.weightedMax / optionMax * 100);
+  });
+  // Average A* threshold across this option's sessions (out of optionMax).
+  const astars = rows.filter(r => r.max_mark === optionMax)
+    .map(r => r.grade_astar).filter(v => v != null);
+  const avgAstar = astars.length ? Math.round(astars.reduce((a, b) => a + b, 0) / astars.length) : null;
+  return { opt, optionMax, comps, avgAstar };
+}
+
+function renderWeightingReference() {
+  if (!weightEl) return;
+  const rows = primaryOption();
+  if (!rows || !rows.length) { weightEl.hidden = true; weightEl.innerHTML = ""; return; }
+
+  const { optionMax, comps, avgAstar } = optionBreakdown(rows);
+  // A* is reachable at a uniform performance level p = avgAstar / optionMax.
+  const p = avgAstar != null && optionMax ? avgAstar / optionMax : null;
+
+  const cards = comps.map(c => {
+    const pct = c.pct != null ? c.pct : "—";
+    return `
+      <div class="gcw-card">
+        <div class="gcw-card-head">
+          <span class="gcw-paper">Paper ${c.paper}<span class="gcw-variant">v${c.variant}</span></span>
+          <span class="gcw-weight">${pct}%</span>
+        </div>
+        <div class="gcw-hint">${esc(compHint(state.syllabus, c.paper))}</div>
+        <div class="gcw-convert">
+          <span class="gcw-raw">${c.rawMax}<em>raw</em></span>
+          <span class="gcw-arrow">→</span>
+          <span class="gcw-wtd">${Math.round(c.weightedMax)}<em>weighted</em></span>
+        </div>
+        <div class="gcw-factor">× ${c.factor.toFixed(3)} scaling</div>
+      </div>`;
+  }).join("");
+
+  let targetHtml = "";
+  if (p != null) {
+    const targetRows = comps.map(c => {
+      const need = Math.min(c.rawMax, Math.ceil(p * c.rawMax));
+      return `
+        <div class="gcw-target-row">
+          <span class="gcw-t-paper">Paper ${c.paper} <em>v${c.variant}</em></span>
+          <span class="gcw-t-need"><b>${need}</b> / ${c.rawMax}</span>
+          <span class="gcw-t-pct">${Math.round(need / c.rawMax * 100)}%</span>
+        </div>`;
+    }).join("");
+    targetHtml = `
+      <div class="gcw-target">
+        <div class="gcw-target-head">
+          <span class="gcw-target-title">🎯 Marks needed for an <b class="grade-Astar" style="padding:1px 7px;border-radius:6px">A*</b></span>
+          <span class="gcw-target-sub">A* needs ~${avgAstar}/${optionMax} (${Math.round(p * 100)}%) overall · balanced target per paper</span>
+        </div>
+        <div class="gcw-target-list">${targetRows}</div>
+        <p class="gcw-target-note">Balanced target = the same ${Math.round(p * 100)}% in every paper. You can trade a weaker paper for a stronger one as long as your <b>weighted total clears ~${avgAstar}</b>.</p>
+      </div>`;
   }
-  if (syllabus === "2210" || syllabus === "0478") {
-    if (year <= 2022) return 5 / 6; // 75 -> 62.5
-    return 1.0;
-  }
-  if (syllabus === "9702") {
-    if (paper === 1) return 1.0;
-    if (paper === 2) return 1.0;
-    if (paper === 3) return 0.75; // Practical: 40 -> 30
-    if (paper === 4) return 1.0;
-    if (paper === 5) return 1.0;
-  }
-  return 1.0;
+
+  weightEl.innerHTML = `
+    <div class="gcw-block">
+      <h2 class="gc-summary-title">How your papers are weighted</h2>
+      <p class="gcw-lead">Cambridge scales each paper to a fixed share of <b>${optionMax}</b> marks
+        (variant ${state.variant || "—"} · option ${esc(friendlyOptionCode(rows[0].option_code))}).
+        Your raw marks are converted before being compared to the grade boundaries.</p>
+      <div class="gcw-grid">${cards}</div>
+      ${targetHtml}
+    </div>`;
+  weightEl.hidden = false;
 }
 
 function calculateOverallGrade(score, option) {
@@ -391,24 +580,43 @@ function updateOverallGrade() {
   const optionOutcomes = {};
 
   for (const opt of state._allOptions) {
+    if (!opt.max_mark || opt.max_mark <= 0) continue;   // skip stale/degenerate rows
     const codes = opt.components.split(/[\s,]+/).filter(Boolean);
-    
+
     // Check if the student has entered marks for ALL components of this option
     let complete = true;
     let weightedTotalSum = 0;
     const steps = [];
 
-    for (const code of codes) {
-      const paper = code.length >= 2 ? parseInt(code[0]) : parseInt(code);
-      const variant = code.length >= 2 ? parseInt(code.substring(1)) : 1;
-      const mKey = `${paper}_${variant}`;
+    // Resolve paper+variant from a component code.
+    // Codes are either "42" (paper 4 variant 2) or bare "4" (variant-agnostic).
+    // For bare codes use the selected variant so the mKey matches entered marks.
+    function parseCode(code) {
+      if (code.length >= 2) {
+        return { paper: parseInt(code.slice(0, code.length - 1)), variantStr: code.slice(-1) };
+      }
+      return { paper: parseInt(code), variantStr: state.variant || "1" };
+    }
+
+    // Raw maxes for this option's components → proportional fallback if a
+    // paper has no official weighting on file.
+    const compMax = codes.map(code => {
+      const { paper, variantStr } = parseCode(code);
+      return rawMaxFor(paper, variantStr, opt.year, opt.session) || 0;
+    });
+    const sumRaw = compMax.reduce((a, b) => a + b, 0);
+
+    for (let i = 0; i < codes.length; i++) {
+      const code = codes[i];
+      const { paper, variantStr } = parseCode(code);
+      const mKey = `${paper}_${variantStr}`;
       const mark = state.marks[mKey];
 
       if (mark == null || mark === "") {
         complete = false;
         break;
       } else {
-        const factor = getScalingFactor(state.syllabus, paper, opt.year);
+        const factor = componentFactor(paper, compMax[i], opt.max_mark, sumRaw);
         weightedTotalSum += Number(mark) * factor;
         steps.push(`P${code} (${mark}×${factor.toFixed(2)})`);
       }
@@ -452,9 +660,15 @@ function updateOverallGrade() {
 
   for (const optCode of optionCodes) {
     const outcome = optionOutcomes[optCode];
-    const sessions = outcome.sessions.sort((a, b) => b.year - a.year || b.session.localeCompare(a.session));
+    const allSessions = outcome.sessions.sort((a, b) => b.year - a.year || b.session.localeCompare(a.session));
+    // Keep only the current syllabus era: component/option max marks change
+    // across revisions (e.g. 5054 moved from a 145 total to a weighted 200),
+    // and mixing eras would distort the average score and the A* boundary.
+    const latestMax = allSessions[0].thresholds.max_mark;
+    const sessions = allSessions.filter(s => s.thresholds.max_mark === latestMax);
+    outcome.max_mark = latestMax;
     const totalSessions = sessions.length;
-    
+
     // Calculate grade distribution statistics
     const gradeCounts = {};
     sessions.forEach(s => {
@@ -490,33 +704,67 @@ function updateOverallGrade() {
     // Calculate overall average weighted score text
     const avgWeightedScore = Math.round(sessions.reduce((sum, s) => sum + s.weightedTotal, 0) / totalSessions);
 
+    // A* gap: how far the weighted total is from the average A* boundary.
+    const optAstars = sessions.map(s => s.thresholds.grade_astar).filter(v => v != null);
+    const avgAstar = optAstars.length
+      ? Math.round(optAstars.reduce((a, b) => a + b, 0) / optAstars.length) : null;
+    let astarNote = "";
+    if (avgAstar != null) {
+      const gap = avgAstar - avgWeightedScore;
+      astarNote = gap <= 0
+        ? `<div class="gc-astar-note is-hit">🎉 Clears A* — ~${avgWeightedScore} vs A* ~${avgAstar}</div>`
+        : `<div class="gc-astar-note">A* is ~${avgAstar}/${outcome.max_mark} — you need <b>+${gap}</b> more weighted marks</div>`;
+    }
+
+    const variantLabel = state.variant ? `v${state.variant}` : "";
+    const asBadge = outcome.is_as_level
+      ? `<span class="gc-as-badge">AS</span>` : "";
+
     html += `
-      <div class="gc-option-card gc-option-complete" style="display:flex; flex-direction:column; gap:12px;">
-        <div class="gc-option-header">
-          <span class="gc-option-code">${esc(friendlyOptionCode(outcome.option_code))}</span>
-          ${outcome.is_as_level ? '<span class="gc-as-badge">AS</span>' : ""}
+      <div class="gc-option-card gc-option-complete">
+        <!-- header row: option code + AS badge -->
+        <div class="gc-card-topbar">
+          <span class="gc-option-code">${esc(friendlyOptionCode(outcome.option_code))} ${variantLabel}</span>
+          ${asBadge}
         </div>
+
+        <!-- component chips -->
         <div class="gc-option-comps">${compChips}</div>
-        <div class="gc-option-score" style="margin-top:0;">
-          <span class="gc-option-marks" style="font-size:1.15rem;">~${avgWeightedScore} / ${outcome.max_mark}</span>
-          <span class="gc-option-pct" style="font-size:0.8rem; padding:2px 8px;">Weighted</span>
+
+        <!-- grade hero -->
+        <div class="gc-card-hero">
+          <div class="gc-card-hero-left">
+            <div class="gc-card-label">Predicted Grade</div>
+            <span class="gc-big-grade ${gClass}">${predictedGrade}</span>
+          </div>
+          <div class="gc-card-hero-right">
+            <div class="gc-card-label">Weighted Score</div>
+            <div class="gc-card-score">~${avgWeightedScore}<span class="gc-card-score-max"> / ${outcome.max_mark}</span></div>
+          </div>
         </div>
-        <div class="gc-option-grade" style="margin:4px 0;">
-          <span class="gc-big-grade ${gClass}">${predictedGrade}</span>
+
+        ${astarNote}
+
+        <!-- historical distribution -->
+        <div class="gc-dist-section">
+          <div class="gc-dist-label">Historical outcomes across ${totalSessions} sessions</div>
+          <div class="gc-dist-pills">${sortedGrades.map(([g, count]) => {
+            const pct = Math.round((count / totalSessions) * 100);
+            const gc2 = g === "A*" ? "grade-Astar" : `grade-${g}`;
+            return `<span class="gc-dist-pill ${gc2}">${g} <em>${pct}%</em></span>`;
+          }).join("")}</div>
         </div>
-        <div class="gc-dist-bar" style="font-size:0.75rem; color:var(--muted); line-height:1.4; border-top:1px solid var(--line); padding-top:8px;">
-          <b>Historical outcomes:</b><br>${distHtml}
-        </div>
-        <button class="btn btn-secondary" style="font-size:0.72rem; padding:6px 10px; width:100%; text-align:center; border-radius:8px;" 
+
+        <button class="gc-history-btn"
                 onclick="toggleBreakdown('${outcome.option_code}')">
-          Show Session History ▾
+          Show session history ▾
         </button>
-        
-        <div id="breakdown-${outcome.option_code}" class="gc-breakdown-panel" style="display:none; overflow-x:auto; width:100%; border-top:1px dashed var(--line); padding-top:10px;">
-          <table style="width:100%; font-size:0.72rem; text-align:left; border-collapse:collapse;">
+
+        <div id="breakdown-${outcome.option_code}" class="gc-breakdown-panel" style="display:none;">
+          <table class="gc-breakdown-table">
             <thead>
-              <tr style="border-bottom:1px solid var(--line); color:var(--muted);">
-                <th style="padding:4px 0;">Session</th>
+              <tr>
+                <th>Session</th>
                 <th>Weighted</th>
                 <th>Grade</th>
                 <th>Boundaries</th>
@@ -528,19 +776,16 @@ function updateOverallGrade() {
                 const t = s.thresholds;
                 const boundaryStr = [
                   t.grade_astar != null ? `A*:${t.grade_astar}` : '',
-                  `A:${t.grade_a}`,
-                  `B:${t.grade_b}`,
-                  `C:${t.grade_c}`,
-                  `D:${t.grade_d}`,
-                  `E:${t.grade_e}`
+                  `A:${t.grade_a}`, `B:${t.grade_b}`,
+                  `C:${t.grade_c}`, `D:${t.grade_d}`, `E:${t.grade_e}`
                 ].filter(Boolean).join(", ");
-
+                const sGc = s.grade === "A*" ? "grade-Astar" : `grade-${s.grade}`;
                 return `
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:6px 0; font-weight:600;">${esc(sLabel)}</td>
+                  <tr>
+                    <td><b>${esc(sLabel)}</b></td>
                     <td>${s.weightedTotal}</td>
-                    <td><span class="pm-tch grade-${s.grade}" style="padding:2px 6px; font-size:0.68rem; border-radius:4px; font-weight:700;">${s.grade}</span></td>
-                    <td style="color:var(--muted); font-size:0.65rem;">${boundaryStr}</td>
+                    <td><span class="pm-tch ${sGc}" style="padding:2px 6px;font-size:.68rem;border-radius:4px;font-weight:700;">${s.grade}</span></td>
+                    <td class="gc-bnd-cell">${boundaryStr}</td>
                   </tr>`;
               }).join("")}
             </tbody>
@@ -573,6 +818,7 @@ window.toggleBreakdown = function(optCode) {
 function hideResults() {
   bodyEl.hidden = true;
   summEl.hidden = true;
+  if (weightEl) { weightEl.hidden = true; weightEl.innerHTML = ""; }
   emptyEl.hidden = false;
   tableEl.innerHTML = "";
   summEl.innerHTML = "";

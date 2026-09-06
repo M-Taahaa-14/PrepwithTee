@@ -578,31 +578,35 @@ document.addEventListener("DOMContentLoaded", () => {
                          'teacher-apply.html']);
   if (SKIP.has(page)) return;
 
-  // Inject FAB button
+  // Inject FAB button — notepad icon, stacked above chatbot owl
   const fab = document.createElement('button');
   fab.id = 'global-note-fab';
   fab.type = 'button';
   fab.title = 'Quick note (N)';
   fab.setAttribute('aria-label', 'Add a note');
-  fab.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+  // Notepad/document icon — clearly distinct from the pen annotation button
+  fab.innerHTML = `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="8" y1="13" x2="16" y2="13"/>
+    <line x1="8" y1="17" x2="13" y2="17"/>
   </svg>`;
   fab.style.cssText = `
-    position:fixed; bottom:1.6rem; right:1.5rem; z-index:8000;
-    width:46px; height:46px; border-radius:50%;
-    background:var(--navy,#2d1b69); color:#fff;
+    position:fixed; bottom:6rem; right:1.4rem; z-index:8000;
+    width:44px; height:44px; border-radius:14px;
+    background:#1B3A7A; color:#fff;
     border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 4px 20px rgba(45,27,105,.35);
+    box-shadow:0 4px 18px rgba(27,58,122,.4);
     transition:transform .18s, box-shadow .18s, background .15s;
   `;
   fab.addEventListener('mouseenter', () => {
-    fab.style.transform = 'scale(1.1) translateY(-2px)';
-    fab.style.boxShadow = '0 8px 28px rgba(45,27,105,.45)';
+    fab.style.transform = 'scale(1.08) translateY(-2px)';
+    fab.style.boxShadow = '0 8px 26px rgba(27,58,122,.5)';
   });
   fab.addEventListener('mouseleave', () => {
     fab.style.transform = '';
-    fab.style.boxShadow = '0 4px 20px rgba(45,27,105,.35)';
+    fab.style.boxShadow = '0 4px 18px rgba(27,58,122,.4)';
   });
   document.body.appendChild(fab);
 

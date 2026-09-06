@@ -1,0 +1,103 @@
+<h2 id="quadratic-features">Quadratic graphs — full treatment</h2>
+
+<div class="note-def">
+  A <strong>quadratic function</strong> has the form \( y = ax^2 + bx + c \) where \( a \neq 0 \). Its graph is a smooth, symmetric curve called a <strong>parabola</strong>.
+</div>
+
+<h2 id="shape-sign">Shape depends on the sign of \( a \)</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>If \( a > 0 \)</th><th>If \( a < 0 \)</th></tr></thead>
+    <tbody>
+      <tr><td>U-shape (opens upward); minimum turning point</td><td>∩-shape (opens downward); maximum turning point</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="key-points">Key features to find and label</h2>
+
+<div class="note-key">
+  <ol style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li><strong>y-intercept:</strong> Set \( x = 0 \). The y-intercept is always \( (0, c) \).</li>
+    <li><strong>x-intercepts (roots):</strong> Set \( y = 0 \) and solve \( ax^2 + bx + c = 0 \). Methods: factorisation, completing the square, or the quadratic formula \( x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a} \).</li>
+    <li><strong>Line of symmetry:</strong> \( x = -\dfrac{b}{2a} \). This vertical line passes through the turning point.</li>
+    <li><strong>Turning point (vertex):</strong> Substitute \( x = -\dfrac{b}{2a} \) back to find \( y \). Label as coordinate pair.</li>
+  </ol>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — sketch \( y = x^2 - 4x + 3 \)</summary>
+  <div>
+    <p><strong>1. y-intercept:</strong> \( x = 0 \Rightarrow y = 3 \). Point: \( (0, 3) \).</p>
+    <p><strong>2. Roots (set \( y = 0 \)):</strong> \( x^2 - 4x + 3 = 0 \Rightarrow (x-1)(x-3) = 0 \Rightarrow x = 1 \) or \( x = 3 \). Points: \( (1, 0) \) and \( (3, 0) \).</p>
+    <p><strong>3. Line of symmetry:</strong> \( x = -\dfrac{-4}{2(1)} = 2 \)</p>
+    <p><strong>4. Turning point:</strong> \( y = (2)^2 - 4(2) + 3 = 4 - 8 + 3 = -1 \). Minimum at \( (2, -1) \).</p>
+    <p><strong>Sketch:</strong> U-shaped curve; y-intercept at 3; roots at x = 1 and x = 3; minimum at (2, −1).</p>
+  </div>
+</details>
+
+<h2 id="discriminant">The discriminant — how many roots?</h2>
+
+<div class="note-key">
+  The expression \( \Delta = b^2 - 4ac \) tells you how many times the parabola crosses the x-axis:
+  <table class="note-table" style="margin-top:.6rem">
+    <thead><tr><th>Discriminant</th><th>Number of roots</th><th>Graph behaviour</th></tr></thead>
+    <tbody>
+      <tr><td>\( b^2 - 4ac > 0 \)</td><td>Two distinct real roots</td><td>Crosses x-axis at two points</td></tr>
+      <tr><td>\( b^2 - 4ac = 0 \)</td><td>One repeated root</td><td>Touches x-axis at exactly one point (vertex on x-axis)</td></tr>
+      <tr><td>\( b^2 - 4ac < 0 \)</td><td>No real roots</td><td>Does not cross x-axis at all</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="completing">Vertex form — completing the square</h2>
+
+<p>Writing \( y = a(x - h)^2 + k \) immediately reveals the vertex at \( (h, k) \) and the line of symmetry \( x = h \).</p>
+
+<details class="note-example">
+  <summary>Worked example — completing the square for \( y = 2x^2 - 8x + 5 \)</summary>
+  <div>
+    <p>\( y = 2(x^2 - 4x) + 5 \)</p>
+    <p>\( = 2\left[(x - 2)^2 - 4\right] + 5 \)</p>
+    <p>\( = 2(x-2)^2 - 8 + 5 \)</p>
+    <p>\( = 2(x-2)^2 - 3 \)</p>
+    <p><strong>Vertex:</strong> \( (2, -3) \) — a minimum since \( a = 2 > 0 \).</p>
+    <p><strong>Line of symmetry:</strong> \( x = 2 \)</p>
+  </div>
+</details>
+
+<h2 id="cubic">Cubic graphs</h2>
+
+<div class="note-def">
+  A <strong>cubic function</strong> has the form \( y = ax^3 + bx^2 + cx + d \). Its graph is a smooth S-shaped curve.
+</div>
+
+<h2 id="cubic-shape">Shape and features of cubics</h2>
+
+<div class="note-key">
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li><strong>\( a > 0 \):</strong> the curve goes from bottom-left to top-right (starts low, ends high).</li>
+    <li><strong>\( a < 0 \):</strong> the curve goes from top-left to bottom-right.</li>
+    <li><strong>y-intercept:</strong> set \( x = 0 \) — gives \( (0, d) \).</li>
+    <li><strong>x-intercepts:</strong> solve \( ax^3 + bx^2 + cx + d = 0 \). A cubic has <em>at most 3 real roots</em> and <em>at least 1</em> (since every real cubic must cross the x-axis at least once).</li>
+    <li><strong>Turning points:</strong> a cubic has at most 2 local turning points. Find by differentiating and setting \( dy/dx = 0 \) (if required at this level).</li>
+    <li><strong>\( y = x^3 \) specifically:</strong> passes through origin; one root at \( x = 0 \); no turning points; point of inflection at origin.</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — sketch \( y = x^3 - 3x \)</summary>
+  <div>
+    <p><strong>y-intercept:</strong> \( x = 0 \Rightarrow y = 0 \). Point: \( (0, 0) \).</p>
+    <p><strong>Roots:</strong> \( x^3 - 3x = 0 \Rightarrow x(x^2 - 3) = 0 \Rightarrow x = 0,\; x = \sqrt{3} \approx 1.73,\; x = -\sqrt{3} \approx -1.73 \).</p>
+    <p><strong>Turning points</strong> (via differentiation): \( \dfrac{dy}{dx} = 3x^2 - 3 = 0 \Rightarrow x = \pm 1 \).</p>
+    <p>At \( x = 1 \): \( y = 1 - 3 = -2 \) → local minimum \( (1, -2) \).</p>
+    <p>At \( x = -1 \): \( y = -1 + 3 = 2 \) → local maximum \( (-1, 2) \).</p>
+    <p><strong>Shape:</strong> S-curve, \( a = 1 > 0 \), crossing x-axis at \( -\sqrt{3},\; 0,\; \sqrt{3} \).</p>
+  </div>
+</details>
+
+<div class="note-tip">
+  On Paper 2, a question typically provides a table of values with some missing entries, asks you to complete the table, then plot and draw the curve. Practise plotting accurately — a curve that misses a plotted point by more than 2 mm loses the curve mark.
+</div>

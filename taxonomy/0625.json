@@ -23,25 +23,61 @@
           "name": "Measuring length and volume",
           "links": [],
           "detail": "Using rulers and measuring cylinders to find lengths and volumes; determining small distances or short time intervals by measuring multiples (e.g. pendulum period).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "ruler",
+            "micrometer",
+            "vernier caliper",
+            "measuring cylinder",
+            "displacement method",
+            "screw gauge",
+            "mm",
+            "cm scale",
+            "least count"
+          ]
         },
         {
           "name": "Measuring time intervals",
           "links": [],
           "detail": "Measuring time intervals using clocks and digital timers; determining averages by measuring multiples.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "stopwatch",
+            "pendulum period",
+            "timer",
+            "oscillation",
+            "vibration",
+            "time for 20 oscillations",
+            "periodic time"
+          ]
         },
         {
           "name": "Scalars and vectors",
           "links": [],
           "detail": "Difference between scalar (magnitude only) and vector (magnitude + direction) quantities. Scalars: distance, speed, time, mass, energy, temperature. Vectors: force, weight, velocity, acceleration, momentum, electric and gravitational field strength.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "scalar quantity",
+            "vector quantity",
+            "speed is scalar",
+            "velocity is vector",
+            "magnitude only",
+            "magnitude and direction"
+          ]
         },
         {
           "name": "Resultant of perpendicular vectors",
           "links": [],
           "detail": "Determining by calculation or graphically the resultant of two vectors at right angles (forces or velocities only).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "resultant of",
+            "perpendicular components",
+            "right angle vectors",
+            "pythagoras theorem",
+            "resolve",
+            "component of force"
+          ]
         }
       ]
     },
@@ -64,37 +100,82 @@
           "name": "Speed and velocity",
           "links": [],
           "detail": "Speed = distance / time; velocity = speed in a given direction. Average speed = total distance / total time.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "average speed",
+            "average velocity",
+            "distance divided by time",
+            "uniform speed",
+            "constant speed",
+            "s = d/t"
+          ]
         },
         {
           "name": "Acceleration and deceleration",
           "links": [],
           "detail": "Acceleration = change in velocity / time. Deceleration is negative acceleration. Uniform and non-uniform acceleration.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "acceleration",
+            "deceleration",
+            "rate of change of velocity",
+            "a = (v-u)/t",
+            "change in velocity"
+          ]
         },
         {
           "name": "Distance-time graphs",
           "links": [],
           "detail": "Sketching, plotting and interpreting distance-time graphs. Gradient of a straight-line section gives speed.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "distance-time graph",
+            "gradient of distance",
+            "slope of d-t",
+            "distance against time",
+            "horizontal line on distance"
+          ]
         },
         {
           "name": "Speed-time graphs",
           "links": [],
           "detail": "Sketching, plotting and interpreting speed-time graphs. Gradient gives acceleration; area under graph gives distance. Identifying constant and changing acceleration.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "speed-time graph",
+            "velocity-time graph",
+            "area under speed",
+            "gradient of speed-time",
+            "v-t graph"
+          ]
         },
         {
           "name": "Acceleration of free fall",
           "links": [],
           "detail": "The acceleration of free fall g near Earth's surface is approximately constant (~10 m/s²).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "free fall",
+            "g = 10",
+            "g = 9.8",
+            "acceleration due to gravity",
+            "gravitational acceleration",
+            "falls freely"
+          ]
         },
         {
           "name": "Free fall and terminal velocity",
           "links": [],
           "detail": "Motion of objects falling in a uniform gravitational field with and without air/liquid resistance, including terminal velocity.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "terminal velocity",
+            "terminal speed",
+            "constant speed falling",
+            "parachute",
+            "air resistance increases",
+            "drag equals weight"
+          ]
         }
       ]
     },
@@ -112,13 +193,27 @@
           "name": "Mass and weight",
           "links": [],
           "detail": "Mass is the quantity of matter; weight is the gravitational force on a mass. Both measured with a balance.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "mass",
+            "weight",
+            "difference between mass and weight",
+            "kilogram",
+            "newton"
+          ]
         },
         {
           "name": "Gravitational field strength",
           "links": [],
           "detail": "g = W/m; equivalent to acceleration of free fall. g ≈ 10 N/kg near Earth's surface.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "gravitational field strength",
+            "g = W/m",
+            "N/kg",
+            "10 N/kg",
+            "weight = mass × gravitational field strength"
+          ]
         }
       ]
     },
@@ -138,19 +233,43 @@
           "name": "Density definition and equation",
           "links": [],
           "detail": "Density = mass / volume (ρ = m/V). Units: kg/m³ or g/cm³.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "density",
+            "mass per unit volume",
+            "ρ = m/V",
+            "kg/m³",
+            "g/cm³"
+          ]
         },
         {
           "name": "Measuring density experimentally",
           "links": [],
           "detail": "Determining density of a liquid, regularly shaped solid, and irregularly shaped solid (volume by displacement).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "measure density",
+            "displacement can",
+            "eureka can",
+            "overflow",
+            "find volume of irregular",
+            "water displaced"
+          ]
         },
         {
           "name": "Floating and sinking",
           "links": [],
           "detail": "Whether an object or liquid floats based on density comparisons (for liquids that do not mix).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "float",
+            "sink",
+            "upthrust",
+            "buoyancy",
+            "less dense than water",
+            "density of liquid",
+            "object floats when"
+          ]
         }
       ]
     },
@@ -177,49 +296,117 @@
           "name": "Effects of forces and deformation",
           "links": [],
           "detail": "Forces may change size and shape of an object. Load-extension graphs for elastic solids; associated experimental procedures.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "deformation",
+            "elastic deformation",
+            "plastic deformation",
+            "stretching",
+            "compression",
+            "bending",
+            "change in shape"
+          ]
         },
         {
           "name": "Hooke's Law and spring constant",
           "links": [],
           "detail": "Spring constant k = F/x. Limit of proportionality: where load-extension graph ceases to be straight.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "hooke's law",
+            "spring constant",
+            "extension proportional to force",
+            "limit of proportionality",
+            "k = F/e",
+            "elastic limit",
+            "load-extension"
+          ]
         },
         {
           "name": "Resultant forces",
           "links": [],
           "detail": "Resultant of two or more forces along the same straight line; resultant of forces at right angles.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "resultant force",
+            "net force",
+            "balanced forces",
+            "unbalanced forces",
+            "vector sum of forces",
+            "forces in equilibrium"
+          ]
         },
         {
           "name": "Newton's Laws of motion",
           "links": [],
           "detail": "Newton's 1st Law: object stays at rest or uniform motion unless acted on by a resultant force. Newton's 2nd Law: F = ma.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "newton's first law",
+            "newton's second law",
+            "newton's third law",
+            "F = ma",
+            "force equals mass times acceleration",
+            "action and reaction",
+            "law of inertia"
+          ]
         },
         {
           "name": "Friction and drag",
           "links": [],
           "detail": "Solid friction impedes motion and produces heating. Drag (fluid friction) acts on objects moving through a liquid or gas.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "friction",
+            "drag force",
+            "lubricant",
+            "friction opposes",
+            "sliding friction",
+            "kinetic friction"
+          ]
         },
         {
           "name": "Moments and turning effects",
           "links": [],
           "detail": "Moment = force × perpendicular distance from pivot. Everyday examples of turning effects.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "moment of a force",
+            "turning effect",
+            "pivot",
+            "fulcrum",
+            "perpendicular distance",
+            "moment = force × distance"
+          ]
         },
         {
           "name": "Principle of moments",
           "links": [],
           "detail": "For a body in equilibrium: sum of clockwise moments = sum of anticlockwise moments. Applied to one or more forces each side of the pivot.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "principle of moments",
+            "clockwise moment",
+            "anticlockwise moment",
+            "sum of clockwise",
+            "balanced beam",
+            "see-saw",
+            "moments balance"
+          ]
         },
         {
           "name": "Centre of gravity and equilibrium",
           "links": [],
           "detail": "Centre of gravity: point where weight acts. Experiment to find it for an irregular lamina. No resultant moment on an object in equilibrium.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "centre of gravity",
+            "centre of mass",
+            "stability",
+            "topple",
+            "stable equilibrium",
+            "unstable equilibrium"
+          ]
         }
       ]
     },
@@ -237,19 +424,42 @@
           "name": "Momentum definition",
           "links": [],
           "detail": "Momentum p = mv. Unit: kg m/s.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "momentum",
+            "p = mv",
+            "mass × velocity",
+            "kilogram metre per second",
+            "kg m/s"
+          ]
         },
         {
           "name": "Conservation of momentum",
           "links": [],
           "detail": "Principle of conservation of momentum applied to simple one-dimensional collision problems.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "conservation of momentum",
+            "total momentum",
+            "before and after collision",
+            "momentum is conserved",
+            "collide and stick",
+            "elastic collision",
+            "inelastic collision"
+          ]
         },
         {
           "name": "Impulse and resultant force",
           "links": [],
           "detail": "Impulse = Ft = Δ(mv). Resultant force = rate of change of momentum (F = Δp/Δt).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "impulse",
+            "force × time",
+            "change in momentum",
+            "F = Δp/Δt",
+            "area under force-time graph"
+          ]
         }
       ]
     },
@@ -274,43 +484,108 @@
           "name": "Energy stores",
           "links": [],
           "detail": "Energy may be stored as kinetic, gravitational potential, chemical, elastic (strain), nuclear, electrostatic and internal (thermal).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "kinetic energy",
+            "gravitational potential energy",
+            "chemical energy",
+            "nuclear energy",
+            "elastic potential energy",
+            "thermal energy store",
+            "energy stored"
+          ]
         },
         {
           "name": "Energy transfers and conservation",
           "links": [],
           "detail": "Energy transferred by forces, electrical currents, heating and waves. Principle of conservation of energy; flow diagrams.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "energy transfer",
+            "conservation of energy",
+            "energy is not created",
+            "energy dissipated",
+            "wasted energy",
+            "energy changes"
+          ]
         },
         {
           "name": "Kinetic and gravitational potential energy",
           "links": [],
           "detail": "Ek = ½mv². Ep = mgh (change in gravitational PE).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "KE = ½mv²",
+            "GPE = mgh",
+            "kinetic energy equation",
+            "potential energy equation",
+            "Ek = ½mv²",
+            "Ep = mgh",
+            "½ × mass × speed²"
+          ]
         },
         {
           "name": "Work done",
           "links": [],
           "detail": "Mechanical and electrical work done equals energy transferred. W = Fd.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "work done",
+            "W = Fd",
+            "work = force × distance",
+            "joule",
+            "energy transferred by force",
+            "work against friction"
+          ]
         },
         {
           "name": "Energy resources",
           "links": [],
           "detail": "How useful energy is obtained from fossil fuels, biofuels, water (waves, tides, hydro), geothermal, nuclear, solar cells and solar panels. Advantages and disadvantages: renewability, availability, reliability, scale, environmental impact. Solar radiation is the main source except geothermal, nuclear and tidal; energy released by nuclear fusion in the Sun.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "fossil fuel",
+            "renewable energy",
+            "solar energy",
+            "wind energy",
+            "hydroelectric",
+            "nuclear power station",
+            "biomass",
+            "geothermal",
+            "non-renewable",
+            "energy resource"
+          ]
         },
         {
           "name": "Power",
           "links": [],
           "detail": "Power = work done / time = energy transferred / time. P = W/t = E/t.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "power",
+            "P = E/t",
+            "P = W/t",
+            "watt",
+            "rate of energy transfer",
+            "kilowatt",
+            "power output",
+            "power input"
+          ]
         },
         {
           "name": "Efficiency",
           "links": [],
           "detail": "Efficiency = (useful energy output / total energy input) × 100% or (useful power output / total power input) × 100%.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "efficiency",
+            "useful energy output",
+            "total energy input",
+            "efficiency = useful/total",
+            "percentage efficiency",
+            "η",
+            "energy wasted"
+          ]
         }
       ]
     },
@@ -330,13 +605,29 @@
           "name": "Pressure definition and equation",
           "links": [],
           "detail": "Pressure = force / area (p = F/A). Everyday examples showing how pressure varies with force and area.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "pressure",
+            "P = F/A",
+            "force per unit area",
+            "pascal",
+            "N/m²",
+            "pressure = force / area"
+          ]
         },
         {
           "name": "Pressure in liquids",
           "links": [],
           "detail": "Pressure in a liquid increases with depth: Δp = ρgh.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "pressure in a liquid",
+            "depth and pressure",
+            "P = ρgh",
+            "liquid pressure increases with depth",
+            "pressure at depth",
+            "hydraulic"
+          ]
         }
       ]
     },
@@ -360,37 +651,88 @@
           "name": "States of matter",
           "links": [],
           "detail": "Distinguishing properties of solids, liquids and gases. Terms for changes in state (melting, boiling, condensation, solidification).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "solid liquid gas",
+            "state of matter",
+            "change of state",
+            "properties of solids",
+            "properties of gases",
+            "melting",
+            "boiling",
+            "freezing"
+          ]
         },
         {
           "name": "Particle model",
           "links": [],
           "detail": "Arrangement, separation and motion of particles in solids, liquids and gases. Forces and distances between particles affect properties.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "particle model",
+            "particles in a solid",
+            "particles in a liquid",
+            "particles in a gas",
+            "arrangement of particles",
+            "movement of particles"
+          ]
         },
         {
           "name": "Brownian motion",
           "links": [],
           "detail": "Random motion of microscopic particles in suspension is evidence for the kinetic particle model. Explained by random collisions with gas or liquid molecules.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "brownian motion",
+            "pollen grains",
+            "smoke particles",
+            "random motion",
+            "evidence for particles",
+            "random walk"
+          ]
         },
         {
           "name": "Gas pressure and temperature",
           "links": [],
           "detail": "Gas pressure arises from particle collisions with surfaces. Qualitative effect of changing temperature (constant V) or changing volume (constant T).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "gas pressure",
+            "pressure of a gas",
+            "temperature and pressure",
+            "pressure law",
+            "pressure increases with temperature",
+            "constant volume"
+          ]
         },
         {
           "name": "Absolute zero and the Kelvin scale",
           "links": [],
           "detail": "Absolute zero (−273 °C): particles have minimum kinetic energy. T (K) = θ (°C) + 273.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "absolute zero",
+            "kelvin",
+            "–273",
+            "0 K",
+            "thermodynamic temperature",
+            "convert to kelvin",
+            "celsius to kelvin"
+          ]
         },
         {
           "name": "Boyle's Law",
           "links": [],
           "detail": "pV = constant for a fixed mass of gas at constant temperature. Graphical representation.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "boyle's law",
+            "pressure × volume",
+            "PV = constant",
+            "P₁V₁ = P₂V₂",
+            "inversely proportional",
+            "constant temperature"
+          ]
         }
       ]
     },
@@ -411,31 +753,71 @@
           "name": "Thermal expansion",
           "links": [],
           "detail": "Everyday applications and consequences of thermal expansion.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "thermal expansion",
+            "expand when heated",
+            "contracts when cooled",
+            "bimetallic strip",
+            "expansion of solids",
+            "expansion of liquids"
+          ]
         },
         {
           "name": "Specific heat capacity",
           "links": [],
           "detail": "SHC = energy required per unit mass per unit temperature increase. E = mcθ. Experiments to measure SHC of a solid and a liquid.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "specific heat capacity",
+            "c = E/(mΔθ)",
+            "energy to heat",
+            "joules per kilogram per degree",
+            "J/(kg°C)",
+            "heat capacity"
+          ]
         },
         {
           "name": "Melting and boiling",
           "links": [],
           "detail": "Melting and boiling involve energy input at constant temperature. Melting point and boiling point of water at standard pressure. Condensation and solidification described in terms of particles.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "melting point",
+            "boiling point",
+            "temperature stays constant",
+            "plateau on heating curve",
+            "change of state",
+            "solidify",
+            "condense"
+          ]
         },
         {
           "name": "Evaporation",
           "links": [],
           "detail": "Evaporation: more-energetic particles escape from a liquid surface, causing cooling. Factors affecting evaporation: temperature, surface area, air movement.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "evaporation",
+            "evaporates",
+            "cooling by evaporation",
+            "fastest particles",
+            "evaporation from surface",
+            "sweating",
+            "faster molecules escape"
+          ]
         },
         {
           "name": "Boiling vs. evaporation",
           "links": [],
           "detail": "Differences between boiling and evaporation. Cooling of an object in contact with an evaporating liquid.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "difference between boiling and evaporation",
+            "boiling throughout liquid",
+            "evaporation from surface",
+            "boiling at fixed temperature"
+          ]
         }
       ]
     },
@@ -459,37 +841,91 @@
           "name": "Conduction",
           "links": [],
           "detail": "Experiments demonstrating good and bad thermal conductors. Conduction in solids: lattice vibrations and free electrons in metals.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "conduction",
+            "heat conduction",
+            "thermal conductor",
+            "thermal insulator",
+            "conduction in metals",
+            "free electrons",
+            "vibrating particles"
+          ]
         },
         {
           "name": "Convection",
           "links": [],
           "detail": "Convection in liquids and gases: density changes drive the current. Experiments to illustrate convection.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "convection",
+            "convection current",
+            "hot fluid rises",
+            "cool fluid sinks",
+            "convection in liquids",
+            "convection in gases",
+            "density changes"
+          ]
         },
         {
           "name": "Radiation (infrared)",
           "links": [],
           "detail": "All objects emit infrared radiation. Transfer does not require a medium. Effect of surface colour and texture on emission, absorption and reflection.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "infrared radiation",
+            "thermal radiation",
+            "radiation of heat",
+            "does not need a medium",
+            "travels through vacuum",
+            "radiated heat"
+          ]
         },
         {
           "name": "Good and bad emitters and absorbers",
           "links": [],
           "detail": "Experiments to distinguish good and bad emitters and absorbers. Rate of emission depends on surface temperature and area.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "black surface",
+            "dull surface",
+            "shiny surface",
+            "white surface",
+            "good absorber",
+            "good emitter",
+            "poor emitter",
+            "poor absorber",
+            "matt black"
+          ]
         },
         {
           "name": "Energy balance and Earth's temperature",
           "links": [],
           "detail": "Object at constant temperature transfers energy away at the same rate it receives it. Earth's temperature balance between incoming and outgoing radiation.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "energy balance",
+            "greenhouse effect",
+            "global warming",
+            "earth temperature",
+            "absorbed = emitted",
+            "net radiation"
+          ]
         },
         {
           "name": "Everyday applications",
           "links": [],
           "detail": "Basic and complex applications of conduction, convection and radiation: kitchen pans, room heating, car radiator, wood/coal fires.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "vacuum flask",
+            "thermos flask",
+            "insulation of house",
+            "double glazing",
+            "radiator",
+            "cooling fins",
+            "application of heat transfer"
+          ]
         }
       ]
     },
@@ -512,37 +948,84 @@
           "name": "Energy transfer by waves",
           "links": [],
           "detail": "Waves transfer energy without transferring matter.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "waves transfer energy",
+            "wave carries energy",
+            "no matter transferred",
+            "energy without matter"
+          ]
         },
         {
           "name": "Wave features",
           "links": [],
           "detail": "Wavefront, wavelength, frequency, crest, trough, amplitude and wave speed.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "wavelength",
+            "amplitude",
+            "frequency",
+            "crest",
+            "trough",
+            "wave features",
+            "displacement of wave",
+            "wave diagram"
+          ]
         },
         {
           "name": "Wave speed equation",
           "links": [],
           "detail": "v = fλ. Calculating wave speed, frequency or wavelength.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "v = fλ",
+            "wave speed",
+            "frequency × wavelength",
+            "speed of wave",
+            "wave equation"
+          ]
         },
         {
           "name": "Transverse and longitudinal waves",
           "links": [],
           "detail": "Transverse: vibration perpendicular to propagation (EM waves, water, S-waves). Longitudinal: vibration parallel to propagation (sound, P-waves).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "transverse wave",
+            "longitudinal wave",
+            "compression",
+            "rarefaction",
+            "perpendicular to direction",
+            "parallel to direction"
+          ]
         },
         {
           "name": "Reflection, refraction and diffraction",
           "links": [],
           "detail": "Waves undergo reflection (plane surface), refraction (change of speed) and diffraction (through a gap or past an edge). Ripple tank experiments.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "reflection",
+            "refraction",
+            "diffraction",
+            "angle of incidence",
+            "angle of reflection",
+            "wave bends",
+            "wavefront"
+          ]
         },
         {
           "name": "Diffraction effects",
           "links": [],
           "detail": "How wavelength and gap size affect diffraction through a gap; how wavelength affects diffraction at an edge.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "diffraction",
+            "gap and wavelength",
+            "spreading of waves",
+            "diffraction through a gap",
+            "diffraction around an obstacle"
+          ]
         }
       ]
     },
@@ -568,49 +1051,116 @@
           "name": "Reflection and plane mirrors",
           "links": [],
           "detail": "Laws of reflection (angle of incidence = angle of reflection). Image in a plane mirror: same size, same distance, virtual. Simple constructions for reflection.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "plane mirror",
+            "image in a mirror",
+            "virtual image",
+            "angle of incidence",
+            "angle of reflection",
+            "normal to mirror",
+            "lateral inversion"
+          ]
         },
         {
           "name": "Refraction of light",
           "links": [],
           "detail": "Experiment showing refraction by transparent blocks. Passage of light through a transparent material at a boundary.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "refraction",
+            "light bends",
+            "snell's law",
+            "n = sin i / sin r",
+            "change in speed",
+            "towards normal",
+            "away from normal"
+          ]
         },
         {
           "name": "Total internal reflection",
           "links": [],
           "detail": "Critical angle; internal reflection and total internal reflection. Everyday examples.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "total internal reflection",
+            "critical angle",
+            "TIR",
+            "angle greater than critical",
+            "ray trapped",
+            "reflects internally"
+          ]
         },
         {
           "name": "Optical fibres",
           "links": [],
           "detail": "Use of optical fibres, particularly in telecommunications.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "optical fibre",
+            "fiber optic",
+            "total internal reflection in fibre",
+            "light travels along fibre",
+            "endoscope",
+            "communication using fibre"
+          ]
         },
         {
           "name": "Thin lenses",
           "links": [],
           "detail": "Converging and diverging lenses: focal length, principal axis, principal focus. Ray diagrams for real and virtual images. Image characteristics: enlarged/same size/diminished, upright/inverted, real/virtual.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "convex lens",
+            "concave lens",
+            "converging lens",
+            "diverging lens",
+            "focal length",
+            "principal focus",
+            "ray diagram for lens"
+          ]
         },
         {
           "name": "Magnifying glass and vision correction",
           "links": [],
           "detail": "Single converging lens as a magnifying glass. Converging and diverging lenses to correct long-sightedness and short-sightedness.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "magnifying glass",
+            "magnification",
+            "short-sighted",
+            "long-sighted",
+            "corrective lens",
+            "spectacles",
+            "eye correction"
+          ]
         },
         {
           "name": "Dispersion and colour",
           "links": [],
           "detail": "Dispersion of white light by a glass prism. Seven colours of the visible spectrum in order of frequency and wavelength. Monochromatic light.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "dispersion",
+            "spectrum",
+            "white light splits",
+            "prism",
+            "red orange yellow green blue",
+            "ROYGBIV"
+          ]
         },
         {
           "name": "Refractive index",
           "links": [],
           "detail": "n = speed in medium 1 / speed in medium 2. Snell's law: n = sin i / sin r. Relationship to critical angle: n = 1/sin c.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "refractive index",
+            "n = c/v",
+            "n = sin i / sin r",
+            "optical density",
+            "speed of light in medium"
+          ]
         }
       ]
     },
@@ -632,31 +1182,76 @@
           "name": "Regions of the EM spectrum",
           "links": [],
           "detail": "Main regions in order of frequency (and wavelength): radio, microwave, infrared, visible, ultraviolet, X-ray, gamma. All travel at the same speed in a vacuum (~3.0 × 10⁸ m/s).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "radio waves",
+            "microwaves",
+            "infrared",
+            "visible light",
+            "ultraviolet",
+            "X-rays",
+            "gamma rays",
+            "electromagnetic spectrum",
+            "order of EM"
+          ]
         },
         {
           "name": "Uses of EM radiation",
           "links": [],
           "detail": "Radio: radio/TV/astronomy/RFID. Microwave: satellite TV, mobile phones, ovens. Infrared: grills, remote controls, thermal imaging, optical fibres. Visible: vision, photography. UV: security marking, detecting fake notes, sterilising water. X-rays: medical scanning, security. Gamma: sterilising food/equipment, cancer detection and treatment.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "use of radio waves",
+            "use of microwaves",
+            "use of X-rays",
+            "use of ultraviolet",
+            "use of gamma",
+            "communication",
+            "medical imaging"
+          ]
         },
         {
           "name": "Harmful effects of EM radiation",
           "links": [],
           "detail": "Microwaves: internal heating of cells. Infrared: skin burns. UV: skin cancer, eye damage. X-rays and gamma: cell mutation or damage.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "harmful effects",
+            "ionising radiation",
+            "cancer",
+            "UV damage",
+            "skin cancer",
+            "radiation damage",
+            "hazards of EM"
+          ]
         },
         {
           "name": "Communication systems",
           "links": [],
           "detail": "Satellite communication mainly by microwaves (low-orbit and geostationary). Mobile phones and wireless internet: microwaves. Bluetooth: radio waves. Optical fibres (visible light or infrared): cable TV and broadband.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "satellite communication",
+            "optical fibre communication",
+            "radio transmission",
+            "signal",
+            "transmitter",
+            "receiver"
+          ]
         },
         {
           "name": "Digital vs. analogue signals",
           "links": [],
           "detail": "Difference between digital and analogue signals. Sound can be transmitted as either. Benefits of digital signalling: higher data rate, greater range due to accurate signal regeneration.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "digital signal",
+            "analogue signal",
+            "binary",
+            "noise",
+            "digital advantages",
+            "regeneration of signal"
+          ]
         }
       ]
     },
@@ -679,31 +1274,72 @@
           "name": "Production and nature of sound",
           "links": [],
           "detail": "Sound produced by vibrating sources. Sound is a longitudinal wave requiring a medium. Compressions and rarefactions.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "sound is produced by vibration",
+            "longitudinal wave",
+            "mechanical wave",
+            "needs a medium",
+            "compression and rarefaction"
+          ]
         },
         {
           "name": "Speed of sound",
           "links": [],
           "detail": "Speed of sound in air ≈ 330–350 m/s. Method: measuring distance and time. Sound travels faster in denser media.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "speed of sound",
+            "340 m/s",
+            "speed in air",
+            "faster in solid",
+            "sound travels faster in",
+            "sonic boom"
+          ]
         },
         {
           "name": "Loudness, pitch and amplitude",
           "links": [],
           "detail": "Amplitude affects loudness; frequency affects pitch. Audible range: 20 Hz to 20 000 Hz.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "loudness",
+            "pitch",
+            "amplitude of sound",
+            "frequency of sound",
+            "higher frequency higher pitch",
+            "larger amplitude louder",
+            "decibel"
+          ]
         },
         {
           "name": "Echoes",
           "links": [],
           "detail": "Echo = reflection of sound waves.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "echo",
+            "reflection of sound",
+            "time delay",
+            "distance using echo",
+            "sonar",
+            "d = vt/2"
+          ]
         },
         {
           "name": "Ultrasound",
           "links": [],
           "detail": "Ultrasound: frequency > 20 kHz. Uses: non-destructive material testing, medical scanning of soft tissue, sonar (depth/distance calculations).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "ultrasound",
+            "above 20 000 Hz",
+            "above 20 kHz",
+            "ultrasonic",
+            "prenatal scan",
+            "flaw detection",
+            "ultrasound imaging"
+          ]
         }
       ]
     },
@@ -726,31 +1362,66 @@
           "name": "Magnetic poles and forces",
           "links": [],
           "detail": "Like poles repel; unlike poles attract. Force between magnets and magnetic materials. Induced magnetism.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "north pole",
+            "south pole",
+            "like poles repel",
+            "unlike poles attract"
+          ]
         },
         {
           "name": "Magnetic and non-magnetic materials",
           "links": [],
           "detail": "Magnetic materials include iron, steel, nickel, cobalt. Non-magnetic materials do not experience magnetic forces.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "magnetic material",
+            "iron",
+            "steel",
+            "nickel",
+            "non-magnetic",
+            "cobalt"
+          ]
         },
         {
           "name": "Temporary and permanent magnets",
           "links": [],
           "detail": "Soft iron: temporary magnets. Steel: permanent magnets. Uses of each.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "permanent magnet",
+            "temporary magnet",
+            "induced magnetism",
+            "magnetise"
+          ]
         },
         {
           "name": "Magnetic fields and field lines",
           "links": [],
           "detail": "Magnetic field: region where a magnetic pole experiences a force. Drawing and plotting field lines around a bar magnet; direction = force on N pole. Field line spacing represents relative strength.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "magnetic field lines",
+            "compass needle",
+            "direction of field",
+            "field outside magnet"
+          ]
         },
         {
           "name": "Uses of magnets and electromagnets",
           "links": [],
           "detail": "Applications of permanent magnets and electromagnets. Magnetic forces arise from interactions between magnetic fields.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "electromagnet",
+            "relay",
+            "electric bell",
+            "loudspeaker",
+            "crane magnet",
+            "magnetic lock",
+            "applications of electromagnets"
+          ]
         }
       ]
     },
@@ -776,49 +1447,117 @@
           "name": "Electric charge and static electricity",
           "links": [],
           "detail": "Positive and negative charges; like charges repel, unlike attract. Production of electrostatic charges by friction (transfer of electrons only). Detecting charges.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electric charge",
+            "static electricity",
+            "positive charge",
+            "negative charge",
+            "charge by friction",
+            "electrostatic",
+            "coulomb"
+          ]
         },
         {
           "name": "Conductors and insulators",
           "links": [],
           "detail": "Experiment to distinguish conductors and insulators. Electron model: free electrons in conductors; bound electrons in insulators.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electrical conductor",
+            "electrical insulator",
+            "free electrons",
+            "copper conducts",
+            "rubber insulates",
+            "plastic insulator"
+          ]
         },
         {
           "name": "Electric fields",
           "links": [],
           "detail": "Electric field: region where an electric charge experiences a force. Direction = force on a positive charge. Field patterns: around a point charge, a charged sphere, between parallel plates.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "electric field",
+            "field lines between charges",
+            "uniform electric field",
+            "field between plates",
+            "direction of electric field"
+          ]
         },
         {
           "name": "Electric current",
           "links": [],
           "detail": "Current = charge / time (I = Q/t). Direct (d.c.) and alternating (a.c.) current. Conventional current from + to −; electron flow from − to +. Using ammeters (analogue and digital).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electric current",
+            "ampere",
+            "I = Q/t",
+            "rate of flow of charge",
+            "conventional current",
+            "electron flow",
+            "ammeter"
+          ]
         },
         {
           "name": "Electromotive force and potential difference",
           "links": [],
           "detail": "e.m.f. = electrical work done by a source per unit charge around a complete circuit. p.d. = work done per unit charge through a component. Both measured in volts (V).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electromotive force",
+            "e.m.f.",
+            "potential difference",
+            "voltage",
+            "volt",
+            "voltmeter",
+            "energy per unit charge"
+          ]
         },
         {
           "name": "Resistance and Ohm's Law",
           "links": [],
           "detail": "R = V/I. Experiment to determine resistance using voltmeter and ammeter. Current-voltage graphs for constant resistor, filament lamp and diode.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "resistance",
+            "ohm's law",
+            "V = IR",
+            "ohm",
+            "I = V/R",
+            "current proportional to voltage",
+            "ohmic conductor"
+          ]
         },
         {
           "name": "Resistance and dimensions",
           "links": [],
           "detail": "For a metallic conductor: resistance ∝ length; resistance ∝ 1/cross-sectional area.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "resistance depends on length",
+            "resistance depends on cross-section",
+            "thicker wire",
+            "longer wire",
+            "resistivity"
+          ]
         },
         {
           "name": "Electrical power and energy",
           "links": [],
           "detail": "P = IV; E = IVt. Kilowatt-hour: kWh. Cost of electrical energy. Transfer of energy from source through circuit to surroundings.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electrical power",
+            "P = IV",
+            "P = I²R",
+            "P = V²/R",
+            "energy = power × time",
+            "watt",
+            "kilowatt-hour",
+            "E = VIt"
+          ]
         }
       ]
     },
@@ -846,31 +1585,75 @@
           "name": "Circuit symbols and components",
           "links": [],
           "detail": "Drawing and interpreting circuit diagrams: cells, batteries, switches, resistors (fixed and variable), thermistors, LDRs, lamps, motors, bells, ammeters, voltmeters, transformers, fuses, relays, diodes, LEDs. Component behaviour.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "circuit symbol",
+            "resistor symbol",
+            "battery symbol",
+            "cell",
+            "lamp",
+            "switch",
+            "diode",
+            "LED",
+            "capacitor",
+            "thermistor",
+            "LDR"
+          ]
         },
         {
           "name": "Series circuits",
           "links": [],
           "detail": "Current is the same at every point in a series circuit. Total e.m.f. is the sum of individual e.m.f.s. Total p.d. = sum of individual p.d.s. Combined series resistance = R₁ + R₂ + …",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "series circuit",
+            "same current throughout",
+            "voltage adds up",
+            "total resistance in series",
+            "one path"
+          ]
         },
         {
           "name": "Parallel circuits",
           "links": [],
           "detail": "Sum of currents into a junction = sum of currents leaving. p.d. is the same across all branches. Combined resistance of two parallel resistors is less than either alone. Advantages of parallel lamp circuits.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "parallel circuit",
+            "same voltage across",
+            "currents add up",
+            "total resistance in parallel",
+            "branches"
+          ]
         },
         {
           "name": "Combining resistance",
           "links": [],
           "detail": "Combined resistance for resistors in series and in parallel (including calculation for two in parallel).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "resistors in series",
+            "resistors in parallel",
+            "total resistance",
+            "equivalent resistance",
+            "1/R = 1/R₁ + 1/R₂",
+            "R = R₁ + R₂"
+          ]
         },
         {
           "name": "Potential divider",
           "links": [],
           "detail": "How a variable potential divider works. Equation for two resistors as a potential divider: V₁/V₂ = R₁/R₂. p.d. across a conductor increases with resistance at constant current.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "potential divider",
+            "voltage divider",
+            "divide voltage",
+            "output voltage",
+            "two resistors in series",
+            "thermistor divider",
+            "LDR divider"
+          ]
         }
       ]
     },
@@ -894,25 +1677,55 @@
           "name": "Electrical hazards",
           "links": [],
           "detail": "Hazards: damaged insulation, overheating cables, damp conditions, overloading of plugs and extension leads.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electrical hazard",
+            "electric shock",
+            "overheating",
+            "fire",
+            "damaged insulation"
+          ]
         },
         {
           "name": "Mains wiring",
           "links": [],
           "detail": "Mains circuit: live wire, neutral wire and earth wire. Switch must be on the live side for safe disconnection.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "live wire",
+            "neutral wire",
+            "earth wire",
+            "three-pin plug",
+            "brown",
+            "blue",
+            "green and yellow"
+          ]
         },
         {
           "name": "Fuses and circuit breakers",
           "links": [],
           "detail": "Operation of fuses and trip switches (circuit breakers). Choosing appropriate fuse ratings and trip settings.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "fuse",
+            "circuit breaker",
+            "fuse melts",
+            "overload",
+            "MCB",
+            "trip"
+          ]
         },
         {
           "name": "Double insulation and earthing",
           "links": [],
           "detail": "Outer casing must be non-conducting (double-insulated) or earthed. A fuse without an earth wire protects the cable for a double-insulated appliance.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "double insulation",
+            "earthing",
+            "earth wire",
+            "Class II"
+          ]
         }
       ]
     },
@@ -938,49 +1751,116 @@
           "name": "Electromagnetic induction",
           "links": [],
           "detail": "A conductor moving through a magnetic field, or a changing magnetic field linking a conductor, induces an e.m.f. Direction of induced e.m.f. opposes the change (Lenz's Law). Relative directions of force, field and induced current.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "electromagnetic induction",
+            "induced e.m.f.",
+            "induced voltage",
+            "faraday's law",
+            "lenz's law",
+            "flux cutting",
+            "changing flux"
+          ]
         },
         {
           "name": "Factors affecting induced e.m.f.",
           "links": [],
           "detail": "Magnitude of induced e.m.f. affected by speed of movement, strength of field and number of turns.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "increase induced e.m.f.",
+            "faster movement",
+            "stronger magnet",
+            "more turns of coil",
+            "rate of change of flux",
+            "magnitude of induced"
+          ]
         },
         {
           "name": "The AC generator",
           "links": [],
           "detail": "Simple a.c. generator (rotating coil or magnet); slip rings and brushes. e.m.f. vs. time graph; relating coil position to peaks, troughs and zeros.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "AC generator",
+            "alternating current generator",
+            "slip rings",
+            "rotating coil in field",
+            "sinusoidal output",
+            "generator"
+          ]
         },
         {
           "name": "Magnetic field of a current",
           "links": [],
           "detail": "Pattern and direction of magnetic field around straight wires and solenoids. Experiments to map fields. Qualitative variation of field strength; effect of changing current direction/magnitude. Applications: relays and loudspeakers.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "magnetic field of a current",
+            "field around wire",
+            "solenoid field",
+            "right hand grip rule",
+            "field inside solenoid",
+            "electromagnet"
+          ]
         },
         {
           "name": "Force on a current-carrying conductor",
           "links": [],
           "detail": "Experiment showing force on a current in a magnetic field; effect of reversing current or field. Force on beams of charged particles in a magnetic field.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "force on a wire",
+            "catapult field",
+            "motor effect",
+            "F = BIL",
+            "Fleming's left hand rule",
+            "current in magnetic field"
+          ]
         },
         {
           "name": "The DC motor",
           "links": [],
           "detail": "Current-carrying coil in a field experiences a turning effect, increased by more turns, larger current or stronger field. DC motor operation: split-ring commutator and brushes.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "DC motor",
+            "direct current motor",
+            "split ring commutator",
+            "commutator",
+            "brushes",
+            "motor coil"
+          ]
         },
         {
           "name": "Transformers and voltage transformation",
           "links": [],
           "detail": "Construction: soft-iron core, primary and secondary coils. Step-up and step-down. Turns ratio equation: Vₚ/Vₛ = Nₚ/Nₛ. Transformer efficiency: VₚIₚ = VₛIₛ. P = I²R to explain why high voltage means lower power loss.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "transformer",
+            "Vs/Vp = Ns/Np",
+            "voltage ratio",
+            "turns ratio",
+            "step-up",
+            "step-down",
+            "ideal transformer"
+          ]
         },
         {
           "name": "High-voltage electricity transmission",
           "links": [],
           "detail": "Use of transformers in high-voltage transmission. Advantages: lower current reduces power loss in cables (P = I²R).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "power transmission",
+            "high voltage",
+            "national grid",
+            "pylon",
+            "transmission loss",
+            "I²R losses",
+            "step up for transmission"
+          ]
         }
       ]
     },
@@ -1003,37 +1883,91 @@
           "name": "Atomic structure",
           "links": [],
           "detail": "Atom: positively charged nucleus surrounded by orbiting electrons. Nucleus contains protons and neutrons.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "atomic structure",
+            "nucleus",
+            "electron",
+            "proton",
+            "neutron",
+            "electron orbit",
+            "energy level"
+          ]
         },
         {
           "name": "Protons, neutrons and electrons",
           "links": [],
           "detail": "Relative charges: proton +1, neutron 0, electron −1. Atoms form ions by gaining or losing electrons.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "proton",
+            "neutron",
+            "electron",
+            "charge of proton",
+            "mass of proton",
+            "relative charge",
+            "relative mass"
+          ]
         },
         {
           "name": "Proton number and nucleon number",
           "links": [],
           "detail": "Proton (atomic) number Z; nucleon (mass) number A. Number of neutrons = A − Z. Nuclide notation ᴬZ X.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "proton number",
+            "atomic number",
+            "nucleon number",
+            "mass number",
+            "number of protons",
+            "number of neutrons",
+            "Z",
+            "A"
+          ]
         },
         {
           "name": "Isotopes",
           "links": [],
           "detail": "Isotopes: atoms of the same element with the same proton number but different nucleon numbers.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "isotope",
+            "same element different neutrons",
+            "same proton number",
+            "different mass number",
+            "radioactive isotope"
+          ]
         },
         {
           "name": "Alpha particle scattering",
           "links": [],
           "detail": "Scattering of α particles by a thin metal sheet provides evidence for a very small, dense, positively charged nucleus surrounded by mostly empty space.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "alpha particle scattering",
+            "Rutherford",
+            "gold foil",
+            "nucleus discovered",
+            "most pass through",
+            "few deflect",
+            "planetary model"
+          ]
         },
         {
           "name": "Nuclear fission and fusion",
           "links": [],
           "detail": "Fission: splitting of a heavy nucleus into smaller nuclei, releasing energy. Fusion: joining of light nuclei, releasing energy. Nuclide equations; qualitative mass-energy changes.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "nuclear fission",
+            "nuclear fusion",
+            "uranium-235",
+            "chain reaction",
+            "energy from nucleus",
+            "fission reactor",
+            "stars produce energy by fusion",
+            "hydrogen nuclei fuse"
+          ]
         }
       ]
     },
@@ -1058,43 +1992,107 @@
           "name": "Background radiation",
           "links": [],
           "detail": "Sources: radon gas, rocks and buildings, food and drink, cosmic rays. Measuring background and using it to correct count rates.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "background radiation",
+            "natural background",
+            "radon gas",
+            "cosmic rays",
+            "medical X-rays",
+            "background count rate"
+          ]
         },
         {
           "name": "Types of nuclear emission",
           "links": [],
           "detail": "Alpha (α), beta (β) and gamma (γ) radiation. Emission is spontaneous and random in direction.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "alpha particle",
+            "beta particle",
+            "gamma ray",
+            "alpha radiation",
+            "beta radiation",
+            "gamma radiation",
+            "nuclear emission"
+          ]
         },
         {
           "name": "Properties of radiation",
           "links": [],
           "detail": "Deflection of α, β and γ in electric and magnetic fields. Relative ionising effects (kinetic energy and charge).",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "penetrating power",
+            "ionising ability",
+            "stopped by paper",
+            "stopped by aluminium",
+            "stopped by lead",
+            "range in air",
+            "deflected by field"
+          ]
         },
         {
           "name": "Radioactive decay",
           "links": [],
           "detail": "Decay is a spontaneous, random change in an unstable nucleus. α or β emission changes the element. Decay equations using nuclide notation.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "radioactive decay",
+            "decay equation",
+            "alpha decay",
+            "beta decay",
+            "nuclear equation",
+            "daughter nucleus",
+            "emit alpha"
+          ]
         },
         {
           "name": "Half-life",
           "links": [],
           "detail": "Half-life: time for half the nuclei of an isotope in any sample to decay. Simple calculations using tables or decay curves.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "half-life",
+            "half life",
+            "time for half to decay",
+            "activity halves",
+            "count rate halves",
+            "decay graph",
+            "N = N₀/2ⁿ"
+          ]
         },
         {
           "name": "Uses of radioactive isotopes",
           "links": [],
           "detail": "Smoke alarms, food irradiation, equipment sterilisation, thickness gauging, cancer diagnosis and treatment. Choice of isotope depends on radiation type and half-life.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "medical tracer",
+            "cancer treatment",
+            "radiotherapy",
+            "smoke detector",
+            "carbon dating",
+            "sterilise",
+            "thickness gauge",
+            "industrial use"
+          ]
         },
         {
           "name": "Radiation safety",
           "links": [],
           "detail": "Effects on living things: cell death, mutation, cancer. Safe handling, storage and transport of radioactive materials. Precautions: reduce exposure time, increase distance, use shielding.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "radiation safety",
+            "radiation hazard",
+            "shielding",
+            "distance",
+            "lead shielding",
+            "reduce exposure",
+            "dosimeter",
+            "contamination"
+          ]
         }
       ]
     },
@@ -1117,37 +2115,86 @@
           "name": "Earth's rotation and day/night",
           "links": [],
           "detail": "Earth rotates on its tilted axis approximately once every 24 hours, explaining apparent daily motion of the Sun and the cycle of day and night.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "rotation of earth",
+            "day and night",
+            "24 hours",
+            "spin on axis",
+            "day length",
+            "earth rotates"
+          ]
         },
         {
           "name": "Earth's orbit and the seasons",
           "links": [],
           "detail": "Earth orbits the Sun in approximately 365 days; the tilt explains the periodic cycle of seasons.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "orbit around sun",
+            "seasons",
+            "tilted axis",
+            "summer winter",
+            "365 days",
+            "year"
+          ]
         },
         {
           "name": "The Moon's orbit and phases",
           "links": [],
           "detail": "The Moon orbits Earth in approximately one month, explaining the periodic cycle of lunar phases.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "moon orbit",
+            "phases of moon",
+            "lunar cycle",
+            "new moon",
+            "full moon",
+            "crescent",
+            "29 days",
+            "28 days"
+          ]
         },
         {
           "name": "The Solar System",
           "links": [],
           "detail": "The Solar System contains the Sun, eight named planets (and their order), dwarf planets, asteroids (asteroid belt), moons, comets and other natural satellites. Orbits are elliptical; the Sun is not at the centre of an ellipse.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "solar system",
+            "planets",
+            "mercury venus earth mars jupiter",
+            "asteroid belt",
+            "comet",
+            "orbit of planets"
+          ]
         },
         {
           "name": "Gravitational fields in the Solar System",
           "links": [],
           "detail": "Sun contains most of the Solar System's mass; gravity keeps planets in orbit. Gravitational field strength at a planet's surface depends on its mass; field decreases with distance. Orbital speeds decrease with distance from the Sun. Objects in elliptical orbits travel faster when closer to the Sun (conservation of energy).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "gravitational field",
+            "gravity in solar system",
+            "planet's gravity",
+            "weight on moon",
+            "weight on mars"
+          ]
         },
         {
           "name": "Orbital speed and light travel time",
           "links": [],
           "detail": "Average orbital speed: v = 2πr/T. Calculating time for light to travel between Solar System objects.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "orbital speed",
+            "speed of light",
+            "light travel time",
+            "light year",
+            "distance to star",
+            "time to reach"
+          ]
         }
       ]
     },
@@ -1172,37 +2219,90 @@
           "name": "The Sun as a star",
           "links": [],
           "detail": "The Sun is a medium-sized star, mostly hydrogen and helium, radiating most energy as infrared, visible and ultraviolet. Stars are powered by nuclear fusion (hydrogen → helium).",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "sun as a star",
+            "nuclear fusion in sun",
+            "hydrogen to helium",
+            "main sequence star",
+            "sun's energy",
+            "star"
+          ]
         },
         {
           "name": "Life cycle of a star",
           "links": [],
           "detail": "Interstellar cloud → protostar → stable star (gravity balanced by outward thermal pressure) → red giant or red supergiant → planetary nebula/white dwarf (less massive) or supernova/neutron star/black hole (more massive). Supernova nebulae may form new star systems.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "life cycle of a star",
+            "nebula",
+            "protostar",
+            "main sequence",
+            "red giant",
+            "supernova",
+            "neutron star",
+            "black hole",
+            "white dwarf"
+          ]
         },
         {
           "name": "Scale of the Universe",
           "links": [],
           "detail": "One light-year = 9.5 × 10¹⁵ m. The Milky Way is one of billions of galaxies; diameter ≈ 100 000 light-years.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "scale of universe",
+            "galaxy",
+            "milky way",
+            "light year distance",
+            "universe is vast",
+            "parsec",
+            "billions of stars"
+          ]
         },
         {
           "name": "Redshift and the expanding Universe",
           "links": [],
           "detail": "Redshift: increase in observed wavelength from receding stars/galaxies. Light from distant galaxies is redshifted. This is evidence that the Universe is expanding and supports the Big Bang Theory.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "redshift",
+            "doppler effect",
+            "galaxies moving away",
+            "expanding universe",
+            "red shifted light",
+            "wavelength increases",
+            "recession speed"
+          ]
         },
         {
           "name": "Cosmic microwave background radiation",
           "links": [],
           "detail": "CMBR: microwave radiation observed at all points in space, produced shortly after the Big Bang and stretched into the microwave region as the Universe expanded. Further evidence for the Big Bang.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "cosmic microwave background",
+            "CMB",
+            "CMBR",
+            "background microwave",
+            "big bang evidence",
+            "microwave background"
+          ]
         },
         {
           "name": "The Hubble constant and age of the Universe",
           "links": [],
           "detail": "Speed v of a galaxy found from its redshift. Distance d found from supernova brightness. Hubble constant H = v/d. 1/H estimates the age of the Universe — evidence that all matter was once at a single point.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "hubble constant",
+            "H₀",
+            "hubble's law",
+            "age of universe",
+            "recession speed / distance",
+            "13.8 billion years"
+          ]
         }
       ]
     },
@@ -1233,43 +2333,101 @@
           "name": "Analogue and digital signals",
           "links": [],
           "detail": "Difference between analogue and digital signals. Sound can be transmitted as either. Benefits of digital: higher data rate, greater range.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "analogue signal",
+            "digital signal",
+            "continuous variation",
+            "on/off signal",
+            "binary 0 and 1"
+          ]
         },
         {
           "name": "Logic gates: AND, OR, NOT",
           "links": [],
           "detail": "Action of AND, OR and NOT gates; constructing truth tables for each.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "AND gate",
+            "OR gate",
+            "NOT gate",
+            "inverter",
+            "truth table",
+            "logic gate",
+            "output is 1 when"
+          ]
         },
         {
           "name": "NAND and NOR gates",
           "links": [],
           "detail": "Action of NAND and NOR gates; truth tables.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "NAND gate",
+            "NOR gate",
+            "nand",
+            "nor",
+            "universal gate",
+            "nand truth table",
+            "nor truth table"
+          ]
         },
         {
           "name": "Combining logic gates",
           "links": [],
           "detail": "Producing truth tables for combinations of logic gates.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "combination of gates",
+            "logic circuit",
+            "design a circuit",
+            "combined truth table",
+            "construct from gates"
+          ]
         },
         {
           "name": "Transistor as a switch",
           "links": [],
           "detail": "NPN transistor as a switch. Drawing and interpreting transistor switching circuits.",
-          "tier": "Supplement"
+          "tier": "Supplement",
+          "keywords": [
+            "transistor",
+            "npn transistor",
+            "base current",
+            "collector",
+            "emitter",
+            "transistor switch",
+            "switch on transistor"
+          ]
         },
         {
           "name": "Input sensors",
           "links": [],
           "detail": "Light-dependent resistor (LDR) as a light sensor; thermistor (NTC) as a temperature sensor in electronic circuits.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "thermistor",
+            "LDR",
+            "light dependent resistor",
+            "temperature sensor",
+            "input transducer",
+            "sense temperature",
+            "sense light"
+          ]
         },
         {
           "name": "Output devices",
           "links": [],
           "detail": "Output devices include LEDs, buzzers, relays and electric motors.",
-          "tier": "Core"
+          "tier": "Core",
+          "keywords": [
+            "LED",
+            "relay",
+            "motor",
+            "loudspeaker",
+            "output transducer",
+            "output device in electronics"
+          ]
         }
       ]
     }

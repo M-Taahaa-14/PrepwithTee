@@ -1,0 +1,32 @@
+{
+  "syllabus": "5054",
+  "subject": "Physics (O Level)",
+  "note": "Verified 2026-07-17 against 5054-2026-2028-syllabus.pdf: names and order follow its subject content 1.1-6.2 exactly. NOTE 5054 and 0625 diverge - 5054 has 'Simple magnetism and magnetic fields', 'Practical electricity' and 'Uses of an oscilloscope'; 0625 has 'Simple phenomena of magnetism' and 'Electrical safety' and no oscilloscope topic. Keep 0625.json separate. Keywords drive the heuristic classifier; refine freely - lowercase, phrases allowed.",
+  "topics": [
+    {"name": "Physical quantities & measurement", "keywords": ["measuring cylinder", "micrometer", "vernier", "stopwatch", "pendulum", "scalar", "vector quantity", "si unit", "parallax", "precision", "measure the volume"]},
+    {"name": "Motion", "keywords": ["velocity", "acceleration", "speed-time", "distance-time", "free fall", "air resistance", "terminal velocity", "deceleration", "uniform speed", "acceleration of free fall"]},
+    {"name": "Mass & weight", "keywords": ["gravitational field strength", "mass and weight", "newton per kilogram", "beam balance", "weight of the object"]},
+    {"name": "Density", "keywords": ["density", "displacement can", "float", "sink", "volume of the liquid", "kg / m3", "g / cm3"]},
+    {"name": "Forces", "keywords": ["resultant force", "friction", "spring", "extension", "load-extension", "moment", "pivot", "centre of gravity", "equilibrium", "stability", "circular motion", "hooke", "limit of proportionality", "turning effect"]},
+    {"name": "Momentum", "keywords": ["momentum", "impulse", "collision", "conservation of momentum", "resultant force acting for a time"]},
+    {"name": "Energy, work & power", "keywords": ["kinetic energy", "potential energy", "work done", "power", "efficiency", "joule", "energy transfer", "renewable", "fossil fuel", "chemical energy", "energy resource", "sankey"]},
+    {"name": "Pressure", "keywords": ["pressure", "barometer", "manometer", "hydraulic", "atmospheric pressure", "liquid column", "force per unit area"]},
+    {"name": "Kinetic particle model of matter", "keywords": ["particle", "molecule", "brownian", "evaporation", "boiling", "melting", "states of matter", "gas pressure", "diffusion", "kinetic model", "random motion"]},
+    {"name": "Thermal properties & temperature", "keywords": ["thermometer", "specific heat capacity", "latent heat", "thermal expansion", "fixed points", "temperature rise", "heating curve", "cooling curve"]},
+    {"name": "Transfer of thermal energy", "keywords": ["conduction", "convection", "radiation", "infrared radiation", "insulator", "vacuum flask", "emitter", "absorber", "thermal energy transfer", "shiny surface", "dull black"]},
+    {"name": "General wave properties", "keywords": ["wavelength", "frequency", "amplitude", "wavefront", "diffraction", "transverse", "longitudinal", "ripple tank", "wave speed", "period of the wave"]},
+    {"name": "Light", "keywords": ["mirror", "lens", "focal length", "image", "refraction", "refractive index", "total internal reflection", "critical angle", "optical fibre", "ray diagram", "converging lens", "magnifying glass", "angle of incidence"]},
+    {"name": "Electromagnetic spectrum", "keywords": ["electromagnetic spectrum", "radio wave", "microwave", "ultraviolet", "x-ray", "gamma ray", "visible light", "electromagnetic wave", "speed of light in a vacuum"]},
+    {"name": "Sound", "keywords": ["sound wave", "echo", "ultrasound", "pitch", "loudness", "compression", "rarefaction", "speed of sound", "vibrat", "oscilloscope"]},
+    {"name": "Simple magnetism and magnetic fields", "keywords": ["magnet", "magnetic field", "north pole", "south pole", "plotting compass", "magnetise", "soft iron", "induced magnetism", "magnetic material", "field line"]},
+    {"name": "Electrical quantities", "keywords": ["electric charge", "current", "potential difference", "e.m.f.", "resistance", "ohm", "coulomb", "electron", "static electricity", "charged rod", "electric field", "conductor and insulator", "i = q"]},
+    {"name": "Electric circuits", "keywords": ["circuit diagram", "series", "parallel", "resistor", "variable resistor", "thermistor", "light-dependent resistor", "ldr", "diode", "ammeter", "voltmeter", "potential divider", "combined resistance", "lamp", "switch"]},
+    {"name": "Practical electricity", "keywords": ["fuse", "earth wire", "circuit breaker", "live wire", "neutral wire", "double insulat", "electrical hazard", "damaged insulation", "trip switch", "kilowatt-hour", "mains"]},
+    {"name": "Electromagnetic effects", "keywords": ["electromagnetic induction", "generator", "transformer", "motor", "relay", "solenoid", "induced e.m.f.", "magnetic effect of a current", "turns ratio", "split-ring commutator", "slip ring", "left-hand rule", "force on a current-carrying"]},
+    {"name": "Uses of an oscilloscope", "keywords": ["oscilloscope", "y-gain", "timebase", "trace on the screen", "cathode-ray"]},
+    {"name": "Nuclear model of the atom", "keywords": ["nucleus", "proton", "neutron", "nuclide", "isotope", "alpha-particle scattering", "atomic number", "mass number", "proton number", "nucleon number"]},
+    {"name": "Radioactivity", "keywords": ["radioactive", "alpha-particle", "beta-particle", "gamma radiation", "half-life", "decay", "ionising", "background radiation", "count rate", "fission", "fusion", "radiation detector"]},
+    {"name": "Earth & the Solar System", "keywords": ["orbit", "planet", "satellite", "solar system", "the moon", "comet", "asteroid", "orbital period", "gravitational attraction of the sun", "phases of the moon"]},
+    {"name": "Stars & the Universe", "keywords": ["star", "galaxy", "universe", "big bang", "redshift", "milky way", "supernova", "nebula", "light-year", "white dwarf", "main sequence", "cosmic microwave background"]}
+  ]
+}

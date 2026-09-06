@@ -1318,10 +1318,10 @@ function renderBlog() {
       : empty("✍️", "No posts yet.", "Add a post to start building your SEO blog."),
     `<button class="btn btn-primary" id="add-blog">+ New post</button>`);
 
-  $("add-blog").addEventListener("click", () => openBlogForm(null));
+  $("add-blog").addEventListener("click", () => openBlogEditor(null));
 
   $("view-blog").querySelectorAll("[data-blog-edit]").forEach(b =>
-    b.addEventListener("click", () => openBlogForm(Number(b.dataset.blogEdit))));
+    b.addEventListener("click", () => openBlogEditor(Number(b.dataset.blogEdit))));
 
   $("view-blog").querySelectorAll("[data-blog-del]").forEach(b =>
     b.addEventListener("click", async () => {
@@ -1357,128 +1357,354 @@ function renderBlog() {
     }));
 }
 
-function openBlogForm(postId) {
+/* Compact Markdown → HTML for the live preview. Mirrors the subset the server
+   (blog.py) renders: headings, bold/italic/code, links, images, lists,
+   blockquotes, fenced code, rules and paragraphs. It's a preview aid — the
+   published page is rendered server-side. */
+function mdToHtml(src) {
+  if (!src || !src.trim())
+    return '<p class="be-pv-empty">Your formatted post will appear here as you write.</p>';
+  const e = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const inline = t => e(t)
+    .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1">')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+  const lines = src.replace(/\r\n/g, "\n").split("\n");
+  let out = "", i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (/^```/.test(line)) {
+      const buf = []; i++;
+      while (i < lines.length && !/^```/.test(lines[i])) { buf.push(e(lines[i])); i++; }
+      i++; out += `<pre><code>${buf.join("\n")}</code></pre>`; continue;
+    }
+    if (/^###\s+/.test(line)) { out += `<h3>${inline(line.replace(/^###\s+/, ""))}</h3>`; i++; continue; }
+    if (/^##\s+/.test(line))  { out += `<h2>${inline(line.replace(/^##\s+/, ""))}</h2>`;  i++; continue; }
+    if (/^#\s+/.test(line))   { out += `<h2>${inline(line.replace(/^#\s+/, ""))}</h2>`;   i++; continue; }
+    if (/^(---|\*\*\*)\s*$/.test(line)) { out += "<hr>"; i++; continue; }
+    if (/^>\s?/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) { buf.push(inline(lines[i].replace(/^>\s?/, ""))); i++; }
+      out += `<blockquote>${buf.join("<br>")}</blockquote>`; continue;
+    }
+    if (/^\s*[-*]\s+/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) { buf.push(`<li>${inline(lines[i].replace(/^\s*[-*]\s+/, ""))}</li>`); i++; }
+      out += `<ul>${buf.join("")}</ul>`; continue;
+    }
+    if (/^\s*\d+\.\s+/.test(line)) {
+      const buf = [];
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) { buf.push(`<li>${inline(lines[i].replace(/^\s*\d+\.\s+/, ""))}</li>`); i++; }
+      out += `<ol>${buf.join("")}</ol>`; continue;
+    }
+    if (!line.trim()) { i++; continue; }
+    const buf = [];
+    while (i < lines.length && lines[i].trim() &&
+           !/^(#{1,3}\s|>|\s*[-*]\s|\s*\d+\.\s|```|---|\*\*\*)/.test(lines[i])) {
+      buf.push(inline(lines[i])); i++;
+    }
+    out += `<p>${buf.join("<br>")}</p>`;
+  }
+  return out;
+}
+
+let _beEl = null;   // the mounted editor overlay, if any
+
+function closeBlogEditor(force) {
+  if (!_beEl) return;
+  if (!force && _beEl.dataset.dirty === "1" &&
+      !confirm("Discard your unsaved changes?")) return;
+  _beEl.remove();
+  _beEl = null;
+  document.body.style.overflow = "";
+}
+
+/* Full-screen writing studio: toolbar + live preview + drag-drop image upload.
+   Metadata (slug, excerpt, SEO) is auto-derived and tucked behind “Advanced”,
+   so posting is just: title, write, publish. */
+function openBlogEditor(postId) {
   const p = postId ? state.blog.find(x => x.id === postId) : null;
+  closeBlogEditor(true);
 
-  openDrawer(`
-    <h2>${p ? "Edit post" : "New post"}</h2>
+  const el = document.createElement("div");
+  el.className = "be-backdrop";
+  el.dataset.dirty = "0";
+  el.innerHTML = `
+    <div class="be-modal" role="dialog" aria-label="${p ? "Edit post" : "New post"}">
+      <header class="be-top">
+        <div class="be-top-left">
+          <span class="be-badge">✍️ ${p ? "Editing" : "New post"}</span>
+          <span class="be-status" id="be-status"></span>
+        </div>
+        <div class="be-top-actions">
+          <button class="btn" id="be-cancel" type="button">Cancel</button>
+          <button class="btn" id="be-save" type="button">Save draft</button>
+          <button class="btn btn-gold" id="be-publish" type="button">
+            ${p?.published ? "Save &amp; keep live" : "Publish"}
+          </button>
+        </div>
+      </header>
 
-    <div class="dr-block">
-      <h3>Content</h3>
-      <div class="f-field">
-        <label>Title *</label>
-        <input id="bp-title" value="${esc(p?.title || "")}"
-               placeholder="e.g. How to ace O Level Physics Paper 2">
-      </div>
-      <div class="f-field">
-        <label>Slug * <span class="ts">URL-safe, auto-filled from title</span></label>
-        <input id="bp-slug" value="${esc(p?.slug || "")}"
-               placeholder="how-to-ace-o-level-physics-paper-2"
-               style="font-family:monospace;font-size:.82rem">
-      </div>
-      <div class="f-field">
-        <label>Excerpt <span class="ts">shown on the blog list page</span></label>
-        <textarea id="bp-excerpt" rows="2"
-          placeholder="A short description of what this post covers."
-          >${esc(p?.excerpt || "")}</textarea>
-      </div>
-      <div class="f-field">
-        <label>Body <span class="ts">Markdown — # Heading, **bold**, *italic*, - list</span></label>
-        <textarea id="bp-body" rows="18"
-          style="font-family:monospace;font-size:.82rem;line-height:1.6;resize:vertical"
-          placeholder="Start writing your post in Markdown…"
-          >${esc(p?.body_markdown || "")}</textarea>
-        <div class="ts" id="bp-wordcount" style="margin-top:4px"></div>
-      </div>
-    </div>
+      <div class="be-cols">
+        <div class="be-edit">
+          <input id="be-title" class="be-title-input" value="${esc(p?.title || "")}"
+                 placeholder="Post title…">
 
-    <div class="dr-block">
-      <h3>Media &amp; SEO <span class="ts">optional</span></h3>
-      <div class="f-field">
-        <label>Cover image URL</label>
-        <input id="bp-cover" value="${esc(p?.cover_url || "")}"
-               placeholder="https://…/image.jpg">
-      </div>
-      <div class="f-field">
-        <label>Author</label>
-        <input id="bp-author" value="${esc(p?.author || "Muhammad Taahaa")}">
-      </div>
-      <div class="f-field">
-        <label>SEO title <span class="ts">defaults to post title</span></label>
-        <input id="bp-meta-title" value="${esc(p?.meta_title || "")}"
-               placeholder="Leave blank to use the post title">
-      </div>
-      <div class="f-field">
-        <label>SEO description <span class="ts">defaults to excerpt</span></label>
-        <textarea id="bp-meta-desc" rows="2"
-          placeholder="Leave blank to use the excerpt."
-          >${esc(p?.meta_desc || "")}</textarea>
-      </div>
-    </div>
+          <div class="be-cover" id="be-cover">
+            <input type="file" id="be-cover-file" accept="image/*" hidden>
+            <div class="be-cover-empty" id="be-cover-empty">
+              <span class="be-cover-ico">🖼️</span>
+              <div>
+                <b>Add a cover image</b>
+                <span class="ts">Drag &amp; drop, or click to upload — shown on the card and at the top of the post.</span>
+              </div>
+              <button class="btn" type="button" id="be-cover-pick">Choose image</button>
+            </div>
+            <div class="be-cover-set" id="be-cover-set" hidden>
+              <img id="be-cover-img" alt="cover preview">
+              <div class="be-cover-actions">
+                <button class="btn" type="button" id="be-cover-replace">Replace</button>
+                <button class="btn btn-danger" type="button" id="be-cover-remove">Remove</button>
+              </div>
+            </div>
+          </div>
 
-    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem">
-      <button class="btn btn-primary" id="bp-save">Save draft</button>
-      <button class="btn btn-gold"    id="bp-publish">
-        ${p?.published ? "Save &amp; keep live" : "Save &amp; publish"}
-      </button>
-    </div>
-    <p class="ts" id="bp-err" style="color:var(--danger,#ef4444);margin-top:.5rem"></p>
-  `);
+          <div class="be-toolbar" id="be-toolbar">
+            <button type="button" data-wrap="**" title="Bold"><b>B</b></button>
+            <button type="button" data-wrap="*" title="Italic"><i>I</i></button>
+            <span class="be-tb-sep"></span>
+            <button type="button" data-line="## " title="Heading">H2</button>
+            <button type="button" data-line="### " title="Sub-heading">H3</button>
+            <button type="button" data-line="- " title="Bullet list">• List</button>
+            <button type="button" data-line="1. " title="Numbered list">1. List</button>
+            <button type="button" data-line="> " title="Quote">❝ Quote</button>
+            <span class="be-tb-sep"></span>
+            <button type="button" id="be-tb-link" title="Link">🔗 Link</button>
+            <button type="button" id="be-tb-img" title="Insert image">🖼 Image</button>
+            <button type="button" data-wrap="\`" title="Inline code">&lt;/&gt;</button>
+          </div>
 
-  // Auto-fill slug from title (only when slug is still empty or was auto-generated)
-  const titleEl  = document.getElementById("bp-title");
-  const slugEl   = document.getElementById("bp-slug");
-  const bodyEl   = document.getElementById("bp-body");
-  const wcEl     = document.getElementById("bp-wordcount");
+          <textarea id="be-md" class="be-md"
+            placeholder="Write your post here. Use the toolbar above — no need to know Markdown.">${esc(p?.body_markdown || "")}</textarea>
+          <input type="file" id="be-body-file" accept="image/*" hidden>
+
+          <div class="be-editfoot">
+            <span class="ts" id="be-wc"></span>
+            <button class="be-adv-toggle" id="be-adv-toggle" type="button">⚙ Advanced (URL &amp; SEO)</button>
+          </div>
+
+          <div class="be-adv" id="be-adv" hidden>
+            <div class="f-field">
+              <label>URL slug <span class="ts">auto-filled from the title</span></label>
+              <input id="be-slug" value="${esc(p?.slug || "")}"
+                     placeholder="how-to-ace-o-level-physics" style="font-family:monospace;font-size:.82rem">
+            </div>
+            <div class="f-field">
+              <label>Excerpt <span class="ts">the summary shown on the blog card</span></label>
+              <textarea id="be-excerpt" rows="2"
+                placeholder="A one-line summary. Leave blank to auto-generate from the post.">${esc(p?.excerpt || "")}</textarea>
+            </div>
+            <div class="f-grid">
+              <div class="f-field">
+                <label>Author</label>
+                <input id="be-author" value="${esc(p?.author || "Muhammad Taahaa")}">
+              </div>
+              <div class="f-field">
+                <label>SEO title <span class="ts">optional</span></label>
+                <input id="be-meta-title" value="${esc(p?.meta_title || "")}"
+                       placeholder="Defaults to the post title">
+              </div>
+            </div>
+            <div class="f-field">
+              <label>SEO description <span class="ts">optional</span></label>
+              <textarea id="be-meta-desc" rows="2"
+                placeholder="Defaults to the excerpt.">${esc(p?.meta_desc || "")}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="be-preview-wrap">
+          <div class="be-preview-lbl">Live preview</div>
+          <article class="be-preview" id="be-preview"></article>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(el);
+  document.body.style.overflow = "hidden";
+  _beEl = el;
+
+  const $$ = sel => el.querySelector(sel);
+  const titleEl = $$("#be-title");
+  const mdEl    = $$("#be-md");
+  const slugEl  = $$("#be-slug");
+  const excerptEl = $$("#be-excerpt");
+  const previewEl = $$("#be-preview");
+  const wcEl    = $$("#be-wc");
+  const statusEl = $$("#be-status");
   let slugEdited = !!p?.slug;
+  let coverUrl   = p?.cover_url || "";
+
+  const markDirty = () => { el.dataset.dirty = "1"; };
+
+  const renderPreview = () => {
+    const cover = coverUrl
+      ? `<img class="be-pv-cover" src="${esc(coverUrl)}" alt="">` : "";
+    const title = titleEl.value.trim()
+      ? `<h1 class="be-pv-title">${esc(titleEl.value.trim())}</h1>` : "";
+    previewEl.innerHTML =
+      `${cover}${title}<div class="pbody-preview">${mdToHtml(mdEl.value)}</div>`;
+  };
+
+  const updateWC = () => {
+    const words = mdEl.value.trim().split(/\s+/).filter(Boolean).length;
+    wcEl.textContent = `${words} word${words === 1 ? "" : "s"} · ~${Math.max(1, Math.ceil(words / 200))} min read`;
+  };
+
+  const setCover = (url, dirty = true) => {
+    coverUrl = url || "";
+    const hasCover = !!coverUrl;
+    $$("#be-cover-empty").hidden = hasCover;
+    $$("#be-cover-set").hidden = !hasCover;
+    if (hasCover) $$("#be-cover-img").src = coverUrl;
+    if (dirty) markDirty();
+    renderPreview();
+  };
 
   titleEl.addEventListener("input", () => {
     if (!slugEdited) slugEl.value = toSlug(titleEl.value);
+    markDirty(); renderPreview();
   });
-  slugEl.addEventListener("input", () => { slugEdited = true; });
+  slugEl.addEventListener("input", () => { slugEdited = true; markDirty(); });
+  excerptEl.addEventListener("input", markDirty);
+  mdEl.addEventListener("input", () => { markDirty(); updateWC(); renderPreview(); });
 
-  const updateWC = () => {
-    const words = bodyEl.value.trim().split(/\s+/).filter(Boolean).length;
-    wcEl.textContent = `${words} word${words === 1 ? "" : "s"} — est. ${Math.max(1, Math.ceil(words / 200))} min read`;
+  // ── Toolbar: wrap selection / prefix lines / insert link ──────────────────
+  const applyWrap = (token) => {
+    const s = mdEl.selectionStart, e2 = mdEl.selectionEnd;
+    const sel = mdEl.value.slice(s, e2) || "text";
+    mdEl.setRangeText(token + sel + token, s, e2, "select");
+    mdEl.focus(); markDirty(); updateWC(); renderPreview();
   };
-  bodyEl.addEventListener("input", updateWC);
-  updateWC();
+  const applyLinePrefix = (prefix) => {
+    const s = mdEl.selectionStart, e2 = mdEl.selectionEnd;
+    const val = mdEl.value;
+    const from = val.lastIndexOf("\n", s - 1) + 1;
+    const block = val.slice(from, e2);
+    const next = block.split("\n").map(l => prefix + l).join("\n");
+    mdEl.setRangeText(next, from, e2, "select");
+    mdEl.focus(); markDirty(); updateWC(); renderPreview();
+  };
+  const insertText = (text) => {
+    const s = mdEl.selectionStart, e2 = mdEl.selectionEnd;
+    mdEl.setRangeText(text, s, e2, "end");
+    mdEl.focus(); markDirty(); updateWC(); renderPreview();
+  };
 
+  el.querySelectorAll("[data-wrap]").forEach(b =>
+    b.addEventListener("click", () => applyWrap(b.dataset.wrap)));
+  el.querySelectorAll("[data-line]").forEach(b =>
+    b.addEventListener("click", () => applyLinePrefix(b.dataset.line)));
+  $$("#be-tb-link").addEventListener("click", () => {
+    const url = prompt("Link URL (https://…)");
+    if (!url) return;
+    const s = mdEl.selectionStart, e2 = mdEl.selectionEnd;
+    const sel = mdEl.value.slice(s, e2) || "link text";
+    mdEl.setRangeText(`[${sel}](${url})`, s, e2, "end");
+    mdEl.focus(); markDirty(); updateWC(); renderPreview();
+  });
+
+  // ── Image upload (cover + inline) ─────────────────────────────────────────
+  const doUpload = async (file, onDone) => {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { toast("That's not an image file.", true); return; }
+    statusEl.textContent = "Uploading image…";
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await upload("/api/admin/blog/upload", fd);
+      onDone(res.url);
+      statusEl.textContent = "";
+    } catch (ex) { statusEl.textContent = ""; toast(ex.message, true); }
+  };
+
+  const coverFile = $$("#be-cover-file");
+  $$("#be-cover-pick").addEventListener("click", () => coverFile.click());
+  $$("#be-cover-replace").addEventListener("click", () => coverFile.click());
+  $$("#be-cover-remove").addEventListener("click", () => setCover(""));
+  coverFile.addEventListener("change", () =>
+    doUpload(coverFile.files[0], (url) => setCover(url)));
+
+  const coverBox = $$("#be-cover");
+  ["dragover", "dragenter"].forEach(ev => coverBox.addEventListener(ev, e => {
+    e.preventDefault(); coverBox.classList.add("be-drag");
+  }));
+  ["dragleave", "drop"].forEach(ev => coverBox.addEventListener(ev, e => {
+    e.preventDefault(); coverBox.classList.remove("be-drag");
+  }));
+  coverBox.addEventListener("drop", e =>
+    doUpload(e.dataTransfer.files[0], (url) => setCover(url)));
+
+  const bodyFile = $$("#be-body-file");
+  $$("#be-tb-img").addEventListener("click", () => bodyFile.click());
+  bodyFile.addEventListener("change", () =>
+    doUpload(bodyFile.files[0], (url) => insertText(`\n![](${url})\n`)));
+
+  // ── Advanced toggle ───────────────────────────────────────────────────────
+  $$("#be-adv-toggle").addEventListener("click", () => {
+    const adv = $$("#be-adv");
+    adv.hidden = !adv.hidden;
+    $$("#be-adv-toggle").classList.toggle("open", !adv.hidden);
+  });
+
+  // ── Save / publish ────────────────────────────────────────────────────────
   const collect = (publish) => ({
-    title:        document.getElementById("bp-title").value.trim(),
-    slug:         document.getElementById("bp-slug").value.trim(),
-    excerpt:      document.getElementById("bp-excerpt").value.trim() || null,
-    body_markdown: document.getElementById("bp-body").value,
-    cover_url:    document.getElementById("bp-cover").value.trim() || null,
-    author:       document.getElementById("bp-author").value.trim() || "Muhammad Taahaa",
-    meta_title:   document.getElementById("bp-meta-title").value.trim() || null,
-    meta_desc:    document.getElementById("bp-meta-desc").value.trim() || null,
+    title:         titleEl.value.trim(),
+    slug:          slugEl.value.trim() || toSlug(titleEl.value),
+    excerpt:       excerptEl.value.trim() || null,
+    body_markdown: mdEl.value,
+    cover_url:     coverUrl || null,
+    author:        $$("#be-author").value.trim() || "Muhammad Taahaa",
+    meta_title:    $$("#be-meta-title").value.trim() || null,
+    meta_desc:     $$("#be-meta-desc").value.trim() || null,
     ...(publish !== null ? { published: publish } : {}),
   });
 
-  const save = async (publish) => {
-    const errEl = document.getElementById("bp-err");
-    const data  = collect(publish);
-    if (!data.title) { errEl.textContent = "Title is required."; return; }
-    if (!data.slug)  { errEl.textContent = "Slug is required."; return; }
-    errEl.textContent = "";
+  const save = async (publish, btn) => {
+    const data = collect(publish);
+    if (!data.title) { toast("Give your post a title first.", true); titleEl.focus(); return; }
+    if (!data.slug)  { toast("A URL slug is required (open Advanced).", true); return; }
+    btn.disabled = true;
+    statusEl.textContent = "Saving…";
     try {
-      if (p) {
-        await api(`/api/admin/blog/${p.id}`, { method: "PATCH", body: data });
-      } else {
-        await api("/api/admin/blog", { method: "POST", body: data });
-      }
+      if (p) await api(`/api/admin/blog/${p.id}`, { method: "PATCH", body: data });
+      else   await api("/api/admin/blog", { method: "POST", body: data });
+      el.dataset.dirty = "0";
       toast(publish ? "Post published ✓" : "Draft saved ✓");
-      closeDrawer();
-      const res   = await api("/api/admin/blog");
-      state.blog  = res.posts || [];
+      closeBlogEditor(true);
+      const res  = await api("/api/admin/blog");
+      state.blog = res.posts || [];
       renderBlog();
       setCount("blog", state.blog.length);
-    } catch (ex) { errEl.textContent = ex.message; }
+    } catch (ex) {
+      statusEl.textContent = "";
+      btn.disabled = false;
+      toast(ex.message, true);
+    }
   };
 
-  document.getElementById("bp-save").addEventListener("click",    () => save(p ? null : false));
-  document.getElementById("bp-publish").addEventListener("click", () => save(true));
+  $$("#be-save").addEventListener("click", (e) => save(p ? null : false, e.currentTarget));
+  $$("#be-publish").addEventListener("click", (e) => save(true, e.currentTarget));
+  $$("#be-cancel").addEventListener("click", () => closeBlogEditor(false));
+  el.addEventListener("mousedown", (e) => { if (e.target === el) closeBlogEditor(false); });
+
+  // Initial paint
+  if (coverUrl) setCover(coverUrl, false);
+  updateWC();
+  renderPreview();
+  titleEl.focus();
 }
 
 /* ---- Courses ------------------------------------------------------------- */
@@ -2003,7 +2229,9 @@ $("drawer-backdrop").addEventListener("click", e => {
   if (e.target === $("drawer-backdrop")) closeDrawer();
 });
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && !$("drawer-backdrop").hidden) closeDrawer();
+  if (e.key !== "Escape") return;
+  if (_beEl) { closeBlogEditor(false); return; }
+  if (!$("drawer-backdrop").hidden) closeDrawer();
 });
 
 /* ---- Homework -------------------------------------------------------------

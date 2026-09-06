@@ -1,0 +1,259 @@
+{
+ "syllabus": "9618",
+ "subject": "Computer Science (A Level)",
+ "note": "Built 2026-07-23, expanded 2026-07-25. P3 (Advanced Theory) builds on P1/P2 AS content, so Data Types & Structures, Algorithm Design, and Processor Fundamentals are extended to P3. P3 also introduces compiler design (BNF, RPN, FSM) under System Software A Level, and SISD/MISD under Hardware & VMs.",
+ "topics": [
+  {
+   "name": "Information representation",
+   "papers": [1],
+   "keywords": [
+    "binary", "hexadecimal", "denary", "two's complement", "ascii", "unicode",
+    "floating point", "bitmap", "resolution", "sample rate", "run-length encoding",
+    "colour depth", "binary coded decimal", "overflow", "number base",
+    "character set", "encoding", "lossy", "lossless", "compression"
+   ]
+  },
+  {
+   "name": "Communication",
+   "papers": [1],
+   "keywords": [
+    "network", "lan", "wan", "protocol", "packet", "ip address", "mac address",
+    "bandwidth", "transmission", "serial", "parallel", "error checking", "parity",
+    "checksum", "network topology", "star", "bus", "ring", "ethernet",
+    "collision detection", "csma", "wireless", "wifi", "bluetooth"
+   ]
+  },
+  {
+   "name": "Hardware",
+   "papers": [1],
+   "keywords": [
+    "logic gate", "truth table", "input device", "output device",
+    "secondary storage", "primary storage", "main memory", "ram", "rom",
+    "boolean", "monitor", "sensor", "solid state", "hard disk", "optical",
+    "magnetic", "cache memory", "and gate", "or gate", "not gate", "xor",
+    "nand", "nor", "half adder", "full adder",
+    "control system", "feedback", "monitoring system", "actuator",
+    "closed loop", "open loop", "embedded system", "microcontroller",
+    "automated system", "cloud computing", "cloud", "saas", "paas", "iaas",
+    "virtualisation", "3d printing", "3d printer", "server", "data centre"
+   ]
+  },
+  {
+   "name": "Processor Fundamentals",
+   "papers": [1, 3],
+   "keywords": [
+    "von neumann", "arithmetic logic unit", "control unit", "register",
+    "fetch execute cycle", "program counter", "accumulator", "bus", "opcode",
+    "operand", "addressing mode", "assembly language", "mar", "mdr",
+    "immediate addressing", "direct addressing", "indirect addressing",
+    "indexed addressing", "instruction set", "status register", "flag",
+    "mnemonics", "branch", "jump", "load", "store", "add", "subtract",
+    "compare", "shift", "interrupt", "clock speed"
+   ]
+  },
+  {
+   "name": "System Software",
+   "papers": [1],
+   "keywords": [
+    "operating system", "utility software", "compiler", "interpreter",
+    "assembler", "memory management", "device driver", "bootloader",
+    "translator", "library routine", "linker", "loader", "debugging"
+   ]
+  },
+  {
+   "name": "Security, privacy and data integrity",
+   "papers": [1],
+   "keywords": [
+    "encryption", "malware", "phishing", "firewall", "validation", "verification",
+    "backup", "authentication", "biometrics", "data integrity", "check digit",
+    "access rights", "virus", "worm", "trojan", "spyware", "ransomware",
+    "data loss", "privacy", "gdpr"
+   ]
+  },
+  {
+   "name": "Ethics and Ownership",
+   "papers": [1],
+   "keywords": [
+    "ethics", "copyright", "patent", "licence", "open source", "freeware",
+    "gnu", "professional body", "ownership", "plagiarism", "software licensing",
+    "creative commons", "shareware", "artificial intelligence ethics",
+    "autonomous", "accountability", "digital divide"
+   ]
+  },
+  {
+   "name": "Databases",
+   "papers": [1, 3],
+   "keywords": [
+    "database", "primary key", "foreign key", "sql", "dbms", "normalisation",
+    "entity relationship", "query", "referential integrity", "relational",
+    "select from where", "candidate key", "flat file", "serial file",
+    "sequential file", "indexed sequential", "random access file",
+    "record", "field", "transaction", "record locking", "deadlock",
+    "commit", "rollback", "data dictionary", "view", "stored procedure",
+    "first normal form", "second normal form", "third normal form"
+   ]
+  },
+  {
+   "name": "Algorithm Design and Problem-solving",
+   "papers": [2, 3],
+   "keywords": [
+    "algorithm", "pseudocode", "flowchart", "structure chart", "trace table",
+    "decomposition", "abstraction", "stepwise refinement", "linear search",
+    "bubble sort", "dry run", "identifier table", "binary search",
+    "insertion sort", "merge sort", "quick sort", "recursion", "efficiency",
+    "big o", "time complexity", "space complexity", "backtracking",
+    "greedy algorithm", "dynamic programming",
+    "state transition", "state-transition", "state diagram", "state machine",
+    "finite state", "transition table", "mealy", "moore machine"
+   ]
+  },
+  {
+   "name": "Data Types and Structures",
+   "papers": [2, 3],
+   "keywords": [
+    "array", "record", "data type", "string", "boolean", "stack", "queue",
+    "linked list", "abstract data type", "two-dimensional array", "file handling",
+    "declare", "composite data type", "integer", "real", "char", "enumerated",
+    "pointer", "node", "binary tree", "heap", "hash table", "dictionary",
+    "set", "graph", "adjacency matrix", "adjacency list", "dynamic data structure",
+    "static data structure", "non-contiguous", "overflow", "underflow",
+    "push", "pop", "enqueue", "dequeue", "front", "rear", "top",
+    "reverse polish", "rpn", "infix", "postfix", "expression tree"
+   ]
+  },
+  {
+   "name": "Programming",
+   "papers": [2, 4],
+   "keywords": [
+    "procedure", "function", "parameter", "loop", "iteration", "selection",
+    "variable", "constant", "subroutine", "for to", "while", "repeat until",
+    "if then", "case of", "assignment", "byref", "byval", "local", "global",
+    "scope", "passing by value", "passing by reference", "return value",
+    "module", "monolithic"
+   ]
+  },
+  {
+   "name": "Software Development",
+   "papers": [2],
+   "keywords": [
+    "testing", "debugging", "integrated development environment", "breakpoint",
+    "test data", "boundary", "waterfall", "prototyping", "rapid application",
+    "maintenance", "program development", "normal abnormal extreme",
+    "black box", "white box", "stub testing", "integration testing",
+    "regression testing", "agile", "spiral model"
+   ]
+  },
+  {
+   "name": "Data Representation",
+   "papers": [3],
+   "keywords": [
+    "floating point", "mantissa", "exponent", "normalisation", "binary shift",
+    "rounding error", "precision", "bit manipulation", "two's complement",
+    "range of values", "underflow", "denormalised", "guard bit",
+    "excess notation", "biased exponent", "single precision", "double precision"
+   ]
+  },
+  {
+   "name": "Communication and internet technologies",
+   "papers": [3],
+   "keywords": [
+    "packet switching", "circuit switching", "router", "tcp/ip", "protocol suite",
+    "transmission media", "fibre optic", "client server", "peer to peer",
+    "world wide web", "internet", "url", "domain name", "protocol",
+    "handshaking", "http", "https", "ftp", "smtp", "pop3", "imap",
+    "dns", "socket", "port", "ip", "subnet", "routing algorithm",
+    "ospf", "bgp", "rip", "gateway", "bridge", "switch", "hub",
+    "attenuation", "noise", "latency", "throughput", "bit streaming",
+    "serial transmission", "network address translation", "nat"
+   ]
+  },
+  {
+   "name": "Hardware and Virtual Machines",
+   "papers": [3],
+   "keywords": [
+    "risc", "cisc", "pipelining", "parallel processing", "simd", "mimd",
+    "sisd", "misd", "interrupt", "virtual machine", "flip-flop",
+    "boolean algebra", "karnaugh map", "logic circuit", "sr flip", "de morgan",
+    "single instruction single data", "multiple instruction multiple data",
+    "shared memory", "distributed memory", "massively parallel",
+    "multi-core", "co-processor", "gpu", "computer architecture",
+    "superscalar", "out of order execution", "branch prediction",
+    "von neumann bottleneck", "harvard architecture", "dma"
+   ]
+  },
+  {
+   "name": "System Software (A Level)",
+   "papers": [3],
+   "keywords": [
+    "scheduling", "process state", "interrupt handling", "virtual memory",
+    "paging", "segmentation", "memory management", "kernel", "round robin",
+    "translation software", "loader", "lexical analysis", "syntax analysis",
+    "semantic analysis", "code generation", "optimisation", "compiler design",
+    "syntax diagram", "bnf", "backus naur", "context free grammar", "grammar",
+    "token", "lexer", "tokeniser", "parser", "parse tree", "syntax tree",
+    "symbol table", "two pass", "one pass", "finite state machine", "fsm",
+    "finite automaton", "state transition", "regular expression",
+    "first follow set", "top down parsing", "bottom up parsing",
+    "linker", "loader", "object code", "source code", "intermediate code",
+    "first in first out", "shortest job first", "priority scheduling",
+    "round-robin", "thrashing", "page fault", "page table", "frame",
+    "multitasking", "multi-tasking", "tasking", "process", "thread", "concurrent",
+    "interpreter", "translation", "exception", "runtime error"
+   ]
+  },
+  {
+   "name": "Security (A Level)",
+   "papers": [3],
+   "keywords": [
+    "asymmetric encryption", "public key", "private key", "digital signature",
+    "ssl", "tls", "symmetric key", "encryption algorithm", "digital certificate",
+    "quantum cryptography", "hashing", "rsa", "aes", "des", "key exchange",
+    "man in the middle", "certificate authority", "https", "secure socket",
+    "message digest", "sha", "md5", "salting", "dictionary attack"
+   ]
+  },
+  {
+   "name": "Artificial Intelligence (AI)",
+   "papers": [1, 3],
+   "keywords": [
+    "artificial intelligence", "machine learning", "neural network",
+    "deep learning", "breadth first", "depth first", "a* algorithm",
+    "reinforcement learning", "back propagation", "expert system", "graph traversal",
+    "heuristic", "inference engine", "knowledge base", "training data",
+    "supervised learning", "unsupervised learning", "classification",
+    "natural language processing", "computer vision", "game playing",
+    "minimax", "alpha beta pruning", "genetic algorithm", "fuzzy logic",
+    "application of artificial intelligence", "chatbot", "autonomous"
+   ]
+  },
+  {
+   "name": "Computational thinking and Problem-solving",
+   "papers": [3, 4],
+   "keywords": [
+    "recursion", "stack frame", "binary search", "insertion sort", "big o",
+    "abstract data type", "algorithm efficiency", "backtracking", "linked list",
+    "tree traversal", "hash table", "stack", "queue", "binary tree", "heap",
+    "pointer", "node", "dynamic data structure", "collision", "chaining",
+    "open addressing", "in-order", "pre-order", "post-order",
+    "depth first search", "breadth first search", "dijkstra", "shortest path",
+    "minimum spanning tree", "kruskal", "prim", "greedy", "divide and conquer",
+    "time complexity", "space complexity", "omega notation"
+   ]
+  },
+  {
+   "name": "Further Programming",
+   "papers": [3, 4],
+   "keywords": [
+    "object oriented", "class", "inheritance", "polymorphism", "encapsulation",
+    "instantiation", "method", "declarative", "exception handling",
+    "file processing", "getter", "setter", "constructor", "attribute",
+    "instance", "subclass", "superclass", "overriding", "overloading",
+    "abstract class", "interface", "library class", "destructor",
+    "private", "public", "protected", "oop", "prolog", "fact", "rule",
+    "predicate", "backtracking", "functional programming", "lambda",
+    "list comprehension", "immutable", "higher order function",
+    "exception", "try", "catch", "finally", "throw", "handle error"
+   ]
+  }
+ ]
+}

@@ -67,11 +67,29 @@ def _keyword_weight(keyword: str) -> float:
     return 1.0 if words == 1 else 2.0 if words == 2 else 3.0
 
 
+_SUBTOPIC_STOP = frozenset({
+    "and", "or", "the", "of", "a", "an", "in", "is", "are", "to", "for",
+    "with", "from", "by", "on", "at", "as", "its", "their", "it", "be",
+    "have", "has", "use", "uses", "introduction", "basic", "basics",
+    "advanced", "type", "types", "part", "parts", "concept", "concepts",
+    "questions", "practice", "exam", "tips", "level", "form", "forms",
+    "including", "methods", "method",
+})
+
+
+def _name_keywords(name: str) -> list[str]:
+    """Derive keyword tokens from a subtopic name when no explicit list exists."""
+    tokens = re.findall(r"[a-zA-Z']+", name.lower())
+    return [t for t in tokens if t not in _SUBTOPIC_STOP and len(t) > 2]
+
+
 def score_subtopics(text: str, topic_entry: dict) -> list[tuple[str, float]]:
     """Score subtopics within a single topic entry.
 
     Returns [(subtopic_name, score), ...] sorted best-first.
     If the topic has no subtopics key, returns an empty list.
+    When a subtopic has no explicit keywords, derives them from the subtopic
+    name so that subtopics are always scored even in thin taxonomies.
     """
     subtopics = topic_entry.get("subtopics", [])
     if not subtopics:
@@ -79,8 +97,10 @@ def score_subtopics(text: str, topic_entry: dict) -> list[tuple[str, float]]:
     t = " " + re.sub(r"\s+", " ", _normalize(text.lower())) + " "
     scores = []
     for sub in subtopics:
+        explicit_kws = sub.get("keywords", [])
+        kws = explicit_kws if explicit_kws else _name_keywords(sub["name"])
         s = 0.0
-        for kw in sub.get("keywords", []):
+        for kw in kws:
             hits = len(_kw_pattern(kw).findall(t))
             if hits:
                 s += _keyword_weight(kw) * min(hits, 4)
@@ -90,7 +110,12 @@ def score_subtopics(text: str, topic_entry: dict) -> list[tuple[str, float]]:
 
 
 def classify_subtopic(text: str, taxonomy: dict, topic_name: str) -> str | None:
-    """Return the best-matching subtopic name within a topic, or None if no signal."""
+    """Return the best-matching subtopic name within a topic.
+
+    Falls back to the first subtopic when keyword scoring finds no signal,
+    so every classified question with subtopics defined gets a subtopic value.
+    Returns None only when the topic genuinely has no subtopics.
+    """
     topic_entry = next((t for t in taxonomy.get("topics", [])
                         if t["name"] == topic_name), None)
     if topic_entry is None:
@@ -98,8 +123,9 @@ def classify_subtopic(text: str, taxonomy: dict, topic_name: str) -> str | None:
     ranked = score_subtopics(text, topic_entry)
     if not ranked:
         return None
+    # Always return something — best match or first subtopic as fallback
     best_name, best_score = ranked[0]
-    return best_name if best_score > 0 else None
+    return best_name
 
 
 def score_topics(text: str, taxonomy: dict,

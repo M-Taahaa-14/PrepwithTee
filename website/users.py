@@ -12,9 +12,9 @@ import uuid
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
 from pydantic import BaseModel
 
-from .auth import get_current_user, maybe_user
-from . import users_db as _udb
-from .access import check_quota, require_plan, _plan_active, MONTHLY_QUOTAS
+from auth import get_current_user, maybe_user
+import users_db as _udb
+from access import check_quota, require_plan, _plan_active, MONTHLY_QUOTAS
 
 router = APIRouter()
 
@@ -128,7 +128,7 @@ def save_profile(req: ProfileUpdate, user: _CurrentUser,
         return {k: v for k, v in user.items() if k != "password_hash"}
 
     updated = _udb.update_profile(user["id"], updates)
-    from . import auth as _auth_mod
+    import auth as _auth_mod
     _auth_mod._set_cookie(response, updated["id"], updated)
     return {k: v for k, v in updated.items() if k != "password_hash"}
 
@@ -148,7 +148,7 @@ def delete_account(
         raise HTTPException(400, "Send confirm='DELETE' to delete your account")
     _udb.delete_user(user["id"])
     # Clear the session cookie
-    from . import auth as _auth_mod
+    import auth as _auth_mod
     response.delete_cookie("session", httponly=True, samesite="lax")
     return {"ok": True}
 
@@ -161,7 +161,7 @@ class ChangePasswordReq(BaseModel):
 
 @router.post("/api/auth/change-password")
 def change_password(req: ChangePasswordReq, user: _CurrentUser):
-    from . import auth as _auth_mod
+    import auth as _auth_mod
 
     # Google-only accounts have no password hash
     full = _udb.get_user(user["id"])
@@ -217,7 +217,7 @@ def enroll(req: EnrollReq, user: _CurrentUser, response: Response):
     # If this is the first enrollment and the user already has a grade, complete their profile now.
     if user.get("grade") and not user.get("profile_complete"):
         updated = _udb.update_profile(user["id"], {"profile_complete": 1})
-        from . import auth as _auth_mod
+        import auth as _auth_mod
         _auth_mod._set_cookie(response, user["id"], updated)
     return {"status": "enrolled", "syllabus": req.syllabus}
 
@@ -322,7 +322,7 @@ def _chat(messages, max_tokens=800):
     On failure _chat_complete returns (None, diagnostic); the diagnostic names
     env vars and provider errors, so it goes to the log, never to the student.
     """
-    from .app import _chat_complete
+    from app import _chat_complete
     text, info = _chat_complete(messages, max_tokens=max_tokens)
     if text is None:
         print(f"[quiz] no AI response: {info}", flush=True)
@@ -353,7 +353,7 @@ def _past_paper_question(syllabus: str, topic: str, subtopic: str | None) -> dic
     Returns the metadata the panel needs to render the original vector crop;
     the crop itself is served by /api/question/{id}/preview.
     """
-    from .app import _con, _SESSION_ABBR, _USE_PG
+    from app import _con, _SESSION_ABBR, _USE_PG
     con = _con()
     con.row_factory = __import__("sqlite3").Row
     rnd = "random()" if _USE_PG else "RANDOM()"
@@ -421,7 +421,7 @@ def quiz_generate(req: QuizGenReq, user: _CurrentUser,
     # Ground the model in genuine Cambridge phrasing for this exact topic.
     samples = ""
     try:
-        from .app import _topic_samples
+        from app import _topic_samples
         samples = _topic_samples(req.syllabus, req.topic, k=3)
     except Exception:
         pass
@@ -492,7 +492,7 @@ def quiz_generate(req: QuizGenReq, user: _CurrentUser,
 def _plain_math(s: str | None) -> str:
     """Printed-paper notation. One shared implementation lives in app.py so the
     tutor, the solver and the quiz can never drift apart on formatting."""
-    from .app import _plain_math as impl
+    from app import _plain_math as impl
     return impl(s)
 
 
@@ -529,7 +529,7 @@ def quiz_evaluate(req: QuizEvalReq, user: _CurrentUser,
     # original crop, so pull its text layer for the examiner prompt.
     if req.question_id and not question_text.strip():
         try:
-            from .app import _con
+            from app import _con
             con = _con()
             con.row_factory = __import__("sqlite3").Row
             row = con.execute("SELECT text FROM questions WHERE id = ?",
@@ -955,7 +955,7 @@ def download_assignment_file(assignment_id: int, idx: int, user: _CurrentUser):
     """Serve an uploaded worksheet. Ownership is checked first, and the stored
     name is resolve-and-checked against the upload directory before serving."""
     from fastapi.responses import FileResponse
-    from .admin import UPLOADS_DIR
+    from admin import UPLOADS_DIR
 
     row = _own_assignment(assignment_id, user)
     attachments = _json_list(row.get("attachments_json"))
@@ -985,7 +985,7 @@ def download_assignment_file(assignment_id: int, idx: int, user: _CurrentUser):
 async def submit_assignment(assignment_id: int, user: _CurrentUser,
                             file: UploadFile = File(...)):
     """Upload a student's completed work for an assignment."""
-    from .admin import UPLOADS_DIR, MAX_UPLOAD_BYTES, ALLOWED_UPLOAD_EXTS
+    from admin import UPLOADS_DIR, MAX_UPLOAD_BYTES, ALLOWED_UPLOAD_EXTS
 
     row = _own_assignment(assignment_id, user)
 
@@ -1019,7 +1019,7 @@ async def submit_assignment(assignment_id: int, user: _CurrentUser,
 def download_own_submission(assignment_id: int, idx: int, user: _CurrentUser):
     """Let a student re-download a file they submitted."""
     from fastapi.responses import FileResponse
-    from .admin import UPLOADS_DIR
+    from admin import UPLOADS_DIR
 
     row = _own_assignment(assignment_id, user)
     submissions = _json_list(row.get("student_submissions_json"))
@@ -1044,7 +1044,7 @@ def download_own_submission(assignment_id: int, idx: int, user: _CurrentUser):
 @router.get("/api/my-calendar")
 def my_calendar(user: _CurrentUser):
     """The student's own subscribe-once homework feed URL."""
-    from . import reminders
+    import reminders
     return {"url": reminders.calendar_url(user["id"]),
             "webcal": reminders.calendar_url(user["id"]).replace("https://", "webcal://")
                                                         .replace("http://", "webcal://")}
@@ -1060,7 +1060,7 @@ def calendar_feed(user_id: str, token: str):
     Exposes only homework titles and dates — no marks, no contact details.
     """
     from fastapi.responses import Response
-    from . import reminders
+    import reminders
 
     if not reminders.verify_calendar_token(user_id, token):
         raise HTTPException(404, "No such calendar")
@@ -1279,7 +1279,7 @@ def submit_teacher_application(req: TeacherAppReq):
 
     # Notify admin (reuse existing helper from app.py)
     try:
-        from .app import _notify
+        from app import _notify
         _notify(
             f"[PrepWithTee] Teacher Application — {name}",
             f"Name: {name}\nEmail: {email}\nSubjects: {req.subjects}\n\n{req.message or ''}",
@@ -1303,7 +1303,7 @@ def submit_teacher_application(req: TeacherAppReq):
 @router.get("/api/usage")
 def get_usage(user: _CurrentUser):
     """Return billing-cycle usage counts, limits, and plan info for the dashboard meter."""
-    from .access import MONTHLY_QUOTAS, TRIAL_QUOTAS, plan_info
+    from access import MONTHLY_QUOTAS, TRIAL_QUOTAS, plan_info
 
     info = plan_info(user)
     plan = info["plan"]
@@ -1760,7 +1760,7 @@ def newsletter_signup(req: NewsletterReq):
             ("Unsubscribe", unsub_url),
         ]
         try:
-            from .app import _notify
+            from app import _notify
             _notify("[PrepWithTee] You're on the list!", body, rows=rows, to=email,
                     cta=("Explore PrepWithTee", "https://prepwithtee.com/"))
         except Exception as exc:

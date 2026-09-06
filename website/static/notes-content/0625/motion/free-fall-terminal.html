@@ -1,0 +1,104 @@
+<h2 id="free-fall">Free fall</h2>
+
+<div class="note-def">
+  <strong>Free fall</strong> is the motion of an object falling under gravity alone, with no air resistance.
+  <br><br>
+  Near the Earth's surface, every freely falling object accelerates downward at the same rate regardless of mass:
+  \[ g \approx 10\,\text{m/s}^2 \]
+  This value is given in the IGCSE exam and can be used in calculations. (More precisely, \( g = 9.81\,\text{m/s}^2 \), but 10 m/s² is the standard for IGCSE.)
+</div>
+
+<div class="note-key">
+  <strong>Key results for free fall from rest:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>After 1 s: speed = 10 m/s, distance fallen = 5 m</li>
+    <li>After 2 s: speed = 20 m/s, distance fallen = 20 m</li>
+    <li>After 3 s: speed = 30 m/s, distance fallen = 45 m</li>
+  </ul>
+  Distance fallen: \( d = \tfrac{1}{2}g t^2 = 5t^2 \) (for fall from rest).
+</div>
+
+<details class="note-example">
+  <summary>Worked example — free fall</summary>
+  <div>
+    <p>A stone is dropped from a cliff. Calculate (a) its speed after 3.0 s, and (b) the distance it has fallen.</p>
+    <p><strong>(a)</strong> \( v = u + gt = 0 + (10)(3.0) = 30\,\text{m/s} \)</p>
+    <p><strong>(b)</strong> \( s = \tfrac{1}{2}gt^2 = \tfrac{1}{2}(10)(3.0)^2 = 5 \times 9 = 45\,\text{m} \)</p>
+  </div>
+</details>
+
+<h2 id="falling-air">Falling with air resistance</h2>
+
+<p>In reality, all falling objects experience <strong>air resistance</strong> (drag). The drag force depends on the object's speed — the faster it moves, the larger the drag force.</p>
+
+<div class="note-key">
+  Two forces act on a falling object:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Weight</strong> (\( W = mg \)) — downward, constant.</li>
+    <li><strong>Air resistance (drag)</strong> — upward, increases as speed increases.</li>
+  </ul>
+  The <strong>net downward force</strong> = Weight − Air resistance. As drag increases, the net force decreases, so acceleration decreases.
+</div>
+
+<h2 id="terminal-velocity">Terminal velocity</h2>
+
+<div class="note-def">
+  <strong>Terminal velocity</strong> is the constant (maximum) speed reached when the drag force becomes equal to the weight. At this point, the net force is zero and acceleration is zero, so the object falls at constant velocity.
+</div>
+
+<div class="note-key">
+  <strong>Sequence of events for a sky-diver:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2.1">
+    <li><strong>Immediately after jumping:</strong> weight &gt; drag → net downward force → sky-diver accelerates.</li>
+    <li><strong>As speed increases:</strong> drag increases → net force decreases → acceleration decreases (but still speeding up).</li>
+    <li><strong>At terminal velocity:</strong> drag = weight → net force = 0 → constant speed (first terminal velocity, ~55 m/s for a typical sky-diver).</li>
+    <li><strong>Parachute opens:</strong> drag suddenly increases dramatically (much larger than weight) → net upward force → sky-diver decelerates rapidly.</li>
+    <li><strong>New (lower) terminal velocity:</strong> drag falls back to equal weight at a much lower speed (~7 m/s) → safe landing speed.</li>
+  </ol>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Speed-time graph for a sky-diver. A: accelerating (curve flattening). B: first terminal velocity (horizontal). C: sharp decrease when parachute opens. D: second, lower terminal velocity (horizontal).">
+  <div style="padding:1rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 320 210" width="320" height="210" aria-label="Sky-diver terminal velocity graph">
+      <!-- axes -->
+      <line x1="40" y1="180" x2="300" y2="180" stroke="#5A5A72" stroke-width="1.5"/>
+      <line x1="40" y1="180" x2="40"  y2="20"  stroke="#5A5A72" stroke-width="1.5"/>
+      <text x="170" y="200" font-size="11" fill="#5A5A72" text-anchor="middle">Time / s</text>
+      <text x="12"  y="100" font-size="11" fill="#5A5A72" text-anchor="middle" transform="rotate(-90,12,100)">Speed / m s⁻¹</text>
+      <!-- A: curve accelerating, flattening → terminal 1 at y=70 -->
+      <path d="M 40 180 Q 100 80 160 70" fill="none" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- B: terminal velocity 1 (horizontal) -->
+      <line x1="160" y1="70" x2="200" y2="70" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- C: parachute opens - rapid drop to terminal 2 at y=155 -->
+      <path d="M 200 70 Q 215 160 240 155" fill="none" stroke="#E8913A" stroke-width="2.2"/>
+      <!-- D: terminal velocity 2 (lower, horizontal) -->
+      <line x1="240" y1="155" x2="295" y2="155" stroke="#1A6B4A" stroke-width="2.2"/>
+      <!-- dashed guide lines -->
+      <line x1="40" y1="70"  x2="200" y2="70"  stroke="#4C2E72" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="40" y1="155" x2="240" y2="155" stroke="#1A6B4A" stroke-width="1" stroke-dasharray="4,3"/>
+      <!-- labels -->
+      <text x="95"  y="110" font-size="9" fill="#4C2E72" font-weight="700">A — accelerating</text>
+      <text x="163" y="62"  font-size="9" fill="#4C2E72" font-weight="700">B</text>
+      <text x="210" y="115" font-size="9" fill="#E8913A" font-weight="700">C — chute opens</text>
+      <text x="252" y="148" font-size="9" fill="#1A6B4A" font-weight="700">D</text>
+      <!-- y-axis labels -->
+      <text x="25" y="73"  font-size="9" fill="#4C2E72">v₁</text>
+      <text x="25" y="158" font-size="9" fill="#1A6B4A">v₂</text>
+    </svg>
+  </div>
+</div>
+
+<div class="note-tip">
+  For "describe the motion" graph questions, describe each labelled section separately: state whether the object is accelerating/decelerating/at constant speed, and <em>explain</em> the forces responsible (weight vs drag). The explanation must reference the balance (or imbalance) of forces.
+</div>
+
+<div class="note-warn">
+  A common error: students say "at terminal velocity, all forces disappear." Wrong — both weight AND drag are still acting; they are just <strong>equal and opposite</strong>, giving a net force of zero. This is why the speed is constant, not why forces vanish.
+</div>
+
+<details class="note-example">
+  <summary>Model answer: Why does a sky-diver reach terminal velocity?</summary>
+  <div>
+    <p>When the sky-diver jumps, weight acts downward and air resistance acts upward. Initially, weight is greater than air resistance, so there is a net downward force and the sky-diver accelerates. As speed increases, air resistance increases. The net force decreases, so the acceleration decreases. Eventually, air resistance equals weight. The net force is zero and acceleration is zero, so the sky-diver falls at a constant speed — terminal velocity.</p>
+  </div>
+</details>

@@ -1,0 +1,92 @@
+<h2 id="atmosphere">The atmosphere and atmospheric pressure</h2>
+
+<div class="note-def">
+  <strong>Atmospheric pressure</strong> is the pressure exerted by the weight of the column of air in the atmosphere above a given point. At sea level:
+  \[ P_\text{atm} \approx 101\,000\,\text{Pa} \approx 100\,\text{kPa} \]
+  This is often written as 1 atmosphere (1 atm). Atmospheric pressure acts in all directions.
+</div>
+
+<div class="note-key">
+  <strong>Why atmospheric pressure changes with altitude:</strong>
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Atmospheric pressure is caused by the weight of the air column above.</li>
+    <li>Higher altitude → less air above → smaller weight of air → lower atmospheric pressure.</li>
+    <li>At the top of a high mountain the atmospheric pressure is significantly less than at sea level.</li>
+  </ul>
+</div>
+
+<h2 id="evidence">Evidence for atmospheric pressure</h2>
+
+<div class="note-key">
+  <strong>Crushed can experiment:</strong> Remove air from inside a metal can (e.g. by boiling water to fill it with steam, then sealing and cooling it). The steam condenses, lowering the internal pressure. Atmospheric pressure on the outside then crushes the can inward.
+  <br><br>
+  <strong>Suction cup:</strong> Pressing a suction cup expels air. The lower internal pressure means atmospheric pressure holds the cup firmly against the surface.
+  <br><br>
+  <strong>Drinking through a straw:</strong> Sucking lowers the pressure inside the straw. Atmospheric pressure acting on the surface of the liquid pushes it up the straw.
+</div>
+
+<h2 id="barometer">Measuring atmospheric pressure — the mercury barometer</h2>
+
+<div class="note-key">
+  A <strong>mercury barometer</strong> consists of a glass tube (closed at the top, open at the bottom) filled with mercury and inverted in a trough of mercury.
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Atmospheric pressure acts on the mercury surface in the trough.</li>
+    <li>This pressure supports a column of mercury of height \( h \) in the tube.</li>
+    <li>The space above the mercury in the closed tube is a near-vacuum (very low pressure).</li>
+    <li>At sea level: \( h \approx 760\,\text{mm Hg} = 76\,\text{cm Hg} \).</li>
+  </ul>
+  \[ P_\text{atm} = h\rho g = 0.760 \times 13\,600 \times 10 = 103\,360\,\text{Pa} \approx 100\,\text{kPa} \]
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Mercury barometer. Atmospheric pressure acting on the trough supports the 76 cm mercury column. The space above the mercury is a vacuum (≈ 0 Pa). If P_atm increases, h increases; if P_atm decreases (higher altitude), h decreases.">
+  <div style="padding:.5rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 200 200" width="200" height="200" aria-label="Mercury barometer">
+      <!-- trough -->
+      <rect x="40" y="150" width="120" height="35" fill="rgba(156,163,175,.3)" stroke="#5A5A72" stroke-width="1.2" rx="3"/>
+      <!-- mercury in trough -->
+      <rect x="41" y="155" width="118" height="29" fill="rgba(107,114,128,.5)" rx="2"/>
+      <!-- glass tube -->
+      <rect x="88" y="20" width="24" height="135" fill="rgba(255,255,255,.15)" stroke="#5A5A72" stroke-width="1.2" rx="3"/>
+      <!-- vacuum space -->
+      <rect x="89" y="21" width="22" height="60" fill="rgba(200,210,230,.1)" rx="2"/>
+      <text x="100" y="53" font-size="7.5" fill="#5A5A72" text-anchor="middle">vacuum</text>
+      <!-- mercury in tube -->
+      <rect x="89" y="81" width="22" height="74" fill="rgba(107,114,128,.55)" rx="2"/>
+      <!-- h measurement arrow -->
+      <line x1="120" y1="81"  x2="120" y2="155" stroke="#4C2E72" stroke-width="1.2" stroke-dasharray="3,2"/>
+      <line x1="115" y1="81"  x2="125" y2="81"  stroke="#4C2E72" stroke-width="1.2"/>
+      <line x1="115" y1="155" x2="125" y2="155" stroke="#4C2E72" stroke-width="1.2"/>
+      <text x="138" y="125" font-size="8.5" fill="#4C2E72" font-weight="700">h ≈ 76 cm</text>
+      <!-- atmospheric pressure arrow -->
+      <line x1="50" y1="135" x2="50" y2="155" stroke="#E8913A" stroke-width="2" marker-end="url(#aAtm)"/>
+      <text x="53" y="130" font-size="8" fill="#E8913A" font-weight="700">P_atm</text>
+      <defs>
+        <marker id="aAtm" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#E8913A"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<h2 id="manometer">U-tube manometer</h2>
+
+<div class="note-key">
+  A <strong>U-tube manometer</strong> measures the pressure of a gas relative to atmospheric pressure:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>One arm is connected to the gas supply; the other is open to the atmosphere.</li>
+    <li>If the gas pressure is greater than atmospheric, the liquid level on the gas side is <em>lower</em>.</li>
+    <li>The difference in liquid levels \( h \) gives the <em>gauge pressure</em> (excess above atmospheric): \( \Delta P = h\rho g \).</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Example — gas pressure from manometer reading</summary>
+  <div>
+    <p>A U-tube manometer containing water (ρ = 1000 kg/m³) shows a height difference of 12 cm. Atmospheric pressure is 100 000 Pa. Find the gas pressure. (g = 10 N/kg)</p>
+    <p>Gauge pressure: \( \Delta P = h\rho g = 0.12 \times 1000 \times 10 = 1200\,\text{Pa} \)</p>
+    <p>Absolute gas pressure = \( P_\text{atm} + \Delta P = 100\,000 + 1200 = 101\,200\,\text{Pa} \)</p>
+  </div>
+</details>
+
+<div class="note-tip">
+  In barometer questions, if you are asked "what happens when the barometer is taken to the top of a mountain", the answer is: the height of the mercury column decreases, because atmospheric pressure decreases with altitude (less air above). If the tube is tilted, the vertical height of mercury stays the same but the length of the column increases.
+</div>

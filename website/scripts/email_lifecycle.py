@@ -25,7 +25,8 @@ import sys
 from datetime import datetime, timedelta, timezone, date as _date
 
 from .. import users_db as _udb
-from ..app import _notify, _public_base, _esc
+from ..app import _notify, _esc
+from ..reminders import _public_base
 
 APP_URL = _public_base()
 _UNSUB_MAILTO = "mailto:nexgentutors6@gmail.com?subject=Unsubscribe%20from%20PrepWithTee%20emails"
@@ -105,50 +106,111 @@ def _last_active_map() -> dict[str, _date]:
 
 # ── HTML email builder ────────────────────────────────────────────────────────
 
+_LOGO_URL  = "https://prepwithtee.com/logo.png"
+_SITE_URL  = "https://prepwithtee.com"
+
 def _letter_html(body_html: str, cta_label: str, cta_url: str) -> str:
-    """Render a personal letter-style HTML email in PrepWithTee brand colours."""
+    """Branded letter-style HTML email: logo header, gold rule, white card, footer."""
+
     cta_block = f"""
-    <p style="margin:28px 0 0;text-align:center">
-      <a href="{_esc(cta_url)}"
-         style="display:inline-block;background:#E8913A;color:#fff;
-                text-decoration:none;font-weight:700;font-size:.9rem;
-                padding:12px 28px;border-radius:10px;letter-spacing:.01em">
-        {_esc(cta_label)}
-      </a>
-    </p>""" if cta_label else ""
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+           style="margin-top:28px">
+      <tr><td style="text-align:center">
+        <a href="{_esc(cta_url)}"
+           style="display:inline-block;background:#E8913A;color:#ffffff;
+                  text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,
+                  'Segoe UI',Arial,sans-serif;font-weight:700;font-size:.9rem;
+                  padding:13px 32px;border-radius:8px;letter-spacing:.02em;
+                  mso-padding-alt:13px 32px">
+          {_esc(cta_label)} &rarr;
+        </a>
+      </td></tr>
+    </table>""" if cta_label else ""
 
     return f"""<!DOCTYPE html>
-<html lang="en"><body style="margin:0;padding:0;background:#f4f0ea;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Georgia,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:32px 16px">
-<table width="100%" cellpadding="0" cellspacing="0"
-       style="max-width:500px;margin:0 auto">
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+</head>
+<body style="margin:0;padding:0;background:#edeae5;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+      -webkit-text-size-adjust:100%;mso-line-height-rule:exactly">
 
-  <tr><td style="background:#2E1B4A;border-radius:12px 12px 0 0;
-                 padding:16px 28px 14px">
-    <p style="color:#C9BDF0;font-size:.72rem;margin:0;
-              letter-spacing:.07em;text-transform:uppercase">PrepWithTee</p>
-  </td></tr>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<tr><td style="padding:32px 16px 48px">
 
-  <tr><td style="background:#fff;padding:28px 32px 32px;
-                 border-radius:0 0 12px 12px;
-                 box-shadow:0 2px 16px rgba(0,0,0,.08)">
-    <div style="font-size:.92rem;color:#1a1a2e;line-height:1.75">
-      {body_html}
-    </div>
-    {cta_block}
-  </td></tr>
+  <!-- CARD WRAPPER ─────────────────────────────────────────── -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+         style="max-width:520px;margin:0 auto">
 
-  <tr><td style="padding:18px 0 8px;text-align:center;
-                 color:#bbb;font-size:.72rem;line-height:1.6">
-    PrepWithTee &nbsp;&middot;&nbsp; Lahore, Pakistan<br>
-    You're getting this because you signed up at prepwithtee.com.<br>
-    <a href="{_esc(_UNSUB_MAILTO)}"
-       style="color:#bbb;text-decoration:underline">Unsubscribe</a>
-  </td></tr>
+    <!-- ① HEADER: logo on dark-purple -->
+    <tr><td style="background:#2E1B4A;border-radius:16px 16px 0 0;
+                   padding:28px 32px 22px;text-align:center">
+      <a href="{_SITE_URL}" style="text-decoration:none;display:block">
+        <img src="{_LOGO_URL}" alt="PrepWithTee" width="72" height="72"
+             style="display:block;margin:0 auto 12px;border-radius:50%;
+                    border:3px solid rgba(201,168,76,.45)">
+        <p style="margin:0;color:#ffffff;font-size:1.05rem;font-weight:700;
+                  letter-spacing:.01em">PrepWithTee</p>
+        <p style="margin:4px 0 0;color:#C9BDF0;font-size:.72rem;
+                  letter-spacing:.09em;text-transform:uppercase">
+          Cambridge Exam Prep
+        </p>
+      </a>
+    </td></tr>
 
-</table></td></tr></table>
+    <!-- ② GOLD RULE -->
+    <tr><td style="background:#C9A84C;height:3px;font-size:1px;line-height:1px">&nbsp;</td></tr>
+
+    <!-- ③ BODY: white card -->
+    <tr><td style="background:#ffffff;padding:34px 38px 38px;
+                   border-radius:0 0 16px 16px;
+                   box-shadow:0 6px 32px rgba(46,27,74,.12)">
+
+      <!-- message text -->
+      <div style="font-size:.93rem;color:#1e1b30;line-height:1.85;
+                  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
+        {body_html}
+      </div>
+
+      <!-- divider before CTA -->
+      {f'<div style="border-top:1px solid #f0ece6;margin:26px 0 0"></div>' if cta_label else ''}
+
+      {cta_block}
+    </td></tr>
+
+    <!-- ④ FOOTER -->
+    <tr><td style="padding:22px 0 4px;text-align:center">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr><td style="text-align:center;padding-bottom:10px">
+          <img src="{_LOGO_URL}" alt="" width="28" height="28"
+               style="display:inline-block;border-radius:50%;opacity:.4;
+                      vertical-align:middle">
+        </td></tr>
+        <tr><td style="font-size:.7rem;color:#aaa;line-height:1.7;
+                       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+                       text-align:center">
+          <strong style="color:#888">PrepWithTee</strong>
+          &nbsp;&middot;&nbsp; Lahore, Pakistan<br>
+          You're getting this because you signed up at
+          <a href="{_SITE_URL}" style="color:#aaa;text-decoration:none">prepwithtee.com</a>.<br>
+          Questions or need tutoring?
+          <a href="https://wa.me/923204884375"
+             style="color:#aaa;text-decoration:underline">WhatsApp us</a><br>
+          <a href="{_esc(_UNSUB_MAILTO)}"
+             style="color:#aaa;text-decoration:underline">Unsubscribe</a>
+        </td></tr>
+      </table>
+    </td></tr>
+
+  </table>
+  <!-- /CARD WRAPPER -->
+
+</td></tr>
+</table>
 </body></html>"""
 
 
@@ -177,7 +239,7 @@ def send_W1(user: dict) -> bool:
     lib = f"{APP_URL}/library.html"
     return _send(
         user, "W1",
-        subject="You're in. Let's make sure every mark counts.",
+        subject="You're in, {first} — here's your first move.".format(first=first),
         body_plain=(
             f"Hi {first},\n\n"
             "Welcome to PrepWithTee.\n\n"
@@ -217,7 +279,7 @@ def send_W2(user: dict) -> bool:
     lib = f"{APP_URL}/library.html"
     return _send(
         user, "W2",
-        subject="The single best thing you can do today (takes 10 minutes)",
+        subject="The revision habit that actually works (10 min today)",
         body_plain=(
             f"Hi {first},\n\n"
             "Most students revise by reading their notes.\n\n"
@@ -260,7 +322,7 @@ def send_W3(user: dict) -> bool:
     ask = f"{APP_URL}/ask.html"
     return _send(
         user, "W3",
-        subject="Stuck on a question at midnight? There's someone here.",
+        subject="Stuck at midnight on a question? This helps.",
         body_plain=(
             f"Hi {first},\n\n"
             "Ever been working through a past paper at 11 PM and hit a question "
@@ -300,7 +362,7 @@ def send_R1(user: dict) -> bool:
     lib = f"{APP_URL}/library.html"
     return _send(
         user, "R1",
-        subject="Everything okay?",
+        subject="{first}, is everything okay?".format(first=first),
         body_plain=(
             f"Hi {first},\n\n"
             "I noticed you haven't been on in a few days. That's completely fine — life gets busy.\n\n"
@@ -440,24 +502,228 @@ def send_R3(user: dict) -> bool:
     )
 
 
-def send_F1(user: dict) -> bool:
-    """Weekly Study Tip — every Sunday."""
+# ── Weekly tip bank ──────────────────────────────────────────────────────────
+# Cycles by ISO week number. Add more tips freely — the modulo keeps it working.
+# Each entry: (subject, plain_intro, html_tip_paragraph, plain_tip_paragraph)
+
+_WEEKLY_TIPS = [
+    (
+        "Your study tip this week: mark scheme first",
+        "Try 'mark scheme first' on one question this week.\n\n"
+        "Pick a question you're unsure about. Before you attempt it, read the mark scheme — "
+        "see exactly what Cambridge is looking for. Then close it, answer the question, and compare.\n\n"
+        "Most students treat mark schemes as answer keys. They're not. They're blueprints for "
+        "how to think about the question. Reading them before answering teaches you the examiner's "
+        "logic, which is half of what the exam tests.",
+        "<strong>Try &ldquo;mark scheme first&rdquo; on one question this week.</strong>"
+        "<br><br>"
+        "Pick a question you're unsure about. Before you attempt it, read the mark scheme &mdash; "
+        "see exactly what Cambridge is looking for. Then close it, answer the question, and compare."
+        "<br><br>"
+        "Most students treat mark schemes as answer keys. They're not &mdash; they're blueprints "
+        "for how to think about the question. Reading them <em>before</em> answering teaches you "
+        "the examiner's logic, which is half of what the exam tests.",
+    ),
+    (
+        "Your study tip this week: test yourself, don't re-read",
+        "This week, replace one re-reading session with a blank-page test.\n\n"
+        "Close your notes. Pick a topic. Write down everything you can remember about it — "
+        "definitions, formulas, worked examples, anything. Then open your notes and check.\n\n"
+        "The gaps you find are your actual revision list. Re-reading hides them. "
+        "This surfaces them in 10 minutes.",
+        "<strong>This week: replace one re-reading session with a blank-page test.</strong>"
+        "<br><br>"
+        "Close your notes. Pick a topic. Write down everything you can remember about it &mdash; "
+        "definitions, formulas, worked examples, anything. Then open your notes and check."
+        "<br><br>"
+        "The gaps you find are your actual revision list. Re-reading hides them. "
+        "This surfaces them in 10 minutes.",
+    ),
+    (
+        "Your study tip this week: count the answer lines",
+        "Cambridge answer boxes have a specific number of lines for a reason. Use them.\n\n"
+        "A 2-line box wants 2 distinct points. A 6-line box wants a structured explanation "
+        "with multiple steps. Before you write a word, count the lines and plan your answer to fill them.\n\n"
+        "Most marks lost on 'describe' and 'explain' questions are from students who gave one point "
+        "when the box clearly expected three.",
+        "<strong>Cambridge answer boxes have a specific number of lines for a reason. Use them.</strong>"
+        "<br><br>"
+        "A 2-line box wants 2 distinct points. A 6-line box wants a structured explanation "
+        "with multiple steps. Before you write a word, count the lines and plan your answer to fill them."
+        "<br><br>"
+        "Most marks lost on &lsquo;describe&rsquo; and &lsquo;explain&rsquo; questions are from "
+        "students who gave one point when the box clearly expected three.",
+    ),
+    (
+        "Your study tip this week: time pressure from day one",
+        "This week, try one question under timed conditions.\n\n"
+        "Pick a structured question worth 6 marks. Set a timer for 7 minutes. "
+        "Attempt it with no pausing, no peeking. Then check the mark scheme.\n\n"
+        "Exam panic is almost always about pace, not knowledge. Students who practise timed "
+        "from early on don't freeze in the hall — they've already felt the pressure and worked through it.",
+        "<strong>This week: attempt one question under real timed conditions.</strong>"
+        "<br><br>"
+        "Pick a structured question worth 6 marks. Set a timer for 7 minutes. "
+        "Attempt it with no pausing, no peeking. Then check the mark scheme."
+        "<br><br>"
+        "Exam panic is almost always about pace, not knowledge. Students who practise timed "
+        "from early on don't freeze in the hall &mdash; they've already felt that pressure "
+        "and worked through it.",
+    ),
+    (
+        "Your study tip this week: learn the command words",
+        "Cambridge uses the same command words across every paper, and each one has a specific meaning.\n\n"
+        "'State' means one fact, no explanation. 'Describe' means what happens. "
+        "'Explain' means why it happens — mechanism required. 'Suggest' means apply your knowledge "
+        "to an unfamiliar situation.\n\n"
+        "Read the command word before anything else. Half the marks lost on long-answer questions "
+        "come from answering the wrong thing — explaining when they only asked you to describe.",
+        "<strong>Cambridge uses the same command words on every paper. Each one has a specific meaning.</strong>"
+        "<br><br>"
+        "&lsquo;State&rsquo; = one fact, no explanation. &lsquo;Describe&rsquo; = what happens. "
+        "&lsquo;Explain&rsquo; = why it happens &mdash; mechanism required. "
+        "&lsquo;Suggest&rsquo; = apply knowledge to an unfamiliar situation."
+        "<br><br>"
+        "Read the command word before anything else. Half the marks lost on long-answer questions "
+        "come from answering the wrong thing &mdash; explaining when they only asked you to describe.",
+    ),
+    (
+        "Your study tip this week: work backwards from the marks",
+        "In Maths and Physics, the mark allocation tells you how much working to show.\n\n"
+        "A 1-mark question: just the answer. A 3-mark question: method, substitution, answer — "
+        "three distinct steps on three lines. A 5-mark question: set up, working, intermediate "
+        "result, final answer, units.\n\n"
+        "Cambridge often awards marks for correct method even if the final answer is wrong. "
+        "A student who shows full working and gets the arithmetic wrong can still score 4/5. "
+        "A student who writes only the wrong answer scores 0.",
+        "<strong>In Maths and Physics, the mark allocation tells you how much working to show.</strong>"
+        "<br><br>"
+        "A 1-mark question: just the answer. A 3-mark question: method, substitution, answer &mdash; "
+        "three steps on three lines. A 5-mark question: set-up, working, intermediate result, "
+        "final answer, units."
+        "<br><br>"
+        "Cambridge often awards marks for correct method even if the final answer is wrong. "
+        "A student who shows full working and gets the arithmetic wrong can still score 4/5. "
+        "A student who writes only the wrong answer scores 0.",
+    ),
+    (
+        "Your study tip this week: keep a wrong-answers log",
+        "This week, start a wrong-answers log. It takes 2 minutes per question.\n\n"
+        "Every question you get wrong, write down: the topic, what you wrote, "
+        "what the mark scheme wanted, and why you missed it.\n\n"
+        "After a week you'll see a pattern. Not 'I'm bad at Physics' — something specific, "
+        "like 'I keep forgetting to include units' or 'I miss the second mark on explain questions'. "
+        "Specific problems have specific fixes. Vague ones don't.",
+        "<strong>This week: start a wrong-answers log.</strong> It takes 2 minutes per question."
+        "<br><br>"
+        "Every question you get wrong, write: the topic, what you wrote, "
+        "what the mark scheme wanted, and why you missed it."
+        "<br><br>"
+        "After a week you'll see a pattern &mdash; not &lsquo;I'm bad at Physics&rsquo; but "
+        "something specific: <em>&lsquo;I keep forgetting units&rsquo;</em> or "
+        "<em>&lsquo;I miss the second mark on explain questions.&rsquo;</em> "
+        "Specific problems have specific fixes. Vague ones don't.",
+    ),
+    (
+        "Your study tip this week: draw before you write",
+        "For Physics and Maths, draw a diagram before you start any calculation.\n\n"
+        "Even a rough sketch — a circuit, a force diagram, a triangle — "
+        "locks in what the question is actually asking. It stops you substituting into "
+        "the wrong formula and gives you something to check your answer against.\n\n"
+        "Diagrams don't cost marks. In fact, examiners often give credit for a correct "
+        "diagram even when the algebra that follows has an error.",
+        "<strong>For Physics and Maths: draw a diagram before you start any calculation.</strong>"
+        "<br><br>"
+        "Even a rough sketch &mdash; a circuit, a force diagram, a triangle &mdash; "
+        "locks in what the question is actually asking. It stops you substituting into "
+        "the wrong formula and gives you something to check your answer against."
+        "<br><br>"
+        "Diagrams don't cost marks. In fact, examiners often award credit for a correct "
+        "diagram even when the algebra that follows has an error.",
+    ),
+    (
+        "Your study tip this week: spot the repeating questions",
+        "Cambridge reuses question patterns more than students realise.\n\n"
+        "Open five past papers for one topic. Look at how the question is phrased each time. "
+        "You'll find 2 or 3 recurring structures — the same setup, different numbers or context.\n\n"
+        "Once you know the pattern, you're not 'doing a question' — you're recognising a type. "
+        "That's the difference between students who find exams familiar and students who find them unpredictable.",
+        "<strong>Cambridge reuses question patterns more than students realise.</strong>"
+        "<br><br>"
+        "Open five past papers for one topic. Look at how each question is phrased. "
+        "You'll find 2 or 3 recurring structures &mdash; the same setup with different numbers or context."
+        "<br><br>"
+        "Once you know the pattern, you're not &lsquo;doing a question&rsquo; &mdash; "
+        "you're recognising a type. That's the difference between students who find exams "
+        "familiar and students who find them unpredictable.",
+    ),
+    (
+        "Your study tip this week: the Feynman check",
+        "After you revise a topic, close your notes and explain it out loud as if you're teaching a 12-year-old.\n\n"
+        "Where you hesitate or use vague words like 'somehow' or 'it just does' — "
+        "that's exactly where your understanding has a hole.\n\n"
+        "Go back to that specific point, re-read it, then explain it again. "
+        "If you can say it clearly in simple language, you understand it well enough to answer any exam question about it.",
+        "<strong>After revising a topic, explain it out loud as if you're teaching a 12-year-old.</strong>"
+        "<br><br>"
+        "Where you hesitate or use vague words like &lsquo;somehow&rsquo; or &lsquo;it just does&rsquo; &mdash; "
+        "that's exactly where your understanding has a hole."
+        "<br><br>"
+        "Go back to that specific point, re-read it, then explain it again. "
+        "If you can say it clearly in simple language, you can answer any exam question about it.",
+    ),
+    (
+        "Your study tip this week: one mark per minute",
+        "Cambridge papers are designed for one mark per minute. Use that.\n\n"
+        "A 2-mark question gets 2 minutes. A 6-mark question gets 6 minutes. "
+        "If you're spending 12 minutes on a 4-mark question, you're already behind — "
+        "move on, come back to it at the end.\n\n"
+        "Practise timing yourself this week. Set a phone timer for each question. "
+        "You don't need to get faster — you need to get comfortable stopping when the time is up.",
+        "<strong>Cambridge papers are designed for one mark per minute. Use that rule.</strong>"
+        "<br><br>"
+        "A 2-mark question gets 2 minutes. A 6-mark question gets 6 minutes. "
+        "If you're spending 12 minutes on a 4-mark question, you're already behind &mdash; "
+        "move on and come back."
+        "<br><br>"
+        "Practise timing yourself this week. Set a timer for each question. "
+        "You don't need to get faster &mdash; you need to get comfortable stopping when time is up.",
+    ),
+    (
+        "Your study tip this week: read the question twice",
+        "The most common exam mistake isn't not knowing the answer. It's misreading the question.\n\n"
+        "This week, practise reading every question twice before you write anything. "
+        "First read: understand the context. Second read: identify exactly what is being asked "
+        "and circle the command word.\n\n"
+        "A student who knows the topic but answers the wrong question scores zero. "
+        "A student who reads carefully and answers precisely scores full marks — "
+        "even with imperfect knowledge.",
+        "<strong>The most common exam mistake isn't not knowing the answer. It's misreading the question.</strong>"
+        "<br><br>"
+        "This week: read every question twice before writing anything. "
+        "First read: understand the context. Second read: identify exactly what's being asked "
+        "and note the command word."
+        "<br><br>"
+        "A student who knows the topic but answers the wrong question scores zero. "
+        "A student who reads carefully and answers precisely scores full marks &mdash; "
+        "even with imperfect knowledge.",
+    ),
+]
+
+
+def send_F1(user: dict, week_number: int) -> bool:
+    """Weekly Study Tip — rotates through _WEEKLY_TIPS by ISO week number."""
     first = (user.get("name") or "there").split()[0]
     lib = f"{APP_URL}/library.html"
+    subject, plain_tip, html_tip = _WEEKLY_TIPS[week_number % len(_WEEKLY_TIPS)]
+
     return _send(
         user, "F1",
-        subject="One thing worth trying this week",
+        subject=subject,
         body_plain=(
             f"Hi {first},\n\n"
             "Quick one this week.\n\n"
-            "Try 'mark scheme first' on one question.\n\n"
-            "Pick a question you're unsure about. Before you attempt it, "
-            "read the mark scheme. See exactly what Cambridge is looking for. "
-            "Then close the mark scheme, answer the question, and compare.\n\n"
-            "Most students treat mark schemes as answer keys. They're not — "
-            "they're blueprints for how to think about the question. "
-            "Reading them before answering teaches you the examiner's logic, "
-            "which is half of what the exam actually tests.\n\n"
+            f"{plain_tip}\n\n"
             "Give it a go this week.\n\n"
             f"{lib}\n\n"
             "Have a good week,\n"
@@ -466,18 +732,9 @@ def send_F1(user: dict) -> bool:
         body_html=(
             _p(f"Hi {_esc(first)},")
             + _p("Quick one this week.")
-            + _p("<strong>Try &ldquo;mark scheme first&rdquo; on one question.</strong>")
-            + _p(
-                "Pick a question you're unsure about. Before you attempt it, "
-                "read the mark scheme. See exactly what Cambridge is looking for. "
-                "Then close the mark scheme, answer the question, and compare."
-            )
-            + _p(
-                "Most students treat mark schemes as answer keys. They're not &mdash; "
-                "they're blueprints for how to think about the question. "
-                "Reading them <em>before</em> answering teaches you the examiner's logic, "
-                "which is half of what the exam actually tests."
-            )
+            + f'<p style="margin:0 0 14px;padding:16px 18px;background:#faf8f5;'
+              f'border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;'
+              f'font-size:.9rem;color:#1e1b30;line-height:1.8">{html_tip}</p>'
             + _p("Give it a go this week in whatever topic you're revising.")
             + _p("Have a good week,<br><strong>Tee</strong>")
         ),
@@ -548,7 +805,7 @@ def send_M2(user: dict, notify_fn) -> bool:
     )
     html = _letter_html(body_html, "", "")
     ok = notify_fn(
-        "Your mock test is ready — here's how to use it.",
+        f"Your mock test is ready, {first} — here's how to nail it.",
         f"Hi {first},\n\nYou've just generated your first mock test.\n\n"
         "Sit it timed, no mark scheme. Then review every wrong answer carefully.\n\n"
         "Repeat in a week. You'll be surprised how much sticks.\n\n— Tee",
@@ -653,7 +910,7 @@ def main() -> int:
 
         # ── Weekly tip (Sundays only) ─────────────────────────────────────────
         if is_sunday and not _already_sent(sent_7d, uid, "F1"):
-            if send_F1(u):
+            if send_F1(u, today.isocalendar()[1]):
                 f1 += 1
                 sent_7d.add((uid, "F1"))
 

@@ -1,0 +1,105 @@
+{
+ "syllabus": "5070",
+ "subject": "Chemistry (O Level)",
+ "note": "Built 2026-07-23 from 5070-2026-2028-syllabus.pdf subject content 1-12. O Level Chemistry shares Cambridge's standard 12-topic chemistry structure with IGCSE 0620 (same top-level names). Paper 1 is multiple choice, Paper 2 is theory; every topic can appear in either, so no per-paper scoping.",
+ "topics": [
+  {
+   "name": "States of matter",
+   "keywords": [
+    "kinetic particle theory", "states of matter", "melting", "boiling point",
+    "evaporation", "condensation", "sublimation", "diffusion", "brownian motion",
+    "change of state", "solid liquid gas", "gas pressure", "particle model"
+   ]
+  },
+  {
+   "name": "Atoms, elements and compounds",
+   "keywords": [
+    "proton", "neutron", "electron", "atomic number", "mass number", "isotope",
+    "electronic configuration", "covalent bond", "ionic bond", "metallic bond",
+    "element compound mixture", "giant lattice", "allotrope", "shell", "molecule"
+   ]
+  },
+  {
+   "name": "Stoichiometry",
+   "keywords": [
+    "relative atomic mass", "mole", "molar mass", "empirical formula",
+    "molecular formula", "avogadro", "concentration", "mol / dm", "percentage yield",
+    "limiting reagent", "balanced equation", "relative formula mass", "reacting mass"
+   ]
+  },
+  {
+   "name": "Electrochemistry",
+   "keywords": [
+    "electrolysis", "electrolyte", "electrode", "anode", "cathode", "cation",
+    "anion", "electroplating", "half equation", "molten", "aqueous solution",
+    "hydrogen fuel cell", "electrical conduction", "inert electrode"
+   ]
+  },
+  {
+   "name": "Chemical energetics",
+   "keywords": [
+    "exothermic", "endothermic", "enthalpy", "energy level diagram",
+    "bond breaking", "bond forming", "activation energy", "energy released",
+    "energy profile", "heat energy", "temperature change"
+   ]
+  },
+  {
+   "name": "Chemical reactions",
+   "keywords": [
+    "rate of reaction", "catalyst", "reversible reaction", "equilibrium",
+    "oxidation", "reduction", "redox", "oxidising agent", "reducing agent",
+    "collision", "physical change", "chemical change", "concentration",
+    "surface area", "temperature increases"
+   ]
+  },
+  {
+   "name": "Acids, bases and salts",
+   "keywords": [
+    "acid", "base", "alkali", "neutralisation", "salt", "indicator", "titration",
+    "hydroxide", "oxide", "soluble salt", "insoluble", "universal indicator",
+    "strong acid", "weak acid", "ph value", "limewater"
+   ]
+  },
+  {
+   "name": "The Periodic Table",
+   "keywords": [
+    "periodic table", "group i", "group vii", "group viii", "alkali metals",
+    "halogens", "noble gases", "transition elements", "reactivity trend",
+    "period", "group number", "across the period"
+   ]
+  },
+  {
+   "name": "Metals",
+   "keywords": [
+    "reactivity series", "alloy", "corrosion", "rusting", "extraction of metals",
+    "blast furnace", "ore", "iron", "aluminium", "displacement reaction",
+    "sacrificial protection", "properties of metals", "galvanising", "steel"
+   ]
+  },
+  {
+   "name": "Chemistry of the environment",
+   "keywords": [
+    "water treatment", "air quality", "greenhouse gas", "carbon dioxide",
+    "methane", "climate change", "pollutant", "catalytic converter", "fertiliser",
+    "nitrogen", "ammonia", "acid rain", "sulfur dioxide"
+   ]
+  },
+  {
+   "name": "Organic chemistry",
+   "keywords": [
+    "hydrocarbon", "alkane", "alkene", "alcohol", "carboxylic acid", "ester",
+    "polymer", "fuel", "fractional distillation", "crude oil", "addition reaction",
+    "functional group", "homologous series", "combustion", "saturated",
+    "unsaturated", "ethanol", "petroleum"
+   ]
+  },
+  {
+   "name": "Experimental techniques and chemical analysis",
+   "keywords": [
+    "chromatography", "filtration", "distillation", "crystallisation",
+    "melting point", "flame test", "gas test", "litmus", "purity", "separating",
+    "identification of ions", "precipitate", "test for", "locating agent"
+   ]
+  }
+ ]
+}

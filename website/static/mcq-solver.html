@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -18,11 +18,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
-<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-<link rel="stylesheet" href="styles.css?v=20260831a">
-  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+<script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=20260907b">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260906a">
 <link rel="stylesheet" href="tools.css?v=20260829a">
-<link rel="stylesheet" href="mcq-session.css?v=20260812b">
+<link rel="stylesheet" href="mcq-session.css?v=20260905b">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <script>
 /* Resolve the session theme before first paint. Blocking + classic on purpose:
@@ -41,23 +41,27 @@
 </head>
 <body>
 
+<!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
 <header class="site-header">
-  <div class="container header-row">
-    <a class="brand" href="index.html">
-      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
-      <span>PrepWithTee</span>
-    </a>      <nav class="header-nav" id="site-nav">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>      <nav class="header-nav" id="site-nav">
         <!-- Dashboard mega-menu: all sections in one organised dropdown -->
-        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
-        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Stats, flashcards &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a></div></div></div></div>
+        <div class="nav-group nav-mega nav-mega-notes"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><div class="nav-mega-cols" style="grid-template-columns:1fr 1fr"><div class="nav-mega-col"><div class="nav-mega-head">Content</div><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Workspace</div><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">✏️</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><div class="nav-mega-head" style="margin-top:.5rem">Reference</div><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a></div></div></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
-        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <div class="nav-group"><div class="nav-group-header"><a href="teachers.html" class="nav-link nav-group-link">Teach</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="teachers.html" class="nav-drop-item"><span class="ndi ndi-blue">🎓</span><span class="ndi-text"><b>Meet our teachers</b><span>Our expert tutors</span></span></a><a href="teacher-apply.html" class="nav-drop-item"><span class="ndi ndi-green">✏️</span><span class="ndi-text"><b>Teach with Us</b><span>Join our team</span></span></a></div></div>
+        <a href="/blog" class="nav-link">Blog</a>
         <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
       <div class="header-right"></div>
-  </div>
-</header>
+    </div>
+  </header>
+<!--NAV:END-->
+<div class="page-back-bar"><a href="dashboard.html" class="page-back-link">Dashboard</a></div>
 
 <!-- ============================================================
      PANEL 1: SETUP
@@ -173,6 +177,16 @@
           <div class="mcq-fp-info" id="mcq-fp-info"></div>
         </div>
       </div><!-- /mcq-mode-paper -->
+
+      <!-- View layout (shared between modes) -->
+      <div class="field">
+        <label class="field-label">&#x1F4CB; View layout</label>
+        <div class="pill-row" id="mcq-layout-seg">
+          <button type="button" class="pill filter-pill active" data-layout="card">&#x1F4CB; Card mode</button>
+          <button type="button" class="pill filter-pill" data-layout="paper">&#x1F4C4; Paper view</button>
+        </div>
+        <p class="mcq-layout-hint muted" id="mcq-layout-hint">One question at a time &mdash; timed, with keyboard shortcuts.</p>
+      </div>
 
       <!-- Time (shared between modes) -->
       <div class="field">
@@ -292,13 +306,48 @@
     <div class="mcq-question-card" id="mcq-question-card">
       <div class="mcq-q-ref" id="mcq-q-ref">&mdash;</div>
       <div class="mcq-q-topic-badge" id="mcq-q-topic"></div>
-      <div class="mcq-q-img-wrap">
+      <div class="mcq-q-img-wrap" id="mcq-q-img-wrap">
         <img id="mcq-q-img" src="" alt="Question image" class="mcq-q-img">
         <div id="mcq-q-img-spinner" class="mcq-q-spinner">Loading&hellip;</div>
         <div id="mcq-q-img-error" class="mcq-q-img-error" hidden>
           <span>&#x1F4F7; Preview unavailable</span>
           <p id="mcq-q-text-fallback" class="mcq-q-text-fallback"></p>
         </div>
+      </div>
+    </div>
+
+    <!-- Annotation toolbar (card view) -->
+    <div class="mcq-annot-bar" id="mcq-annot-bar">
+      <div class="pv-annot-group">
+        <button class="pv-annot-btn active" data-tool="select" title="Select (V)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l5 12 2-5 5-2L1 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="pv-annot-btn" data-tool="pen" title="Pen (P)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2.5l3 3M1.5 9.5l6-6 3 3-6 6H1.5v-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="pv-annot-btn" data-tool="highlighter" title="Highlighter (H)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 11v2h4v-2" stroke="currentColor" stroke-width="1.3"/></svg>
+        </button>
+        <button class="pv-annot-btn" data-tool="eraser" title="Eraser (E)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 13h7M2.5 9.5l5-7 4 3-5 7-4-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2.5 9.5l2.5 2" stroke="currentColor" stroke-width="1.3"/></svg>
+        </button>
+      </div>
+      <span class="pv-annot-sep"></span>
+      <div class="pv-annot-group mcq-annot-colors" id="mcq-annot-colors" hidden>
+        <button class="pv-color-dot active" data-color="#E8913A" style="--dot:#E8913A" title="Orange"></button>
+        <button class="pv-color-dot" data-color="#E53E3E" style="--dot:#E53E3E" title="Red"></button>
+        <button class="pv-color-dot" data-color="#3182CE" style="--dot:#3182CE" title="Blue"></button>
+        <button class="pv-color-dot" data-color="#38A169" style="--dot:#38A169" title="Green"></button>
+        <button class="pv-color-dot" data-color="#1A1A2E" style="--dot:#1A1A2E" title="Black"></button>
+      </div>
+      <div class="pv-annot-group mcq-eraser-opts" id="mcq-eraser-opts" hidden>
+        <button class="pv-eraser-mode active" data-erase="stroke" title="Erase whole stroke">Stroke</button>
+        <button class="pv-eraser-mode" data-erase="point" title="Erase where you touch">Point</button>
+      </div>
+      <span class="pv-annot-sep"></span>
+      <div class="pv-annot-group">
+        <button class="pv-annot-btn" id="mcq-annot-undo" title="Undo (Ctrl+Z)">&#x21B6;</button>
+        <button class="pv-annot-btn" id="mcq-annot-clear" title="Clear all">&#x1F5D1;</button>
       </div>
     </div>
 
@@ -399,6 +448,161 @@
   <!-- Question navigator — fixed bottom-right, built by JS -->
   <div class="mcq-q-nav" id="mcq-q-nav"></div>
 </main><!-- /session-panel -->
+
+<!-- ============================================================
+     PANEL 2b: PAPER VIEW
+     Split-pane layout: PDF viewer with annotation toolbar on the
+     left, rich answer panel with explanations on the right.
+     Divider is draggable.
+============================================================ -->
+<main id="paper-view-panel" class="mcq-paper-view-panel" hidden aria-label="MCQ Paper View">
+
+  <!-- Top bar -->
+  <div class="pv-bar">
+    <div class="pv-bar-left">
+      <button class="pv-bar-icon-btn pv-quit-btn" id="pv-quit-btn" title="End session" aria-label="End session">&#x2715;</button>
+      <span class="pv-subject-label" id="pv-subject-label"></span>
+    </div>
+    <div class="pv-bar-center">
+      <div class="pv-stat-pill" title="Answered"><span class="pv-stat-ico">&#x1F441;</span> <span id="pv-q-counter">0 / 0</span></div>
+      <div class="pv-stat-pill pv-stat-correct" title="Correct"><span class="pv-stat-ico">&#x2713;</span> Correct: <span id="pv-correct-count">0</span></div>
+      <div class="pv-stat-pill pv-stat-timer" title="Session timer">
+        <span class="pv-stat-ico">&#x23F1;</span>
+        <span id="pv-timer">00:00:00</span>
+        <button class="pv-timer-toggle" id="pv-timer-toggle" title="Start / Pause timer" aria-label="Toggle timer">&#x25B6;</button>
+      </div>
+      <div class="pv-stat-pill pv-stat-live" title="Live answer checking">
+        <span>Live Check</span>
+        <button class="pv-live-switch" id="pv-live-toggle" aria-pressed="true" role="switch">
+          <span class="pv-switch-track"><span class="pv-switch-thumb"></span></span>
+        </button>
+      </div>
+    </div>
+    <div class="pv-bar-right">
+      <div class="mcq-paper-time" id="pv-paper-time" hidden title="Booklet time remaining"></div>
+      <button class="pv-bar-icon-btn" id="pv-answers-toggle" title="Toggle answer panel" aria-label="Toggle answer panel" aria-pressed="true">&#x1F4CB; Answers</button>
+      <button class="pv-bar-icon-btn" id="pv-reset-btn" title="Reset all answers" aria-label="Reset answers">&#x21BA;</button>
+      <button class="pv-bar-icon-btn" id="pv-fullscreen-btn" title="Fullscreen" aria-label="Toggle fullscreen">&#x26F6;</button>
+      <button class="pv-bar-icon-btn pv-theme-btn" id="pv-theme-btn" title="Toggle theme (T)" aria-label="Toggle theme">
+        <span class="mcq-theme-ico mcq-theme-ico-dark" aria-hidden="true">&#x1F319;</span>
+        <span class="mcq-theme-ico mcq-theme-ico-light" aria-hidden="true">&#x2600;&#xFE0F;</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="mcq-progress-wrap"><div class="mcq-progress-fill" id="pv-progress-fill"></div></div>
+
+  <!-- Body: resizable split pane -->
+  <div class="pv-body" id="pv-body">
+
+    <!-- Left: PDF viewer with annotation canvas -->
+    <div class="pv-pdf-pane" id="pv-pdf-pane">
+      <div class="pv-pdf-container" id="pv-pdf-container">
+        <!-- PDF embed + annotation canvas injected by JS -->
+      </div>
+      <!-- Annotation toolbar -->
+      <div class="pv-annot-bar" id="pv-annot-bar">
+        <div class="pv-annot-group">
+          <button class="pv-annot-btn active" data-tool="select" title="Select (V)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l5 12 2-5 5-2L1 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="pv-annot-btn" data-tool="pen" title="Pen (P)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2.5l3 3M1.5 9.5l6-6 3 3-6 6H1.5v-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="pv-annot-btn" data-tool="highlighter" title="Highlighter (H)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 11v2h4v-2" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+          <button class="pv-annot-btn" data-tool="text" title="Text (T)">T</button>
+          <button class="pv-annot-btn" data-tool="eraser" title="Eraser (E)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 13h7M2.5 9.5l5-7 4 3-5 7-4-3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2.5 9.5l2.5 2" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+        <span class="pv-annot-sep"></span>
+        <div class="pv-annot-group pv-annot-colors" id="pv-annot-colors" hidden>
+          <button class="pv-color-dot active" data-color="#E8913A" style="--dot:#E8913A" title="Orange"></button>
+          <button class="pv-color-dot" data-color="#E53E3E" style="--dot:#E53E3E" title="Red"></button>
+          <button class="pv-color-dot" data-color="#3182CE" style="--dot:#3182CE" title="Blue"></button>
+          <button class="pv-color-dot" data-color="#38A169" style="--dot:#38A169" title="Green"></button>
+          <button class="pv-color-dot" data-color="#1A1A2E" style="--dot:#1A1A2E" title="Black"></button>
+        </div>
+        <div class="pv-annot-group pv-eraser-opts" id="pv-eraser-opts" hidden>
+          <button class="pv-eraser-mode active" data-erase="stroke" title="Erase whole stroke">Stroke</button>
+          <button class="pv-eraser-mode" data-erase="point" title="Erase where you touch">Point</button>
+          <button class="pv-eraser-mode" data-erase="all" title="Clear all annotations">Clear all</button>
+        </div>
+        <span class="pv-annot-sep pv-annot-sep-right"></span>
+        <div class="pv-annot-group">
+          <button class="pv-annot-btn" id="pv-annot-undo" title="Undo (Ctrl+Z)">&#x21B6;</button>
+          <button class="pv-annot-btn" id="pv-annot-clear" title="Clear all">&#x1F5D1;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Draggable resize handle -->
+    <div class="pv-resize-handle" id="pv-resize-handle" title="Drag to resize">
+      <div class="pv-resize-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- Right: Answer panel -->
+    <div class="pv-answer-pane" id="pv-answer-pane">
+      <div class="pv-ans-header">
+        <div class="pv-ans-header-row">
+          <span class="pv-ans-title">Answers</span>
+          <div class="pv-ans-actions">
+            <button class="pv-action-btn" id="pv-check-all-btn" hidden>&#x2713; Check all</button>
+            <button class="pv-action-btn pv-finish-btn" id="pv-finish-btn">Finish &#x2192;</button>
+          </div>
+        </div>
+      </div>
+      <div class="pv-ans-scroll" id="pv-ans-grid">
+        <!-- Question answer cards generated by JS -->
+      </div>
+      <div class="pv-ans-footer">
+        <button class="pv-nav-btn" id="pv-nav-prev" disabled>&#x2039; Prev</button>
+        <span class="pv-page-label" id="pv-page-label"></span>
+        <button class="pv-nav-btn pv-nav-next-btn" id="pv-nav-next">Next &#x203A;</button>
+      </div>
+    </div>
+
+  </div><!-- /pv-body -->
+
+  <!-- Explanation drawer overlay -->
+  <div class="pv-explain-overlay" id="pv-explain-overlay" hidden>
+    <div class="pv-explain-drawer" id="pv-explain-drawer">
+      <div class="pv-explain-header">
+        <button class="pv-explain-back" id="pv-explain-back" aria-label="Close explanation">&#x2190;</button>
+        <span class="pv-explain-title">Detailed Explanation</span>
+        <span class="pv-explain-qbadge" id="pv-explain-qbadge">Q1</span>
+        <span style="flex:1"></span>
+        <button class="pv-explain-icon-btn" id="pv-explain-refresh" title="Regenerate explanation">&#x21BA;</button>
+        <button class="pv-explain-icon-btn" id="pv-explain-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="pv-explain-body" id="pv-explain-body">
+        <div class="pv-explain-loading" id="pv-explain-loading">
+          <div class="mcq-shimmer-line"></div>
+          <div class="mcq-shimmer-line short"></div>
+          <div class="mcq-shimmer-line"></div>
+        </div>
+        <div class="pv-explain-content" id="pv-explain-content"></div>
+      </div>
+      <div class="pv-explain-footer">
+        <div class="pv-explain-feedback">
+          <span>Share feedback, earn points.</span>
+          <div class="pv-fb-btns">
+            <button class="pv-fb-btn" id="pv-fb-helpful">&#x1F44D; Helpful</button>
+            <button class="pv-fb-btn" id="pv-fb-unhelpful">&#x1F44E; Not helpful</button>
+          </div>
+        </div>
+        <div class="pv-followup-row">
+          <input type="text" class="pv-followup-input" id="pv-followup-input" placeholder="Ask a follow-up question&hellip;" autocomplete="off">
+          <button class="pv-followup-send" id="pv-followup-send" aria-label="Send follow-up" disabled>&#x27A4;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main><!-- /paper-view-panel -->
 
 <!-- Resume prompt — sibling of the session panel so it can render on boot,
      before any panel is ready. Shown only when a saved session is found. -->
@@ -616,7 +820,7 @@
 <script src="main.js?v=20260831a"></script>
 <script src="styled-dropdown.js?v=20260828a"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
-<script type="module" src="mcq-solver.js?v=20260813a"></script>
+<script type="module" src="mcq-solver.js?v=20260905b"></script>
 <script src="tools-core.js?v=20260811d"></script>
 <script src="tools-nav.js?v=20260811d"></script>
 <script src="tools-dock.js?v=20260810k"></script>

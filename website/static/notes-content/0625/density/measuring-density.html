@@ -1,0 +1,148 @@
+<h2 id="overview">Overview — what you need to measure</h2>
+
+<div class="note-key">
+  To find density you need two measurements: <strong>mass</strong> and <strong>volume</strong>.
+  <ul style="margin:.45rem 0 0 1.2rem;line-height:2">
+    <li><strong>Mass</strong> — always measured with a top-pan balance or beam balance.</li>
+    <li><strong>Volume</strong> — method depends on the shape of the object.</li>
+  </ul>
+  Then calculate: \( \rho = m / V \).
+</div>
+
+<h2 id="regular-solid">Regular solid (cuboid or cylinder)</h2>
+
+<div class="note-key">
+  <strong>Equipment:</strong> ruler (mm scale), vernier calipers for small objects, top-pan balance.<br>
+  <strong>Method:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Measure the three dimensions: length \( l \), width \( w \), height \( h \) (or diameter and height for a cylinder). Take each measurement at least twice and average.</li>
+    <li>Calculate volume: cuboid \( V = l \times w \times h \); cylinder \( V = \pi r^2 h \).</li>
+    <li>Measure the mass on a balance.</li>
+    <li>Calculate: \( \rho = m / V \).</li>
+  </ol>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — density of a cuboid block</summary>
+  <div>
+    <p>A wooden block measures 5.0 cm × 4.0 cm × 2.0 cm. Its mass is 28 g.</p>
+    <p>Volume: \( V = 5.0 \times 4.0 \times 2.0 = 40\,\text{cm}^3 \)</p>
+    <p>Density: \( \rho = \dfrac{28}{40} = 0.70\,\text{g/cm}^3 \)</p>
+    <p>Since \( 0.70 < 1.00 \) (water), the block will float.</p>
+  </div>
+</details>
+
+<h2 id="irregular-solid">Irregular solid (displacement method)</h2>
+
+<div class="note-key">
+  An irregular solid has a shape that cannot be calculated mathematically, so its volume is found using <strong>water displacement</strong>.
+</div>
+
+<div class="note-key">
+  <strong>Method A — measuring cylinder:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Part-fill a measuring cylinder with water. Record the initial volume \( V_1 \).</li>
+    <li>Carefully lower the solid into the cylinder on a thread (to avoid splashing).</li>
+    <li>Record the new volume \( V_2 \).</li>
+    <li>Volume of solid: \( V = V_2 - V_1 \).</li>
+    <li>Measure mass on a balance. Calculate \( \rho = m / V \).</li>
+  </ol>
+  <br>
+  <strong>Method B — eureka (displacement) can:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Fill the eureka can to the spout. Place an empty measuring cylinder under the spout.</li>
+    <li>Lower the solid into the can; it displaces water which flows out of the spout.</li>
+    <li>Collect the displaced water and read its volume — this equals the volume of the solid.</li>
+    <li>Measure mass on a balance. Calculate \( \rho = m / V \).</li>
+  </ol>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Displacement method. Left: measuring cylinder, water level rises from V₁ to V₂ when solid is submerged. Right: eureka can, displaced water flows into measuring cylinder.">
+  <div style="padding:.8rem 0;display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap">
+    <!-- Measuring cylinder -->
+    <svg viewBox="0 0 80 160" width="80" height="160" aria-label="Measuring cylinder">
+      <rect x="25" y="10" width="30" height="140" rx="3" fill="none" stroke="#5A5A72" stroke-width="1.5"/>
+      <!-- water fill initial -->
+      <rect x="26" y="90" width="28" height="59" fill="rgba(29,78,216,.15)"/>
+      <!-- water fill after -->
+      <rect x="26" y="70" width="28" height="79" fill="rgba(29,78,216,.25)"/>
+      <!-- solid submerged -->
+      <ellipse cx="40" cy="80" rx="9" ry="6" fill="#4C2E72" opacity=".7"/>
+      <!-- labels -->
+      <line x1="10" y1="90" x2="25" y2="90" stroke="#94A3B8" stroke-width="1"/>
+      <text x="8" y="93" font-size="8" fill="#5A5A72" text-anchor="end">V₁</text>
+      <line x1="10" y1="70" x2="25" y2="70" stroke="#E8913A" stroke-width="1"/>
+      <text x="8" y="73" font-size="8" fill="#E8913A" text-anchor="end">V₂</text>
+      <!-- scale marks -->
+      <line x1="55" y1="70" x2="58" y2="70" stroke="#5A5A72" stroke-width="1"/>
+      <line x1="55" y1="90" x2="58" y2="90" stroke="#5A5A72" stroke-width="1"/>
+    </svg>
+    <!-- Eureka can -->
+    <svg viewBox="0 0 110 160" width="110" height="160" aria-label="Eureka can">
+      <!-- can body -->
+      <rect x="5" y="30" width="60" height="90" rx="4" fill="none" stroke="#5A5A72" stroke-width="1.5"/>
+      <!-- water in can -->
+      <rect x="6" y="50" width="58" height="69" fill="rgba(29,78,216,.18)"/>
+      <!-- spout -->
+      <line x1="65" y1="50" x2="85" y2="50" stroke="#5A5A72" stroke-width="2"/>
+      <line x1="85" y1="50" x2="85" y2="75" stroke="#5A5A72" stroke-width="2"/>
+      <!-- solid dropped in -->
+      <ellipse cx="35" cy="65" rx="12" ry="9" fill="#4C2E72" opacity=".7"/>
+      <text x="35" y="69" font-size="7" fill="#fff" text-anchor="middle" font-weight="700">solid</text>
+      <!-- displaced water drops -->
+      <line x1="85" y1="75" x2="85" y2="82" stroke="rgba(29,78,216,.6)" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <!-- collecting cylinder -->
+      <rect x="75" y="82" width="28" height="55" rx="2" fill="none" stroke="#5A5A72" stroke-width="1.2"/>
+      <rect x="76" y="105" width="26" height="31" fill="rgba(29,78,216,.3)"/>
+      <text x="89" y="98" font-size="7" fill="#5A5A72" text-anchor="middle">collecting</text>
+      <text x="89" y="107" font-size="7" fill="#5A5A72" text-anchor="middle">cylinder</text>
+    </svg>
+  </div>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — density of an irregular pebble</summary>
+  <div>
+    <p>A pebble has mass 126 g. It is placed in a measuring cylinder: water level rises from 40 cm³ to 87 cm³.</p>
+    <p>Volume of pebble: \( V = 87 - 40 = 47\,\text{cm}^3 \)</p>
+    <p>Density: \( \rho = \dfrac{126}{47} = 2.68\,\text{g/cm}^3 \approx 2.7\,\text{g/cm}^3 \)</p>
+    <p>This is consistent with the density of granite or quartz.</p>
+  </div>
+</details>
+
+<h2 id="liquid">Density of a liquid</h2>
+
+<div class="note-key">
+  <strong>Equipment:</strong> measuring cylinder, top-pan balance.<br>
+  <strong>Method:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Measure the mass of an <em>empty</em> measuring cylinder: \( m_1 \).</li>
+    <li>Pour a known volume \( V \) of the liquid into the cylinder (read at the bottom of the meniscus, at eye level).</li>
+    <li>Measure the mass of the cylinder + liquid: \( m_2 \).</li>
+    <li>Mass of liquid: \( m = m_2 - m_1 \).</li>
+    <li>Calculate: \( \rho = m / V \).</li>
+  </ol>
+</div>
+
+<div class="note-tip">
+  Always read the meniscus at eye level and from the bottom of the curve. A parallax error (reading from above or below) gives the wrong volume and therefore the wrong density.
+</div>
+
+<h2 id="errors">Sources of error and how to reduce them</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>Error</th><th>How to reduce it</th></tr></thead>
+    <tbody>
+      <tr><td>Parallax when reading the ruler or measuring cylinder</td><td>Read at eye level; ensure eye is level with the scale marking</td></tr>
+      <tr><td>Air bubbles trapped on the irregular solid in the cylinder</td><td>Gently tap the cylinder; use a thread to fully submerge the solid</td></tr>
+      <tr><td>Water droplets remaining in the eureka can spout</td><td>Wait until dripping stops before reading the collected volume</td></tr>
+      <tr><td>Surface tension making the meniscus hard to read</td><td>Read the bottom of the meniscus for water; add one drop of detergent to reduce surface tension if needed</td></tr>
+      <tr><td>Balance not zeroed (tared)</td><td>Zero (tare) the balance before measuring; place the balance on a level surface</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-warn">
+  For the displacement method, the solid <em>must be fully submerged</em> and <em>must not dissolve</em> in the liquid. If the solid dissolves in water, use a different liquid (e.g. oil) or coat the solid with a thin layer of wax.
+</div>

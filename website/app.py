@@ -24,6 +24,13 @@ import smtplib
 import subprocess
 import sys
 import tempfile
+
+# When gunicorn loads this as website.app:app from the project root, the
+# website/ directory is not on sys.path, so sibling modules (db, auth,
+# users_db, …) need it to be added explicitly.
+_website_dir = os.path.dirname(os.path.abspath(__file__))
+if _website_dir not in sys.path:
+    sys.path.insert(0, _website_dir)
 import threading
 import time
 import zipfile
@@ -46,7 +53,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / "data" / "index.db"
 
 # ── Dual-mode DB: psycopg2 (Supabase) or SQLite ────────────────────────────
-from . import db as _db
+import db as _db
 _USE_PG = _db.USE_PG
 
 def _con():
@@ -82,8 +89,8 @@ PAPER_LABELS = {
 
 app = FastAPI(title="PrepWithTee")
 
-from . import admin as _admin_mod, auth as _auth_mod, users as _users_mod, access as _access_mod, teacher as _teacher_mod, blog as _blog_mod, flashcards as _fc_mod
-from .auth import get_current_user as _get_current_user
+import admin as _admin_mod, auth as _auth_mod, users as _users_mod, access as _access_mod, teacher as _teacher_mod, blog as _blog_mod, flashcards as _fc_mod
+from auth import get_current_user as _get_current_user
 from fastapi import Depends as _Depends
 app.include_router(_auth_mod.router)
 app.include_router(_users_mod.router)
@@ -99,14 +106,14 @@ from fastapi import HTTPException as _HTTPException
 @app.get("/api/courses")
 def public_courses():
     """Published courses for the public course page and pricing catalog."""
-    from . import users_db as _udb
+    import users_db as _udb
     return {"courses": _udb.get_all_courses(published_only=True)}
 
 
 @app.get("/api/courses/{slug}")
 def public_course(slug: str):
     """Single published course by slug — powers /course.html."""
-    from . import users_db as _udb
+    import users_db as _udb
     course = _udb.get_course_by_slug(slug)
     if course is None or not course.get("published"):
         raise _HTTPException(404, "Course not found or not published")
@@ -543,6 +550,187 @@ def mcq_questions(req: MCQSessionReq):
         "seed": seed,
         "has_answers": any(q["has_answer"] for q in questions),
     }
+
+
+# ── MCQ PDF stitch ─────────────────────────────────────────────────────────────
+
+class MCQPreviewPdfReq(BaseModel):
+    question_ids: list[int]
+
+    @field_validator("question_ids")
+    @classmethod
+    def _check_ids(cls, v: list[int]) -> list[int]:
+        if not v:
+            raise ValueError("at least one question id required")
+        if len(v) > 200:
+            raise ValueError("max 200 questions")
+        return v
+
+
+@app.post("/api/mcq/preview-pdf")
+def mcq_preview_pdf(req: MCQPreviewPdfReq):
+    """Build an A4-layout exam-style PDF with branding, watermark, and headers.
+
+    Uses the same Booklet-style layout as compose.py: each question gets a
+    Q1/Q2/... header, pages carry the PrepWithTee watermark, and a footer
+    with page number and brand name.
+    """
+    import fitz
+
+    PAGE_W, PAGE_H = 595.28, 841.89
+    MARGIN_X = 24.0
+    TOP_Y = 40.0
+    BOTTOM_Y = PAGE_H - 40.0
+    CONTENT_W = PAGE_W - 2 * MARGIN_X
+    Q_HEADER_H = 18.0
+    DIVIDER_GAP = 14.0
+    ACCENT = (0.161, 0.208, 0.329)
+    GREY = (0.35, 0.35, 0.35)
+    GOLD = (0.957, 0.651, 0.196)
+    BRAND = "PrepWithTee"
+    WM_STRENGTH = 0.12
+    WM_TEXT_GREY = 0.92
+    LOGO_PATH = ROOT / "website" / "static" / "prepwithtee-logo.png"
+    LOGO_OWL_CLIP = (414, 252, 786, 834)
+
+    _wm_cache = getattr(mcq_preview_pdf, "_wm_cache", {})
+    mcq_preview_pdf._wm_cache = _wm_cache
+
+    def _watermark(pg):
+        if LOGO_PATH.exists():
+            if "owl" not in _wm_cache:
+                clip = fitz.IRect(*LOGO_OWL_CLIP)
+                src = fitz.Pixmap(str(LOGO_PATH))
+                rgb = fitz.Pixmap(fitz.csRGB, clip, False)
+                rgb.copy(src, clip)
+                gray = fitz.Pixmap(fitz.csGRAY, rgb)
+                faint = bytes(
+                    255 if s >= 200 else 255 - int(WM_STRENGTH * (255 - s))
+                    for s in gray.samples)
+                _wm_cache["owl"] = fitz.Pixmap(fitz.csGRAY, gray.w, gray.h, faint, 0)
+            pix = _wm_cache["owl"]
+            h = 300.0
+            w = h * pix.width / pix.height
+            r = fitz.Rect((PAGE_W - w) / 2, (PAGE_H - h) / 2 - 26,
+                          (PAGE_W + w) / 2, (PAGE_H + h) / 2 - 26)
+            pg.insert_image(r, pixmap=pix)
+            ty = r.y1 + 40
+        else:
+            ty = PAGE_H / 2
+        fs = 30
+        tw = fitz.get_text_length(BRAND, fontname="hebo", fontsize=fs)
+        pg.insert_text(((PAGE_W - tw) / 2, ty), BRAND, fontsize=fs,
+                       fontname="hebo",
+                       color=(WM_TEXT_GREY, WM_TEXT_GREY, WM_TEXT_GREY))
+
+    keys = _question_keys(req.question_ids)
+    pdf_out = fitz.open()
+    missing = 0
+    q_num = 0
+    page = None
+    y = TOP_Y
+    body_pages = 0
+
+    def new_page():
+        nonlocal page, y, body_pages
+        page = pdf_out.new_page(width=PAGE_W, height=PAGE_H)
+        body_pages += 1
+        _watermark(page)
+        page.insert_text(
+            (MARGIN_X, PAGE_H - 22), BRAND,
+            fontsize=7.5, fontname="hebo", color=ACCENT)
+        num = f"Page {body_pages}"
+        w = fitz.get_text_length(num, fontname="helv", fontsize=7)
+        page.insert_text(
+            ((PAGE_W - w) / 2, PAGE_H - 22), num,
+            fontsize=7, fontname="helv", color=GREY)
+        y = TOP_Y
+
+    def ensure(height):
+        nonlocal page, y
+        if page is None or y + height > BOTTOM_Y:
+            new_page()
+
+    for qid in req.question_ids:
+        q_key = keys.get(qid)
+        files = _crop_files_for_key(q_key) if q_key else None
+        if not files:
+            missing += 1
+            q_num += 1
+            continue
+        _, crop_path = files
+        if crop_path is None or not crop_path.exists():
+            missing += 1
+            q_num += 1
+            continue
+        try:
+            with fitz.open(str(crop_path)) as crop_doc:
+                crop_pages = crop_doc.page_count
+                if crop_pages == 0:
+                    missing += 1
+                    q_num += 1
+                    continue
+                q_num += 1
+
+                first_crop = crop_doc[0]
+                first_h = first_crop.rect.height * (CONTENT_W / first_crop.rect.width)
+
+                if q_num > 1 and page is not None and y + DIVIDER_GAP < BOTTOM_Y:
+                    mid = y + DIVIDER_GAP / 2
+                    page.draw_line(
+                        fitz.Point(MARGIN_X, mid),
+                        fitz.Point(PAGE_W - MARGIN_X, mid),
+                        color=(0.75, 0.75, 0.75), width=0.5)
+                    y += DIVIDER_GAP
+
+                max_keep = BOTTOM_Y - TOP_Y - Q_HEADER_H
+                ensure(Q_HEADER_H + min(first_h, max_keep))
+
+                label = f"Q{q_num}"
+                bar_w = 4.0
+                page.draw_rect(
+                    fitz.Rect(MARGIN_X, y + 2, MARGIN_X + bar_w, y + Q_HEADER_H - 2),
+                    color=None, fill=ACCENT)
+                lx = MARGIN_X + bar_w + 6
+                page.insert_text((lx, y + 11), label,
+                                 fontsize=12, fontname="hebo", color=ACCENT)
+                x = lx + fitz.get_text_length(label, fontname="hebo", fontsize=12)
+                ref_str = (q_key or "").replace("_", "/") if q_key else ""
+                if ref_str:
+                    page.insert_text((x + 8, y + 10), ref_str,
+                                     fontsize=8.5, fontname="helv", color=GREY)
+                rule_y = y + Q_HEADER_H - 1
+                page.draw_line(
+                    fitz.Point(MARGIN_X, rule_y),
+                    fitz.Point(PAGE_W - MARGIN_X, rule_y),
+                    color=GOLD, width=0.6)
+                y += Q_HEADER_H
+
+                for pg_idx in range(crop_pages):
+                    cp = crop_doc[pg_idx]
+                    scale = CONTENT_W / cp.rect.width
+                    h = cp.rect.height * scale
+                    ensure(h)
+                    target = fitz.Rect(MARGIN_X, y, MARGIN_X + CONTENT_W, y + h)
+                    page.show_pdf_page(target, crop_doc, pg_idx)
+                    y += h + 4
+
+        except Exception:
+            missing += 1
+            q_num += 1
+
+    if pdf_out.page_count == 0:
+        pdf_out.close()
+        raise HTTPException(404, "no crop PDFs found for these questions")
+
+    pdf_bytes = pdf_out.tobytes(garbage=3, deflate=True)
+    pdf_out.close()
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"X-Missing-Crops": str(missing)},
+    )
 
 
 # ── MCQ AI explanation ─────────────────────────────────────────────────────────
@@ -1067,7 +1255,7 @@ def _report_question_rows(qids: list[int]) -> dict[int, dict]:
 
 def _report_worker(job_dir: Path, req: MCQReportReq):
     """Build one review PDF. Runs in a plain thread; owns all its own errors."""
-    from . import mcq_report
+    import mcq_report
 
     try:
         meta = _report_question_rows([i.question_id for i in req.items])
@@ -1398,7 +1586,7 @@ def _meta_refresh_async():
 
 @app.get("/api/stats")
 def get_stats(user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     stats = _udb.get_user_stats(user["id"])
     if stats is None:
         return {"xp_total": 0, "xp_log": [], "streak": 0,
@@ -1434,7 +1622,7 @@ class _StatsPayload(BaseModel):
 
 @app.post("/api/stats")
 def post_stats(payload: _StatsPayload, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     _udb.upsert_user_stats(user["id"], payload.dict())
     return {"ok": True}
 
@@ -1496,7 +1684,7 @@ def _warm_meta_cache():
     # first student to load a dashboard does not pay eight TLS handshakes.
     def warm_db():
         try:
-            from . import users_db as _udb
+            import users_db as _udb
             _udb.warm_pool()
         except Exception as exc:
             print(f"[db] pool warm-up failed: {exc}", flush=True)
@@ -2890,14 +3078,14 @@ class FeedbackReq(BaseModel):
 
 @app.get("/api/tutor/sessions")
 def get_tutor_sessions(user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     sessions = _udb.list_tutor_sessions(user["id"])
     return {"sessions": sessions}
 
 
 @app.get("/api/tutor/sessions/{session_id}")
 def get_tutor_session_details(session_id: str, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     session = _udb.get_tutor_session(session_id, user["id"])
     if not session:
         raise _HTTPException(404, "Session not found")
@@ -2906,7 +3094,7 @@ def get_tutor_session_details(session_id: str, user: dict = _Depends(_get_curren
 
 @app.post("/api/tutor/sessions/{session_id}/title")
 def rename_tutor_session(session_id: str, req: RenameSessionReq, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     ok = _udb.rename_tutor_session(session_id, user["id"], req.title)
     if not ok:
         raise _HTTPException(404, "Session not found")
@@ -2915,7 +3103,7 @@ def rename_tutor_session(session_id: str, req: RenameSessionReq, user: dict = _D
 
 @app.patch("/api/tutor/sessions/{session_id}")
 def pin_tutor_session(session_id: str, req: PinSessionReq, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     ok = _udb.pin_tutor_session(session_id, user["id"], req.pinned)
     if not ok:
         raise _HTTPException(404, "Session not found")
@@ -2924,7 +3112,7 @@ def pin_tutor_session(session_id: str, req: PinSessionReq, user: dict = _Depends
 
 @app.delete("/api/tutor/sessions/{session_id}")
 def delete_tutor_session(session_id: str, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     ok = _udb.delete_tutor_session(session_id, user["id"])
     if not ok:
         raise _HTTPException(404, "Session not found")
@@ -2933,7 +3121,7 @@ def delete_tutor_session(session_id: str, user: dict = _Depends(_get_current_use
 
 @app.post("/api/tutor/messages/{message_id}/feedback")
 def set_tutor_message_feedback(message_id: str, req: FeedbackReq, user: dict = _Depends(_get_current_user)):
-    from . import users_db as _udb
+    import users_db as _udb
     ok = _udb.set_message_feedback(message_id, req.feedback)
     if not ok:
         raise _HTTPException(404, "Message not found")
@@ -2944,14 +3132,14 @@ def set_tutor_message_feedback(message_id: str, req: FeedbackReq, user: dict = _
 def ask(req: AskReq, request: Request):
     """Chat: generate practice questions or explain a concept (non-streaming fallback)."""
     import uuid
-    from . import users_db as _udb
+    import users_db as _udb
     
     user = _auth_mod.maybe_user(request.cookies.get("session"))
     session_id = req.session_id
     new_session_created = False
     
     if user:
-        from .access import check_quota
+        from access import check_quota
         check_quota(user, "ai_tutor")
         if not session_id:
             session_id = str(uuid.uuid4())
@@ -3102,14 +3290,14 @@ def ask(req: AskReq, request: Request):
 def tutor_stream(req: AskReq, request: Request):
     """Chat: generate practice questions or explain a concept with streaming response (SSE)."""
     import uuid
-    from . import users_db as _udb
+    import users_db as _udb
     
     user = _auth_mod.maybe_user(request.cookies.get("session"))
     session_id = req.session_id
     new_session_created = False
     
     if user:
-        from .access import check_quota
+        from access import check_quota
         check_quota(user, "ai_tutor")
         existing_session = _udb.get_tutor_session(session_id, user["id"]) if session_id else None
         if not existing_session:
@@ -3384,7 +3572,7 @@ class DemoBookingReq(BaseModel):
 
 @app.post("/api/demo")
 def book_demo(req: DemoBookingReq):
-    from . import users_db as _udb
+    import users_db as _udb
     _udb.save_lead({
         "parent_name": req.parent_name,
         "student_name": req.student_name,
@@ -3696,7 +3884,7 @@ def submit_feedback(req: FeedbackReq):
     if req.rating is not None and not (1 <= req.rating <= 5):
         raise HTTPException(400, "Rating must be 1–5")
 
-    from . import users_db as _udb
+    import users_db as _udb
     fb_type = req.type or "feedback"
     _udb.save_feedback({
         "rating": req.rating,
@@ -3735,7 +3923,7 @@ def subject_request(req: SubjectRequestReq):
     if len(subj) > 200:
         raise HTTPException(400, "Subject name too long")
 
-    from . import users_db as _udb
+    import users_db as _udb
     _udb.save_subject_request({
         "subject": subj,
         "board": (req.board or "").strip() or None,
@@ -3906,18 +4094,25 @@ _PUBLIC_PATHS = [
     "/", "/subjects.html", "/papers.html", "/resources.html",
     "/pricing.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/blog",
-    # Tool pages (each has a distinct meta description and real student value)
+    # Study tools — each has a distinct meta description and real student value
     "/mcq-solver.html", "/formulas.html", "/definitions.html",
     "/command-words.html", "/calculator.html", "/periodic-table.html",
     "/bases-logic.html", "/pseudocode.html", "/graph.html",
-    "/walkthrough.html",
+    "/grade-calculator.html", "/grade-trends.html", "/graphs-guide.html",
+    "/islamiat-references.html",
 ]
 _NOINDEX_PATHS = {
     "/admin.html", "/dashboard.html", "/login.html", "/profile.html",
     "/teacher-dashboard.html", "/parent-dashboard.html",
     "/messages.html", "/homework.html", "/set-password.html",
+    "/reset-password.html", "/forgot-password.html",
+    "/study.html", "/study-hub.html", "/quiz.html",
+    "/flashcards.html", "/fc-progress.html",
+    "/topical-progress.html", "/yearly-progress.html",
+    "/achievements.html", "/notes.html", "/notes-view.html",
+    "/analytics.html", "/calendar.html",
     # Redirect stubs — no content, should never be indexed
-    "/library.html", "/ask.html",
+    "/library.html", "/revise.html", "/ask.html", "/walkthrough.html",
 }
 
 
@@ -3935,14 +4130,26 @@ def robots_txt():
 @app.get("/sitemap.xml", include_in_schema=False)
 def sitemap_xml():
     origin = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-    # Priority hints: homepage highest, tools and blog medium, others standard
-    _priority = {"/": "1.0", "/blog": "0.9", "/pricing.html": "0.9",
-                 "/subjects.html": "0.8", "/papers.html": "0.8",
-                 "/teachers.html": "0.8", "/resources.html": "0.7"}
+    # Priority hints: homepage highest, topical papers second, then by traffic value
+    _priority = {
+        "/": "1.0",
+        "/papers.html": "0.95",
+        "/subjects.html": "0.90",
+        "/resources.html": "0.85",
+        "/mcq-solver.html": "0.85",
+        "/pricing.html": "0.80",
+        "/tools.html": "0.80",
+        "/formulas.html": "0.80",
+        "/blog": "0.80",
+        "/teachers.html": "0.75",
+        "/definitions.html": "0.75",
+        "/grade-calculator.html": "0.70",
+        "/grade-trends.html": "0.70",
+    }
     entries = []
     for p in _PUBLIC_PATHS:
-        pri = _priority.get(p, "0.6")
-        freq = "weekly" if p in ("/", "/blog", "/pricing.html") else "monthly"
+        pri = _priority.get(p, "0.60")
+        freq = "weekly" if p in ("/", "/papers.html", "/blog", "/resources.html") else "monthly"
         entries.append(
             f"  <url><loc>{origin}{p}</loc>"
             f"<changefreq>{freq}</changefreq>"
@@ -3961,7 +4168,7 @@ def sitemap_xml():
         pass
     # Add published course pages
     try:
-        from . import users_db as _udb
+        import users_db as _udb
         for course in _udb.get_all_courses(published_only=True):
             slug = course.get("slug")
             if slug:
@@ -4050,7 +4257,7 @@ def quiz_eval_stream(req: QuizEvalReq, request: Request):
     """AI evaluation of a student's typed answer. Streams SSE."""
     user = _auth_mod.maybe_user(request.cookies.get("session"))
     if user:
-        from .access import check_quota
+        from access import check_quota
         check_quota(user, "ai_tutor")
     else:
         client_ip = _client_ip(request)

@@ -18,12 +18,12 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
-from . import db as _db
+import db as _db
 
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260822a"  # keep in sync with styles.css version pin
+_CSS_V = "20260907a"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -168,8 +168,14 @@ def _fmt_date(s) -> str:
         return str(s)[:10]
 
 
-def _nav() -> str:
-    return """<header class="site-header">
+# The site navbar is a single shared partial (website/partials/nav.html), stamped
+# into every static page by sync_nav.py. Blog pages are server-rendered, so we read
+# the same partial here — one source of truth for the whole site. Page-relative
+# links/images are rewritten to absolute so they still resolve under /blog/<slug>.
+_NAV_PARTIAL = Path(__file__).resolve().parent / "partials" / "nav.html"
+_NAV_HTML: str | None = None
+
+_NAV_FALLBACK = """<header class="site-header">
   <div class="container header-row">
     <a class="brand" href="/">
       <img src="/logo.png" alt="PrepWithTee owl logo">
@@ -185,6 +191,21 @@ def _nav() -> str:
     </nav>
   </div>
 </header>"""
+
+
+def _nav() -> str:
+    global _NAV_HTML
+    if _NAV_HTML is None:
+        try:
+            raw = _NAV_PARTIAL.read_text(encoding="utf-8")
+            # href/src that are page-relative (not absolute, protocol, #, mailto,
+            # tel or data) → absolute, so they work on /blog and /blog/<slug>.
+            _NAV_HTML = re.sub(
+                r'(href|src)="(?!https?:|//|/|#|mailto:|tel:|data:)',
+                r'\1="/', raw)
+        except OSError:
+            _NAV_HTML = _NAV_FALLBACK
+    return _NAV_HTML
 
 
 def _foot() -> str:
@@ -212,48 +233,92 @@ def _foot() -> str:
 
 
 _BLOG_CSS = """
+/* Theme-aware tokens (styles.css defines --gold, not these) so the blog matches
+   the site in both light and dark. */
+:root{--bl-head:#1a1a2e;--bl-muted:#6b6b7b;--bl-border:#e7e0d2;--bl-surface:#ffffff;
+      --bl-code:#f3f0e8;--bl-shadow:rgba(46,27,74,.12);--bl-goldwash:rgba(232,145,58,.12)}
+html[data-theme="dark"]{--bl-head:#ece7f5;--bl-muted:#a49dba;--bl-border:#2a2340;
+      --bl-surface:#1b1733;--bl-code:#241f38;--bl-shadow:rgba(0,0,0,.45);
+      --bl-goldwash:rgba(245,158,11,.14)}
+
 .bwrap{max-width:780px;margin:0 auto;padding:2.5rem 1.25rem 5rem}
-.blist{display:grid;gap:1.75rem;margin-top:2.5rem}
-.bcard{border:1px solid var(--border,#e5e7eb);border-radius:14px;overflow:hidden;
-       transition:box-shadow .15s;text-decoration:none;color:inherit;display:block}
-.bcard:hover{box-shadow:0 4px 24px rgba(0,0,0,.1)}
-.bcard img{width:100%;aspect-ratio:16/7;object-fit:cover;display:block}
-.bcbd{padding:1.4rem}
-.bcmeta{font-size:.78rem;color:var(--muted,#6b7280);margin:0 0 .4rem}
-.bctitle{font-size:1.2rem;font-weight:700;line-height:1.3;margin:0 0 .5rem;
-         color:var(--heading,#111827)}
-.bcex{color:var(--muted,#6b7280);font-size:.875rem;line-height:1.6;margin:0 0 .9rem}
-.bclink{font-weight:600;font-size:.82rem;color:var(--gold,#c9a227)}
-.phd{margin-bottom:2.25rem;border-bottom:1px solid var(--border,#e5e7eb);padding-bottom:1.5rem}
-.peye{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;
-      color:var(--muted,#6b7280);margin:0 0 .6rem}
-.ptitle{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;line-height:1.2;margin:0 0 .9rem}
-.pmeta{font-size:.82rem;color:var(--muted,#6b7280);margin:0}
+.bwrap-wide{max-width:1140px}
+
+/* hero */
+.bhero{text-align:center;max-width:660px;margin:0 auto 1rem}
+.beyebrow{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;
+          text-transform:uppercase;letter-spacing:.09em;color:var(--gold,#E8913A);
+          background:var(--bl-goldwash);padding:.42rem .85rem;border-radius:999px;margin:0 0 1.1rem}
+.bhtitle{font-family:'Playfair Display',Georgia,serif;font-size:clamp(2rem,5vw,3rem);
+         font-weight:800;line-height:1.12;margin:0 0 .85rem;color:var(--bl-head)}
+.bhsub{color:var(--bl-muted);font-size:1.05rem;line-height:1.65;margin:0 auto;max-width:560px}
+.bhrule{width:56px;height:3px;background:var(--gold,#E8913A);border:none;border-radius:2px;
+        margin:1.6rem auto 0}
+
+/* cards grid */
+.blist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+       gap:1.6rem;margin-top:2.75rem}
+.bcard{border:1px solid var(--bl-border);border-radius:16px;overflow:hidden;
+       transition:transform .16s ease,box-shadow .16s ease;text-decoration:none;color:inherit;
+       display:flex;flex-direction:column;background:var(--bl-surface)}
+.bcard:hover{transform:translateY(-4px);box-shadow:0 14px 34px var(--bl-shadow)}
+.bcard-cover{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.bcard-ph{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+          background:linear-gradient(135deg,#2E1B4A 0%,#4A2E8F 100%);font-size:2.6rem}
+.bcbd{padding:1.35rem 1.4rem 1.5rem;display:flex;flex-direction:column;flex:1}
+.bcmeta{font-size:.72rem;color:var(--bl-muted);margin:0 0 .5rem;
+        text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.bctitle{font-size:1.18rem;font-weight:700;line-height:1.32;margin:0 0 .55rem;color:var(--bl-head)}
+.bcex{color:var(--bl-muted);font-size:.9rem;line-height:1.6;margin:0 0 1.1rem}
+.bclink{margin-top:auto;font-weight:700;font-size:.82rem;color:var(--gold,#E8913A)}
+
+/* empty state */
+.bempty{max-width:580px;margin:1rem auto 0;text-align:center;
+        border:1px solid var(--bl-border);border-radius:22px;padding:3.2rem 2rem;
+        background:var(--bl-surface);box-shadow:0 10px 40px var(--bl-shadow)}
+.bempty-ico{font-size:3rem;line-height:1;margin-bottom:.7rem}
+.bempty h2{font-size:1.45rem;font-weight:800;margin:0 0 .7rem;color:var(--bl-head)}
+.bempty p{color:var(--bl-muted);line-height:1.65;margin:0 auto 1.7rem;max-width:440px}
+.bempty-links{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center}
+.bempty-links a{text-decoration:none;font-weight:600;font-size:.875rem;padding:.62rem 1.15rem;
+                border-radius:11px;border:1px solid var(--bl-border);color:var(--bl-head);
+                transition:background .15s,border-color .15s,transform .15s}
+.bempty-links a:hover{border-color:var(--gold,#E8913A);background:var(--bl-goldwash);transform:translateY(-2px)}
+.bempty-links a.primary{background:#2E1B4A;color:#fff;border-color:#2E1B4A}
+.bempty-links a.primary:hover{background:#3D2560;border-color:#3D2560}
+
+/* single post */
+.phd{margin-bottom:2.25rem;border-bottom:1px solid var(--bl-border);padding-bottom:1.5rem}
+.peye{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--bl-muted);margin:0 0 .6rem}
+.ptitle{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.9rem,4.5vw,2.6rem);
+        font-weight:800;line-height:1.16;margin:0 0 .9rem;color:var(--bl-head)}
+.pmeta{font-size:.82rem;color:var(--bl-muted);margin:0}
 .pcover{width:100%;border-radius:12px;margin-bottom:2rem}
-.pbody{line-height:1.85;font-size:1.03rem}
-.pbody h2{font-size:1.45rem;font-weight:700;margin:2.25rem 0 .65rem}
-.pbody h3{font-size:1.15rem;font-weight:700;margin:1.75rem 0 .45rem}
+.pbody{line-height:1.85;font-size:1.05rem}
+.pbody h2{font-size:1.5rem;font-weight:700;margin:2.25rem 0 .65rem;color:var(--bl-head)}
+.pbody h3{font-size:1.18rem;font-weight:700;margin:1.75rem 0 .45rem;color:var(--bl-head)}
 .pbody p{margin:0 0 1.2rem}
 .pbody ul,.pbody ol{margin:0 0 1.2rem;padding-left:1.5rem}
 .pbody li{margin-bottom:.35rem}
-.pbody blockquote{border-left:3px solid var(--gold,#c9a227);padding:.5rem 1rem;
-                  margin:1.5rem 0;color:var(--muted,#6b7280);font-style:italic}
-.pbody code{background:var(--surface2,#f3f4f6);padding:.15em .35em;
-            border-radius:4px;font-size:.87em;font-family:monospace}
-.pbody pre{background:var(--surface2,#f3f4f6);padding:1rem 1.25rem;
+.pbody blockquote{border-left:3px solid var(--gold,#E8913A);padding:.5rem 1rem;
+                  margin:1.5rem 0;color:var(--bl-muted);font-style:italic}
+.pbody code{background:var(--bl-code);padding:.15em .35em;
+            border-radius:4px;font-size:.87em;font-family:ui-monospace,Menlo,monospace}
+.pbody pre{background:var(--bl-code);padding:1rem 1.25rem;
            border-radius:8px;overflow-x:auto;margin:0 0 1.2rem}
 .pbody pre code{background:none;padding:0}
-.pbody a{color:var(--gold,#c9a227);text-decoration:underline}
+.pbody img{max-width:100%;border-radius:8px;margin:.4rem 0}
+.pbody a{color:var(--gold,#E8913A);text-decoration:underline}
 .pback{display:inline-flex;align-items:center;gap:.3rem;font-size:.875rem;
-       font-weight:600;color:var(--muted,#6b7280);text-decoration:none;margin-bottom:2rem}
-.pback:hover{color:var(--gold,#c9a227)}
+       font-weight:600;color:var(--bl-muted);text-decoration:none;margin-bottom:2rem}
+.pback:hover{color:var(--gold,#E8913A)}
 @media(max-width:640px){.blist{gap:1.1rem}.bcbd{padding:1rem}}
 """
 
 
 def _page(*, title: str, desc: str, path: str, body: str,
           og_image: str = "", og_type: str = "website",
-          ld_json: dict | None = None) -> str:
+          ld_json: dict | None = None, main_class: str = "bwrap") -> str:
     canonical = f"{_SITE_ORIGIN}{path}"
     og_img    = og_image or f"{_SITE_ORIGIN}/logo.png"
     ld = (f'<script type="application/ld+json">{json.dumps(ld_json, ensure_ascii=False)}</script>'
@@ -263,6 +328,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script>try{{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
   <title>{_html.escape(title)}</title>
   <meta name="description" content="{_html.escape(desc)}">
   <link rel="canonical" href="{_html.escape(canonical)}">
@@ -281,13 +347,28 @@ def _page(*, title: str, desc: str, path: str, body: str,
 </head>
 <body>
 {_nav()}
-<main class="bwrap">{body}</main>
+<main class="{main_class}">{body}</main>
 {_foot()}
+<script src="/main.js?v=20260831a"></script>
+<script src="/tools-core.js?v=20260811d"></script>
+<script src="/tools-nav.js?v=20260811d"></script>
+<script type="module" src="/auth.js?v=20260829a"></script>
 </body>
 </html>"""
 
 
 # ── Public routes ─────────────────────────────────────────────────────────────
+
+_HERO = (
+    '<section class="bhero">'
+    '<p class="beyebrow">✍️ PrepWithTee Blog</p>'
+    '<h1 class="bhtitle">Cambridge Exam Tips &amp; Study Guides</h1>'
+    '<p class="bhsub">Study techniques, topic breakdowns and real exam insights '
+    'from PrepWithTee tutors — for Cambridge O&nbsp;Level, IGCSE &amp; A&nbsp;Level.</p>'
+    '<hr class="bhrule">'
+    '</section>'
+)
+
 
 @router.get("/blog", response_class=HTMLResponse)
 def blog_list():
@@ -295,36 +376,40 @@ def blog_list():
     if posts:
         cards = []
         for p in posts:
-            cover = (
-                f'<img src="{_html.escape(p["cover_url"])}" '
-                f'alt="{_html.escape(p["title"])}" loading="lazy">'
-                if p.get("cover_url") else ""
-            )
+            if p.get("cover_url"):
+                cover = (f'<img class="bcard-cover" src="{_html.escape(p["cover_url"])}" '
+                         f'alt="{_html.escape(p["title"])}" loading="lazy">')
+            else:
+                cover = ('<div class="bcard-ph">'
+                         '<img src="/logo.png" alt="" style="height:56px;opacity:.92"></div>')
             date = _fmt_date(p.get("published_at") or p.get("created_at"))
+            author = _html.escape(p.get("author") or "Muhammad Taahaa")
             ex   = _html.escape(p.get("excerpt") or "")
             ex_p = f'<p class="bcex">{ex}</p>' if ex else ""
             cards.append(
                 f'<a class="bcard" href="/blog/{_html.escape(p["slug"])}">'
                 f'{cover}'
                 f'<div class="bcbd">'
-                f'<p class="bcmeta">{date}'
-                f' &middot; {_html.escape(p.get("author") or "Muhammad Taahaa")}</p>'
+                f'<p class="bcmeta">{date} &middot; {author}</p>'
                 f'<p class="bctitle">{_html.escape(p["title"])}</p>'
                 f'{ex_p}'
                 f'<span class="bclink">Read more →</span>'
                 f'</div></a>'
             )
-        body = (
-            '<h1 style="font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;margin:0 0 .4rem">'
-            'Cambridge Exam Tips &amp; Study Guides</h1>'
-            '<p style="color:var(--muted,#6b7280);margin:0 0 .25rem">Study techniques, '
-            'topic breakdowns and exam insights from PrepWithTee.</p>'
-            f'<div class="blist">{"".join(cards)}</div>'
-        )
+        body = _HERO + f'<div class="blist">{"".join(cards)}</div>'
     else:
         body = (
-            '<h1 style="font-size:2rem;font-weight:800;margin:0 0 1rem">Blog</h1>'
-            '<p style="color:var(--muted,#6b7280)">No posts yet — check back soon.</p>'
+            _HERO +
+            '<div class="bempty">'
+            '<div class="bempty-ico">🦉</div>'
+            '<h2>New posts are on the way</h2>'
+            "<p>We're busy writing study guides, exam tips and topic breakdowns. "
+            'In the meantime, dive straight into the good stuff:</p>'
+            '<div class="bempty-links">'
+            '<a class="primary" href="/papers.html">Topical Past Papers →</a>'
+            '<a href="/resources.html">Revision Notes →</a>'
+            '<a href="/#contact">Book a free demo →</a>'
+            '</div></div>'
         )
 
     return _page(
@@ -333,6 +418,7 @@ def blog_list():
               "& A Level exam tips from PrepWithTee tutors."),
         path="/blog",
         body=body,
+        main_class="bwrap bwrap-wide",
     )
 
 

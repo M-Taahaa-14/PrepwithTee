@@ -15,9 +15,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from .auth import get_current_user
-from . import users_db as _udb
-from . import reminders
+from auth import get_current_user
+import users_db as _udb
+import reminders
 
 # ── Paths & constants ──────────────────────────────────────────────────────────
 
@@ -620,8 +620,8 @@ def remind_student(student_id: str, user: _Teacher):
     student = _udb.get_user(student_id)
     if not student:
         raise HTTPException(404, "Student not found")
-    from .app import _notify
-    from . import reminders
+    from app import _notify
+    import reminders
     items = reminders.open_homework(student_id)
     if not items:
         raise HTTPException(400, "Nothing outstanding to remind them about")
@@ -680,7 +680,7 @@ def send_parent_message(student_id: str, req: ParentMessageReq, user: _Teacher):
     parent_email = parents[0].get("email")
     if parent_email:
         try:
-            from .app import _notify
+            from app import _notify
             student_name = (_udb.get_user(student_id) or {}).get("name", "your child")
             _notify(
                 f"[PrepWithTee] Message from Tutor ({user.get('name', 'Tutor')}) regarding {student_name}",

@@ -1,0 +1,111 @@
+<h2 id="elastic">Elastic and inelastic deformation</h2>
+
+<div class="note-def">
+  <strong>Elastic deformation:</strong> the object returns to its original shape and size when the force is removed.<br><br>
+  <strong>Inelastic (plastic) deformation:</strong> the object does not fully return to its original shape — the deformation is permanent.
+</div>
+
+<div class="note-key">
+  A spring or wire shows elastic behaviour up to a certain force. Beyond the <strong>elastic limit</strong>, the deformation becomes inelastic (permanent). The object is said to have been <em>permanently deformed</em>.
+</div>
+
+<h2 id="hookes">Hooke's Law</h2>
+
+<div class="note-def">
+  Within the limit of proportionality, the extension of a spring is <strong>directly proportional</strong> to the applied force.
+  \[ F = ke \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( F \)</td><td>Force applied</td><td>newton, N</td></tr>
+      <tr><td>\( k \)</td><td>Spring constant (spring stiffness)</td><td>N/m</td></tr>
+      <tr><td>\( e \)</td><td>Extension (increase in length from natural length)</td><td>metre, m</td></tr>
+    </tbody>
+  </table>
+  A <strong>larger spring constant</strong> means a stiffer spring (more force needed per unit extension).
+</div>
+
+<div class="note-warn">
+  Extension \( e \) is the <em>increase</em> in length: \( e = \text{new length} - \text{natural length} \). Do not use the total length of the spring as the extension.
+</div>
+
+<h2 id="graph">Force–extension graph</h2>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Force-extension graph for a spring. OA: straight line through origin (Hooke's Law obeyed). A = limit of proportionality. AB: still elastic but no longer proportional. Beyond B (elastic limit): inelastic (permanent deformation).">
+  <div style="padding:.8rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 280 200" width="280" height="200" aria-label="Force-extension graph">
+      <!-- axes -->
+      <line x1="40" y1="175" x2="265" y2="175" stroke="#5A5A72" stroke-width="1.5"/>
+      <line x1="40" y1="175" x2="40"  y2="15"  stroke="#5A5A72" stroke-width="1.5"/>
+      <text x="153" y="193" font-size="10" fill="#5A5A72" text-anchor="middle">Extension / m</text>
+      <text x="14"  y="95"  font-size="10" fill="#5A5A72" text-anchor="middle" transform="rotate(-90,14,95)">Force / N</text>
+      <!-- Hooke's law line OA -->
+      <line x1="40" y1="175" x2="145" y2="75" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- curved section AB -->
+      <path d="M145,75 Q175,55 195,48" fill="none" stroke="#E8913A" stroke-width="2.2"/>
+      <!-- inelastic region beyond B -->
+      <path d="M195,48 Q220,42 255,60" fill="none" stroke="#C97070" stroke-width="2.2" stroke-dasharray="6,3"/>
+      <!-- point A label -->
+      <circle cx="145" cy="75" r="3.5" fill="#4C2E72"/>
+      <text x="150" y="72" font-size="9" fill="#4C2E72" font-weight="700">A</text>
+      <text x="152" y="82" font-size="8" fill="#5A5A72">limit of</text>
+      <text x="152" y="91" font-size="8" fill="#5A5A72">proportionality</text>
+      <!-- point B label -->
+      <circle cx="195" cy="48" r="3.5" fill="#E8913A"/>
+      <text x="200" y="46" font-size="9" fill="#E8913A" font-weight="700">B</text>
+      <text x="200" y="56" font-size="8" fill="#5A5A72">elastic limit</text>
+      <!-- slope label -->
+      <text x="72" y="138" font-size="9" fill="#4C2E72" font-style="italic">gradient = k</text>
+      <!-- origin -->
+      <text x="28" y="182" font-size="9" fill="#5A5A72">O</text>
+    </svg>
+  </div>
+</div>
+
+<div class="note-key">
+  Reading the graph:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>O → A</strong>: straight line through the origin — Hooke's Law obeyed. Gradient = spring constant \( k \).</li>
+    <li><strong>A</strong>: <em>limit of proportionality</em> — beyond here, \( F \) and \( e \) are no longer proportional.</li>
+    <li><strong>A → B</strong>: still elastic (spring returns to original shape) but not proportional.</li>
+    <li><strong>Beyond B</strong>: <em>elastic limit</em> exceeded — permanent (inelastic) deformation. Dashed line = spring does not return to origin when force removed.</li>
+  </ul>
+</div>
+
+<h2 id="calculations">Calculations using F = ke</h2>
+
+<details class="note-example">
+  <summary>Example 1 — find spring constant</summary>
+  <div>
+    <p>A spring has a natural length of 12 cm. When a force of 6.0 N is applied, it stretches to 18 cm. Find the spring constant.</p>
+    <p>Extension: \( e = 18 - 12 = 6\,\text{cm} = 0.06\,\text{m} \)</p>
+    <p>\( k = \dfrac{F}{e} = \dfrac{6.0}{0.06} = 100\,\text{N/m} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find extension</summary>
+  <div>
+    <p>A spring with \( k = 250\,\text{N/m} \) has a force of 15 N applied. Find the extension.</p>
+    <p>\( e = \dfrac{F}{k} = \dfrac{15}{250} = 0.060\,\text{m} = 6.0\,\text{cm} \)</p>
+  </div>
+</details>
+
+<h2 id="experiment">Investigating Hooke's Law</h2>
+
+<div class="note-key">
+  <strong>Apparatus:</strong> spring, clamp stand, ruler, set of 100 g masses, pointer.<br>
+  <strong>Method:</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Measure and record the natural length of the spring with no masses.</li>
+    <li>Add masses one at a time (e.g. 100 g = 1.0 N). Record the new length after each addition.</li>
+    <li>Calculate extension = new length − natural length for each force.</li>
+    <li>Plot a graph of force (y-axis) against extension (x-axis).</li>
+    <li>The gradient of the straight-line section = spring constant \( k \).</li>
+  </ol>
+  <strong>Source of error:</strong> ensure the pointer is at eye level when reading the ruler to avoid parallax. Allow the spring to settle before reading.
+</div>
+
+<div class="note-tip">
+  If the question asks you to find \( k \) from a graph, calculate the gradient of the straight-line section only. Use two widely spaced points on the line (not data points) and show the working as \( k = \Delta F / \Delta e \).
+</div>

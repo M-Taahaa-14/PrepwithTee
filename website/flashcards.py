@@ -24,8 +24,8 @@ from typing import Optional
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from . import db as _db
-from .auth import get_current_user, maybe_user
+import db as _db
+from auth import get_current_user, maybe_user
 
 router = APIRouter()
 
@@ -175,7 +175,7 @@ def fc_taxonomy(user: Optional[dict] = Depends(maybe_user)):
         ).fetchall()
 
         if user:
-            from . import users_db as _udb
+            import users_db as _udb
             active_codes = set(_udb.get_enrollments(user["id"]))
             filtered_subjects = []
             for s in subjects_rows:
@@ -708,7 +708,7 @@ def fc_progress(
         ).fetchall()
 
         if user:
-            from . import users_db as _udb
+            import users_db as _udb
             import json as _json
             active_codes = set(_udb.get_enrollments(user["id"]))
             filtered = []

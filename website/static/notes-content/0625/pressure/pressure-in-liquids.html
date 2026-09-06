@@ -1,0 +1,105 @@
+<h2 id="liquid-pressure">Pressure in liquids</h2>
+
+<div class="note-def">
+  Pressure in a liquid <strong>increases with depth</strong> and depends on the <strong>density of the liquid</strong>. It acts equally in <strong>all directions</strong> at a given depth.
+  \[ P = h\rho g \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( P \)</td><td>Pressure at depth \( h \)</td><td>pascal, Pa</td></tr>
+      <tr><td>\( h \)</td><td>Depth below the liquid surface</td><td>metre, m</td></tr>
+      <tr><td>\( \rho \)</td><td>Density of the liquid</td><td>kg/m³</td></tr>
+      <tr><td>\( g \)</td><td>Gravitational field strength</td><td>N/kg (= 10 N/kg near Earth's surface)</td></tr>
+    </tbody>
+  </table>
+  This formula gives the <em>additional</em> pressure due to the liquid column — it does not include atmospheric pressure acting on the surface.
+</div>
+
+<div class="note-key">
+  Key properties of liquid pressure:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Pressure <strong>increases with depth</strong> — the greater the depth, the greater the weight of liquid above.</li>
+    <li>Pressure depends on the liquid's <strong>density</strong> — mercury (13 600 kg/m³) produces far greater pressure at a given depth than water (1000 kg/m³).</li>
+    <li>Pressure is <strong>independent of the shape of the container</strong> — only the vertical depth matters.</li>
+    <li>Pressure at a given depth acts <strong>equally in all directions</strong> — upward, downward, and sideways.</li>
+  </ul>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Pressure increases with depth. Horizontal arrows at increasing depths show the pressure acting outward in all directions. Longer arrows = greater pressure. The shape of the container does not affect pressure at a given depth.">
+  <div style="padding:.5rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 260 180" width="260" height="180" aria-label="Pressure increases with depth">
+      <!-- container walls -->
+      <rect x="70" y="20" width="120" height="145" fill="rgba(76,46,114,.06)" stroke="#4C2E72" stroke-width="1.5" rx="3"/>
+      <!-- water fill -->
+      <rect x="71" y="21" width="118" height="143" fill="rgba(59,130,246,.12)" rx="2"/>
+      <!-- surface label -->
+      <line x1="70" y1="21" x2="190" y2="21" stroke="#3B82F6" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <text x="197" y="25" font-size="8" fill="#3B82F6">surface</text>
+      <!-- depth arrows at 3 levels -->
+      <!-- Level 1: shallow -->
+      <line x1="130" y1="60" x2="108" y2="60" stroke="#E8913A" stroke-width="1.8" marker-end="url(#arrL)"/>
+      <line x1="130" y1="60" x2="152" y2="60" stroke="#E8913A" stroke-width="1.8" marker-end="url(#arrR)"/>
+      <text x="130" y="55" font-size="8" fill="#5A5A72" text-anchor="middle">h₁</text>
+      <!-- Level 2: mid -->
+      <line x1="130" y1="100" x2="100" y2="100" stroke="#E8913A" stroke-width="1.8" marker-end="url(#arrL)"/>
+      <line x1="130" y1="100" x2="160" y2="100" stroke="#E8913A" stroke-width="1.8" marker-end="url(#arrR)"/>
+      <text x="130" y="95" font-size="8" fill="#5A5A72" text-anchor="middle">h₂</text>
+      <!-- Level 3: deep -->
+      <line x1="130" y1="145" x2="90"  y2="145" stroke="#E8913A" stroke-width="2.2" marker-end="url(#arrL)"/>
+      <line x1="130" y1="145" x2="170" y2="145" stroke="#E8913A" stroke-width="2.2" marker-end="url(#arrR)"/>
+      <text x="130" y="140" font-size="8" fill="#5A5A72" text-anchor="middle">h₃</text>
+      <!-- depth label -->
+      <line x1="58" y1="21" x2="58" y2="163" stroke="#4C2E72" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="53" y1="21"  x2="63" y2="21"  stroke="#4C2E72" stroke-width="1"/>
+      <line x1="53" y1="163" x2="63" y2="163" stroke="#4C2E72" stroke-width="1"/>
+      <text x="20" y="100" font-size="8" fill="#4C2E72" text-anchor="middle" transform="rotate(-90,20,100)">depth increases</text>
+      <defs>
+        <marker id="arrL" markerWidth="5" markerHeight="5" refX="0" refY="2.5" orient="auto"><path d="M5,0 L0,2.5 L5,5 Z" fill="#E8913A"/></marker>
+        <marker id="arrR" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#E8913A"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<h2 id="calculations">Worked examples</h2>
+
+<details class="note-example">
+  <summary>Example 1 — pressure at depth in water</summary>
+  <div>
+    <p>Calculate the pressure due to the water at a depth of 5.0 m in a swimming pool. (ρ_water = 1000 kg/m³, g = 10 N/kg)</p>
+    <p>\( P = h\rho g = 5.0 \times 1000 \times 10 = 50\,000\,\text{Pa} = 50\,\text{kPa} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find depth from pressure</summary>
+  <div>
+    <p>The pressure at the bottom of a tank of mercury is 65 000 Pa. Find the depth of the mercury. (ρ_mercury = 13 600 kg/m³, g = 10 N/kg)</p>
+    <p>\( h = \dfrac{P}{\rho g} = \dfrac{65\,000}{13\,600 \times 10} = \dfrac{65\,000}{136\,000} = 0.478\,\text{m} \approx 0.48\,\text{m} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 3 — compare two liquids at the same depth</summary>
+  <div>
+    <p>A diver is at a depth of 10 m in fresh water (ρ = 1000 kg/m³) and in sea water (ρ = 1025 kg/m³). Compare the pressures from each liquid alone.</p>
+    <p>Fresh water: \( P = 10 \times 1000 \times 10 = 100\,000\,\text{Pa} \)</p>
+    <p>Sea water: \( P = 10 \times 1025 \times 10 = 102\,500\,\text{Pa} \)</p>
+    <p>Sea water exerts 2500 Pa more pressure at the same depth due to its higher density.</p>
+  </div>
+</details>
+
+<h2 id="applications">Applications</h2>
+
+<div class="note-key">
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Dams</strong> — built thicker at the base because pressure increases with depth; the base must withstand greater force.</li>
+    <li><strong>Submarines</strong> — designed with reinforced hulls to withstand increasing pressure at depth.</li>
+    <li><strong>Hydraulic systems</strong> — liquid transmits pressure equally in all directions (Pascal's principle), used in car brakes and hydraulic presses.</li>
+    <li><strong>U-tube manometer</strong> — liquid levels show relative pressure; the side with higher pressure is lower.</li>
+  </ul>
+</div>
+
+<div class="note-tip">
+  \( P = h\rho g \) gives only the pressure from the liquid column. The <em>total</em> pressure at depth is \( P_\text{total} = P_\text{atm} + h\rho g \). Questions usually ask for the pressure due to the liquid only — read carefully whether atmospheric pressure should be included.
+</div>

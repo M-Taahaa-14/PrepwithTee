@@ -1,0 +1,100 @@
+<h2 id="definition">Defining density</h2>
+
+<div class="note-def">
+  <strong>Density</strong> is the mass per unit volume of a substance.
+  \[ \rho = \frac{m}{V} \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( \rho \) (rho)</td><td>Density</td><td>kg/m³ <em>or</em> g/cm³</td></tr>
+      <tr><td>\( m \)</td><td>Mass</td><td>kg <em>or</em> g</td></tr>
+      <tr><td>\( V \)</td><td>Volume</td><td>m³ <em>or</em> cm³</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-key">
+  <strong>Rearrangements of \( \rho = m / V \):</strong>
+  \[ m = \rho V \qquad V = \frac{m}{\rho} \]
+  A useful memory aid — cover the quantity you want in this triangle:
+  <div style="text-align:center;margin:.8rem 0">
+    <svg viewBox="0 0 160 110" width="160" height="110" aria-label="Density triangle: m at top, rho and V at bottom">
+      <polygon points="80,8 155,102 5,102" fill="none" stroke="#4C2E72" stroke-width="1.8"/>
+      <line x1="5" y1="102" x2="155" y2="102" stroke="#4C2E72" stroke-width="1.8"/>
+      <line x1="80" y1="52" x2="80" y2="102" stroke="#4C2E72" stroke-width="1.4" stroke-dasharray="4,3"/>
+      <text x="80"  y="40"  font-size="18" font-weight="700" fill="#4C2E72" text-anchor="middle" font-family="serif">m</text>
+      <text x="36"  y="96"  font-size="18" font-weight="700" fill="#E8913A" text-anchor="middle" font-family="serif">ρ</text>
+      <text x="122" y="96"  font-size="18" font-weight="700" fill="#1A6B4A" text-anchor="middle" font-family="serif">V</text>
+    </svg>
+  </div>
+  Cover \( m \) → \( \rho \times V \); cover \( \rho \) → \( m \div V \); cover \( V \) → \( m \div \rho \).
+</div>
+
+<h2 id="units">Units and conversion</h2>
+
+<div class="note-key">
+  <strong>SI unit:</strong> kg/m³ (used in calculations with SI quantities)<br>
+  <strong>Common alternative:</strong> g/cm³ (convenient for lab work)
+  \[ 1\,\text{g/cm}^3 = 1000\,\text{kg/m}^3 \]
+  Examples: water = 1.0 g/cm³ = 1000 kg/m³; iron = 7.9 g/cm³ = 7900 kg/m³.
+</div>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>Material</th><th>Density (kg/m³)</th><th>Density (g/cm³)</th></tr></thead>
+    <tbody>
+      <tr><td>Air (at room temperature)</td><td>1.2</td><td>0.0012</td></tr>
+      <tr><td>Ice</td><td>917</td><td>0.92</td></tr>
+      <tr><td>Water (liquid)</td><td>1000</td><td>1.00</td></tr>
+      <tr><td>Sea water</td><td>1025</td><td>1.03</td></tr>
+      <tr><td>Wood (typical)</td><td>600–900</td><td>0.6–0.9</td></tr>
+      <tr><td>Aluminium</td><td>2700</td><td>2.70</td></tr>
+      <tr><td>Iron / steel</td><td>7900</td><td>7.90</td></tr>
+      <tr><td>Lead</td><td>11 300</td><td>11.3</td></tr>
+      <tr><td>Gold</td><td>19 300</td><td>19.3</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="calculations">Worked calculations</h2>
+
+<details class="note-example">
+  <summary>Example 1 — find density</summary>
+  <div>
+    <p>A block of aluminium has mass 540 g and volume 200 cm³. Calculate its density.</p>
+    <p>\( \rho = \dfrac{m}{V} = \dfrac{540}{200} = 2.7\,\text{g/cm}^3 \)</p>
+    <p>In SI units: \( 2.7\,\text{g/cm}^3 = 2700\,\text{kg/m}^3 \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find mass</summary>
+  <div>
+    <p>A piece of iron has volume 50 cm³. Iron has density 7.9 g/cm³. Find the mass.</p>
+    <p>\( m = \rho V = 7.9 \times 50 = 395\,\text{g} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 3 — find volume</summary>
+  <div>
+    <p>A liquid has density 1.2 g/cm³ and mass 360 g. Find its volume.</p>
+    <p>\( V = \dfrac{m}{\rho} = \dfrac{360}{1.2} = 300\,\text{cm}^3 \)</p>
+  </div>
+</details>
+
+<h2 id="floating">Floating and sinking</h2>
+
+<div class="note-key">
+  An object placed in a fluid will:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li><strong>Float</strong> if its density is <em>less than</em> the density of the fluid (\( \rho_\text{object} < \rho_\text{fluid} \)).</li>
+    <li><strong>Sink</strong> if its density is <em>greater than</em> the density of the fluid (\( \rho_\text{object} > \rho_\text{fluid} \)).</li>
+    <li><strong>Be neutrally buoyant</strong> (hover at any depth) if \( \rho_\text{object} = \rho_\text{fluid} \).</li>
+  </ul>
+  Example: ice (917 kg/m³) floats in water (1000 kg/m³). Iron (7900 kg/m³) sinks in water.
+</div>
+
+<div class="note-tip">
+  In density calculations, always check that mass and volume units are consistent. If mass is in grams and volume is in cm³, the answer is in g/cm³. If mass is in kg and volume is in m³, the answer is in kg/m³. Mixing units gives a wrong answer.
+</div>

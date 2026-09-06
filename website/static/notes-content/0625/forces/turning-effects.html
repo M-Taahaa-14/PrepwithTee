@@ -1,0 +1,121 @@
+<h2 id="moment">The turning effect of a force (moment)</h2>
+
+<div class="note-def">
+  The <strong>moment</strong> of a force about a pivot is the turning effect of that force. It depends on the size of the force <em>and</em> how far from the pivot it acts.
+  \[ M = F \times d \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( M \)</td><td>Moment</td><td>newton-metre, N·m</td></tr>
+      <tr><td>\( F \)</td><td>Force</td><td>newton, N</td></tr>
+      <tr><td>\( d \)</td><td>Perpendicular distance from the pivot to the line of action of the force</td><td>metre, m</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-warn">
+  The distance \( d \) must be the <strong>perpendicular</strong> distance from the pivot to the <em>line of action</em> of the force — not the distance along the object. If the force is applied at an angle, you must resolve it or find the perpendicular distance geometrically.
+</div>
+
+<div class="note-key">
+  <strong>Clockwise vs anticlockwise moments:</strong><br>
+  A force acting to cause rotation clockwise produces a <em>clockwise moment</em>; a force that tends to rotate the object anticlockwise produces an <em>anticlockwise moment</em>.
+</div>
+
+<h2 id="principle">Principle of moments</h2>
+
+<div class="note-def">
+  For an object in <strong>rotational equilibrium</strong> (not rotating):
+  \[ \text{Sum of clockwise moments} = \text{Sum of anticlockwise moments} \]
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — A balanced beam (lever). Anticlockwise moment: F₁ × d₁. Clockwise moment: F₂ × d₂. Equilibrium when F₁d₁ = F₂d₂.">
+  <div style="padding:.5rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 280 120" width="280" height="120" aria-label="Balanced beam">
+      <!-- beam -->
+      <rect x="30" y="55" width="220" height="6" rx="2" fill="#4C2E72"/>
+      <!-- pivot -->
+      <polygon points="140,61 130,85 150,85" fill="#5A5A72"/>
+      <rect x="120" y="85" width="40" height="6" rx="2" fill="#5A5A72"/>
+      <!-- F1 on left -->
+      <line x1="75" y1="55" x2="75" y2="20" stroke="#E8913A" stroke-width="2" marker-end="url(#a1)"/>
+      <text x="60" y="16" font-size="9" fill="#E8913A" font-weight="700">F₁</text>
+      <!-- d1 arrow -->
+      <line x1="75" y1="95" x2="140" y2="95" stroke="#E8913A" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="105" y="108" font-size="8" fill="#E8913A" text-anchor="middle">d₁</text>
+      <!-- F2 on right -->
+      <line x1="195" y1="55" x2="195" y2="20" stroke="#4C2E72" stroke-width="2" marker-end="url(#a2)"/>
+      <text x="200" y="16" font-size="9" fill="#4C2E72" font-weight="700">F₂</text>
+      <!-- d2 arrow -->
+      <line x1="140" y1="95" x2="195" y2="95" stroke="#4C2E72" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="168" y="108" font-size="8" fill="#4C2E72" text-anchor="middle">d₂</text>
+      <!-- pivot label -->
+      <text x="140" y="118" font-size="8" fill="#5A5A72" text-anchor="middle">pivot</text>
+      <defs>
+        <marker id="a1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#E8913A"/></marker>
+        <marker id="a2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4C2E72"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<details class="note-example">
+  <summary>Example 1 — balanced beam</summary>
+  <div>
+    <p>A beam is balanced on a pivot. A 6 N force acts 0.4 m to the left of the pivot. What force \( F \) must act 0.3 m to the right to maintain equilibrium?</p>
+    <p>Anticlockwise moment = \( 6 \times 0.4 = 2.4\,\text{N·m} \)</p>
+    <p>For equilibrium: clockwise moment = 2.4 N·m</p>
+    <p>\( F \times 0.3 = 2.4 \Rightarrow F = \dfrac{2.4}{0.3} = 8\,\text{N} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find unknown distance</summary>
+  <div>
+    <p>A 10 N weight acts 0.5 m left of the pivot. A 25 N weight is on the right. How far from the pivot must the 25 N weight be placed for balance?</p>
+    <p>Anticlockwise: \( 10 \times 0.5 = 5.0\,\text{N·m} \)</p>
+    <p>Clockwise: \( 25 \times d = 5.0 \Rightarrow d = 0.20\,\text{m} \)</p>
+  </div>
+</details>
+
+<h2 id="cog">Centre of gravity</h2>
+
+<div class="note-def">
+  The <strong>centre of gravity</strong> of an object is the point through which its entire weight appears to act (the point at which the gravitational force effectively acts on the whole object).
+</div>
+
+<div class="note-key">
+  <strong>Finding the centre of gravity of a flat lamina (irregular shape):</strong>
+  <ol style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Suspend the lamina freely from one point near its edge. It will hang in equilibrium.</li>
+    <li>Hang a plumb line from the same pin. Draw a line on the lamina along the plumb line.</li>
+    <li>Repeat from a <em>different</em> point on the edge.</li>
+    <li>The centre of gravity is at the <strong>intersection</strong> of the two lines.</li>
+  </ol>
+</div>
+
+<h2 id="stability">Stability</h2>
+
+<div class="note-key">
+  An object is more stable when:
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Its <strong>centre of gravity is lower</strong> (closer to the ground).</li>
+    <li>Its <strong>base area is wider</strong>.</li>
+  </ul>
+  An object topples when the vertical line through its centre of gravity falls <em>outside</em> the base. It remains upright when that line falls <em>inside</em> the base.
+</div>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>Stability type</th><th>Displaced slightly…</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Stable equilibrium</strong></td><td>Returns to original position</td><td>Ball in a bowl, racing car (low CoG)</td></tr>
+      <tr><td><strong>Unstable equilibrium</strong></td><td>Continues to move away (topples)</td><td>Pencil balanced on its tip</td></tr>
+      <tr><td><strong>Neutral equilibrium</strong></td><td>Stays in new position</td><td>Ball on a flat surface</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-tip">
+  Double-decker buses, racing cars, and cargo ships are designed with low centres of gravity (heavy components at the bottom) and wide bases to maximise stability. Questions often ask you to explain how a design feature improves stability — always link it to the <strong>lower centre of gravity</strong> or the <strong>wider base</strong>.
+</div>

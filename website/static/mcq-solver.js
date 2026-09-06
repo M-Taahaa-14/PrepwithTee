@@ -46,7 +46,7 @@ function fmtTime(secs) {
   return `${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")}`;
 }
 function showPanel(id) {
-  ["setup-panel","session-panel","results-panel"].forEach(pid => {
+  ["setup-panel","session-panel","paper-view-panel","results-panel"].forEach(pid => {
     const el = document.getElementById(pid);
     if (el) el.hidden = pid !== id;
   });
@@ -56,6 +56,9 @@ function showPanel(id) {
 const state = {
   meta: null, syllabus: null, papers: [], board: null,
   mode: "topic",       // "topic" | "paper"
+  layout: "card",      // "card" | "paper"
+  liveCheck: true,
+  subjectLabel: "",
   fpSel: null,         // {paper_id, label, q_count, paper} for full-paper mode
   fpAllPapers: [],     // cached list from /api/mcq/papers
   fpYear: null,        // selected year in tabbed FP picker
@@ -94,8 +97,11 @@ function snapshot() {
     v: 1,
     savedAt: Date.now(),
     mode: state.mode,
+    layout: state.layout,
     syllabus: state.syllabus,
-    subjectLabel: $("mcq-session-subject-label").textContent,
+    subjectLabel: state.subjectLabel ||
+      $("pv-subject-label")?.textContent ||
+      $("mcq-session-subject-label")?.textContent || "",
     body: state.lastBody,
     total: state.questions.length,
     qIndex: state.qIndex,
@@ -186,18 +192,24 @@ async function resumeSession(rec) {
     return failResumePrompt("That session can't be restored — the question set changed. Start fresh.");
   }
 
-  state.mode = rec.mode; state.syllabus = rec.syllabus;
+  state.mode = rec.mode; state.layout = rec.layout || "card";
+  state.syllabus = rec.syllabus;
   state.lastBody = rec.body; state.timeSecs = rec.timeSecs;
   state.questions = data.questions;
   state.results = rec.results || new Array(rec.total).fill(null);
   state.flags = rec.flags?.length === rec.total ? rec.flags : new Array(rec.total).fill(false);
   state.streak = rec.streak || 0;
   state.bestStreak = rec.bestStreak || 0;
+  state.subjectLabel = rec.subjectLabel || "";
   state.sessionStartTime = Date.now() - (rec.elapsedMs || 0);
 
   $("mcq-resume-modal").hidden = true;
-  enterSession(rec.qIndex, rec.subjectLabel,
-    rec.paperRemainMs != null ? Date.now() + rec.paperRemainMs : null);
+  const resumePaperEndAt = rec.paperRemainMs != null ? Date.now() + rec.paperRemainMs : null;
+  if (state.layout === "paper") {
+    enterPaperView(rec.subjectLabel, resumePaperEndAt);
+  } else {
+    enterSession(rec.qIndex, rec.subjectLabel, resumePaperEndAt);
+  }
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
@@ -260,6 +272,19 @@ function initSetupUI() {
         }
       }
       updateSetupSummary();
+    };
+  });
+
+  // Layout toggle
+  document.querySelectorAll("#mcq-layout-seg .pill").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll("#mcq-layout-seg .pill").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.layout = btn.dataset.layout;
+      const hint = $("mcq-layout-hint");
+      if (hint) hint.textContent = state.layout === "card"
+        ? "One question at a time — timed, with keyboard shortcuts."
+        : "Scroll all questions on the left, fill the answer grid on the right.";
     };
   });
 
@@ -725,10 +750,11 @@ async function startSession() {
       papersToSend = mcqPapersFor(state.syllabus, sub);
     }
 
+    const rawCount = getCount();
     body = {
       syllabus: state.syllabus, topics,
       year_from: +$("mcq-yfrom").value, year_to: +$("mcq-yto").value,
-      count: getCount(),
+      count: state.layout === "paper" ? Math.min(rawCount, 200) : rawCount,
       seed: Math.floor(Math.random() * 99999),
     };
     if (papersToSend.length) body.papers = papersToSend;
@@ -755,9 +781,15 @@ async function startSession() {
   state.sessionStartTime = Date.now();
   const sub = state.meta.subjects.find(s => s.syllabus === state.syllabus);
   const label = sub ? (sub.short || sub.subject) : state.syllabus;
+  state.subjectLabel = label;
   const ms = bookletMs();
+  const paperEndAt = ms ? Date.now() + ms : null;
   clearSaved();
-  enterSession(0, label, ms ? Date.now() + ms : null);
+  if (state.layout === "paper") {
+    enterPaperView(label, paperEndAt);
+  } else {
+    enterSession(0, label, paperEndAt);
+  }
 }
 
 // Total time allowed for the whole booklet.
@@ -777,6 +809,7 @@ function bookletMs() {
 function enterSession(startIndex, subjectLabel, paperEndAt) {
   state.qIndex = startIndex;
   state.paused = false; state.answered = false;
+  state.subjectLabel = subjectLabel || "";
   $("mcq-setup-status").textContent = "";
   $("mcq-session-subject-label").textContent = subjectLabel || "";
   const pFill = $("mcq-progress-fill");
@@ -797,6 +830,7 @@ function enterSession(startIndex, subjectLabel, paperEndAt) {
   toggleNav();           // open navigator by default
   syncThemeBtn();
   renderStreak();
+  mcqSetupAnnotBar();
   loadQuestion(startIndex);
   document.addEventListener("keydown", onKeyDown);
 }
@@ -834,33 +868,38 @@ function paperExamMins(syl, paper) { return EXAM_MINS[`${syl}-${paper}`] ?? 45; 
 
 function startPaperTimer(endAt) {
   stopPaperTimer();
-  const el = $("mcq-paper-time");
-  if (!el) return;
-  el.hidden = false;
-  el.classList.remove("is-warn", "is-danger");
   state.paperTimerEnd = endAt;
+  for (const id of ["mcq-paper-time", "pv-paper-time"]) {
+    const el = $(id);
+    if (el) { el.hidden = false; el.classList.remove("is-warn", "is-danger"); }
+  }
   updatePaperTimer();
   state.paperTimer = setInterval(() => { if (!state.paused) updatePaperTimer(); }, 1000);
 }
 function updatePaperTimer() {
-  const el = $("mcq-paper-time");
-  if (!el || !state.paperTimerEnd) return;
+  if (!state.paperTimerEnd) return;
   const rem = Math.max(0, Math.round((state.paperTimerEnd - Date.now()) / 1000));
   const h = Math.floor(rem / 3600);
   const m = Math.floor((rem % 3600) / 60);
   const s = rem % 60;
   const pad = n => String(n).padStart(2, "0");
-  el.textContent = h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-  // Classes, not inline colours — the palette differs per theme.
-  el.classList.toggle("is-danger", rem === 0);
-  el.classList.toggle("is-warn", rem > 0 && rem <= 300);
+  const txt = h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  for (const id of ["mcq-paper-time", "pv-paper-time"]) {
+    const el = $(id);
+    if (!el) continue;
+    el.hidden = false;
+    el.textContent = txt;
+    el.classList.toggle("is-danger", rem === 0);
+    el.classList.toggle("is-warn", rem > 0 && rem <= 300);
+  }
   if (rem === 0) {
     stopPaperTimer();
-    // Booklet time is up — end it like a real paper would.
     if (!$("session-panel").hidden) {
       stopQTimer(); stopOverallTimer();
       document.removeEventListener("keydown", onKeyDown);
       endSession();
+    } else if ($("paper-view-panel") && !$("paper-view-panel").hidden) {
+      pvFinish();
     }
   }
 }
@@ -900,9 +939,9 @@ function updateRing(rem, total) {
 // ── Load question ──────────────────────────────────────────────────────────────
 function loadQuestion(index) {
   if (index >= state.questions.length) { endSession(); return; }
+  if (mcqAnnotCanvas) mcqSaveAnnotForQ(state.qIndex);
   state.qIndex = index;
   const q = state.questions[index];
-
   $("mcq-q-counter").textContent = `Q ${index + 1} / ${state.questions.length}`;
   const pFill = document.getElementById("mcq-progress-fill");
   if (pFill) pFill.style.width = `${((index + 1) / state.questions.length) * 100}%`;
@@ -915,7 +954,7 @@ function loadQuestion(index) {
   // Load question image
   const img = $("mcq-q-img"), spinner = $("mcq-q-img-spinner"), errEl = $("mcq-q-img-error");
   img.style.display = "none"; spinner.style.display = ""; errEl.hidden = true;
-  img.onload = () => { spinner.style.display = "none"; img.style.display = ""; };
+  img.onload = () => { spinner.style.display = "none"; img.style.display = ""; mcqSetupAnnotCanvas(); mcqRestoreAnnotForQ(index); };
   img.onerror = () => {
     spinner.style.display = "none"; errEl.hidden = false;
     $("mcq-q-text-fallback").textContent = q.text_snippet || "";
@@ -1295,6 +1334,11 @@ function onKeyDown(e) {
     case "F": e.preventDefault(); toggleFlag(); break;
     case "T": e.preventDefault(); toggleTheme(); break;
     case " ": e.preventDefault(); togglePause(); break;
+    case "V": mcqSelectAnnotTool("select"); break;
+    case "P": mcqSelectAnnotTool("pen"); break;
+    case "H": mcqSelectAnnotTool("highlighter"); break;
+    case "E": mcqSelectAnnotTool("eraser"); break;
+    case "Z": if (e.ctrlKey) { mcqAnnotStrokes.pop(); mcqRedrawAnnot(); } break;
   }
 }
 
@@ -1346,11 +1390,753 @@ $("mcq-quit-btn").onclick = () => {
   }
 };
 
+// ── PAPER VIEW ────────────────────────────────────────────────────────────────
+let pvTimerInterval = null;
+let pvTimerRunning = false;
+let pvPage = 0;
+const PV_PAGE_SIZE = 5;
+let pvAnnotTool = "select";
+let pvAnnotColor = "#E8913A";
+let pvAnnotStrokes = [];
+let pvAnnotCanvas = null;
+let pvAnnotCtx = null;
+let pvDrawing = false;
+let pvEraserMode = "stroke";
+let pvBookmarks = [];
+
+let mcqAnnotCanvas = null;
+let mcqAnnotCtx = null;
+let mcqAnnotStrokes = [];
+let mcqAnnotDrawing = false;
+let mcqAnnotPerQ = {};
+
+function fmtTimeHMS(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+function enterPaperView(subjectLabel, paperEndAt) {
+  state.subjectLabel = subjectLabel || "";
+  state.paused = true;
+  pvTimerRunning = false;
+  state.sessionStartTime = Date.now();
+  document.body.classList.add("mcq-in-session");
+  showPanel("paper-view-panel");
+
+  $("pv-subject-label").textContent = subjectLabel || "";
+  syncThemeBtn();
+
+  pvPage = 0;
+  pvBookmarks = new Array(state.questions.length).fill(false);
+  pvAnnotStrokes = [];
+
+  buildPaperViewUI();
+  stopPVTimer();
+  if (paperEndAt) startPaperTimer(paperEndAt);
+
+  $("pv-quit-btn").onclick = () => {
+    if (confirm("End this session and see your results?")) pvFinish();
+  };
+  $("pv-theme-btn").onclick = toggleTheme;
+  $("pv-live-toggle").onclick = pvToggleLiveCheck;
+  if ($("pv-check-all-btn")) $("pv-check-all-btn").onclick = pvCheckAll;
+  if ($("pv-finish-btn")) $("pv-finish-btn").onclick = pvFinish;
+  $("pv-timer-toggle").onclick = pvToggleTimer;
+  $("pv-answers-toggle").onclick = pvToggleAnswerPane;
+  $("pv-reset-btn").onclick = pvResetAnswers;
+  $("pv-fullscreen-btn").onclick = pvToggleFullscreen;
+  const navEl = document.querySelector(".pv-ans-nav");
+  if (navEl) navEl.hidden = true;
+
+  pvSetupAnnotBar();
+  pvSetupResizeHandle();
+
+  $("pv-explain-back").onclick = pvCloseExplain;
+  $("pv-explain-close").onclick = pvCloseExplain;
+  $("pv-explain-refresh").onclick = () => pvOpenExplain(pvExplainIdx, true);
+  $("pv-followup-input").addEventListener("input", () => {
+    $("pv-followup-send").disabled = !$("pv-followup-input").value.trim();
+  });
+  $("pv-followup-send").onclick = pvSendFollowup;
+  $("pv-followup-input").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !$("pv-followup-send").disabled) pvSendFollowup();
+  });
+  $("pv-fb-helpful").onclick = () => pvFeedback("helpful");
+  $("pv-fb-unhelpful").onclick = () => pvFeedback("unhelpful");
+
+  document.addEventListener("keydown", onPVKeyDown);
+}
+
+function buildPaperViewUI() {
+  const gridEl = $("pv-ans-grid");
+  const pdfContainer = $("pv-pdf-container");
+  gridEl.innerHTML = "";
+  pdfContainer.innerHTML = "";
+
+  state.questions.forEach((q, i) => {
+    const card = document.createElement("div");
+    card.className = "pv-q-card";
+    card.id = `pv-q-card-${i}`;
+    const ref = q.ref || "";
+    const topic = q.topic || "";
+    card.innerHTML =
+      `<div class="pv-q-card-head">`
+      + `<span class="pv-q-card-num">Question ${i + 1}</span>`
+      + (ref ? `<span class="pv-q-card-ref">${esc(ref)}</span>` : "")
+      + (topic ? `<span class="pv-q-card-topic" title="${esc(topic)}">${esc(topic)}</span>` : "")
+      + `<span class="pv-q-card-verdict" id="pv-verdict-${i}"></span>`
+      + `<button class="pv-q-card-bookmark" data-idx="${i}" aria-label="Bookmark Q${i+1}" title="Bookmark">&#x2691;</button>`
+      + `</div>`
+      + `<div class="pv-q-card-opts" role="group" aria-label="Answer Q${i+1}">`
+      + ["A","B","C","D"].map(l =>
+        `<button class="pv-opt-btn" data-letter="${l}" data-idx="${i}" aria-label="Q${i+1} ${l}">`
+        + `<span class="pv-opt-radio"></span>${l}</button>`
+      ).join("")
+      + `</div>`
+      + `<button class="pv-explain-trigger" data-idx="${i}">&#x1F4A1; View Detailed Explanation</button>`;
+    card.querySelectorAll(".pv-opt-btn").forEach(btn =>
+      btn.addEventListener("click", () => pvClickAnswer(i, btn.dataset.letter))
+    );
+    card.querySelector(".pv-q-card-bookmark").addEventListener("click", () => pvToggleBookmark(i));
+    card.querySelector(".pv-explain-trigger").addEventListener("click", () => pvOpenExplain(i));
+    gridEl.appendChild(card);
+  });
+
+  pvRenderPage();
+
+  const loadDiv = document.createElement("div");
+  loadDiv.className = "pv-pdf-loading";
+  loadDiv.innerHTML = `<div class="pv-load-spinner"></div><span>Building PDF&hellip;</span>`;
+  pdfContainer.appendChild(loadDiv);
+
+  const ids = state.questions.map(q => q.id);
+  fetch("/api/mcq/preview-pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question_ids: ids }),
+  })
+    .then(r => {
+      if (!r.ok) throw new Error(`Server error ${r.status}`);
+      return r.blob();
+    })
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      loadDiv.remove();
+      const embed = document.createElement("embed");
+      embed.src = url;
+      embed.type = "application/pdf";
+      embed.style.cssText = "display:block;width:100%;height:100%;border:none";
+      pdfContainer.appendChild(embed);
+      pvSetupAnnotCanvas();
+    })
+    .catch(err => {
+      loadDiv.innerHTML = `<span>Could not load PDF &mdash; please try again.</span>`;
+      console.error("PDF stitch failed:", err);
+    });
+
+  state.results.forEach((r, i) => { if (r) restorePVAnswer(i, r); });
+  pvUpdateCounter();
+  pvUpdateScore();
+  pvUpdateProgress();
+  pvSyncLiveCheckUI();
+}
+
+function pvRenderPage() {
+  const total = state.questions.length;
+  for (let i = 0; i < total; i++) {
+    const card = $(`pv-q-card-${i}`);
+    if (card) card.hidden = false;
+  }
+  const nav = document.querySelector(".pv-ans-nav");
+  if (nav) nav.hidden = true;
+}
+
+function pvClickAnswer(idx, letter) {
+  const q = state.questions[idx];
+  const existing = state.results[idx];
+  if (state.liveCheck && existing && existing.result !== "pending" && existing.result !== "no-key") return;
+  const timeTaken = Math.round((Date.now() - state.sessionStartTime) / 1000);
+  if (state.liveCheck) {
+    const result = q.has_answer ? (letter === q.answer ? "correct" : "wrong") : "no-key";
+    state.results[idx] = {
+      qid: q.id, ref: q.ref, topic: q.topic,
+      yourAnswer: letter, correctAnswer: q.answer, timeSecs: timeTaken, result,
+    };
+    colorPVCard(idx, letter, q, result);
+  } else {
+    state.results[idx] = {
+      qid: q.id, ref: q.ref, topic: q.topic,
+      yourAnswer: letter, correctAnswer: q.answer, timeSecs: timeTaken, result: "pending",
+    };
+    highlightPVSelection(idx, letter);
+  }
+  pvUpdateScore();
+  pvUpdateCounter();
+  pvUpdateProgress();
+  saveSession();
+}
+
+function colorPVCard(idx, letter, q, result) {
+  const card = $(`pv-q-card-${idx}`);
+  if (!card) return;
+  card.querySelectorAll(".pv-opt-btn").forEach(b => {
+    const l = b.dataset.letter;
+    b.classList.remove("pv-selected", "pv-correct", "pv-wrong");
+    if (q.has_answer) {
+      b.disabled = true;
+      if (l === q.answer) b.classList.add("pv-correct");
+      if (l === letter && l !== q.answer) b.classList.add("pv-wrong");
+    } else {
+      if (l === letter) b.classList.add("pv-selected");
+    }
+  });
+  const verdict = $(`pv-verdict-${idx}`);
+  if (verdict) {
+    if (result === "correct") {
+      verdict.textContent = "✓"; verdict.className = "pv-q-card-verdict pv-v-correct";
+    } else if (result === "wrong") {
+      verdict.textContent = "✗"; verdict.className = "pv-q-card-verdict pv-v-wrong";
+    } else {
+      verdict.textContent = ""; verdict.className = "pv-q-card-verdict";
+    }
+  }
+  if (result === "correct" || result === "wrong") {
+    card.classList.add("pv-has-explain");
+  }
+}
+
+function highlightPVSelection(idx, letter) {
+  const card = $(`pv-q-card-${idx}`);
+  if (!card) return;
+  card.querySelectorAll(".pv-opt-btn").forEach(b => {
+    b.classList.remove("pv-selected", "pv-correct", "pv-wrong");
+    if (b.dataset.letter === letter) b.classList.add("pv-selected");
+  });
+  const verdict = $(`pv-verdict-${idx}`);
+  if (verdict) { verdict.textContent = ""; verdict.className = "pv-q-card-verdict"; }
+}
+
+function restorePVAnswer(idx, r) {
+  const q = state.questions[idx];
+  if (!q || !r || !r.yourAnswer) return;
+  if (r.result === "pending") highlightPVSelection(idx, r.yourAnswer);
+  else colorPVCard(idx, r.yourAnswer, q, r.result);
+}
+
+function pvCheckAll() {
+  state.questions.forEach((q, i) => {
+    const r = state.results[i];
+    if (!r || r.result !== "pending") return;
+    const result = q.has_answer ? (r.yourAnswer === q.answer ? "correct" : "wrong") : "no-key";
+    state.results[i] = { ...r, result, correctAnswer: q.answer };
+    colorPVCard(i, r.yourAnswer, q, result);
+  });
+  pvUpdateScore();
+  pvUpdateCounter();
+  saveSession();
+}
+
+function pvToggleLiveCheck() {
+  state.liveCheck = !state.liveCheck;
+  pvSyncLiveCheckUI();
+}
+
+function pvSyncLiveCheckUI() {
+  const sw = $("pv-live-toggle");
+  if (sw) sw.setAttribute("aria-pressed", String(state.liveCheck));
+  const track = sw?.querySelector(".pv-switch-track");
+  if (track) track.classList.toggle("on", state.liveCheck);
+  if ($("pv-check-all-btn")) $("pv-check-all-btn").hidden = state.liveCheck;
+}
+
+function pvUpdateScore() {
+  const el = $("pv-correct-count");
+  if (!el) return;
+  const correct = state.results.filter(r => r && r.result === "correct").length;
+  el.textContent = correct;
+}
+
+function pvUpdateCounter() {
+  const el = $("pv-q-counter");
+  if (!el) return;
+  const answered = state.results.filter(Boolean).length;
+  el.textContent = `${answered} / ${state.questions.length}`;
+}
+
+function pvUpdateProgress() {
+  const el = $("pv-progress-fill");
+  if (!el) return;
+  const answered = state.results.filter(Boolean).length;
+  el.style.width = `${(answered / state.questions.length) * 100}%`;
+}
+
+function startPVTimer() {
+  stopPVTimer();
+  pvTimerRunning = true;
+  const btn = $("pv-timer-toggle");
+  if (btn) btn.textContent = "\u23f8";
+  pvTimerInterval = setInterval(() => {
+    if (!pvTimerRunning) return;
+    const e = Math.floor((Date.now() - state.sessionStartTime) / 1000);
+    const el = $("pv-timer");
+    if (el) el.textContent = fmtTimeHMS(e);
+  }, 500);
+}
+
+function stopPVTimer() {
+  if (pvTimerInterval) { clearInterval(pvTimerInterval); pvTimerInterval = null; }
+  pvTimerRunning = false;
+  const btn = $("pv-timer-toggle");
+  if (btn) btn.textContent = "\u25b6";
+}
+
+function pvToggleTimer() {
+  if (pvTimerRunning) stopPVTimer();
+  else startPVTimer();
+}
+
+function pvToggleAnswerPane() {
+  const pane = $("pv-answer-pane");
+  if (!pane) return;
+  pane.classList.toggle("pv-pane-hidden");
+}
+
+function pvResetAnswers() {
+  if (!confirm("Reset all answers?")) return;
+  state.results = new Array(state.questions.length).fill(null);
+  state.questions.forEach((_, i) => {
+    const card = $(`pv-q-card-${i}`);
+    if (!card) return;
+    card.querySelectorAll(".pv-opt-btn").forEach(b => {
+      b.classList.remove("pv-selected", "pv-correct", "pv-wrong");
+      b.disabled = false;
+    });
+    card.classList.remove("pv-has-explain");
+    const v = $(`pv-verdict-${i}`);
+    if (v) { v.textContent = ""; v.className = "pv-q-card-verdict"; }
+  });
+  pvUpdateScore();
+  pvUpdateCounter();
+  saveSession();
+}
+
+function pvToggleFullscreen() {
+  const panel = $("paper-view-panel");
+  if (!panel) return;
+  if (!document.fullscreenElement) panel.requestFullscreen?.();
+  else document.exitFullscreen?.();
+}
+
+function pvToggleBookmark(idx) {
+  const i = pvBookmarks.indexOf(idx);
+  if (i >= 0) pvBookmarks.splice(i, 1);
+  else pvBookmarks.push(idx);
+  const icon = document.querySelector(`#pv-q-card-${idx} .pv-bookmark-icon`);
+  if (icon) icon.textContent = pvBookmarks.includes(idx) ? "\u2605" : "\u2606";
+}
+
+function pvSetupResizeHandle() {
+  const handle = $("pv-resize-handle");
+  const body = $("pv-body");
+  const ansPane = $("pv-answer-pane");
+  if (!handle || !body || !ansPane) return;
+  let dragging = false;
+  handle.addEventListener("pointerdown", e => {
+    dragging = true;
+    handle.setPointerCapture(e.pointerId);
+    body.classList.add("pv-resizing");
+  });
+  document.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const rect = body.getBoundingClientRect();
+    let w = rect.right - e.clientX;
+    w = Math.max(280, Math.min(w, rect.width * 0.5));
+    ansPane.style.width = w + "px";
+  });
+  document.addEventListener("pointerup", () => {
+    if (!dragging) return;
+    dragging = false;
+    body.classList.remove("pv-resizing");
+  });
+}
+
+function pvSetupAnnotCanvas() {
+  const container = $("pv-pdf-container");
+  if (!container) return;
+  let canvas = container.querySelector(".pv-annot-canvas");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.className = "pv-annot-canvas";
+    container.appendChild(canvas);
+  }
+  const resize = () => {
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    pvRedrawAnnot();
+  };
+  resize();
+  new ResizeObserver(resize).observe(container);
+  pvAnnotCanvas = canvas;
+  pvAnnotCtx = canvas.getContext("2d");
+
+  canvas.addEventListener("pointerdown", e => {
+    if (pvAnnotTool === "select") return;
+    pvDrawing = true;
+    const pt = { x: e.offsetX, y: e.offsetY };
+    if (pvAnnotTool === "eraser") { pvEraseAt(pt); return; }
+    pvAnnotStrokes.push({ tool: pvAnnotTool, color: pvAnnotColor, points: [pt] });
+  });
+  canvas.addEventListener("pointermove", e => {
+    if (!pvDrawing) return;
+    const pt = { x: e.offsetX, y: e.offsetY };
+    if (pvAnnotTool === "eraser") { pvEraseAt(pt); return; }
+    const s = pvAnnotStrokes[pvAnnotStrokes.length - 1];
+    if (s) { s.points.push(pt); pvRedrawAnnot(); }
+  });
+  canvas.addEventListener("pointerup", () => { pvDrawing = false; });
+  canvas.addEventListener("pointerleave", () => { pvDrawing = false; });
+}
+
+function pvDrawStroke(ctx, s) {
+  if (!s.points.length) return;
+  ctx.beginPath();
+  ctx.strokeStyle = s.color;
+  ctx.lineWidth = s.tool === "highlighter" ? 18 : s.tool === "text" ? 2 : 3;
+  ctx.globalAlpha = s.tool === "highlighter" ? 0.35 : 1;
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.moveTo(s.points[0].x, s.points[0].y);
+  for (let i = 1; i < s.points.length; i++) ctx.lineTo(s.points[i].x, s.points[i].y);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function pvRedrawAnnot() {
+  if (!pvAnnotCtx || !pvAnnotCanvas) return;
+  pvAnnotCtx.clearRect(0, 0, pvAnnotCanvas.width, pvAnnotCanvas.height);
+  pvAnnotStrokes.forEach(s => pvDrawStroke(pvAnnotCtx, s));
+}
+
+function pvEraseAt(pt) {
+  if (pvEraserMode === "all") {
+    pvAnnotStrokes = [];
+  } else if (pvEraserMode === "stroke") {
+    pvAnnotStrokes = pvAnnotStrokes.filter(s =>
+      !s.points.some(p => Math.hypot(p.x - pt.x, p.y - pt.y) < 15)
+    );
+  } else {
+    pvAnnotStrokes.forEach(s => {
+      s.points = s.points.filter(p => Math.hypot(p.x - pt.x, p.y - pt.y) >= 8);
+    });
+    pvAnnotStrokes = pvAnnotStrokes.filter(s => s.points.length > 0);
+  }
+  pvRedrawAnnot();
+}
+
+function pvSetupAnnotBar() {
+  const bar = $("pv-annot-bar");
+  if (!bar) return;
+  bar.querySelectorAll(".pv-annot-btn[data-tool]").forEach(b => {
+    b.addEventListener("click", () => pvSelectAnnotTool(b.dataset.tool));
+  });
+  const colorDots = bar.querySelectorAll(".pv-color-dot");
+  colorDots.forEach(d => {
+    d.addEventListener("click", () => {
+      pvAnnotColor = d.dataset.color;
+      colorDots.forEach(c => c.classList.toggle("active", c === d));
+    });
+  });
+  const eraserBtns = bar.querySelectorAll(".pv-eraser-mode");
+  eraserBtns.forEach(b => {
+    b.addEventListener("click", () => {
+      pvEraserMode = b.dataset.erase;
+      eraserBtns.forEach(e => e.classList.toggle("active", e === b));
+      if (b.dataset.erase === "all") { pvAnnotStrokes = []; pvRedrawAnnot(); }
+    });
+  });
+  const undoBtn = $("pv-annot-undo");
+  if (undoBtn) undoBtn.addEventListener("click", () => { pvAnnotStrokes.pop(); pvRedrawAnnot(); });
+  const clearBtn = $("pv-annot-clear");
+  if (clearBtn) clearBtn.addEventListener("click", () => { pvAnnotStrokes = []; pvRedrawAnnot(); });
+}
+
+function pvSelectAnnotTool(tool) {
+  pvAnnotTool = tool;
+  const canvas = pvAnnotCanvas;
+  if (!canvas) return;
+  canvas.classList.remove("pv-drawing", "pv-erasing", "pv-texting");
+  if (tool === "select") { canvas.style.pointerEvents = "none"; }
+  else {
+    canvas.style.pointerEvents = "auto";
+    if (tool === "eraser") canvas.classList.add("pv-erasing");
+    else if (tool === "text") canvas.classList.add("pv-texting");
+    else canvas.classList.add("pv-drawing");
+  }
+  const bar = $("pv-annot-bar");
+  if (bar) bar.querySelectorAll(".pv-annot-btn[data-tool]").forEach(b =>
+    b.classList.toggle("active", b.dataset.tool === tool)
+  );
+  const colors = $("pv-annot-colors");
+  if (colors) colors.hidden = (tool === "select" || tool === "eraser");
+  const eraserOpts = $("pv-eraser-opts");
+  if (eraserOpts) eraserOpts.hidden = (tool !== "eraser");
+}
+
+let pvExplainIdx = -1;
+let pvExplainFollowups = [];
+
+function pvOpenExplain(idx) {
+  pvExplainIdx = idx;
+  pvExplainFollowups = [];
+  const overlay = $("pv-explain-overlay");
+  const drawer = $("pv-explain-drawer");
+  const body = $("pv-explain-content");
+  if (!overlay || !drawer || !body) return;
+  overlay.hidden = false;
+  drawer.classList.add("open");
+  body.innerHTML = '<div class="pv-explain-loading">Loading explanation...</div>';
+
+  const q = state.questions[idx];
+  const r = state.results[idx];
+  if (!q || !r) return;
+
+  fetchExplanation(q.id, r.yourAnswer, r.correctAnswer, state.syllabus, q.topic)
+    .then(html => {
+      body.innerHTML = html;
+    })
+    .catch(() => {
+      body.innerHTML = '<p style="color:var(--mcq-wrong-ink)">Could not load explanation.</p>';
+    });
+}
+
+function pvCloseExplain() {
+  const overlay = $("pv-explain-overlay");
+  const drawer = $("pv-explain-drawer");
+  if (overlay) overlay.hidden = true;
+  if (drawer) drawer.classList.remove("open");
+  pvExplainIdx = -1;
+}
+
+async function pvSendFollowup() {
+  const input = $("pv-followup-input");
+  if (!input || !input.value.trim()) return;
+  const question = input.value.trim();
+  input.value = "";
+  pvExplainFollowups.push(question);
+  const body = $("pv-explain-content");
+  if (!body) return;
+  const bubble = document.createElement("div");
+  bubble.className = "pv-followup-q";
+  bubble.textContent = question;
+  body.appendChild(bubble);
+  const loading = document.createElement("div");
+  loading.className = "pv-explain-loading";
+  loading.textContent = "Thinking...";
+  body.appendChild(loading);
+
+  const q = state.questions[pvExplainIdx];
+  const r = state.results[pvExplainIdx];
+  if (!q || !r) return;
+  try {
+    const resp = await api("/api/mcq/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question_id: q.id,
+        your_answer: r.yourAnswer,
+        correct_answer: r.correctAnswer,
+        syllabus: state.syllabus,
+        topic: q.topic,
+        followup: question,
+      }),
+    });
+    const data = await resp.json();
+    loading.remove();
+    const ans = document.createElement("div");
+    ans.className = "pv-followup-a";
+    ans.innerHTML = data.html || data.explanation || "No response.";
+    body.appendChild(ans);
+  } catch {
+    loading.textContent = "Error loading follow-up.";
+  }
+  body.scrollTop = body.scrollHeight;
+}
+
+function pvFeedback(type) {
+  const q = state.questions[pvExplainIdx];
+  if (!q) return;
+  api("/api/mcq/explain-feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question_id: q.id, feedback: type }),
+  }).catch(() => {});
+  const helpful = $("pv-fb-helpful");
+  const unhelpful = $("pv-fb-unhelpful");
+  if (helpful) helpful.disabled = true;
+  if (unhelpful) unhelpful.disabled = true;
+}
+
+function pvFinish() {
+  stopPVTimer();
+  stopPaperTimer();
+  document.removeEventListener("keydown", onPVKeyDown);
+
+  state.questions.forEach((q, i) => {
+    if (!state.results[i]) {
+      state.results[i] = {
+        qid: q.id, ref: q.ref, topic: q.topic,
+        yourAnswer: null, correctAnswer: q.answer, timeSecs: 0, result: "skipped",
+      };
+    } else if (state.results[i].result === "pending") {
+      const r = state.results[i];
+      const result = q.has_answer ? (r.yourAnswer === q.answer ? "correct" : "wrong") : "no-key";
+      state.results[i] = { ...r, result, correctAnswer: q.answer };
+    }
+  });
+
+  endSession();
+}
+
+function onPVKeyDown(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if ($("paper-view-panel")?.hidden) return;
+  const k = e.key;
+  if (k === "T") { e.preventDefault(); toggleTheme(); }
+  if (k === "Escape") {
+    if (!$("pv-explain-overlay")?.hidden) { pvCloseExplain(); return; }
+    pvFinish();
+  }
+  if (k === " ") { e.preventDefault(); pvToggleTimer(); }
+  if (k === "v" || k === "V") pvSelectAnnotTool("select");
+  if (k === "p" || k === "P") pvSelectAnnotTool("pen");
+  if (k === "h" || k === "H") pvSelectAnnotTool("highlighter");
+  if (k === "e" || k === "E") pvSelectAnnotTool("eraser");
+  if (e.ctrlKey && k === "z") { pvAnnotStrokes.pop(); pvRedrawAnnot(); }
+}
+
+
+// ── Card-view annotation ──────────────────────────────────────────────────────
+function mcqSetupAnnotCanvas() {
+  const wrap = $("mcq-q-img-wrap");
+  if (!wrap) return;
+  let canvas = wrap.querySelector(".mcq-annot-canvas");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.className = "mcq-annot-canvas";
+    wrap.appendChild(canvas);
+  }
+  const resize = () => {
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+    mcqRedrawAnnot();
+  };
+  resize();
+  if (!canvas._resObs) {
+    canvas._resObs = new ResizeObserver(resize);
+    canvas._resObs.observe(wrap);
+  }
+  mcqAnnotCanvas = canvas;
+  mcqAnnotCtx = canvas.getContext("2d");
+
+  canvas.onpointerdown = e => {
+    if (pvAnnotTool === "select") return;
+    mcqAnnotDrawing = true;
+    const pt = { x: e.offsetX, y: e.offsetY };
+    if (pvAnnotTool === "eraser") { mcqEraseAt(pt); return; }
+    mcqAnnotStrokes.push({ tool: pvAnnotTool, color: pvAnnotColor, points: [pt] });
+  };
+  canvas.onpointermove = e => {
+    if (!mcqAnnotDrawing) return;
+    const pt = { x: e.offsetX, y: e.offsetY };
+    if (pvAnnotTool === "eraser") { mcqEraseAt(pt); return; }
+    const s = mcqAnnotStrokes[mcqAnnotStrokes.length - 1];
+    if (s) { s.points.push(pt); mcqRedrawAnnot(); }
+  };
+  canvas.onpointerup = () => { mcqAnnotDrawing = false; };
+  canvas.onpointerleave = () => { mcqAnnotDrawing = false; };
+}
+
+function mcqRedrawAnnot() {
+  if (!mcqAnnotCtx || !mcqAnnotCanvas) return;
+  mcqAnnotCtx.clearRect(0, 0, mcqAnnotCanvas.width, mcqAnnotCanvas.height);
+  mcqAnnotStrokes.forEach(s => pvDrawStroke(mcqAnnotCtx, s));
+}
+
+function mcqEraseAt(pt) {
+  if (pvEraserMode === "stroke") {
+    mcqAnnotStrokes = mcqAnnotStrokes.filter(s =>
+      !s.points.some(p => Math.hypot(p.x - pt.x, p.y - pt.y) < 15)
+    );
+  } else {
+    mcqAnnotStrokes.forEach(s => {
+      s.points = s.points.filter(p => Math.hypot(p.x - pt.x, p.y - pt.y) >= 8);
+    });
+    mcqAnnotStrokes = mcqAnnotStrokes.filter(s => s.points.length > 0);
+  }
+  mcqRedrawAnnot();
+}
+
+function mcqSaveAnnotForQ(idx) {
+  if (mcqAnnotStrokes.length) mcqAnnotPerQ[idx] = JSON.parse(JSON.stringify(mcqAnnotStrokes));
+  else delete mcqAnnotPerQ[idx];
+}
+
+function mcqRestoreAnnotForQ(idx) {
+  mcqAnnotStrokes = mcqAnnotPerQ[idx] ? JSON.parse(JSON.stringify(mcqAnnotPerQ[idx])) : [];
+  mcqRedrawAnnot();
+}
+
+function mcqSetupAnnotBar() {
+  const bar = $("mcq-annot-bar");
+  if (!bar) return;
+  bar.querySelectorAll(".pv-annot-btn[data-tool]").forEach(b => {
+    b.addEventListener("click", () => mcqSelectAnnotTool(b.dataset.tool));
+  });
+  bar.querySelectorAll(".pv-color-dot").forEach(d => {
+    d.addEventListener("click", () => {
+      pvAnnotColor = d.dataset.color;
+      bar.querySelectorAll(".pv-color-dot").forEach(c => c.classList.toggle("active", c === d));
+    });
+  });
+  bar.querySelectorAll(".pv-eraser-mode").forEach(b => {
+    b.addEventListener("click", () => {
+      pvEraserMode = b.dataset.erase;
+      bar.querySelectorAll(".pv-eraser-mode").forEach(e => e.classList.toggle("active", e === b));
+    });
+  });
+  $("mcq-annot-undo")?.addEventListener("click", () => { mcqAnnotStrokes.pop(); mcqRedrawAnnot(); });
+  $("mcq-annot-clear")?.addEventListener("click", () => { mcqAnnotStrokes = []; mcqRedrawAnnot(); });
+}
+
+function mcqSelectAnnotTool(tool) {
+  pvAnnotTool = tool;
+  const canvas = mcqAnnotCanvas;
+  if (canvas) {
+    canvas.classList.remove("pv-drawing", "pv-erasing");
+    if (tool === "select") canvas.style.pointerEvents = "none";
+    else {
+      canvas.style.pointerEvents = "auto";
+      canvas.classList.add(tool === "eraser" ? "pv-erasing" : "pv-drawing");
+    }
+  }
+  const bar = $("mcq-annot-bar");
+  if (bar) bar.querySelectorAll(".pv-annot-btn[data-tool]").forEach(b =>
+    b.classList.toggle("active", b.dataset.tool === tool)
+  );
+  const colors = $("mcq-annot-colors");
+  if (colors) colors.hidden = (tool === "select" || tool === "eraser");
+  const eraserOpts = $("mcq-eraser-opts");
+  if (eraserOpts) eraserOpts.hidden = (tool !== "eraser");
+}
+
 // ── End session → Results ──────────────────────────────────────────────────────
 function endSession() {
   stopQTimer(); stopOverallTimer(); stopPaperTimer();
   document.removeEventListener("keydown", onKeyDown);
   document.body.classList.remove("mcq-in-session");
+  mcqAnnotCanvas = null; mcqAnnotCtx = null; mcqAnnotStrokes = []; mcqAnnotPerQ = {};
   clearSaved();   // the session is over — nothing left to resume
   const ptEl = $("mcq-paper-time");
   if (ptEl) {

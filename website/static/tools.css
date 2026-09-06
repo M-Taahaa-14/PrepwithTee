@@ -2098,3 +2098,101 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
   .ar-grade-btns { grid-template-columns: 1fr 1fr; }
 }
 
+
+/* ── Grade calculator: weighting reference + A* targets ─────────── */
+.gcw-block { margin-top: 26px; }
+.gcw-lead { color: var(--grey); font-size: .92rem; line-height: 1.5;
+  max-width: 760px; margin: 2px 0 16px; }
+.gcw-lead b { color: var(--ink); }
+.gcw-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+}
+.gcw-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: 14px; padding: 14px 15px; display: flex;
+  flex-direction: column; gap: 6px;
+  border-top: 3px solid var(--gold);
+}
+.gcw-card-head { display: flex; align-items: baseline;
+  justify-content: space-between; gap: 8px; }
+.gcw-paper { font-weight: 800; color: var(--ink); font-size: 1rem; }
+.gcw-variant { color: var(--grey); font-weight: 600; font-size: .72rem;
+  margin-left: 4px; }
+.gcw-weight { font-family: Archivo, system-ui, sans-serif;
+  font-weight: 900; font-size: 1.5rem; color: var(--gold);
+  line-height: 1; }
+.gcw-hint { color: var(--grey); font-size: .78rem; }
+.gcw-convert { display: flex; align-items: center; gap: 8px;
+  margin-top: 4px; }
+.gcw-raw, .gcw-wtd { display: flex; flex-direction: column;
+  align-items: center; font-weight: 800; font-size: 1.15rem;
+  color: var(--ink); line-height: 1.1; }
+.gcw-raw em, .gcw-wtd em { font-style: normal; font-weight: 600;
+  font-size: .62rem; color: var(--grey); text-transform: uppercase;
+  letter-spacing: .04em; }
+.gcw-wtd { color: var(--purple); }
+.gcw-arrow { color: var(--gold); font-weight: 900; font-size: 1.1rem; }
+.gcw-factor { color: var(--grey); font-size: .72rem;
+  border-top: 1px dashed var(--line); padding-top: 6px; }
+
+.gcw-target {
+  margin-top: 18px; background: var(--cream);
+  border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
+}
+.gcw-target-head { display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 6px 14px; margin-bottom: 12px; }
+.gcw-target-title { font-weight: 800; color: var(--ink); font-size: 1.02rem; }
+.gcw-target-sub { color: var(--grey); font-size: .8rem; }
+.gcw-target-list { display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.gcw-target-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; background: var(--white); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 12px;
+}
+.gcw-t-paper { font-weight: 700; color: var(--ink); font-size: .84rem; }
+.gcw-t-paper em { font-style: normal; color: var(--grey); font-weight: 600;
+  font-size: .72rem; }
+.gcw-t-need { font-weight: 800; color: var(--purple); font-size: .92rem; }
+.gcw-t-need b { color: var(--gold); font-size: 1.08rem; }
+.gcw-t-pct { color: var(--grey); font-size: .74rem; min-width: 34px;
+  text-align: right; }
+.gcw-target-note { color: var(--grey); font-size: .78rem; line-height: 1.5;
+  margin: 12px 0 0; }
+.gcw-target-note b { color: var(--ink); }
+
+.gc-astar-note {
+  font-size: .78rem; color: var(--grey); background: var(--cream);
+  border: 1px dashed var(--line); border-radius: 9px; padding: 7px 10px;
+  line-height: 1.4;
+}
+.gc-astar-note b { color: var(--gold); }
+.gc-astar-note.is-hit { color: var(--green-ink); background: var(--green);
+  border-color: var(--green-line); border-style: solid; }
+
+/* ── Yearly library: grade thresholds panel ─────────────────────── */
+.lib-thresholds {
+  margin: 14px 0 6px; background: var(--white);
+  border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
+}
+.lib-th-head { display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 4px 12px; margin-bottom: 10px; }
+.lib-th-head b { color: var(--ink); font-size: 1rem; }
+.lib-th-head span { color: var(--grey); font-size: .8rem; }
+.lib-th-block { padding: 10px 0; border-top: 1px dashed var(--line); }
+.lib-th-block:first-of-type { border-top: none; }
+.lib-th-label { color: var(--grey); font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+.lib-th-none { color: var(--grey); font-size: .82rem; }
+.lib-th-opt {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+  padding: 7px 0;
+}
+.lib-th-opt + .lib-th-opt { border-top: 1px solid var(--line); }
+.lib-th-opt-code { font-weight: 800; color: var(--purple); font-size: .82rem;
+  min-width: 34px; }
+.lib-th-opt-comp { color: var(--grey); font-size: .76rem; margin-right: auto; }
+.lib-th-note { color: var(--grey); font-size: .76rem; line-height: 1.5;
+  margin: 10px 0 0; }
+.lib-th-note a { color: var(--gold); font-weight: 700; }

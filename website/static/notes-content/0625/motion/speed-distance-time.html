@@ -1,0 +1,96 @@
+<h2 id="speed-formula">Speed and average speed</h2>
+
+<div class="note-def">
+  <strong>Speed</strong> is the distance travelled per unit time. It is a <strong>scalar</strong> quantity (magnitude only, no direction).
+  \[ \text{speed} = \frac{\text{distance}}{\text{time}} \quad\Rightarrow\quad v = \frac{d}{t} \]
+  SI unit: <strong>metres per second (m/s)</strong>. Also used: km/h, cm/s.
+</div>
+
+<div class="note-key">
+  <strong>Average speed</strong> is calculated over a whole journey — it does not tell you whether the object was speeding up, slowing down, or stationary at any particular moment.
+  \[ \text{average speed} = \frac{\text{total distance}}{\text{total time}} \]
+</div>
+
+<details class="note-example">
+  <summary>Worked example — average speed calculation</summary>
+  <div>
+    <p>A car travels 120 km in 1.5 hours. Calculate its average speed in m/s.</p>
+    <p><strong>Step 1:</strong> Convert units. \( d = 120\,\text{km} = 120\,000\,\text{m} \); \( t = 1.5\,\text{h} = 1.5 \times 3600 = 5400\,\text{s} \).</p>
+    <p><strong>Step 2:</strong> Apply the formula. \( v = \dfrac{d}{t} = \dfrac{120\,000}{5400} = 22.2\,\text{m/s} \)</p>
+  </div>
+</details>
+
+<h2 id="dt-graphs">Distance-time graphs</h2>
+
+<div class="note-key">
+  A distance-time (d-t) graph shows how far an object has travelled from its starting point at each moment in time.
+  <ul style="margin:.5rem 0 0 1.2rem;line-height:2">
+    <li><strong>Gradient = speed.</strong> A steeper slope means a higher speed.</li>
+    <li><strong>Horizontal line</strong> → the object is <em>stationary</em> (distance not changing).</li>
+    <li><strong>Straight line with positive slope</strong> → constant speed.</li>
+    <li><strong>Curve becoming steeper</strong> → the object is speeding up (accelerating).</li>
+    <li><strong>Curve becoming shallower</strong> → the object is slowing down (decelerating).</li>
+  </ul>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Distance-time graph. Section A: constant speed (steep straight line). Section B: stationary (horizontal). Section C: faster constant speed (steeper line).">
+  <div style="padding:1rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 300 200" width="300" height="200" aria-label="Distance-time graph">
+      <!-- axes -->
+      <line x1="40" y1="170" x2="280" y2="170" stroke="#5A5A72" stroke-width="1.5"/>
+      <line x1="40" y1="170" x2="40"  y2="20"  stroke="#5A5A72" stroke-width="1.5"/>
+      <!-- axis labels -->
+      <text x="155" y="190" font-size="11" fill="#5A5A72" text-anchor="middle">Time / s</text>
+      <text x="12"  y="100" font-size="11" fill="#5A5A72" text-anchor="middle" transform="rotate(-90,12,100)">Distance / m</text>
+      <!-- Section A: constant speed (0,170)→(100,100) -->
+      <line x1="40" y1="170" x2="130" y2="100" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- Section B: stationary (100,100)→(170,100) -->
+      <line x1="130" y1="100" x2="190" y2="100" stroke="#E8913A" stroke-width="2.2"/>
+      <!-- Section C: faster speed (170,100)→(240,40) -->
+      <line x1="190" y1="100" x2="265" y2="30" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- labels -->
+      <text x="78"  y="145" font-size="10" fill="#4C2E72" font-weight="700">A</text>
+      <text x="158" y="94"  font-size="10" fill="#E8913A" font-weight="700">B</text>
+      <text x="232" y="70"  font-size="10" fill="#4C2E72" font-weight="700">C</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="gradient">Calculating speed from a d-t graph</h2>
+
+<div class="note-key">
+  To find the speed from a <strong>straight section</strong> of a d-t graph:
+  \[ \text{speed} = \text{gradient} = \frac{\Delta d}{\Delta t} = \frac{d_2 - d_1}{t_2 - t_1} \]
+  Choose two clearly readable points on the line (not data points — use the line itself). Draw a large triangle to minimise reading error.
+</div>
+
+<details class="note-example">
+  <summary>Worked example — speed from gradient</summary>
+  <div>
+    <p>On a distance-time graph, a straight line passes through (0 s, 0 m) and (4 s, 24 m). Find the speed.</p>
+    <p>\( v = \dfrac{\Delta d}{\Delta t} = \dfrac{24 - 0}{4 - 0} = \dfrac{24}{4} = 6\,\text{m/s} \)</p>
+  </div>
+</details>
+
+<div class="note-tip">
+  When you calculate the gradient, always show the two coordinates you used and the unit in your final answer. The examiner awards the mark for the correct unit (m/s) — writing just "6" without the unit loses the mark.
+</div>
+
+<div class="note-warn">
+  A d-t graph <strong>cannot show negative distance</strong> in the basic IGCSE context (distance is a scalar and is always ≥ 0). If the graph line goes back down towards the x-axis, the question has plotted a displacement-time graph instead — mention this distinction if the question asks you to comment.
+</div>
+
+<h2 id="unit-conversion">Useful unit conversions</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>From</th><th>To</th><th>Multiply by</th></tr></thead>
+    <tbody>
+      <tr><td>km/h</td><td>m/s</td><td>÷ 3.6</td></tr>
+      <tr><td>m/s</td><td>km/h</td><td>× 3.6</td></tr>
+      <tr><td>cm/s</td><td>m/s</td><td>÷ 100</td></tr>
+      <tr><td>minutes</td><td>seconds</td><td>× 60</td></tr>
+      <tr><td>hours</td><td>seconds</td><td>× 3600</td></tr>
+    </tbody>
+  </table>
+</div>

@@ -17,8 +17,8 @@ Billing cycle: quotas reset from plan_started_at, not the calendar month.
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException
 
-from .auth import get_current_user
-from . import users_db as _udb
+from auth import get_current_user
+import users_db as _udb
 
 # ── Plan hierarchy ────────────────────────────────────────────────────────────
 

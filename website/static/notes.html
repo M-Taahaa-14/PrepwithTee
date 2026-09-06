@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -12,50 +12,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
-  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260828a">
-  <link rel="stylesheet" href="dashboard-hub.css?v=20260829a">
+  <script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="styles.css?v=20260907a">
+  <link rel="stylesheet" href="dashboard-hub.css?v=20260906a">
 
   <style>
-    /* ── Learning ecosystem strip ── */
-    .learn-eco {
-      display: flex; gap: .6rem; margin: 1.1rem 0 0;
-      padding: .65rem; background: var(--cream); border-radius: 14px;
-      border: 1.5px solid var(--line); flex-wrap: wrap;
+    /* ── Learning ecosystem quick links ── */
+    .nh-quick-nav {
+      display: flex; gap: .4rem; margin-top: .9rem; padding-bottom: 1rem; flex-wrap: wrap;
     }
-    .leo-item {
-      flex: 1; min-width: 170px; display: flex; align-items: center; gap: .6rem;
-      padding: .6rem .8rem; border-radius: 10px; text-decoration: none;
-      border: 1.5px solid transparent; color: var(--ink); transition: all .15s;
+    .nh-qnav-link {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .3rem .72rem; border-radius: 20px;
+      border: 1.5px solid var(--line); background: var(--cream);
+      font-size: .78rem; font-weight: 600; color: var(--grey);
+      text-decoration: none; transition: all .13s; white-space: nowrap;
     }
-    .leo-item:hover { background: #fff; border-color: var(--line); box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-    html[data-theme="dark"] .leo-item:hover { background: var(--dark-lighter, #1a1a2e); }
-    .leo-item.leo-active {
-      background: var(--navy); color: #fff; border-color: var(--navy); pointer-events: none;
-    }
-    .leo-ico { font-size: 1.3rem; flex-shrink: 0; line-height: 1; }
-    .leo-label { font-weight: 700; font-size: .86rem; display: block; margin-bottom: .1rem; }
-    .leo-desc { font-size: .72rem; opacity: .68; line-height: 1.35; }
-    .leo-item.leo-active .leo-desc { opacity: .75; }
-    @media(max-width:520px) { .learn-eco { flex-direction: column; } }
+    .nh-qnav-link:hover { border-color: var(--navy); color: var(--navy); background: #fff; }
+    html[data-theme="dark"] .nh-qnav-link { background: var(--cream); }
+    html[data-theme="dark"] .nh-qnav-link:hover { background: var(--white); }
 
-
-    /* ═══════════════════════════════════════════════════
-       NOTES HUB — Page-level styles
-    ═══════════════════════════════════════════════════ */
-
-    /* Hero */
-    .nh-hero {
-      padding: 2rem 0 0;
-      border-bottom: 1px solid var(--line);
-    }
+    /* ── HERO ── */
+    .nh-hero { padding: 2rem 0 0; border-bottom: 1px solid var(--line); }
     .nh-eyebrow {
       font-size: .68rem; font-weight: 700; letter-spacing: .18em;
       text-transform: uppercase; color: var(--gold); margin-bottom: .3rem;
     }
     .nh-h1 {
       font-family: "Playfair Display", Georgia, serif;
-      font-size: clamp(1.7rem, 3.5vw, 2.2rem);
+      font-size: clamp(1.7rem,3.5vw,2.2rem);
       color: var(--navy); margin-bottom: .3rem; line-height: 1.1;
     }
     .nh-desc { color: var(--grey); font-size: .88rem; line-height: 1.6; max-width: 480px; }
@@ -64,7 +49,7 @@
       gap: 1rem; flex-wrap: wrap; margin-top: 1.2rem; padding-bottom: 1.2rem;
     }
 
-    /* Filter bar */
+    /* ── FILTER BAR ── */
     .nh-filter-bar {
       padding: .9rem 0 .7rem; border-bottom: 1px solid var(--line);
       display: flex; gap: .45rem; flex-wrap: wrap; align-items: center;
@@ -78,7 +63,6 @@
       cursor: pointer; min-width: 100px; transition: border-color .15s;
     }
     .nh-sel:focus { outline: none; border-color: var(--navy); }
-    .nh-sel:hover { border-color: #b8b0cc; }
     html[data-theme="dark"] .nh-sel {
       background: var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a87b0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .55rem center;
       color: var(--ink); border-color: var(--line);
@@ -98,7 +82,7 @@
     .nh-search::placeholder { color: var(--grey); }
     html[data-theme="dark"] .nh-search { background: var(--cream); border-color: var(--line); }
 
-    /* View-toggle */
+    /* View toggle */
     .nh-view-toggle {
       display: flex; background: var(--cream); border-radius: 10px; padding: 3px;
       border: 1.5px solid var(--line); gap: 2px; margin-left: auto;
@@ -123,26 +107,132 @@
     }
     .nh-new-btn:hover { background: var(--navy-deep); box-shadow: 0 4px 16px rgba(76,46,114,.25); transform: translateY(-1px); }
 
-    /* ── CONTENT AREA ── */
+    /* ── TABS ── */
+    .nh-tabs {
+      display: flex; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+      border-bottom: 1px solid var(--line); padding-top: .9rem;
+    }
+    .nh-tabs::-webkit-scrollbar { display: none; }
+    .nh-tab {
+      padding: .58rem 1rem; font-size: .84rem; font-weight: 600;
+      color: var(--grey); border: none; background: none; cursor: pointer;
+      white-space: nowrap; border-bottom: 2.5px solid transparent;
+      transition: color .13s, border-color .13s; margin-bottom: -1px; flex-shrink: 0;
+    }
+    .nh-tab:hover { color: var(--navy); }
+    .nh-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+    html[data-theme="dark"] .nh-tab.active { color: #C4D0F0; }
+
+    /* ── SUBJECT PILLS ── */
+    .nh-subject-pills {
+      display: flex; gap: .35rem; flex-wrap: nowrap; overflow-x: auto;
+      padding: .65rem 0 .5rem; border-bottom: 1px solid var(--line);
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .nh-subject-pills::-webkit-scrollbar { display: none; }
+    .nh-spill {
+      padding: .28rem .7rem; border-radius: 20px;
+      border: 1.5px solid var(--line); background: transparent;
+      font-size: .78rem; font-weight: 600; color: var(--grey);
+      cursor: pointer; white-space: nowrap; transition: all .13s; font-family: inherit;
+      flex-shrink: 0;
+    }
+    .nh-spill:hover { border-color: var(--navy); color: var(--navy); }
+    .nh-spill.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    /* ── BODY ── */
     .nh-body { padding: 1.5rem 0 4rem; min-height: 400px; }
 
-    /* ── MASONRY (sticky grid) ── */
-    .nh-masonry {
-      columns: 4; column-gap: .85rem;
+    /* ── GROUP HEADERS ── */
+    .nh-group-head {
+      font-size: .68rem; font-weight: 800; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--grey);
+      padding: 1rem 0 .4rem; margin-top: .2rem;
+      border-top: 1px solid var(--line);
+      display: flex; align-items: center; gap: .5rem;
     }
-    @media(max-width:1100px){ .nh-masonry { columns: 3; } }
-    @media(max-width:740px) { .nh-masonry { columns: 2; } }
-    @media(max-width:460px) { .nh-masonry { columns: 1; } }
+    .nh-group-head:first-child { border-top: none; padding-top: .4rem; }
+    .nh-group-count {
+      font-size: .68rem; font-weight: 700; padding: .1rem .42rem;
+      border-radius: 20px; background: var(--lav); color: var(--lav-ink);
+    }
 
-    /* Sticky card */
+    /* ── LIST ── */
+    .nh-list { display: flex; flex-direction: column; gap: .55rem; }
+    .nh-note-row {
+      background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+      padding: .9rem 1.1rem; display: flex; gap: 1rem; align-items: flex-start;
+      cursor: pointer; transition: border-color .15s, box-shadow .15s;
+      outline-offset: 2px;
+    }
+    .nh-note-row:hover { border-color: var(--navy); box-shadow: 0 2px 14px rgba(76,46,114,.09); }
+    .nh-note-row:focus-visible { outline: 2px solid var(--navy); }
+    html[data-theme="dark"] .nh-note-row { background: var(--white); }
+    .nh-note-row-ico { font-size: 1.25rem; line-height: 1; flex-shrink: 0; margin-top: .1rem; }
+    .nh-note-row-body { flex: 1; min-width: 0; }
+    .nh-note-row-title {
+      font-weight: 700; font-size: .93rem; color: var(--navy);
+      margin-bottom: .18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .nh-note-row-title.untitled { color: var(--grey); font-style: italic; }
+    .nh-note-row-preview {
+      font-size: .82rem; color: var(--grey); line-height: 1.5;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nh-note-row-foot {
+      display: flex; align-items: center; gap: .55rem; margin-top: .3rem; flex-wrap: wrap;
+    }
+    .nh-note-row-date { font-size: .68rem; color: var(--grey); }
+    .nh-note-row-actions {
+      display: flex; gap: .3rem; flex-shrink: 0; opacity: 0; transition: opacity .15s;
+    }
+    .nh-note-row:hover .nh-note-row-actions { opacity: 1; }
+
+    /* ── SOURCE CHIP ── */
+    .nh-source-chip {
+      display: inline-flex; align-items: center; gap: .3rem;
+      font-size: .71rem; font-weight: 600; padding: .18rem .5rem;
+      border-radius: 6px; background: var(--lav,#EEE8FF);
+      color: var(--navy); margin-top: .25rem; width: fit-content;
+    }
+
+    /* ── ACTION BUTTONS ── */
+    .nh-action-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 8px; border: none;
+      background: rgba(0,0,0,.06); color: var(--ink); cursor: pointer;
+      font-size: .82rem; transition: background .13s;
+    }
+    .nh-action-btn:hover { background: rgba(0,0,0,.13); }
+    html[data-theme="dark"] .nh-action-btn { background: rgba(255,255,255,.09); }
+    html[data-theme="dark"] .nh-action-btn:hover { background: rgba(255,255,255,.18); }
+    .nh-pin-btn.pinned { color: var(--gold); background: rgba(232,145,58,.15); }
+
+    /* Jump button */
+    .nh-jump-btn {
+      display: inline-flex; align-items: center; gap: .3rem;
+      font-size: .74rem; font-weight: 700; padding: .28rem .7rem;
+      border-radius: 8px; border: 1.5px solid var(--line);
+      background: none; color: var(--navy); cursor: pointer; white-space: nowrap;
+      transition: border-color .13s, background .13s;
+    }
+    .nh-jump-btn:hover { border-color: var(--navy); background: var(--lav,#EEE8FF); }
+    html[data-theme="dark"] .nh-jump-btn { color: #7B9FE0; border-color: var(--line); }
+
+    /* ── MASONRY ── */
+    .nh-masonry { columns: 3; column-gap: .85rem; }
+    @media(max-width:900px) { .nh-masonry { columns: 2; } }
+    @media(max-width:500px) { .nh-masonry { columns: 1; } }
+
     .nh-sticky {
       break-inside: avoid; margin-bottom: .85rem;
       border-radius: 14px; padding: 1rem 1rem 1.15rem;
       position: relative; cursor: pointer;
       box-shadow: 0 2px 12px rgba(0,0,0,.07);
-      transition: transform .18s, box-shadow .18s;
+      transition: transform .18s, box-shadow .18s; outline-offset: 2px;
     }
-    .nh-sticky:hover { transform: rotate(-0.5deg) translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.13); }
+    .nh-sticky:hover { transform: rotate(-0.4deg) translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,.13); }
+    .nh-sticky:focus-visible { outline: 2px solid var(--navy); }
     .nh-sticky.color-yellow  { background: #FFF8C5; }
     .nh-sticky.color-pink    { background: #FFD6E7; }
     .nh-sticky.color-blue    { background: #D4EDFF; }
@@ -155,103 +245,179 @@
     html[data-theme="dark"] .nh-sticky.color-green   { background: #0e2e1e; color: #9ee4c0; }
     html[data-theme="dark"] .nh-sticky.color-purple  { background: #231040; color: #d4b8ff; }
     html[data-theme="dark"] .nh-sticky.color-default { background: #3a3412; color: #e8e0a0; }
-    .nh-sticky-title {
-      font-weight: 700; font-size: .9rem; color: var(--ink);
-      margin-bottom: .4rem; word-break: break-word;
-    }
+    .nh-sticky-title { font-weight: 700; font-size: .9rem; margin-bottom: .4rem; word-break: break-word; }
     .nh-sticky-body {
-      font-size: .83rem; line-height: 1.55; color: var(--ink);
-      white-space: pre-wrap; word-break: break-word;
-      max-height: 200px; overflow: hidden;
+      font-size: .83rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+      max-height: 210px; overflow: hidden;
     }
     .nh-sticky-meta {
       margin-top: .7rem; display: flex; align-items: center; justify-content: space-between;
-      font-size: .68rem; color: rgba(0,0,0,.45); flex-wrap: wrap; gap: .3rem;
+      font-size: .68rem; color: rgba(0,0,0,.42); flex-wrap: wrap; gap: .3rem;
     }
-    html[data-theme="dark"] .nh-sticky-meta { color: rgba(255,255,255,.35); }
-    .nh-sticky-link-badge {
-      display: inline-flex; align-items: center; gap: .25rem;
-      font-size: .64rem; font-weight: 600; padding: .15rem .45rem;
-      border-radius: 20px; background: rgba(0,0,0,.08); color: rgba(0,0,0,.5);
-      max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    html[data-theme="dark"] .nh-sticky-link-badge { background: rgba(255,255,255,.1); color: rgba(255,255,255,.5); }
-
-    /* ── LIST VIEW (text notes) ── */
-    .nh-list { display: flex; flex-direction: column; gap: .6rem; }
-    .nh-note-row {
-      background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
-      padding: 1rem 1.1rem; display: flex; gap: 1rem; align-items: flex-start;
-      cursor: pointer; transition: border-color .15s, box-shadow .15s;
-    }
-    .nh-note-row:hover { border-color: var(--navy); box-shadow: 0 2px 12px rgba(76,46,114,.08); }
-    html[data-theme="dark"] .nh-note-row { background: var(--white); }
-    .nh-note-row-ico {
-      font-size: 1.3rem; line-height: 1; flex-shrink: 0; margin-top: .1rem;
-    }
-    .nh-note-row-body { flex: 1; min-width: 0; }
-    .nh-note-row-title {
-      font-weight: 700; font-size: .92rem; color: var(--navy);
-      margin-bottom: .2rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .nh-note-row-title.untitled { color: var(--grey); font-style: italic; }
-    .nh-note-row-preview {
-      font-size: .82rem; color: var(--grey); line-height: 1.5;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .nh-note-row-foot {
-      display: flex; align-items: center; gap: .55rem; margin-top: .35rem; flex-wrap: wrap;
-    }
-    .nh-note-row-date { font-size: .68rem; color: var(--grey); }
-    .nh-note-row-actions {
-      display: flex; gap: .3rem; flex-shrink: 0; opacity: 0;
-      transition: opacity .15s;
-    }
-    .nh-note-row:hover .nh-note-row-actions { opacity: 1; }
-    .nh-sticky:hover .nh-sticky-actions { opacity: 1; }
+    html[data-theme="dark"] .nh-sticky-meta { color: rgba(255,255,255,.32); }
     .nh-sticky-actions {
-      position: absolute; top: .55rem; right: .55rem;
+      position: absolute; top: .5rem; right: .5rem;
       display: flex; gap: .25rem; opacity: 0; transition: opacity .15s;
     }
-    .nh-action-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 28px; height: 28px; border-radius: 8px; border: none;
-      background: rgba(0,0,0,.07); color: var(--ink); cursor: pointer;
-      font-size: .8rem; transition: background .13s;
-    }
-    .nh-action-btn:hover { background: rgba(0,0,0,.14); }
-    html[data-theme="dark"] .nh-action-btn { background: rgba(255,255,255,.1); color: var(--ink); }
-    html[data-theme="dark"] .nh-action-btn:hover { background: rgba(255,255,255,.2); }
-    .nh-pin-btn.pinned { color: var(--gold); background: rgba(232,145,58,.15); }
+    .nh-sticky:hover .nh-sticky-actions { opacity: 1; }
 
-    /* Empty / loading */
-    .nh-empty {
-      padding: 4rem 1rem; text-align: center;
+    /* ── BADGES ── */
+    .nh-card-flags { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: .3rem; }
+    .nh-badge {
+      display: inline-flex; align-items: center; gap: .2rem;
+      font-size: .62rem; font-weight: 700; padding: .14rem .42rem;
+      border-radius: 20px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
     }
+    .nh-badge-mistake  { background: #FAEAEC; color: #8B1B2B; }
+    .nh-badge-revision { background: #F3E4C4; color: #8B5E00; }
+    html[data-theme="dark"] .nh-badge-mistake  { background: #2A0A10; color: #E87B8B; }
+    html[data-theme="dark"] .nh-badge-revision { background: #2A1E00; color: #D4A850; }
+
+    /* ── TAGS ── */
+    .nh-card-tags { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .28rem; }
+    .nh-card-tag {
+      font-size: .7rem; font-weight: 600; padding: .12rem .45rem;
+      border-radius: 20px; background: var(--lav,#EEE8FF); color: var(--navy,#1B3A7A);
+    }
+
+    /* ── EMPTY / SKELETON ── */
+    .nh-empty { padding: 4rem 1rem; text-align: center; }
     .nh-empty-ico { font-size: 2.8rem; margin-bottom: .8rem; }
     .nh-empty h3 { font-size: 1.05rem; color: var(--ink); margin-bottom: .3rem; }
     .nh-empty p  { color: var(--grey); font-size: .86rem; line-height: 1.6; }
-    @keyframes sk-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    @keyframes sk-pulse { 0%,100%{opacity:1}50%{opacity:.4} }
     .nh-skeleton { height: 12px; background: var(--line); border-radius: 6px; animation: sk-pulse 1.6s ease infinite; margin-bottom: 6px; }
 
     /* ═══════════════════════════════════════════════════
-       COMPOSER SIDE PANE
+       VIEWER OVERLAY
+    ═══════════════════════════════════════════════════ */
+    .nh-view-overlay {
+      position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+    }
+    .nh-view-overlay.open { pointer-events: all; }
+    .nh-view-overlay .nh-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(10,6,26,.42); backdrop-filter: blur(3px);
+      opacity: 0; transition: opacity .22s; cursor: pointer;
+    }
+    .nh-view-overlay.open .nh-backdrop { opacity: 1; }
+    .nh-view-modal {
+      position: absolute; top: 0; right: 0; bottom: 0;
+      width: min(540px, 100vw);
+      background: #fff; display: flex; flex-direction: column;
+      box-shadow: -8px 0 48px rgba(10,6,26,.2);
+      transform: translateX(100%);
+      transition: transform .28s cubic-bezier(.34,1.0,.64,1);
+      overflow: hidden;
+    }
+    .nh-view-overlay.open .nh-view-modal { transform: translateX(0); }
+    html[data-theme="dark"] .nh-view-modal { background: var(--dark); border-left: 1.5px solid var(--line); }
+
+    .vw-head {
+      padding: 1rem 1.2rem .8rem;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem;
+    }
+    .vw-head-left { flex: 1; min-width: 0; }
+    .vw-title {
+      font-weight: 800; font-size: 1.05rem; color: var(--navy);
+      word-break: break-word; line-height: 1.25; margin-bottom: .2rem;
+    }
+    .vw-date { font-size: .72rem; color: var(--grey); }
+    .vw-head-right { display: flex; align-items: center; gap: .35rem; flex-shrink: 0; }
+    .vw-close-btn {
+      width: 32px; height: 32px; border: none; background: var(--cream);
+      border-radius: 8px; cursor: pointer; color: var(--grey); font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; transition: background .13s;
+    }
+    .vw-close-btn:hover { background: var(--line); }
+    html[data-theme="dark"] .vw-close-btn { background: var(--dark-lighter); }
+
+    /* Jump to source — prominent CTA */
+    .vw-jump-btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .42rem 1rem; border-radius: 10px;
+      background: var(--navy); color: #fff;
+      font-size: .82rem; font-weight: 700; border: none; cursor: pointer;
+      transition: background .15s, transform .12s;
+    }
+    .vw-jump-btn:hover { background: var(--navy-deep); transform: translateY(-1px); }
+
+    .vw-body {
+      flex: 1; overflow-y: auto; padding: 1.2rem 1.2rem 1.5rem;
+      display: flex; flex-direction: column; gap: .9rem;
+    }
+
+    /* Rendered note content */
+    .vw-content {
+      font-size: .92rem; line-height: 1.75; color: var(--ink);
+      word-break: break-word; white-space: pre-wrap;
+    }
+    .vw-content h3 {
+      font-size: 1rem; font-weight: 700; color: var(--navy);
+      margin: .6rem 0 .25rem; line-height: 1.3;
+    }
+    .vw-content strong { font-weight: 700; }
+    .vw-content em { font-style: italic; }
+    .vw-content code {
+      font-family: "Fira Mono", "Courier New", monospace; font-size: .85em;
+      background: var(--cream); border-radius: 4px; padding: .1em .4em;
+      color: #c0392b; border: 1px solid var(--line);
+    }
+    html[data-theme="dark"] .vw-content code { color: #ff8a80; background: var(--dark-lighter); }
+    .vw-content pre {
+      background: var(--cream); border: 1px solid var(--line);
+      border-radius: 8px; padding: .75rem 1rem; overflow-x: auto;
+      font-family: "Fira Mono", "Courier New", monospace; font-size: .84rem;
+      line-height: 1.6; margin: .4rem 0; white-space: pre;
+    }
+    html[data-theme="dark"] .vw-content pre { background: var(--dark-lighter); }
+    .vw-content pre code { background: none; border: none; padding: 0; color: inherit; font-size: 1em; }
+    .vw-content ul, .vw-content ol {
+      padding-left: 1.4rem; margin: .3rem 0;
+    }
+    .vw-content li { margin-bottom: .2rem; }
+    .vw-content u { text-decoration: underline; }
+
+    .vw-foot {
+      padding: .85rem 1.2rem; border-top: 1px solid var(--line);
+      display: flex; gap: .5rem; align-items: center; justify-content: flex-end;
+    }
+    .vw-edit-btn {
+      padding: .45rem 1.1rem; border-radius: 10px;
+      background: var(--cream); color: var(--ink);
+      font-weight: 600; font-size: .86rem;
+      border: 1.5px solid var(--line); cursor: pointer; transition: border-color .15s;
+    }
+    .vw-edit-btn:hover { border-color: var(--navy); }
+    .vw-del-btn {
+      padding: .45rem 1rem; border-radius: 10px;
+      background: none; color: #c0392b;
+      font-weight: 600; font-size: .86rem;
+      border: 1.5px solid rgba(192,57,43,.3); cursor: pointer; transition: all .15s;
+    }
+    .vw-del-btn:hover { background: #faeaec; border-color: #c0392b; }
+    html[data-theme="dark"] .vw-del-btn { color: #E87B8B; border-color: rgba(232,123,139,.3); }
+    html[data-theme="dark"] .vw-del-btn:hover { background: #2A0A10; }
+
+    /* ═══════════════════════════════════════════════════
+       COMPOSER MODAL
     ═══════════════════════════════════════════════════ */
     .nh-overlay {
-      position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+      position: fixed; inset: 0; z-index: 9100; pointer-events: none;
     }
     .nh-overlay.open { pointer-events: all; }
     .nh-backdrop {
       position: absolute; inset: 0;
-      background: rgba(10,6,26,.38); backdrop-filter: blur(2px);
+      background: rgba(10,6,26,.42); backdrop-filter: blur(3px);
       opacity: 0; transition: opacity .22s; cursor: pointer;
     }
     .nh-overlay.open .nh-backdrop { opacity: 1; }
     .nh-modal {
       position: absolute; top: 0; right: 0; bottom: 0;
-      width: min(460px, 100vw);
+      width: min(480px, 100vw);
       background: #fff;
-      box-shadow: -6px 0 40px rgba(10,6,26,.18);
+      box-shadow: -6px 0 40px rgba(10,6,26,.2);
       display: flex; flex-direction: column;
       transform: translateX(100%);
       transition: transform .28s cubic-bezier(.34,1.0,.64,1);
@@ -260,8 +426,7 @@
     .nh-overlay.open .nh-modal { transform: translateX(0); }
     html[data-theme="dark"] .nh-modal { background: var(--dark); border-left: 1.5px solid var(--line); }
     .nh-modal-head {
-      padding: 1rem 1.2rem .85rem;
-      border-bottom: 1px solid var(--line);
+      padding: 1rem 1.2rem .85rem; border-bottom: 1px solid var(--line);
       display: flex; align-items: center; justify-content: space-between;
     }
     .nh-modal-title { font-weight: 700; font-size: .95rem; color: var(--navy); }
@@ -274,43 +439,118 @@
     .nh-close-btn:hover { background: var(--line); }
     html[data-theme="dark"] .nh-close-btn { background: var(--dark-lighter); }
 
-    .nh-modal-body { padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: .75rem; overflow-y: auto; flex: 1; }
+    .nh-modal-body { padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: .7rem; overflow-y: auto; flex: 1; }
 
-    /* Type toggle (text / sticky) */
+    /* Type toggle */
     .nh-type-row { display: flex; gap: .5rem; }
     .nh-type-pill {
       padding: .38rem .9rem; border-radius: 20px; border: 1.5px solid var(--line);
-      font-size: .8rem; font-weight: 600; cursor: pointer; background: #fff;
-      color: var(--grey); transition: all .15s;
+      font-size: .8rem; font-weight: 600; cursor: pointer; background: #fff; color: var(--grey); transition: all .15s;
     }
     .nh-type-pill.active { border-color: var(--navy); background: var(--navy); color: #fff; }
     html[data-theme="dark"] .nh-type-pill { background: var(--dark-lighter); }
 
-    /* Colour picker row */
+    /* Colour swatches */
     .nh-color-row { display: flex; gap: .45rem; flex-wrap: wrap; }
     .nh-color-swatch {
       width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid transparent;
       cursor: pointer; transition: transform .15s;
     }
-    .nh-color-swatch:hover { transform: scale(1.18); }
+    .nh-color-swatch:hover { transform: scale(1.2); }
     .nh-color-swatch.active { border-color: var(--navy); }
-    .nh-color-swatch[data-color="yellow"]  { background: #FFF176; }
-    .nh-color-swatch[data-color="pink"]    { background: #FFB3C8; }
-    .nh-color-swatch[data-color="blue"]    { background: #90CAF9; }
-    .nh-color-swatch[data-color="green"]   { background: #A5D6A7; }
-    .nh-color-swatch[data-color="purple"]  { background: #CE93D8; }
+    .nh-color-swatch[data-color="yellow"] { background: #FFF176; }
+    .nh-color-swatch[data-color="pink"]   { background: #FFB3C8; }
+    .nh-color-swatch[data-color="blue"]   { background: #90CAF9; }
+    .nh-color-swatch[data-color="green"]  { background: #A5D6A7; }
+    .nh-color-swatch[data-color="purple"] { background: #CE93D8; }
 
     .nh-field { display: flex; flex-direction: column; gap: .3rem; }
-    .nh-field label { font-size: .75rem; font-weight: 600; color: var(--grey); text-transform: uppercase; letter-spacing: .07em; }
-    .nh-input, .nh-textarea {
+    .nh-field label { font-size: .74rem; font-weight: 600; color: var(--grey); text-transform: uppercase; letter-spacing: .07em; }
+    .nh-input {
       width: 100%; padding: .55rem .75rem;
       border: 1.5px solid var(--line); border-radius: 10px;
       font-size: .88rem; font-family: inherit; color: var(--ink);
-      background: #fff; transition: border-color .15s; resize: vertical;
+      background: #fff; transition: border-color .15s;
     }
-    .nh-input:focus, .nh-textarea:focus { outline: none; border-color: var(--navy); }
-    html[data-theme="dark"] .nh-input, html[data-theme="dark"] .nh-textarea { background: var(--dark-lighter); border-color: var(--line); color: var(--ink); }
-    .nh-textarea { min-height: 180px; max-height: 400px; }
+    .nh-input:focus { outline: none; border-color: var(--navy); }
+    html[data-theme="dark"] .nh-input { background: var(--dark-lighter); border-color: var(--line); color: var(--ink); }
+
+    /* ── RICH TEXT EDITOR ── */
+    .nh-rich-wrap {
+      border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden;
+      transition: border-color .15s;
+    }
+    .nh-rich-wrap:focus-within { border-color: var(--navy); }
+    .nh-rich-toolbar {
+      display: flex; gap: 1px; padding: 4px 5px;
+      background: var(--cream); border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    html[data-theme="dark"] .nh-rich-toolbar { background: var(--dark-lighter); }
+    .nh-rt-btn {
+      width: 28px; height: 26px; border: none; border-radius: 5px;
+      font-family: inherit; font-size: .8rem; font-weight: 700;
+      cursor: pointer; background: transparent; color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s; flex-shrink: 0;
+    }
+    .nh-rt-btn:hover { background: rgba(0,0,0,.07); }
+    .nh-rt-btn.active { background: rgba(27,58,122,.14); color: var(--navy); }
+    html[data-theme="dark"] .nh-rt-btn:hover  { background: rgba(255,255,255,.1); }
+    html[data-theme="dark"] .nh-rt-btn.active { background: rgba(100,140,255,.18); color: #7B9FE0; }
+    .nh-rt-sep { width: 1px; background: var(--line); margin: 3px 2px; flex-shrink: 0; }
+    .nh-editor {
+      min-height: 200px; max-height: 420px; overflow-y: auto;
+      padding: .65rem .85rem;
+      font-size: .88rem; font-family: inherit; color: var(--ink); line-height: 1.65;
+      background: #fff; outline: none; word-break: break-word;
+    }
+    html[data-theme="dark"] .nh-editor { background: var(--dark); }
+    .nh-editor:empty::before {
+      content: attr(data-placeholder);
+      color: var(--grey); pointer-events: none;
+    }
+    /* Editor content formatting */
+    .nh-editor h3 { font-size: .95rem; font-weight: 700; color: var(--navy); margin: .4rem 0 .15rem; }
+    .nh-editor code {
+      font-family: "Fira Mono","Courier New",monospace; font-size: .85em;
+      background: var(--cream); border-radius: 4px; padding: .1em .4em;
+      color: #c0392b; border: 1px solid var(--line);
+    }
+    html[data-theme="dark"] .nh-editor code { color: #ff8a80; background: var(--dark-lighter); }
+    .nh-editor pre {
+      background: var(--cream); border: 1px solid var(--line);
+      border-radius: 8px; padding: .6rem .85rem; overflow-x: auto;
+      font-family: "Fira Mono","Courier New",monospace; font-size: .83rem;
+      line-height: 1.55; margin: .3rem 0;
+    }
+    html[data-theme="dark"] .nh-editor pre { background: var(--dark-lighter); }
+    .nh-editor ul, .nh-editor ol { padding-left: 1.3rem; margin: .2rem 0; }
+    .nh-editor li { margin-bottom: .15rem; }
+
+    /* Tags input */
+    .nh-tags-wrap {
+      border: 1.5px solid var(--line); border-radius: 10px; padding: .4rem .6rem;
+      display: flex; flex-wrap: wrap; gap: .3rem; align-items: center;
+      cursor: text; transition: border-color .15s; min-height: 38px;
+    }
+    .nh-tags-wrap:focus-within { border-color: var(--navy); }
+    html[data-theme="dark"] .nh-tags-wrap { background: var(--dark-lighter); }
+    .nh-tag-chip {
+      display: inline-flex; align-items: center; gap: .2rem;
+      font-size: .74rem; font-weight: 600; padding: .18rem .52rem;
+      border-radius: 20px; background: var(--lav,#EEE8FF); color: var(--navy);
+      user-select: none;
+    }
+    .nh-tag-chip-x {
+      cursor: pointer; color: var(--grey); background: none; border: none;
+      padding: 0; font-size: .8rem; line-height: 1; transition: color .13s;
+    }
+    .nh-tag-chip-x:hover { color: #c0392b; }
+    .nh-tags-input {
+      border: none; outline: none; font-size: .82rem; font-family: inherit;
+      color: var(--ink); background: transparent; flex: 1; min-width: 80px; padding: .12rem 0;
+    }
 
     /* Context badge */
     .nh-context-tag {
@@ -318,9 +558,28 @@
       font-size: .73rem; font-weight: 600; padding: .25rem .65rem;
       border-radius: 20px; background: var(--lav); color: var(--navy);
     }
+
+    /* Flag buttons */
+    .nh-flag-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .nh-flag-btn {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .36rem .85rem; border-radius: 20px; border: 1.5px solid var(--line);
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      background: #fff; color: var(--grey); transition: all .15s;
+    }
+    .nh-flag-btn:hover { border-color: #b8b0cc; }
+    .nh-flag-btn.active-mistake  { border-color: #8B1B2B; background: #FAEAEC; color: #8B1B2B; }
+    .nh-flag-btn.active-revision { border-color: var(--gold); background: #F3E4C4; color: #8B5E00; }
+    html[data-theme="dark"] .nh-flag-btn { background: var(--dark-lighter,#1a1a2e); }
+
+    /* Auto-save */
+    .nh-autosave { font-size: .72rem; color: var(--grey); display: flex; align-items: center; gap: .3rem; }
+    .nh-autosave.saved { color: #1A6B4A; }
+    html[data-theme="dark"] .nh-autosave.saved { color: #6BD4A0; }
+
+    /* Footer */
     .nh-modal-foot {
-      padding: .85rem 1.2rem;
-      border-top: 1px solid var(--line);
+      padding: .85rem 1.2rem; border-top: 1px solid var(--line);
       display: flex; gap: .55rem; justify-content: flex-end; align-items: center;
     }
     .nh-save-btn {
@@ -349,170 +608,58 @@
     }
     .nh-toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ── TABS ── */
-    .nh-tabs {
-      display: flex; gap: 0; overflow-x: auto;
-      scrollbar-width: none; -ms-overflow-style: none;
-      border-bottom: 1px solid var(--line); padding-top: .9rem;
-    }
-    .nh-tabs::-webkit-scrollbar { display: none; }
-    .nh-tab {
-      padding: .58rem 1rem; font-size: .84rem; font-weight: 600;
-      color: var(--grey); border: none; background: none; cursor: pointer;
-      white-space: nowrap; border-bottom: 2.5px solid transparent;
-      transition: color .13s, border-color .13s; margin-bottom: -1px; flex-shrink: 0;
-    }
-    .nh-tab:hover { color: var(--navy); }
-    .nh-tab.active { color: var(--navy); border-bottom-color: var(--gold); }
-    html[data-theme="dark"] .nh-tab.active { color: #C4D0F0; }
-
-    /* ── BADGES on cards ── */
-    .nh-card-flags { display: flex; gap: .3rem; flex-wrap: wrap; margin-bottom: .3rem; }
-    .nh-badge {
-      display: inline-flex; align-items: center; gap: .2rem;
-      font-size: .62rem; font-weight: 700; padding: .14rem .42rem;
-      border-radius: 20px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
-    }
-    .nh-badge-mistake  { background: #FAEAEC; color: #8B1B2B; }
-    .nh-badge-revision { background: #F3E4C4; color: #8B5E00; }
-    html[data-theme="dark"] .nh-badge-mistake  { background: #2A0A10; color: #E87B8B; }
-    html[data-theme="dark"] .nh-badge-revision { background: #2A1E00; color: #D4A850; }
-
-    /* ── SOURCE BREADCRUMB ── */
-    .nh-breadcrumb {
-      display: flex; align-items: center; gap: .3rem; flex-wrap: wrap;
-      font-size: .72rem; color: var(--grey); font-weight: 500; margin-top: .25rem;
-    }
-    .nh-bc-ico { font-size: .78rem; flex-shrink: 0; }
-    .nh-bc-sep { color: var(--line); font-size: .7rem; }
-
-    /* ── JUMP BUTTON ── */
-    .nh-jump-btn {
-      display: inline-flex; align-items: center; gap: .25rem;
-      font-size: .71rem; font-weight: 700; padding: .2rem .55rem;
-      border-radius: 6px; border: 1.5px solid var(--line);
-      background: none; color: var(--navy); cursor: pointer; white-space: nowrap;
-      transition: border-color .13s, background .13s; flex-shrink: 0;
-    }
-    .nh-jump-btn:hover { border-color: var(--navy); background: var(--lav, #EEE8FF); }
-    html[data-theme="dark"] .nh-jump-btn { color: #7B9FE0; border-color: var(--line); }
-
-    /* ── FLAG TOGGLES in composer ── */
-    .nh-flag-row { display: flex; gap: .5rem; flex-wrap: wrap; }
-    .nh-flag-btn {
-      display: inline-flex; align-items: center; gap: .35rem;
-      padding: .36rem .85rem; border-radius: 20px; border: 1.5px solid var(--line);
-      font-size: .8rem; font-weight: 600; cursor: pointer;
-      background: #fff; color: var(--grey); transition: all .15s;
-    }
-    .nh-flag-btn:hover { border-color: #b8b0cc; }
-    .nh-flag-btn.active-mistake  { border-color: #8B1B2B; background: #FAEAEC; color: #8B1B2B; }
-    .nh-flag-btn.active-revision { border-color: var(--gold); background: #F3E4C4; color: #8B5E00; }
-    html[data-theme="dark"] .nh-flag-btn { background: var(--dark-lighter, #1a1a2e); }
-
-    /* ── AUTO-SAVE STATUS ── */
-    .nh-autosave { font-size: .72rem; color: var(--grey); display: flex; align-items: center; gap: .3rem; }
-    .nh-autosave.saved { color: #1A6B4A; }
-    html[data-theme="dark"] .nh-autosave.saved { color: #6BD4A0; }
-
-    /* Tags input */
-    .nh-tags-wrap {
-      border: 1.5px solid var(--line); border-radius: 10px; padding: .4rem .6rem;
-      display: flex; flex-wrap: wrap; gap: .3rem; align-items: center;
-      cursor: text; transition: border-color .15s; min-height: 38px;
-    }
-    .nh-tags-wrap:focus-within { border-color: var(--navy); }
-    html[data-theme="dark"] .nh-tags-wrap { background: var(--dark-lighter); }
-    .nh-tag-chip {
-      display: inline-flex; align-items: center; gap: .2rem;
-      font-size: .74rem; font-weight: 600; padding: .18rem .52rem;
-      border-radius: 20px; background: var(--lav, #EEE8FF); color: var(--navy);
-      user-select: none;
-    }
-    .nh-tag-chip-x {
-      cursor: pointer; color: var(--grey); background: none; border: none;
-      padding: 0; font-size: .8rem; line-height: 1; transition: color .13s;
-    }
-    .nh-tag-chip-x:hover { color: #c0392b; }
-    .nh-tags-input {
-      border: none; outline: none; font-size: .82rem; font-family: inherit;
-      color: var(--ink); background: transparent; flex: 1; min-width: 80px; padding: .12rem 0;
-    }
-    .nh-card-tags { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .3rem; }
-    .nh-card-tag {
-      font-size: .7rem; font-weight: 600; padding: .12rem .45rem;
-      border-radius: 20px; background: var(--lav, #EEE8FF); color: var(--navy, #1B3A7A);
-    }
-
-    /* Mobile: pane goes full width */
-    @media (max-width: 640px) {
-      .nh-modal { width: 100vw; }
+    @media(max-width:640px) {
+      .nh-modal, .nh-view-modal { width: 100vw; }
     }
   </style>
 </head>
 <body>
 
+<!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
 <header class="site-header">
-  <div class="container header-row">
-    <a class="brand" href="index.html">
-      <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
-      <span>PrepWithTee</span>
-    </a>      <nav class="header-nav" id="site-nav">
+    <div class="container header-row">
+      <a class="brand" href="index.html">
+        <img width="52" height="52" src="logo-nav.webp" alt="PrepWithTee owl logo">
+        <span>PrepWithTee</span>
+      </a>      <nav class="header-nav" id="site-nav">
         <!-- Dashboard mega-menu: all sections in one organised dropdown -->
-        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Progress insights</span></span></a><a href="achievements.html" class="nav-drop-item"><span class="ndi ndi-orange">🏆</span><span class="ndi-text"><b>Achievements</b><span>Badges &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a><a href="fc-progress.html" class="nav-drop-item"><span class="ndi ndi-teal">📊</span><span class="ndi-text"><b>FC Progress</b><span>Flashcard mastery</span></span></a></div></div></div></div>
-        <div class="nav-group"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
+        <div class="nav-group nav-mega"><div class="nav-group-header"><a href="dashboard.html" class="nav-link nav-group-link nav-dashboard">Dashboard</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="dashboard.html" class="nav-drop-item nav-mega-overview"><span class="ndi ndi-blue">🏠</span><span class="ndi-text"><b>Overview</b><span>Your study dashboard</span></span><span class="nav-mega-check">✓</span></a><div class="nav-mega-cols"><div class="nav-mega-col"><div class="nav-mega-head">Study</div><a href="study-hub.html" class="nav-drop-item"><span class="ndi ndi-lav">📚</span><span class="ndi-text"><b>Study Hub</b><span>All learning tools</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><a href="study.html" class="nav-drop-item"><span class="ndi ndi-green">🧠</span><span class="ndi-text"><b>Study Session</b><span>Start reviewing</span></span></a><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>169 exam formulas</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Practice</div><a href="topical-progress.html" class="nav-drop-item"><span class="ndi ndi-green">📖</span><span class="ndi-text"><b>Topical Progress</b><span>Chapter by chapter</span></span></a><a href="yearly-progress.html" class="nav-drop-item"><span class="ndi ndi-blue">📊</span><span class="ndi-text"><b>Yearly Progress</b><span>Paper scores &amp; grades</span></span></a><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Past Papers</b><span>Topical &amp; yearly</span></span></a><a href="mcq-solver.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>MCQ Practice</b><span>Timed drills</span></span></a><a href="homework.html" class="nav-drop-item nav-homework"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>Homework</b><span>Assignments</span></span></a><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Personal</div><a href="calendar.html" class="nav-drop-item"><span class="ndi ndi-blue">📅</span><span class="ndi-text"><b>Calendar</b><span>Planner &amp; tasks</span></span></a><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">📝</span><span class="ndi-text"><b>My Notes</b><span>Jottings &amp; stickies</span></span></a><a href="analytics.html" class="nav-drop-item"><span class="ndi ndi-green">📊</span><span class="ndi-text"><b>Analytics</b><span>Stats, flashcards &amp; XP</span></span></a><a href="profile.html" class="nav-drop-item"><span class="ndi ndi-lav">👤</span><span class="ndi-text"><b>My Profile</b><span>Settings &amp; subjects</span></span></a></div></div></div></div>
+        <div class="nav-group nav-mega nav-mega-notes"><div class="nav-group-header"><a href="notes-view.html" class="nav-link nav-group-link">Notes</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><div class="nav-mega-cols" style="grid-template-columns:1fr 1fr"><div class="nav-mega-col"><div class="nav-mega-head">Content</div><a href="notes-view.html" class="nav-drop-item"><span class="ndi ndi-blue">📖</span><span class="ndi-text"><b>Notes View</b><span>Interactive study notes</span></span></a><a href="resources.html" class="nav-drop-item"><span class="ndi ndi-teal">📂</span><span class="ndi-text"><b>Resources</b><span>PDFs, papers &amp; downloads</span></span></a><a href="definitions.html" class="nav-drop-item"><span class="ndi ndi-green">📝</span><span class="ndi-text"><b>Definitions</b><span>Key terms &amp; meanings</span></span></a><a href="islamiat-references.html" class="nav-drop-item"><span class="ndi ndi-green">📜</span><span class="ndi-text"><b>Islamiat References</b><span>Verses, Hadis &amp; battles</span></span></a></div><div class="nav-mega-col"><div class="nav-mega-head">Workspace</div><a href="notes.html" class="nav-drop-item"><span class="ndi ndi-yellow">✏️</span><span class="ndi-text"><b>Student Notes</b><span>Your personal workspace</span></span></a><a href="flashcards.html" class="nav-drop-item"><span class="ndi ndi-lav">🗂️</span><span class="ndi-text"><b>Flashcards</b><span>Spaced repetition</span></span></a><div class="nav-mega-head" style="margin-top:.5rem">Reference</div><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-orange">⚡</span><span class="ndi-text"><b>Formulae</b><span>Exam formula sheets</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📈</span><span class="ndi-text"><b>Graph Guide</b><span>Graph types &amp; sketching</span></span></a></div></div></div></div><div class="nav-group"><div class="nav-group-header"><a href="papers.html" class="nav-link nav-group-link">Past Papers</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="papers.html" class="nav-drop-item"><span class="ndi ndi-lav">📑</span><span class="ndi-text"><b>Topical Papers</b><span>By chapter &amp; topic</span></span></a><a href="library.html" class="nav-drop-item"><span class="ndi ndi-pink">📅</span><span class="ndi-text"><b>Yearly Papers</b><span>Full papers by year</span></span></a><a href="papers.html?mode=test" class="nav-drop-item"><span class="ndi ndi-green">🧪</span><span class="ndi-text"><b>Test Builder</b><span>Random topic tests</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tutor.html" class="nav-link nav-group-link">AI Tutor</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="tutor.html" class="nav-drop-item"><span class="ndi ndi-yellow">🤖</span><span class="ndi-text"><b>AI Tutor</b><span>Explain any concept</span></span></a><a href="ask.html" class="nav-drop-item"><span class="ndi ndi-teal">💬</span><span class="ndi-text"><b>Ask AI</b><span>Instant answers</span></span></a></div></div>
         <div class="nav-group"><div class="nav-group-header"><a href="tools.html" class="nav-link nav-group-link">Tools</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="calculator.html" class="nav-drop-item"><span class="ndi ndi-lav">🔢</span><span class="ndi-text"><b>Calculator</b><span>Scientific &amp; unit tools</span></span></a><a href="formulas.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Formula Sheets</b><span>169 exam formulas</span></span></a><a href="graph.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Graph Plotter</b><span>Plot any function</span></span></a><a href="command-words.html" class="nav-drop-item"><span class="ndi ndi-yellow">💡</span><span class="ndi-text"><b>Command Words</b><span>State, Describe, Explain…</span></span></a><a href="periodic-table.html" class="nav-drop-item"><span class="ndi ndi-teal">🧪</span><span class="ndi-text"><b>Periodic Table</b><span>Cambridge exact values</span></span></a><a href="bases-logic.html" class="nav-drop-item"><span class="ndi ndi-blue">🔄</span><span class="ndi-text"><b>Number Bases &amp; Logic</b><span>Binary, hex &amp; truth tables</span></span></a><a href="pseudocode.html" class="nav-drop-item"><span class="ndi ndi-lav">💻</span><span class="ndi-text"><b>Pseudocode Runner</b><span>Write &amp; run pseudocode</span></span></a><a href="graphs-guide.html" class="nav-drop-item"><span class="ndi ndi-pink">📐</span><span class="ndi-text"><b>Graphing Guide</b><span>Master sketching &amp; asymptotes</span></span></a><a href="grade-calculator.html" class="nav-drop-item"><span class="ndi ndi-orange">🧮</span><span class="ndi-text"><b>Grade Calculator</b><span>Predict your grade</span></span></a><a href="grade-trends.html" class="nav-drop-item"><span class="ndi ndi-green">📈</span><span class="ndi-text"><b>Grade Trends</b><span>Threshold history</span></span></a><a href="tools.html" class="nav-drop-all">All study tools →</a></div></div>
-        <a href="teacher-apply.html" class="nav-link">Teach</a>
+        <div class="nav-group"><div class="nav-group-header"><a href="teachers.html" class="nav-link nav-group-link">Teach</a><button class="nav-group-btn" type="button" aria-expanded="false"><svg class="drop-arrow" viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="nav-group-panel"><a href="teachers.html" class="nav-drop-item"><span class="ndi ndi-blue">🎓</span><span class="ndi-text"><b>Meet our teachers</b><span>Our expert tutors</span></span></a><a href="teacher-apply.html" class="nav-drop-item"><span class="ndi ndi-green">✏️</span><span class="ndi-text"><b>Teach with Us</b><span>Join our team</span></span></a></div></div>
+        <a href="/blog" class="nav-link">Blog</a>
         <a href="pricing.html" class="nav-link">Pricing</a>
       </nav>
-    <div class="header-right"></div>
-  </div>
-</header>
+      <div class="header-right"></div>
+    </div>
+  </header>
+<!--NAV:END-->
+<div class="page-back-bar"><a href="dashboard.html" class="page-back-link">Dashboard</a></div>
 
 <main>
   <div class="container">
 
     <!-- ── HERO ── -->
     <div class="nh-hero">
-      <p class="nh-eyebrow">Student Notes</p>
-      <h1 class="nh-h1">My Notes</h1>
-      <p class="nh-desc">Your personal workspace — jot bullets, save sticky reminders, and capture ideas while you study. Separate from PrepWithTee content and downloadable resources.</p>
-
-      <!-- Learning ecosystem section guide -->
-      <div class="learn-eco">
-        <a href="notes-view.html" class="leo-item">
-          <span class="leo-ico">📖</span>
-          <div>
-            <span class="leo-label">Notes View</span>
-            <span class="leo-desc">PrepWithTee's interactive study notes</span>
-          </div>
-        </a>
-        <a href="resources.html" class="leo-item">
-          <span class="leo-ico">📂</span>
-          <div>
-            <span class="leo-label">Resources</span>
-            <span class="leo-desc">PDFs, past papers &amp; downloadable files</span>
-          </div>
-        </a>
-        <div class="leo-item leo-active">
-          <span class="leo-ico">✏️</span>
-          <div>
-            <span class="leo-label">Student Notes</span>
-            <span class="leo-desc">Your personal notes workspace</span>
-          </div>
-        </div>
-      </div>
-
       <div class="nh-hero-row">
-        <div style="display:flex;gap:.45rem;flex-wrap:wrap;align-items:center">
-          <span id="nh-count" style="font-size:.78rem;color:var(--grey)"></span>
+        <div>
+          <p class="nh-eyebrow">Student Notes</p>
+          <h1 class="nh-h1">My Notes</h1>
+          <p class="nh-desc">Your personal workspace — format bullets, bold key ideas, save stickies, and jump back to exactly where you were.</p>
         </div>
         <button class="nh-new-btn" id="nh-new-btn" type="button">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New Note
         </button>
       </div>
+      <div class="nh-quick-nav">
+        <a href="notes-view.html" class="nh-qnav-link">📖 Notes View</a>
+        <a href="resources.html"  class="nh-qnav-link">📂 Resources</a>
+        <a href="flashcards.html" class="nh-qnav-link">🗂️ Flashcards</a>
+        <a href="formulas.html"   class="nh-qnav-link">⚡ Formulae</a>
+      </div>
+      <span id="nh-count" style="font-size:.76rem;color:var(--grey);display:block;padding-bottom:.8rem"></span>
     </div>
 
     <!-- ── TABS ── -->
@@ -526,7 +673,10 @@
       <button class="nh-tab"        data-tab="tutor"      role="tab" type="button">🤖 AI Tutor</button>
     </div>
 
-    <!-- ── SECONDARY FILTER BAR ── -->
+    <!-- ── SUBJECT PILLS ── -->
+    <div class="nh-subject-pills" id="nh-subject-pills" style="display:none" role="group" aria-label="Filter by subject"></div>
+
+    <!-- ── FILTER BAR ── -->
     <div class="nh-filter-bar">
       <select class="nh-sel" id="nh-filter-subject" aria-label="Subject">
         <option value="">All subjects</option>
@@ -540,13 +690,12 @@
       </div>
       <div class="nh-view-toggle" role="group" aria-label="View mode">
         <button class="nh-view-btn active" id="nh-view-list" type="button" title="List view">☰ List</button>
-        <button class="nh-view-btn" id="nh-view-grid" type="button" title="Sticky grid">⊞ Board</button>
+        <button class="nh-view-btn" id="nh-view-grid" type="button" title="Sticky board">⊞ Board</button>
       </div>
     </div>
 
-    <!-- ── CONTENT ── -->
+    <!-- ── NOTES LIST ── -->
     <div class="nh-body" id="nh-body">
-      <!-- populated by notes.js -->
       <div class="nh-empty">
         <div class="nh-empty-ico">⏳</div>
         <h3>Loading your notes…</h3>
@@ -557,7 +706,39 @@
 </main>
 
 <!-- ═══════════════════════════════════════════════════
-     COMPOSER MODAL
+     VIEWER OVERLAY (read-only, click note to open)
+═══════════════════════════════════════════════════ -->
+<div class="nh-view-overlay" id="nh-view-overlay" role="dialog" aria-modal="true" aria-label="View note">
+  <div class="nh-backdrop" id="vw-backdrop"></div>
+  <div class="nh-view-modal">
+    <div class="vw-head">
+      <div class="vw-head-left">
+        <div class="vw-title" id="vw-title">Note title</div>
+        <div class="vw-date"  id="vw-date"></div>
+        <div id="vw-badges" style="margin-top:.35rem;display:flex;gap:.3rem;flex-wrap:wrap"></div>
+      </div>
+      <div class="vw-head-right">
+        <button class="vw-jump-btn" id="vw-jump-btn" type="button" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Go to source
+        </button>
+        <button class="vw-close-btn" id="vw-close-btn" type="button" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="vw-body">
+      <div id="vw-source"></div>
+      <div class="vw-content" id="vw-content"></div>
+      <div id="vw-tags"></div>
+    </div>
+    <div class="vw-foot">
+      <button class="vw-del-btn"  id="vw-del-btn"  type="button">🗑 Delete</button>
+      <button class="vw-edit-btn" id="vw-edit-btn" type="button">✏️ Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     COMPOSER OVERLAY (editor)
 ═══════════════════════════════════════════════════ -->
 <div class="nh-overlay" id="nh-overlay" role="dialog" aria-modal="true" aria-label="Compose note">
   <div class="nh-backdrop" id="nh-backdrop"></div>
@@ -570,20 +751,20 @@
 
       <!-- Type toggle -->
       <div class="nh-type-row" id="nh-type-row">
-        <button class="nh-type-pill active" data-type="text" type="button">📄 Text</button>
-        <button class="nh-type-pill" data-type="sticky" type="button">📌 Sticky</button>
+        <button class="nh-type-pill active" data-type="text"   type="button">📄 Text</button>
+        <button class="nh-type-pill"        data-type="sticky" type="button">📌 Sticky</button>
       </div>
 
-      <!-- Colour picker (sticky only) -->
+      <!-- Colour picker (sticky) -->
       <div id="nh-color-wrap" style="display:none">
         <div class="nh-field">
           <label>Colour</label>
           <div class="nh-color-row" id="nh-color-row">
-            <button class="nh-color-swatch active" data-color="yellow" type="button" aria-label="Yellow" title="Yellow"></button>
-            <button class="nh-color-swatch" data-color="pink"   type="button" aria-label="Pink"   title="Pink"></button>
-            <button class="nh-color-swatch" data-color="blue"   type="button" aria-label="Blue"   title="Blue"></button>
-            <button class="nh-color-swatch" data-color="green"  type="button" aria-label="Green"  title="Green"></button>
-            <button class="nh-color-swatch" data-color="purple" type="button" aria-label="Purple" title="Purple"></button>
+            <button class="nh-color-swatch active" data-color="yellow" type="button" aria-label="Yellow"></button>
+            <button class="nh-color-swatch" data-color="pink"   type="button" aria-label="Pink"></button>
+            <button class="nh-color-swatch" data-color="blue"   type="button" aria-label="Blue"></button>
+            <button class="nh-color-swatch" data-color="green"  type="button" aria-label="Green"></button>
+            <button class="nh-color-swatch" data-color="purple" type="button" aria-label="Purple"></button>
           </div>
         </div>
       </div>
@@ -594,15 +775,39 @@
         <input class="nh-input" type="text" id="nh-title-input" placeholder="Give this note a name…" maxlength="140">
       </div>
 
-      <!-- Content -->
+      <!-- Rich text editor -->
       <div class="nh-field">
-        <label for="nh-content-input">Content</label>
-        <textarea class="nh-textarea" id="nh-content-input" placeholder="• Key point&#10;• Something to remember&#10;• Formula or tip…" maxlength="8000"></textarea>
+        <label>Content <span style="font-weight:400;text-transform:none;font-size:.7rem">(Ctrl+Enter to save)</span></label>
+        <div class="nh-rich-wrap">
+          <div class="nh-rich-toolbar" role="toolbar" aria-label="Formatting">
+            <button class="nh-rt-btn" data-cmd="bold"                type="button" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button class="nh-rt-btn" data-cmd="italic"              type="button" title="Italic (Ctrl+I)"><em>I</em></button>
+            <button class="nh-rt-btn" data-cmd="underline"           type="button" title="Underline (Ctrl+U)" style="text-decoration:underline">U</button>
+            <div class="nh-rt-sep"></div>
+            <button class="nh-rt-btn" data-cmd="h3"                  type="button" title="Heading" style="font-size:.78rem;font-weight:800">H</button>
+            <button class="nh-rt-btn" data-cmd="insertUnorderedList" type="button" title="Bullet list">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+            </button>
+            <button class="nh-rt-btn" data-cmd="insertOrderedList"   type="button" title="Numbered list">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="7" font-size="6" fill="currentColor" stroke="none">1</text><text x="2" y="13" font-size="6" fill="currentColor" stroke="none">2</text><text x="2" y="19" font-size="6" fill="currentColor" stroke="none">3</text></svg>
+            </button>
+            <div class="nh-rt-sep"></div>
+            <button class="nh-rt-btn" data-cmd="code" type="button" title="Inline code">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </button>
+            <button class="nh-rt-btn" data-cmd="pre" type="button" title="Code block" style="font-family:monospace;font-size:.72rem;font-weight:700">{}</button>
+          </div>
+          <div class="nh-editor" id="nh-editor"
+            contenteditable="true" spellcheck="true"
+            data-placeholder="• Key point&#10;• Something to remember&#10;• Formula or trick…"
+            role="textbox" aria-multiline="true" aria-label="Note content">
+          </div>
+        </div>
       </div>
 
       <!-- Tags -->
       <div class="nh-field">
-        <label>Tags <span style="font-weight:400;text-transform:none">(optional · Enter to add)</span></label>
+        <label>Tags <span style="font-weight:400;text-transform:none">(Enter to add)</span></label>
         <div class="nh-tags-wrap" id="nh-tags-wrap">
           <input class="nh-tags-input" id="nh-tags-input" type="text" placeholder="formula, mistake, key concept…" maxlength="30" autocomplete="off">
         </div>
@@ -616,7 +821,7 @@
         </select>
       </div>
 
-      <!-- Context (linked item — shown when pre-filled) -->
+      <!-- Context (linked item) -->
       <div id="nh-context-row" style="display:none">
         <div class="nh-field">
           <label>Linked to</label>
@@ -637,17 +842,17 @@
     <div class="nh-modal-foot">
       <span class="nh-autosave" id="nh-autosave"></span>
       <button class="nh-cancel-btn" id="nh-cancel-btn" type="button">Cancel</button>
-      <button class="nh-save-btn" id="nh-save-btn" type="button">Save Note</button>
+      <button class="nh-save-btn"   id="nh-save-btn"   type="button">Save Note</button>
     </div>
   </div><!-- /modal -->
-</div><!-- /overlay -->
+</div>
 
 <!-- Toast -->
 <div class="nh-toast" id="nh-toast" aria-live="polite"></div>
 
-<script src="main.js?v=20260831a"></script>
+<script src="main.js?v=20260907c"></script>
+<script src="annotation-toolbar.js?v=20260907b"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
-<script type="module" src="notes.js?v=20260831a"></script>
-
+<script type="module" src="notes.js?v=20260907a"></script>
 </body>
 </html>

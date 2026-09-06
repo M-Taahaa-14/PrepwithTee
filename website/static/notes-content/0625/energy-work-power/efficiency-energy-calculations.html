@@ -1,0 +1,122 @@
+<h2 id="gpe">Gravitational potential energy (GPE)</h2>
+
+<div class="note-def">
+  The gravitational potential energy of an object is the energy stored due to its height above a reference level.
+  \[ \Delta \text{GPE} = mg\Delta h \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( \Delta \text{GPE} \)</td><td>Change in gravitational potential energy</td><td>joule, J</td></tr>
+      <tr><td>\( m \)</td><td>Mass</td><td>kilogram, kg</td></tr>
+      <tr><td>\( g \)</td><td>Gravitational field strength</td><td>N/kg (= 10 N/kg near Earth's surface)</td></tr>
+      <tr><td>\( \Delta h \)</td><td>Change in height</td><td>metre, m</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="ke">Kinetic energy (KE)</h2>
+
+<div class="note-def">
+  The kinetic energy of a moving object is the energy stored due to its motion.
+  \[ \text{KE} = \tfrac{1}{2}mv^2 \]
+  <table class="note-table" style="margin-top:.7rem">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td>\( \text{KE} \)</td><td>Kinetic energy</td><td>joule, J</td></tr>
+      <tr><td>\( m \)</td><td>Mass</td><td>kilogram, kg</td></tr>
+      <tr><td>\( v \)</td><td>Speed</td><td>metre per second, m/s</td></tr>
+    </tbody>
+  </table>
+  Doubling the speed <em>quadruples</em> the KE (since KE ∝ v²). This is why speed is so dangerous in road accidents.
+</div>
+
+<h2 id="gpe-ke">GPE and KE conversions</h2>
+
+<div class="note-key">
+  For a freely falling object (no air resistance), energy transfers between GPE and KE with none wasted:
+  \[ \text{Loss in GPE} = \text{Gain in KE} \]
+  \[ mg\Delta h = \tfrac{1}{2}mv^2 \]
+  Mass cancels, giving: \( v = \sqrt{2g\Delta h} \) — the final speed of a freely falling object depends only on \( g \) and the height fallen, not on the mass.
+</div>
+
+<details class="note-example">
+  <summary>Example 1 — find speed from height (free fall)</summary>
+  <div>
+    <p>A ball is dropped from a height of 5.0 m. Find the speed just before it hits the ground. (g = 10 N/kg, ignore air resistance)</p>
+    <p>Loss in GPE = gain in KE:</p>
+    <p>\( mgh = \tfrac{1}{2}mv^2 \Rightarrow v = \sqrt{2gh} = \sqrt{2 \times 10 \times 5.0} = \sqrt{100} = 10\,\text{m/s} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 2 — find height from speed (projectile)</summary>
+  <div>
+    <p>A ball is thrown upward at 14 m/s. Find the maximum height reached. (g = 10 N/kg, ignore air resistance)</p>
+    <p>All KE converts to GPE at the top:</p>
+    <p>\( \tfrac{1}{2}mv^2 = mgh \Rightarrow h = \dfrac{v^2}{2g} = \dfrac{14^2}{2 \times 10} = \dfrac{196}{20} = 9.8\,\text{m} \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 3 — energy with air resistance</summary>
+  <div>
+    <p>A 2.0 kg rock falls 10 m and reaches a speed of 12 m/s (not 14 m/s as predicted by free fall). How much energy was transferred to thermal energy by air resistance?</p>
+    <p>Initial GPE lost: \( mgh = 2.0 \times 10 \times 10 = 200\,\text{J} \)</p>
+    <p>Final KE gained: \( \tfrac{1}{2} \times 2.0 \times 12^2 = 144\,\text{J} \)</p>
+    <p>Thermal energy = \( 200 - 144 = 56\,\text{J} \)</p>
+  </div>
+</details>
+
+<h2 id="efficiency">Efficiency</h2>
+
+<div class="note-def">
+  <strong>Efficiency</strong> is the fraction of the input energy that is usefully transferred.
+  \[ \text{efficiency} = \frac{\text{useful energy output}}{\text{total energy input}} \]
+  As a percentage:
+  \[ \text{efficiency (\%)} = \frac{\text{useful energy output}}{\text{total energy input}} \times 100\% \]
+  <span class="note-tier-supplement">Extended (Supplement)</span> — can also be expressed as:
+  \[ \text{efficiency} = \frac{\text{useful power output}}{\text{total power input}} \]
+</div>
+
+<div class="note-key">
+  <ul style="margin:.4rem 0 0 1.2rem;line-height:2">
+    <li>Efficiency has <strong>no unit</strong> (or is expressed as a percentage).</li>
+    <li>Efficiency is always ≤ 1 (or ≤ 100%) — you can never get more useful energy out than you put in.</li>
+    <li>A value > 1 (or > 100%) is <strong>impossible</strong> and indicates an error in calculation.</li>
+    <li>The <em>wasted</em> energy = total input − useful output.</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Example 4 — calculate efficiency</summary>
+  <div>
+    <p>A motor takes in 500 J of electrical energy and produces 350 J of useful kinetic energy. Calculate the efficiency.</p>
+    <p>\( \text{efficiency} = \dfrac{350}{500} = 0.70 \quad (= 70\%) \)</p>
+    <p>Wasted energy = 500 − 350 = 150 J (transferred as thermal energy).</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 5 — efficiency using power (Extended)</summary>
+  <div>
+    <p>A petrol engine has an input power of 80 kW and a useful output power of 20 kW. Find the efficiency.</p>
+    <p>\( \text{efficiency} = \dfrac{20}{80} = 0.25 \quad (= 25\%) \)</p>
+  </div>
+</details>
+
+<details class="note-example">
+  <summary>Example 6 — find useful output energy from efficiency</summary>
+  <div>
+    <p>A light bulb is 12% efficient and uses 50 J of electrical energy. How much light energy does it emit?</p>
+    <p>\( \text{useful output} = 0.12 \times 50 = 6.0\,\text{J} \)</p>
+    <p>Wasted as thermal = 50 − 6 = 44 J.</p>
+  </div>
+</details>
+
+<div class="note-warn">
+  Do not confuse efficiency with percentage change. Efficiency = useful output ÷ total input — always divide by the total input, never the useful output. And remember: no real machine is 100% efficient because some energy is always transferred to thermal energy by friction or resistance.
+</div>
+
+<div class="note-tip">
+  For 6-mark "describe and explain" efficiency questions: (1) state the formula; (2) identify useful and wasted energy stores; (3) explain where wasted energy goes (friction → thermal; air resistance → thermal; electrical resistance → thermal). Relate Sankey diagram arrow widths to energy amounts.
+</div>

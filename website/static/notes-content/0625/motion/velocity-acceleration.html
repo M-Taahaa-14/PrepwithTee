@@ -1,0 +1,125 @@
+<h2 id="velocity">Velocity</h2>
+
+<div class="note-def">
+  <strong>Velocity</strong> is speed in a given direction. It is a <strong>vector</strong> quantity.
+  \[ \text{velocity} = \frac{\text{displacement}}{\text{time}} \quad\Rightarrow\quad v = \frac{s}{t} \]
+  SI unit: <strong>m/s</strong> (always state the direction, e.g. "12 m/s northwards").
+</div>
+
+<div class="note-key">
+  <strong>Speed vs velocity:</strong>
+  <table class="note-table" style="margin-top:.5rem">
+    <thead><tr><th>Speed</th><th>Velocity</th></tr></thead>
+    <tbody>
+      <tr><td>Scalar — magnitude only</td><td>Vector — magnitude + direction</td></tr>
+      <tr><td>Always positive (≥ 0)</td><td>Can be positive or negative</td></tr>
+      <tr><td>e.g. 12 m/s</td><td>e.g. 12 m/s north, or −12 m/s</td></tr>
+    </tbody>
+  </table>
+  An object moving in a circle at constant speed has <em>changing velocity</em> because the direction constantly changes.
+</div>
+
+<h2 id="acceleration">Acceleration</h2>
+
+<div class="note-def">
+  <strong>Acceleration</strong> is the rate of change of velocity. It is a <strong>vector</strong> quantity.
+  \[ a = \frac{v - u}{t} \quad \text{or} \quad a = \frac{\Delta v}{\Delta t} \]
+  Where: \( u \) = initial velocity, \( v \) = final velocity, \( t \) = time taken.<br>
+  SI unit: <strong>m/s²</strong>
+</div>
+
+<div class="note-key">
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li><strong>Positive acceleration</strong> — velocity is increasing.</li>
+    <li><strong>Deceleration (negative acceleration)</strong> — velocity is decreasing; \( a \) is negative when the object is slowing down.</li>
+    <li><strong>Zero acceleration</strong> — object moves at constant velocity (or is stationary).</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — calculating acceleration</summary>
+  <div>
+    <p>A car accelerates from rest to 28 m/s in 7.0 s. Calculate the acceleration.</p>
+    <p>\( u = 0\,\text{m/s},\quad v = 28\,\text{m/s},\quad t = 7.0\,\text{s} \)</p>
+    <p>\( a = \dfrac{v - u}{t} = \dfrac{28 - 0}{7.0} = 4.0\,\text{m/s}^2 \)</p>
+  </div>
+</details>
+
+<h2 id="vt-graphs">Speed-time and velocity-time graphs</h2>
+
+<div class="note-key">
+  A speed-time (v-t) graph shows how speed changes over time. The two key rules:
+  <ul style="margin:.5rem 0 0 1.2rem;line-height:2">
+    <li><strong>Gradient = acceleration.</strong> A steeper positive gradient means greater acceleration. A negative gradient means deceleration.</li>
+    <li><strong>Area under the graph = distance travelled.</strong> Split the area into rectangles and triangles and add them up.</li>
+  </ul>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — Speed-time graph. Section A: uniform acceleration (rising straight line). Section B: constant speed (horizontal). Section C: uniform deceleration (falling straight line to zero).">
+  <div style="padding:1rem 0;display:flex;justify-content:center">
+    <svg viewBox="0 0 320 200" width="320" height="200" aria-label="Speed-time graph">
+      <!-- axes -->
+      <line x1="40" y1="170" x2="300" y2="170" stroke="#5A5A72" stroke-width="1.5"/>
+      <line x1="40" y1="170" x2="40"  y2="20"  stroke="#5A5A72" stroke-width="1.5"/>
+      <text x="170" y="190" font-size="11" fill="#5A5A72" text-anchor="middle">Time / s</text>
+      <text x="12"  y="95"  font-size="11" fill="#5A5A72" text-anchor="middle" transform="rotate(-90,12,95)">Speed / m s⁻¹</text>
+      <!-- A: acceleration 40,170 → 130,60 -->
+      <line x1="40" y1="170" x2="130" y2="60" stroke="#4C2E72" stroke-width="2.2"/>
+      <!-- B: constant 130,60 → 210,60 -->
+      <line x1="130" y1="60" x2="210" y2="60" stroke="#E8913A" stroke-width="2.2"/>
+      <!-- C: deceleration 210,60 → 285,170 -->
+      <line x1="210" y1="60" x2="285" y2="170" stroke="#1A6B4A" stroke-width="2.2"/>
+      <!-- shaded area triangles/rectangles -->
+      <polygon points="40,170 130,60 130,170" fill="rgba(76,46,114,.08)"/>
+      <rect x="130" y="60" width="80" height="110" fill="rgba(232,145,58,.08)"/>
+      <polygon points="210,60 285,170 210,170" fill="rgba(26,107,74,.08)"/>
+      <!-- labels -->
+      <text x="78"  y="140" font-size="10" fill="#4C2E72" font-weight="700">A</text>
+      <text x="168" y="120" font-size="10" fill="#E8913A" font-weight="700">B</text>
+      <text x="248" y="140" font-size="10" fill="#1A6B4A" font-weight="700">C</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="reading-vt">Reading a v-t graph</h2>
+
+<div class="note-key">
+  <strong>To find acceleration from section A:</strong> gradient = \( \dfrac{\Delta v}{\Delta t} = \dfrac{v_2 - v_1}{t_2 - t_1} \)
+  <br><br>
+  <strong>To find total distance:</strong> add the areas of each section.<br>
+  Area A (triangle) = \( \tfrac{1}{2} \times \text{base} \times \text{height} \)<br>
+  Area B (rectangle) = \( \text{base} \times \text{height} \)<br>
+  Area C (triangle) = \( \tfrac{1}{2} \times \text{base} \times \text{height} \)
+</div>
+
+<details class="note-example">
+  <summary>Worked example — acceleration and distance from a v-t graph</summary>
+  <div>
+    <p>A v-t graph shows: speed rises from 0 to 20 m/s over 5 s (section A), stays at 20 m/s for 10 s (section B), then falls to 0 in 4 s (section C). Find: (a) the acceleration in A; (b) total distance.</p>
+    <p><strong>(a)</strong> \( a = \dfrac{20 - 0}{5} = 4.0\,\text{m/s}^2 \)</p>
+    <p><strong>(b)</strong> Area A = \( \tfrac{1}{2}(5)(20) = 50\,\text{m} \)<br>
+    Area B = \( (10)(20) = 200\,\text{m} \)<br>
+    Area C = \( \tfrac{1}{2}(4)(20) = 40\,\text{m} \)<br>
+    Total = \( 50 + 200 + 40 = 290\,\text{m} \)</p>
+  </div>
+</details>
+
+<h2 id="ddt-vs-vt">Comparing d-t and v-t graphs</h2>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead><tr><th>Feature</th><th>Distance-time graph</th><th>Speed-time graph</th></tr></thead>
+    <tbody>
+      <tr><td>y-axis</td><td>Distance (m)</td><td>Speed (m/s)</td></tr>
+      <tr><td>Gradient gives</td><td>Speed</td><td>Acceleration</td></tr>
+      <tr><td>Area under gives</td><td>— (not useful)</td><td>Distance</td></tr>
+      <tr><td>Horizontal line</td><td>Object stationary</td><td>Constant speed</td></tr>
+      <tr><td>Positive slope</td><td>Moving (constant speed)</td><td>Accelerating</td></tr>
+      <tr><td>Negative slope</td><td>Moving back towards start</td><td>Decelerating</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-tip">
+  The most common exam question type: a v-t graph is given with two or three sections. You must (a) calculate acceleration in one section by finding the gradient, and (b) calculate total distance by finding the total area. Always show your gradient working as a fraction with correct units.
+</div>

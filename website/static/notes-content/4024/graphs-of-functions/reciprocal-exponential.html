@@ -1,0 +1,111 @@
+<h2 id="reciprocal">Reciprocal graphs — \( y = k/x \)</h2>
+
+<div class="note-def">
+  The <strong>reciprocal function</strong> \( y = \dfrac{k}{x} \) produces a curve called a <strong>hyperbola</strong>. It is defined for all values of \( x \) <em>except</em> \( x = 0 \).
+</div>
+
+<h2 id="reciprocal-features">Features of \( y = k/x \)</h2>
+
+<div class="note-key">
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li><strong>Two asymptotes:</strong> \( x = 0 \) (y-axis) and \( y = 0 \) (x-axis). Draw these as dashed lines.</li>
+    <li><strong>Sign of \( k \):</strong>
+      <ul style="margin:.2rem 0 0 1.2rem">
+        <li>\( k > 0 \): branches in Quadrant 1 (top-right) and Quadrant 3 (bottom-left).</li>
+        <li>\( k < 0 \): branches in Quadrant 2 (top-left) and Quadrant 4 (bottom-right).</li>
+      </ul>
+    </li>
+    <li><strong>No intercepts:</strong> the curve never crosses either axis.</li>
+    <li><strong>Symmetry:</strong> the curve has two lines of symmetry: \( y = x \) and \( y = -x \).</li>
+    <li>As \( x \to 0 \), \( y \to \pm\infty \). As \( x \to \pm\infty \), \( y \to 0 \).</li>
+  </ul>
+</div>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — y = k/x with k > 0 (two branches, Q1 and Q3); dashed asymptotes at x = 0 and y = 0">
+  <div style="display:flex;align-items:center;justify-content:center;height:140px">
+    <svg viewBox="0 0 200 160" width="200" height="160" aria-label="Reciprocal graph sketch">
+      <!-- axes -->
+      <line x1="100" y1="10" x2="100" y2="150" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <line x1="10" y1="80" x2="190" y2="80" stroke="#888" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <!-- Q1 branch -->
+      <path d="M 112 18 Q 130 35 150 45 Q 165 52 180 57" fill="none" stroke="#4C2E72" stroke-width="2"/>
+      <!-- Q3 branch -->
+      <path d="M 88 142 Q 70 125 50 115 Q 35 108 20 103" fill="none" stroke="#4C2E72" stroke-width="2"/>
+      <text x="104" y="8" font-size="9" fill="#888">x=0</text>
+      <text x="155" y="76" font-size="9" fill="#888">y=0</text>
+      <text x="155" y="48" font-size="10" fill="#4C2E72">y=k/x</text>
+    </svg>
+  </div>
+</div>
+
+<h2 id="reciprocal-squared">Reciprocal squared — \( y = k/x^2 \)</h2>
+
+<div class="note-key">
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li>Since \( x^2 \) is always positive, \( y \) has the same sign as \( k \) for all \( x \neq 0 \).</li>
+    <li>\( k > 0 \): <strong>both branches are above</strong> the x-axis (Q1 and Q2).</li>
+    <li>\( k < 0 \): both branches are below the x-axis.</li>
+    <li>Asymptotes are still \( x = 0 \) and \( y = 0 \).</li>
+    <li>The curve is symmetric about the y-axis (even function).</li>
+  </ul>
+</div>
+
+<div class="note-warn">
+  <strong>\( y = k/x \) vs \( y = k/x^2 \):</strong> For \( y = k/x \) the two branches are in opposite quadrants (one positive, one negative region). For \( y = k/x^2 \) both branches are on the <em>same</em> side of the x-axis. This is the most-tested distinction.
+</div>
+
+<h2 id="exponential">Exponential graphs — \( y = ab^x \)</h2>
+
+<div class="note-def">
+  An <strong>exponential function</strong> has the form \( y = ab^x \) where \( a > 0 \) and \( b > 0,\; b \neq 1 \). The variable is the <em>exponent</em> (power), not the base.
+</div>
+
+<h2 id="exponential-features">Features of \( y = ab^x \)</h2>
+
+<div class="note-key">
+  <ul style="margin:.3rem 0 0 1.2rem;line-height:2">
+    <li><strong>y-intercept:</strong> When \( x = 0 \), \( y = ab^0 = a \cdot 1 = a \). So the curve always passes through \( (0, a) \).</li>
+    <li><strong>Growth or decay?</strong>
+      <ul style="margin:.2rem 0 0 1.2rem">
+        <li>\( b > 1 \): exponential <strong>growth</strong> — curve rises steeply to the right.</li>
+        <li>\( 0 < b < 1 \): exponential <strong>decay</strong> — curve falls and approaches zero from above.</li>
+      </ul>
+    </li>
+    <li><strong>Horizontal asymptote:</strong> \( y = 0 \) (the x-axis). The curve approaches it but never reaches it (for \( a > 0 \)).</li>
+    <li><strong>No x-intercepts</strong> (when \( a > 0 \)).</li>
+    <li>The curve is always <strong>positive</strong> when \( a > 0 \) and \( b > 0 \).</li>
+  </ul>
+</div>
+
+<details class="note-example">
+  <summary>Worked example — using an exponential graph to solve an equation</summary>
+  <div>
+    <p><em>The graph of \( y = 3^x \) is drawn. Use it to solve \( 3^x = 7 \).</em></p>
+    <p>Draw the horizontal line \( y = 7 \) on the graph. Read off the x-value at the intersection — this is the solution.</p>
+    <p>Using logarithms to check: \( x = \dfrac{\log 7}{\log 3} = \dfrac{0.845}{0.477} \approx 1.77 \).</p>
+    <p>The graph reading should give approximately \( x \approx 1.8 \) — within the acceptable tolerance for a graph answer (typically ±0.1).</p>
+  </div>
+</details>
+
+<h2 id="growth-decay">Exponential growth and decay in context</h2>
+
+<div class="note-key">
+  Real-world exponential models:
+  <table class="note-table" style="margin-top:.5rem">
+    <thead><tr><th>Context</th><th>Model</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Population growth</td><td>\( P = P_0 \times r^t \), \( r > 1 \)</td><td>Grows without limit (in theory)</td></tr>
+      <tr><td>Radioactive decay</td><td>\( N = N_0 \times (0.5)^{t/t_{1/2}} \)</td><td>Halves every half-life \( t_{1/2} \)</td></tr>
+      <tr><td>Compound interest</td><td>\( A = P(1 + r)^n \)</td><td>Growth; \( r \) is the rate per period</td></tr>
+      <tr><td>Depreciation</td><td>\( V = V_0(1 - r)^n \)</td><td>Decay; \( r \) is rate of loss</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-tip">
+  When a question says "show that the relationship is exponential," draw \( \log y \) against \( x \) — if the points form a straight line, the original data follows \( y = ab^x \). This is a <em>linearisation</em> technique used in Paper 2 graph questions.
+</div>
+
+<div class="note-warn">
+  Do not confuse \( y = x^2 \) (a quadratic — power of x) with \( y = 2^x \) (an exponential — x is the power). They have completely different shapes and growth rates.
+</div>
