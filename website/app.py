@@ -59,7 +59,7 @@ _USE_PG = _db.USE_PG
 def _con():
     """Open a pipeline DB connection.  Caller must call .close()."""
     return _db.plain_connect()
-YEAR_MIN, YEAR_MAX = 2020, 2025
+YEAR_MIN, YEAR_MAX = 2010, 2026
 
 # Display names for each paper component. The components actually offered are
 # read from the database (only papers with classified questions appear), so a
