@@ -655,14 +655,6 @@ def get_grade_thresholds_history(syllabus: str, paper: int):
     return {"thresholds": _udb.get_grade_thresholds_history(syllabus, paper)}
 
 
-@router.get("/api/grade-thresholds")
-def get_grade_thresholds_route(syllabus: str, year: int | None = None, session: str | None = None):
-    """Retrieve grade thresholds for a syllabus, optionally filtered by year and session."""
-    if not syllabus:
-        raise HTTPException(400, "Syllabus code required")
-    return {"thresholds": _udb.get_grade_thresholds(syllabus, year, session)}
-
-
 @router.get("/api/grade-options/history")
 def get_grade_options_history(syllabus: str, option_code: str | None = None):
     return {"options": _udb.get_grade_options_history(syllabus, option_code)}
