@@ -370,11 +370,29 @@ function renderTopics() {
   const box = $("#topics");
   box.innerHTML = "";
 
+  const yf = parseInt($("#yfrom").value, 10) || 0;
+  const yt = parseInt($("#yto").value, 10) || 9999;
+  const sumYears = (byYear) => {
+    if (!byYear || !Object.keys(byYear).length) return null;
+    let s = 0;
+    for (const [y, n] of Object.entries(byYear)) if (+y >= yf && +y <= yt) s += n;
+    return s;
+  };
+
   let shown = 0;
   for (const t of sub.topics) {
-    const count = state.papers.length === 0
-      ? t.count
-      : state.papers.reduce((s, p) => s + (t.papers[String(p)] || 0), 0);
+    let count;
+    if (state.papers.length === 0) {
+      const y = sumYears(t.counts_by_year);
+      count = y !== null ? y : t.count;
+    } else {
+      const py = t.paper_year || {};
+      count = state.papers.reduce((s, p) => {
+        const byYear = py[String(p)];
+        if (!byYear) return s + (t.papers[String(p)] || 0);
+        return s + (sumYears(byYear) ?? 0);
+      }, 0);
+    }
     if (!count) continue;
     shown++;
 
@@ -417,7 +435,8 @@ function renderTopics() {
       for (const st of t.subtopics) {
         const row = document.createElement("label");
         row.className = "subtopic-item";
-        const countBadge = st.count ? ` <span class="n">${st.count}</span>` : "";
+        const stCountVal = sumYears(st.counts_by_year) ?? st.count;
+        const countBadge = stCountVal ? ` <span class="n">${stCountVal}</span>` : "";
         row.innerHTML =
           `<input type="checkbox" class="subtopic-cb" data-topic="${t.name}" value="${st.name}">` +
           `<span>${st.name}${countBadge}</span>`;
@@ -561,8 +580,8 @@ $("#none").onclick = () => {
 };
 
 $("#topic-search").oninput = (e) => filterTopics(e.target.value);
-$("#yfrom").onchange = updateSummary;
-$("#yto").onchange = updateSummary;
+$("#yfrom").onchange = () => { renderTopics(); updateSummary(); };
+$("#yto").onchange = () => { renderTopics(); updateSummary(); };
 $("#inc-ms").onchange = updateSummary;
 
 document.querySelectorAll(".mode").forEach((b) => {

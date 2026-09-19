@@ -23,11 +23,44 @@
       "subtopics": [
         {
           "name": "Solids, liquids and gases",
-          "links": []
+          "links": [],
+          "keywords": [
+            "particle arrangement",
+            "fixed shape",
+            "fixed volume",
+            "close together",
+            "free to move",
+            "compressible",
+            "random motion",
+            "density of particles",
+            "kinetic theory explains",
+            "state of matter properties",
+            "arrange particles in solid",
+            "particles vibrate",
+            "weakly attracted",
+            "describing the arrangement",
+            "gas particles move randomly"
+          ]
         },
         {
           "name": "Diffusion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "rate of diffusion",
+            "lighter molecules diffuse faster",
+            "gas diffusion",
+            "spreading of particles",
+            "concentrated to dilute",
+            "net movement of particles",
+            "smell spreads",
+            "random movement",
+            "ammonia and hydrogen chloride",
+            "diffusion in liquids",
+            "distance moved by gas",
+            "explain diffusion in terms of particles",
+            "heavier gas diffuses slower",
+            "relative molecular mass and rate"
+          ]
         }
       ]
     },
@@ -53,31 +86,142 @@
       "subtopics": [
         {
           "name": "Elements, compounds and mixtures",
-          "links": []
+          "links": [],
+          "keywords": [
+            "pure substance",
+            "mixture can be separated",
+            "compound contains elements",
+            "cannot be broken down",
+            "chemical symbol",
+            "chemical formula",
+            "method of separation",
+            "single type of atom",
+            "chemically combined",
+            "no chemical bond in mixture",
+            "properties of mixture",
+            "word equation",
+            "formula of compound",
+            "identify element compound mixture"
+          ]
         },
         {
           "name": "Atomic structure and the Periodic Table",
-          "links": []
+          "links": [],
+          "keywords": [
+            "proton number",
+            "electron shells",
+            "energy level",
+            "electronic structure",
+            "atomic model",
+            "sub-atomic particles",
+            "nucleus",
+            "electron configuration",
+            "number of protons electrons neutrons",
+            "draw electronic configuration",
+            "state the electronic structure of",
+            "shells 2 8 8",
+            "outer shell electrons",
+            "group number equals outer electrons"
+          ]
         },
         {
           "name": "Isotopes",
-          "links": []
+          "links": [],
+          "keywords": [
+            "same proton number",
+            "different mass number",
+            "different numbers of neutrons",
+            "relative atomic mass calculation",
+            "radioactive isotope",
+            "carbon-14",
+            "same chemical properties",
+            "mass spectrometer",
+            "abundance of isotopes",
+            "calculate Ar from isotopes",
+            "non-radioactive isotope",
+            "identify isotopes of element",
+            "isotope definition"
+          ]
         },
         {
           "name": "Ion and ionic bonds",
-          "links": []
+          "links": [],
+          "keywords": [
+            "transfer of electrons",
+            "positive ion",
+            "negative ion",
+            "ionic lattice",
+            "electrostatic attraction",
+            "cation formation",
+            "anion formation",
+            "high melting point ionic",
+            "conducts electricity when molten",
+            "sodium chloride structure",
+            "dot-and-cross ionic",
+            "loses electrons to form",
+            "gains electrons to form",
+            "ionic bond definition",
+            "describe ionic bonding"
+          ]
         },
         {
           "name": "Simple molecules and covalent bonds",
-          "links": []
+          "links": [],
+          "keywords": [
+            "sharing electrons",
+            "bond formed by sharing",
+            "non-metal atoms bond",
+            "low boiling point",
+            "does not conduct electricity",
+            "bond pair",
+            "lone pair",
+            "simple covalent structure",
+            "displayed formula",
+            "dot-and-cross diagram covalent",
+            "water methane ammonia",
+            "weak intermolecular forces",
+            "volatile",
+            "covalent bond definition"
+          ]
         },
         {
           "name": "Giant covalent structures",
-          "links": []
+          "links": [],
+          "keywords": [
+            "diamond structure",
+            "graphite structure",
+            "silicon dioxide",
+            "every carbon bonded to four",
+            "strong covalent bonds throughout",
+            "very high melting point",
+            "hard substance",
+            "delocalised electrons in graphite",
+            "layers in graphite",
+            "network solid",
+            "explain why diamond is hard",
+            "explain why graphite conducts",
+            "giant lattice of atoms",
+            "allotropes of carbon"
+          ]
         },
         {
           "name": "Metallic bonding",
-          "links": []
+          "links": [],
+          "keywords": [
+            "sea of electrons",
+            "positive ions in lattice",
+            "delocalised electrons",
+            "good conductor of electricity",
+            "malleable and ductile",
+            "close-packed ions",
+            "explain metallic bonding",
+            "electrostatic attraction between ions and electrons",
+            "metal lattice",
+            "why metals conduct heat",
+            "describe metallic bonding",
+            "layers of ions slide",
+            "why metals are malleable"
+          ]
         }
       ]
     },
@@ -101,15 +245,60 @@
       "subtopics": [
         {
           "name": "Formulae",
-          "links": []
+          "links": [],
+          "keywords": [
+            "write the chemical formula",
+            "molecular formula",
+            "empirical formula",
+            "displayed formula",
+            "ionic formula",
+            "structural formula",
+            "valency of element",
+            "combining power",
+            "formula of the compound",
+            "deduce the formula",
+            "write a balanced equation",
+            "state symbols (s) (l) (g) (aq)",
+            "balance the equation",
+            "simplest whole number ratio"
+          ]
         },
         {
           "name": "Relative masses of atoms and molecules",
-          "links": []
+          "links": [],
+          "keywords": [
+            "relative atomic mass Ar",
+            "relative molecular mass Mr",
+            "relative formula mass",
+            "average mass relative to carbon-12",
+            "calculate Ar from percentage abundance",
+            "mass of one mole",
+            "calculate the Mr of",
+            "sum of relative atomic masses",
+            "molar mass in g/mol",
+            "find the relative formula mass"
+          ]
         },
         {
           "name": "The mole and the Avogadro constant",
-          "links": []
+          "links": [],
+          "keywords": [
+            "one mole contains 6.02 × 10^23",
+            "Avogadro constant",
+            "number of particles",
+            "moles = mass / Mr",
+            "amount of substance",
+            "calculate the number of moles",
+            "mole ratio from equation",
+            "volume of gas at rtp",
+            "24 dm3 per mole at rtp",
+            "concentration = moles / volume",
+            "mol/dm3",
+            "calculate mass from moles",
+            "percentage yield",
+            "limiting reagent calculation",
+            "reacting masses"
+          ]
         }
       ]
     },
@@ -134,11 +323,46 @@
       "subtopics": [
         {
           "name": "Electrolysis",
-          "links": []
+          "links": [],
+          "keywords": [
+            "cathode attracts cations",
+            "anode attracts anions",
+            "product at cathode",
+            "product at anode",
+            "copper sulfate solution electrolysis",
+            "dilute sulfuric acid electrolysis",
+            "sodium chloride solution electrolysis",
+            "selective discharge",
+            "active electrode",
+            "inert electrode platinum",
+            "write half equation for cathode",
+            "write half equation for anode",
+            "oxidation at anode",
+            "reduction at cathode",
+            "electroplating with copper",
+            "molten lead bromide",
+            "predict products of electrolysis"
+          ]
         },
         {
           "name": "Hydrogen–oxygen fuel cells",
-          "links": []
+          "links": [],
+          "keywords": [
+            "hydrogen oxidised at anode",
+            "oxygen reduced at cathode",
+            "water produced",
+            "electrical energy from chemical reaction",
+            "no combustion in fuel cell",
+            "overall equation for fuel cell",
+            "electrolyte in fuel cell",
+            "advantages of fuel cell over combustion",
+            "clean energy source",
+            "hydrogen gas supplied",
+            "half equation at fuel cell anode",
+            "half equation at fuel cell cathode",
+            "proton exchange membrane",
+            "state one advantage of fuel cell"
+          ]
         }
       ]
     },
@@ -160,7 +384,24 @@
       "subtopics": [
         {
           "name": "Exothermic and endothermic reactions",
-          "links": []
+          "links": [],
+          "keywords": [
+            "energy is released to surroundings",
+            "temperature of surroundings rises",
+            "energy is absorbed from surroundings",
+            "temperature of surroundings falls",
+            "energy level diagram",
+            "products at lower energy than reactants",
+            "products at higher energy than reactants",
+            "activation energy on diagram",
+            "heat of combustion",
+            "bond breaking absorbs energy",
+            "bond forming releases energy",
+            "calculate enthalpy change from bond energies",
+            "exothermic examples combustion neutralisation",
+            "endothermic examples thermal decomposition",
+            "draw and label energy profile diagram"
+          ]
         }
       ]
     },
@@ -186,19 +427,84 @@
       "subtopics": [
         {
           "name": "Physical and chemical changes",
-          "links": []
+          "links": [],
+          "keywords": [
+            "reversible physical change",
+            "irreversible chemical change",
+            "new substance formed",
+            "no new substance produced",
+            "mass is conserved",
+            "law of conservation of mass",
+            "colour change indicates chemical change",
+            "gas produced",
+            "precipitate formed",
+            "temperature change indicates chemical",
+            "examples of physical change",
+            "examples of chemical change",
+            "original substance recovered",
+            "identify as physical or chemical"
+          ]
         },
         {
           "name": "Rate of reaction",
-          "links": []
+          "links": [],
+          "keywords": [
+            "rate increases with temperature",
+            "frequency of successful collisions",
+            "effective collisions",
+            "collision theory",
+            "increasing concentration increases rate",
+            "catalyst increases rate",
+            "smaller particle size increases rate",
+            "greater surface area",
+            "graph of volume of gas against time",
+            "graph of mass against time",
+            "initial rate steepest gradient",
+            "time for cross to disappear",
+            "explain in terms of collision theory",
+            "suggest how to increase rate",
+            "measure rate of reaction"
+          ]
         },
         {
           "name": "Reversible reactions and equilibrium",
-          "links": []
+          "links": [],
+          "keywords": [
+            "dynamic equilibrium",
+            "Le Chatelier's principle",
+            "forward reaction rate",
+            "reverse reaction rate",
+            "equilibrium position shifts",
+            "change in concentration shifts equilibrium",
+            "change in pressure shifts equilibrium",
+            "change in temperature shifts equilibrium",
+            "Haber process conditions",
+            "Contact process",
+            "effect on yield",
+            "increasing pressure favours fewer moles",
+            "increasing temperature shifts to endothermic",
+            "predict effect on equilibrium"
+          ]
         },
         {
           "name": "Redox",
-          "links": []
+          "links": [],
+          "keywords": [
+            "oxidation state",
+            "oxidising agent gains electrons",
+            "reducing agent loses electrons",
+            "OIL RIG",
+            "change in oxidation number",
+            "oxidation number of element",
+            "identify the oxidising agent",
+            "identify the reducing agent",
+            "oxidation and reduction occur simultaneously",
+            "ionic equation for redox",
+            "loss of hydrogen is oxidation",
+            "gain of oxygen is oxidation",
+            "electron transfer",
+            "deduce oxidation state from formula"
+          ]
         }
       ]
     },
@@ -225,15 +531,64 @@
       "subtopics": [
         {
           "name": "The characteristic properties of acids and bases",
-          "links": []
+          "links": [],
+          "keywords": [
+            "react with metal to produce hydrogen",
+            "react with metal carbonate to produce carbon dioxide",
+            "react with base to form salt and water",
+            "neutralisation reaction",
+            "pH scale 0 to 14",
+            "hydrogen ion H+",
+            "hydroxide ion OH-",
+            "strong acid fully dissociates",
+            "weak acid partially dissociates",
+            "litmus turns red with acid",
+            "litmus turns blue with alkali",
+            "effervescence with carbonate",
+            "limewater turns cloudy with CO2",
+            "identify acid or alkali from pH",
+            "word equation for acid and metal"
+          ]
         },
         {
           "name": "Oxides",
-          "links": []
+          "links": [],
+          "keywords": [
+            "acidic oxide reacts with base",
+            "basic oxide reacts with acid",
+            "amphoteric oxide reacts with both",
+            "neutral oxide",
+            "non-metal oxide is acidic",
+            "metal oxide is basic",
+            "forms salt and water",
+            "aluminium oxide amphoteric",
+            "examples of acidic oxides",
+            "examples of basic oxides",
+            "classify the oxide",
+            "explain why amphoteric",
+            "sulfur dioxide acidic oxide",
+            "sodium oxide basic oxide"
+          ]
         },
         {
           "name": "Preparation of salts",
-          "links": []
+          "links": [],
+          "keywords": [
+            "soluble salt prepared by",
+            "insoluble salt by precipitation",
+            "excess acid added to solid",
+            "filter off excess solid",
+            "evaporate to crystallise",
+            "titration method for soluble salt",
+            "ionic equation for precipitation",
+            "name the salt formed",
+            "identify the correct method",
+            "crystallisation of salt",
+            "add sodium hydroxide to precipitate",
+            "sulfate carbonate chloride salts",
+            "describe preparation of copper sulfate",
+            "excess base filtered"
+          ]
         }
       ]
     },
@@ -256,23 +611,103 @@
       "subtopics": [
         {
           "name": "Arrangement of elements",
-          "links": []
+          "links": [],
+          "keywords": [
+            "periods and groups",
+            "arranged in order of atomic number",
+            "proton number increases across period",
+            "group number",
+            "period number",
+            "properties across a period",
+            "properties down a group",
+            "metallic to non-metallic across period",
+            "electrons in outer shell",
+            "number of electron shells increases down group",
+            "trend in properties",
+            "state the period and group of",
+            "elements in same group have similar properties"
+          ]
         },
         {
           "name": "Group I properties",
-          "links": []
+          "links": [],
+          "keywords": [
+            "alkali metal",
+            "vigorous reaction with water",
+            "hydrogen gas produced",
+            "lithium sodium potassium",
+            "reactivity increases down group",
+            "soft metal cut with knife",
+            "low density floats on water",
+            "hydroxide solution formed alkaline",
+            "stored under oil",
+            "tarnishes in air",
+            "reaction with oxygen",
+            "describe trend in reactivity",
+            "explain why reactivity increases",
+            "write equation for sodium and water",
+            "outer electron lost more easily"
+          ]
         },
         {
           "name": "Group VII properties",
-          "links": []
+          "links": [],
+          "keywords": [
+            "halogen",
+            "diatomic molecule",
+            "fluorine chlorine bromine iodine",
+            "reactivity decreases down group",
+            "more reactive halogen displaces less reactive",
+            "chlorine is a yellow-green gas",
+            "bromine is a brown liquid",
+            "iodine is a grey solid",
+            "halide ion",
+            "bleaching properties of chlorine",
+            "kills bacteria",
+            "test for halide ions with silver nitrate",
+            "explain decrease in reactivity",
+            "displacement reaction with halide solution",
+            "colour of halogen in hexane"
+          ]
         },
         {
           "name": "Transition elements",
-          "links": []
+          "links": [],
+          "keywords": [
+            "transition metal",
+            "coloured compounds",
+            "variable oxidation state",
+            "use as catalyst",
+            "high melting point",
+            "high density",
+            "harder than Group I metals",
+            "multiple oxidation states",
+            "form complex ions",
+            "iron(II) and iron(III)",
+            "manganese dioxide as catalyst",
+            "copper blue compounds",
+            "iron catalyst in Haber",
+            "describe properties of transition metals",
+            "name a transition element"
+          ]
         },
         {
           "name": "Noble gases",
-          "links": []
+          "links": [],
+          "keywords": [
+            "inert or unreactive",
+            "full outer electron shell",
+            "do not react",
+            "helium neon argon",
+            "monoatomic gas",
+            "uses of argon in light bulbs",
+            "uses of helium in balloons",
+            "stable electron configuration",
+            "Group VIII or Group 0",
+            "why noble gases do not react",
+            "state one use of helium",
+            "non-flammable helium safer than hydrogen"
+          ]
         }
       ]
     },
@@ -297,27 +732,116 @@
       "subtopics": [
         {
           "name": "Properties of metals",
-          "links": []
+          "links": [],
+          "keywords": [
+            "conducts electricity",
+            "conducts heat",
+            "malleable",
+            "ductile",
+            "lustrous appearance",
+            "high density",
+            "high melting point",
+            "sonorous",
+            "metallic bonding explains properties",
+            "explain why metals conduct",
+            "describe physical properties of metals",
+            "bend without breaking",
+            "drawn into wire",
+            "shiny surface"
+          ]
         },
         {
           "name": "Uses of metals",
-          "links": []
+          "links": [],
+          "keywords": [
+            "uses of copper electrical wiring",
+            "uses of iron structural",
+            "uses of aluminium lightweight",
+            "properties determine uses",
+            "cooking utensils",
+            "building material",
+            "electrical conductor use",
+            "low density of aluminium",
+            "corrosion resistance determines use",
+            "why is copper used for",
+            "link property to use"
+          ]
         },
         {
           "name": "Alloys and their properties",
-          "links": []
+          "links": [],
+          "keywords": [
+            "mixture of metals",
+            "harder than pure metal",
+            "bronze is copper and tin",
+            "brass is copper and zinc",
+            "stainless steel contains chromium",
+            "different atom sizes disrupt layers",
+            "alloy is harder because",
+            "composition of steel",
+            "why alloys are used instead of pure metals",
+            "properties of alloys compared to pure metal",
+            "state one use of stainless steel",
+            "explain why alloys are harder"
+          ]
         },
         {
           "name": "Reactivity series",
-          "links": []
+          "links": [],
+          "keywords": [
+            "potassium sodium calcium magnesium aluminium zinc iron lead copper silver",
+            "order of reactivity",
+            "more reactive displaces less reactive",
+            "displacement reaction from salt solution",
+            "reacts vigorously with water",
+            "reacts with dilute acid",
+            "predict whether reaction occurs",
+            "thermite reaction",
+            "write equation for displacement",
+            "place in order of reactivity",
+            "use reactivity to predict",
+            "metal above hydrogen reacts with acid"
+          ]
         },
         {
           "name": "Corrosion of metals",
-          "links": []
+          "links": [],
+          "keywords": [
+            "rusting of iron",
+            "oxygen and water both needed for rusting",
+            "conditions for rusting",
+            "rust prevention methods",
+            "galvanising with zinc",
+            "painting the surface",
+            "sacrificial protection",
+            "electroplating prevents corrosion",
+            "zinc protects iron",
+            "tin coating on cans",
+            "explain why galvanising prevents rust",
+            "barrier method of protection",
+            "which metal used for sacrificial anode",
+            "describe how to test conditions for rusting"
+          ]
         },
         {
           "name": "Extraction of metals",
-          "links": []
+          "links": [],
+          "keywords": [
+            "method of extraction depends on reactivity",
+            "electrolysis used for reactive metals",
+            "reduction with carbon",
+            "blast furnace for iron",
+            "iron ore haematite",
+            "bauxite ore of aluminium",
+            "reduction by more reactive metal",
+            "extraction of aluminium by electrolysis",
+            "raw materials for blast furnace",
+            "limestone coke iron ore",
+            "why aluminium extracted by electrolysis",
+            "coke as reducing agent",
+            "reactions in blast furnace",
+            "carbon more reactive than iron"
+          ]
         }
       ]
     },
@@ -341,15 +865,65 @@
       "subtopics": [
         {
           "name": "Water",
-          "links": []
+          "links": [],
+          "keywords": [
+            "drinking water treatment",
+            "sedimentation",
+            "filtration of water",
+            "chlorination to kill bacteria",
+            "hard water scum with soap",
+            "soft water lathers easily",
+            "temporary hardness caused by",
+            "permanent hardness removed by",
+            "remove hardness by boiling",
+            "remove hardness by adding sodium carbonate",
+            "scale in pipes and boilers",
+            "ion exchange resin",
+            "distillation produces pure water",
+            "advantages and disadvantages of hard water",
+            "describe water treatment process"
+          ]
         },
         {
           "name": "Fertilisers",
-          "links": []
+          "links": [],
+          "keywords": [
+            "nitrogen phosphorus potassium NPK",
+            "nitrate fertiliser",
+            "ammonium nitrate",
+            "urea fertiliser",
+            "fertiliser improves crop yield",
+            "eutrophication",
+            "leaching of nitrates",
+            "Haber process produces ammonia",
+            "excess fertiliser causes water pollution",
+            "algal bloom eutrophication",
+            "oxygen depletion in water",
+            "dead fish",
+            "state one environmental problem caused by fertilisers",
+            "why plants need nitrogen"
+          ]
         },
         {
           "name": "Air quality and climate",
-          "links": []
+          "links": [],
+          "keywords": [
+            "carbon dioxide greenhouse effect",
+            "global warming",
+            "methane from cattle and rice paddies",
+            "ozone layer protects UV",
+            "CFCs damage ozone layer",
+            "pollutants from burning fossil fuels",
+            "sulfur dioxide causes acid rain",
+            "nitrogen oxides from engines",
+            "catalytic converter reduces pollutants",
+            "carbon monoxide is toxic",
+            "particulates",
+            "photochemical smog",
+            "state a cause of global warming",
+            "effects of acid rain",
+            "suggest how to reduce air pollution"
+          ]
         }
       ]
     },
@@ -378,35 +952,159 @@
       "subtopics": [
         {
           "name": "Formulae, functional groups and terminology",
-          "links": []
+          "links": [],
+          "keywords": [
+            "functional group determines properties",
+            "general formula of homologous series",
+            "displayed formula",
+            "skeletal formula",
+            "successive members differ by CH2",
+            "CnH2n+2 alkanes",
+            "CnH2n alkenes",
+            "OH group in alcohol",
+            "COOH group in carboxylic acid",
+            "homologous series same functional group",
+            "naming conventions",
+            "identify functional group in molecule",
+            "what is meant by homologous series"
+          ]
         },
         {
           "name": "Naming organic compounds",
-          "links": []
+          "links": [],
+          "keywords": [
+            "prefix meth- eth- prop- but-",
+            "suffix -ane -ene -ol -oic acid -yl -oate",
+            "IUPAC naming system",
+            "count carbon atoms in chain",
+            "longest carbon chain",
+            "name the compound shown",
+            "draw the structure of",
+            "write the molecular formula",
+            "position of double bond",
+            "branched chain",
+            "write the structural formula"
+          ]
         },
         {
           "name": "Fuels",
-          "links": []
+          "links": [],
+          "keywords": [
+            "fossil fuel",
+            "complete combustion products",
+            "incomplete combustion products",
+            "carbon dioxide and water produced",
+            "carbon monoxide toxic",
+            "soot produced",
+            "crude oil fractional distillation",
+            "natural gas",
+            "biofuel renewable",
+            "cracking hydrocarbons",
+            "shorter chain hydrocarbons more useful",
+            "write equation for combustion",
+            "state products of complete combustion",
+            "advantages of biofuel"
+          ]
         },
         {
           "name": "Alkanes",
-          "links": []
+          "links": [],
+          "keywords": [
+            "saturated hydrocarbon",
+            "substitution reaction with chlorine",
+            "unreactive with bromine water",
+            "CnH2n+2",
+            "methane ethane propane butane",
+            "burns in excess oxygen",
+            "free radical substitution",
+            "UV light needed for substitution",
+            "C-C single bonds only",
+            "no double bond in alkane",
+            "alkane does not decolourise bromine water",
+            "write equation for substitution of methane"
+          ]
         },
         {
           "name": "Alkenes",
-          "links": []
+          "links": [],
+          "keywords": [
+            "unsaturated hydrocarbon",
+            "addition reaction",
+            "C=C double bond",
+            "CnH2n",
+            "ethene propene butene",
+            "decolourises bromine water",
+            "addition of hydrogen hydrogenation",
+            "addition of bromine",
+            "addition of hydrogen halide",
+            "addition polymerisation",
+            "test for double bond bromine water",
+            "write equation for addition of bromine",
+            "cracking produces alkenes",
+            "monomer for addition polymer"
+          ]
         },
         {
           "name": "Alcohols",
-          "links": []
+          "links": [],
+          "keywords": [
+            "OH functional group",
+            "ethanol",
+            "fermentation of glucose",
+            "reaction with sodium",
+            "oxidation of alcohol",
+            "combustion of alcohol",
+            "dehydration of alcohol produces alkene",
+            "reaction with carboxylic acid esterification",
+            "methanol ethanol propanol",
+            "uses of ethanol as fuel",
+            "reaction of ethanol with oxygen",
+            "write equation for fermentation",
+            "ethanol oxidised to ethanoic acid",
+            "conditions for fermentation"
+          ]
         },
         {
           "name": "Carboxylic acids",
-          "links": []
+          "links": [],
+          "keywords": [
+            "COOH functional group",
+            "ethanoic acid",
+            "acetic acid",
+            "reaction with alcohol forms ester",
+            "esterification reaction",
+            "reaction with sodium carbonate",
+            "effervescence with carbonate",
+            "weak acid",
+            "react with base forms salt",
+            "fruity smell of ester",
+            "write equation for esterification",
+            "name the ester formed",
+            "condensation reaction",
+            "identify the carboxylic acid"
+          ]
         },
         {
           "name": "Polymers",
-          "links": []
+          "links": [],
+          "keywords": [
+            "addition polymer",
+            "condensation polymer",
+            "addition polymerisation",
+            "monomer",
+            "repeat unit",
+            "polyethene from ethene",
+            "poly(propene)",
+            "polyester condensation polymer",
+            "nylon polyamide",
+            "thermoplastic",
+            "thermosetting",
+            "recycling plastic",
+            "disposal of plastic",
+            "crude oil feedstock for plastic",
+            "draw the repeat unit",
+            "write the monomer from repeat unit"
+          ]
         }
       ]
     },
@@ -431,23 +1129,104 @@
       "subtopics": [
         {
           "name": "Experimental design",
-          "links": []
+          "links": [],
+          "keywords": [
+            "apparatus required",
+            "measure volume of gas",
+            "measure temperature change",
+            "control variables",
+            "repeat readings for accuracy",
+            "fair test",
+            "sources of error",
+            "improve accuracy of experiment",
+            "risk assessment",
+            "describe the procedure",
+            "draw and label apparatus",
+            "name a suitable indicator",
+            "suggest an improvement",
+            "calculate rate from graph gradient"
+          ]
         },
         {
           "name": "Acid–base titrations",
-          "links": []
+          "links": [],
+          "keywords": [
+            "burette",
+            "pipette",
+            "conical flask",
+            "indicator colour change at end point",
+            "concordant results",
+            "titre",
+            "mean titre calculation",
+            "calculate concentration from titre",
+            "record to nearest 0.05 cm3",
+            "white tile background",
+            "calculate moles from titre",
+            "describe titration procedure",
+            "fill burette with",
+            "swirl conical flask"
+          ]
         },
         {
           "name": "Chromatography",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Rf value",
+            "mobile phase",
+            "stationary phase",
+            "paper chromatography",
+            "solvent front",
+            "spot on baseline",
+            "amino acid identification",
+            "mixture separated by chromatography",
+            "each substance has different Rf",
+            "locating agent ninhydrin",
+            "number of substances in mixture",
+            "calculate Rf value",
+            "compare Rf values",
+            "identify substance from Rf"
+          ]
         },
         {
           "name": "Separation and purification",
-          "links": []
+          "links": [],
+          "keywords": [
+            "filtration",
+            "evaporation",
+            "simple distillation",
+            "fractional distillation",
+            "crystallisation",
+            "separating funnel",
+            "solubility difference",
+            "boiling point difference",
+            "melting point to check purity",
+            "filter paper residue filtrate",
+            "describe how to separate",
+            "which method to separate mixture",
+            "condenser in distillation",
+            "pure substance has sharp melting point"
+          ]
         },
         {
           "name": "Identification of ions and gases",
-          "links": []
+          "links": [],
+          "keywords": [
+            "flame test colour",
+            "lithium red sodium yellow potassium lilac",
+            "precipitate with sodium hydroxide",
+            "precipitate with ammonia solution",
+            "test for sulfate add barium chloride",
+            "test for halide add silver nitrate",
+            "test for carbon dioxide limewater",
+            "test for hydrogen squeaky pop",
+            "test for oxygen glowing splint",
+            "test for chlorine bleaches litmus",
+            "colour of precipitate",
+            "confirmatory test",
+            "white precipitate with",
+            "describe how to test for",
+            "identify the ion present"
+          ]
         }
       ]
     }

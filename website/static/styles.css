@@ -265,8 +265,13 @@ h3, .brand span { font-family: "Archivo", sans-serif; }
 .go.muted { color: var(--grey); }
 
 /* CTA band */
-.cta-band { background: linear-gradient(135deg, var(--navy-deep) 0%, #1a2650 50%, #293860 100%);
+.cta-band { background: linear-gradient(135deg, var(--navy-deep) 0%, #1a2650 30%, #2a1c4a 60%, var(--navy-deep) 100%);
+  background-size: 300% 300%; animation: cta-gradient 8s ease infinite;
   color: #fff; padding: 52px 0; margin-top: 40px; position: relative; overflow: hidden; }
+@keyframes cta-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
 .cta-band::before {
   content: ''; position: absolute; top: -60px; left: -60px;
   width: 300px; height: 300px; border-radius: 50%;
@@ -1061,8 +1066,11 @@ html[data-theme="dark"] .callout-btn-wa  { background: #5dde96; color: #0c2418; 
   display: flex; flex-direction: column; min-height: 250px;
   transition: transform .25s ease, box-shadow .25s ease; }
 .tcard:hover { transform: translateY(-5px); box-shadow: 0 18px 38px rgba(26,26,46,.10); }
-.tcard .mark { font-family: Georgia, serif; font-size: 2.4rem; line-height: 1;
-  height: 34px; opacity: .85; }
+.tcard .mark { font-family: Georgia, serif; font-size: 3.2rem; line-height: 1;
+  height: 40px; display: block;
+  background: linear-gradient(135deg, var(--gold), #f0c040);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; }
 /* Large, near-black, generously spaced: these have to be readable first
    and decorative second. */
 .tcard blockquote { font-size: 1.12rem; line-height: 1.5; font-weight: 600;
@@ -4411,11 +4419,18 @@ button.mcq-nd:hover { transform: scale(1.15);
   margin: 0 auto;
 }
 
-/* Final step — gold node to mark the destination */
+/* Final step — gold node to mark the destination. The shimmer keeps the
+   A* finale moving so the eye lands on the end of the ladder. */
 .journey-step.js-goal .js-node {
-  background: linear-gradient(135deg, #C9A44E, #f0c040);
+  background: linear-gradient(135deg, #C9A44E, #f0c040, #C9A44E);
+  background-size: 200% 200%;
+  animation: goal-shimmer 3s ease infinite;
   border-color: #C9A44E;
   box-shadow: 0 6px 28px rgba(201,164,78,.45);
+}
+@keyframes goal-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 .journey-step.js-goal .js-icon { font-size: 2rem; }
 .journey-step.js-goal .js-title { color: #7a5200; }
@@ -4506,8 +4521,10 @@ button.mcq-nd:hover { transform: scale(1.15);
   .journey-initialized .journey-step { transition: opacity 0.3s ease; }
   .journey-step.js-node-active .js-node,
   .journey-step.js-icon-active .js-icon,
+  .journey-step.js-goal .js-node,
   .journey-step.js-goal.js-node-active .js-node,
   .jsa-sparkle-dot { animation: none !important; }
+  .cta-band { animation: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -8675,3 +8692,48 @@ html[data-theme="dark"] .note-example > div { border-color: rgba(255,255,255,.08
 .note-skel.w80 { width: 80%; }
 @keyframes sk-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
+
+/* ════════════════════════════════════════════════════════════════
+   DARK MODE — papers.html builder
+   Scoped to html[data-theme="dark"] plus a papers-only class or id,
+   so nothing here can reach another page. The light-mode rules for
+   these live in papers-ui.css (loaded by papers.html only).
+════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] .gen-summary {
+  background: rgba(90,70,160,.18);
+  border-color: rgba(90,70,160,.3);
+  color: var(--lav-ink);
+}
+html[data-theme="dark"] .topic-search {
+  background: rgba(255,255,255,.04);
+  border-color: var(--line);
+  color: var(--ink);
+}
+html[data-theme="dark"] .paper-toggle-wrap {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+html[data-theme="dark"] .seg-large {
+  background: rgba(255,255,255,.05);
+  border-color: var(--line);
+}
+/* The dark tokens make --purple a pale lavender, so the ink-dark label
+   from the global .btn-dark rule is what stays legible on it — only the
+   gradient is restated here, not the text colour. */
+html[data-theme="dark"] #go.btn-dark {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-bright) 100%) !important;
+}
+html[data-theme="dark"] .step-num {
+  background: var(--purple);
+  color: #100a26;
+}
+html[data-theme="dark"] .mini {
+  background: rgba(255,255,255,.06);
+  border-color: var(--line);
+  color: var(--ink);
+}
+html[data-theme="dark"] .mini:hover {
+  background: var(--lav);
+  border-color: var(--lav-line);
+  color: var(--lav-ink);
+}

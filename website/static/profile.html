@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,11 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
-  <script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <link rel="stylesheet" href="styles.css?v=20260907a">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260906a">
   <link rel="stylesheet" href="tools.css?v=20260829a">
   <!-- profile v20260901a -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
   <style>
     /* ── Profile page layout ─────────────────────────────────────── */
@@ -259,6 +260,53 @@
       outline: 2px solid var(--lav-line); outline-offset: 1px; border-color: var(--lav-line);
     }
     .profile-form-field.full { grid-column: 1 / -1; }
+    /* Phone row: flag+code select + number input side by side */
+    /* ── Phone row: custom flag dropdown + number input ── */
+    .phone-row { display: flex; gap: 8px; align-items: stretch; }
+    .phone-code-wrap { position: relative; flex-shrink: 0; width: 118px; }
+    .phone-code-btn {
+      width: 100%; height: 100%; min-height: 44px;
+      display: flex; align-items: center; justify-content: space-between; gap: 4px;
+      padding: 0 10px; border-radius: 10px;
+      border: 1.5px solid var(--line); background: var(--page); color: var(--ink);
+      font: inherit; font-size: .9rem; cursor: pointer; box-sizing: border-box;
+      transition: border-color .15s;
+    }
+    .phone-code-btn:focus, .phone-code-btn[aria-expanded="true"] {
+      outline: 2px solid var(--lav-line); outline-offset: 1px; border-color: var(--lav-line);
+    }
+    .phone-code-btn .pc-arrow { font-size: .65rem; color: var(--grey); transition: transform .15s; }
+    .phone-code-btn[aria-expanded="true"] .pc-arrow { transform: rotate(180deg); }
+    .phone-code-drop {
+      position: absolute; top: calc(100% + 4px); left: 0; z-index: 999;
+      width: 230px; background: var(--page); border: 1.5px solid var(--line);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .phone-code-drop[hidden] { display: none; }
+    .phone-code-search {
+      border: none; border-bottom: 1.5px solid var(--line);
+      padding: 9px 12px; font: inherit; font-size: .85rem;
+      background: var(--page); color: var(--ink); outline: none;
+    }
+    .phone-code-list {
+      margin: 0; padding: 4px 0; list-style: none;
+      max-height: 240px; overflow-y: auto; overscroll-behavior: contain;
+    }
+    .phone-code-list li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px; cursor: pointer; font-size: .88rem;
+    }
+    .phone-code-list li:hover, .phone-code-list li.active { background: var(--lav-bg); }
+    .phone-code-list li .pc-flag { font-size: 1.1rem; line-height: 1; flex-shrink: 0; }
+    .phone-code-list li .pc-code { color: var(--grey); font-size: .8rem; margin-left: auto; flex-shrink: 0; }
+    .phone-number-inp { flex: 1; }
+    /* flag-icons sizing inside the dropdown */
+    .phone-code-btn .fi, .phone-code-list .fi { width: 1.4em; height: 1em; flex-shrink: 0; border-radius: 2px; }
+    .phone-hint { margin: 5px 0 0; font-size: .76rem; color: var(--grey); }
+    .phone-err  { margin: 5px 0 0; font-size: .76rem; color: #b91c1c; font-weight: 600; }
+    .phone-number-inp.invalid { border-color: #fca5a5; }
+    .phone-number-inp.valid   { border-color: #86efac; }
     /* Avatar upload button */
     .pf-avatar-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -682,8 +730,27 @@
                   </div>
                   <div class="profile-form-field full">
                     <label>WhatsApp number<span class="req-star" aria-label="required">*</span></label>
-                    <input type="tel" name="phone" autocomplete="tel"
-                           placeholder="+92 3xx xxxxxxx" value="${esc(user.phone || "")}">
+                    <div class="phone-row">
+                      <div class="phone-code-wrap" id="phone-code-wrap">
+                        <button type="button" class="phone-code-btn" id="phone-code-btn"
+                                aria-haspopup="listbox" aria-expanded="false" aria-label="Country code">
+                          <span id="phone-code-display">🇵🇰 +92</span>
+                          <span class="pc-arrow">▾</span>
+                        </button>
+                        <div class="phone-code-drop" id="phone-code-drop" hidden>
+                          <input type="text" class="phone-code-search" id="phone-code-search"
+                                 placeholder="Search country…" autocomplete="off" autocorrect="off">
+                          <ul class="phone-code-list" id="phone-code-list" role="listbox"></ul>
+                        </div>
+                        <input type="hidden" name="phone_code" id="phone-code-val" value="+92">
+                      </div>
+                      <input type="tel" name="phone_number" id="phone-number-inp" class="phone-number-inp"
+                             autocomplete="tel-national" placeholder="300 1234567"
+                             inputmode="numeric">
+                      <input type="hidden" name="phone">
+                    </div>
+                    <p class="phone-hint" id="phone-hint"></p>
+                    <p class="phone-err" id="phone-err" hidden></p>
                   </div>
                 </div>
                 <div class="profile-save-row">
@@ -954,6 +1021,560 @@
 
       </div>`;
 
+      // ── Phone number format rules per dial code ─────────────────────────────
+      // { min, max, ph: placeholder example (digits + spaces only), note }
+      // min/max are digit counts AFTER the country code.
+      const PHONE_FORMATS = {
+        "+1":    { min:10, max:10, ph:"202 555 0123",    note:"10-digit US/Canada number" },
+        "+7":    { min:10, max:10, ph:"912 345 6789",    note:"10 digits" },
+        "+20":   { min:10, max:10, ph:"100 123 4567",    note:"10 digits" },
+        "+27":   { min:9,  max:9,  ph:"71 234 5678",     note:"9 digits" },
+        "+30":   { min:10, max:10, ph:"694 123 4567",    note:"10 digits" },
+        "+31":   { min:9,  max:9,  ph:"6 12345678",      note:"9 digits" },
+        "+32":   { min:9,  max:9,  ph:"470 123 456",     note:"9 digits" },
+        "+33":   { min:9,  max:9,  ph:"6 12 34 56 78",   note:"9 digits" },
+        "+34":   { min:9,  max:9,  ph:"612 345 678",     note:"9 digits" },
+        "+36":   { min:9,  max:9,  ph:"30 123 4567",     note:"9 digits" },
+        "+39":   { min:9,  max:11, ph:"312 345 6789",    note:"9–11 digits" },
+        "+40":   { min:9,  max:9,  ph:"712 345 678",     note:"9 digits" },
+        "+41":   { min:9,  max:9,  ph:"78 123 4567",     note:"9 digits" },
+        "+43":   { min:10, max:11, ph:"664 1234567",     note:"10–11 digits" },
+        "+44":   { min:10, max:10, ph:"7911 123456",     note:"10 digits (no leading 0)" },
+        "+45":   { min:8,  max:8,  ph:"2012 3456",       note:"8 digits" },
+        "+46":   { min:9,  max:9,  ph:"70 123 4567",     note:"9 digits" },
+        "+47":   { min:8,  max:8,  ph:"406 12 345",      note:"8 digits" },
+        "+48":   { min:9,  max:9,  ph:"512 345 678",     note:"9 digits" },
+        "+49":   { min:10, max:11, ph:"1512 3456789",    note:"10–11 digits" },
+        "+51":   { min:9,  max:9,  ph:"912 345 678",     note:"9 digits" },
+        "+52":   { min:10, max:10, ph:"55 1234 5678",    note:"10 digits" },
+        "+54":   { min:10, max:11, ph:"11 1234 5678",    note:"10–11 digits" },
+        "+55":   { min:10, max:11, ph:"11 91234 5678",   note:"10–11 digits" },
+        "+56":   { min:9,  max:9,  ph:"9 1234 5678",     note:"9 digits" },
+        "+57":   { min:10, max:10, ph:"312 345 6789",    note:"10 digits" },
+        "+58":   { min:10, max:10, ph:"412 345 6789",    note:"10 digits" },
+        "+60":   { min:9,  max:10, ph:"12 345 6789",     note:"9–10 digits" },
+        "+61":   { min:9,  max:9,  ph:"412 345 678",     note:"9 digits" },
+        "+62":   { min:9,  max:12, ph:"812 3456 7890",   note:"9–12 digits" },
+        "+63":   { min:10, max:10, ph:"917 123 4567",    note:"10 digits" },
+        "+64":   { min:8,  max:10, ph:"21 123 4567",     note:"8–10 digits" },
+        "+65":   { min:8,  max:8,  ph:"8123 4567",       note:"8 digits" },
+        "+66":   { min:9,  max:9,  ph:"81 234 5678",     note:"9 digits" },
+        "+81":   { min:10, max:11, ph:"90 1234 5678",    note:"10–11 digits" },
+        "+82":   { min:9,  max:11, ph:"10 1234 5678",    note:"9–11 digits" },
+        "+84":   { min:9,  max:10, ph:"91 234 5678",     note:"9–10 digits" },
+        "+86":   { min:11, max:11, ph:"139 1234 5678",   note:"11 digits" },
+        "+90":   { min:10, max:10, ph:"532 123 4567",    note:"10 digits" },
+        "+91":   { min:10, max:10, ph:"98765 43210",     note:"10 digits" },
+        "+92":   { min:10, max:10, ph:"300 1234567",     note:"10 digits (mobile starts 3)" },
+        "+93":   { min:9,  max:9,  ph:"701 234 567",     note:"9 digits" },
+        "+94":   { min:9,  max:9,  ph:"71 234 5678",     note:"9 digits" },
+        "+95":   { min:8,  max:9,  ph:"9123 4567",       note:"8–9 digits" },
+        "+98":   { min:10, max:10, ph:"912 345 6789",    note:"10 digits" },
+        "+212":  { min:9,  max:9,  ph:"661 234 567",     note:"9 digits" },
+        "+213":  { min:9,  max:9,  ph:"551 234 567",     note:"9 digits" },
+        "+216":  { min:8,  max:8,  ph:"2012 3456",       note:"8 digits" },
+        "+218":  { min:9,  max:10, ph:"91 234 5678",     note:"9–10 digits" },
+        "+220":  { min:7,  max:7,  ph:"301 2345",        note:"7 digits" },
+        "+221":  { min:9,  max:9,  ph:"771 234 567",     note:"9 digits" },
+        "+222":  { min:8,  max:8,  ph:"2212 3456",       note:"8 digits" },
+        "+223":  { min:8,  max:8,  ph:"7012 3456",       note:"8 digits" },
+        "+224":  { min:9,  max:9,  ph:"622 123 456",     note:"9 digits" },
+        "+225":  { min:10, max:10, ph:"01 23 45 67 89",  note:"10 digits" },
+        "+226":  { min:8,  max:8,  ph:"7012 3456",       note:"8 digits" },
+        "+227":  { min:8,  max:8,  ph:"9012 3456",       note:"8 digits" },
+        "+228":  { min:8,  max:8,  ph:"9012 3456",       note:"8 digits" },
+        "+229":  { min:8,  max:8,  ph:"9012 3456",       note:"8 digits" },
+        "+230":  { min:8,  max:8,  ph:"5251 2345",       note:"8 digits" },
+        "+231":  { min:7,  max:8,  ph:"770 123 45",      note:"7–8 digits" },
+        "+232":  { min:8,  max:8,  ph:"7612 3456",       note:"8 digits" },
+        "+233":  { min:9,  max:9,  ph:"201 234 567",     note:"9 digits" },
+        "+234":  { min:10, max:10, ph:"803 123 4567",    note:"10 digits" },
+        "+237":  { min:9,  max:9,  ph:"670 123 456",     note:"9 digits" },
+        "+238":  { min:7,  max:7,  ph:"991 2345",        note:"7 digits" },
+        "+248":  { min:7,  max:7,  ph:"251 2345",        note:"7 digits" },
+        "+249":  { min:9,  max:9,  ph:"912 345 678",     note:"9 digits" },
+        "+250":  { min:9,  max:9,  ph:"780 123 456",     note:"9 digits" },
+        "+251":  { min:9,  max:9,  ph:"911 234 567",     note:"9 digits" },
+        "+252":  { min:8,  max:9,  ph:"61 234 567",      note:"8–9 digits" },
+        "+254":  { min:9,  max:9,  ph:"712 345 678",     note:"9 digits" },
+        "+255":  { min:9,  max:9,  ph:"621 234 567",     note:"9 digits" },
+        "+256":  { min:9,  max:9,  ph:"712 345 678",     note:"9 digits" },
+        "+260":  { min:9,  max:9,  ph:"955 123 456",     note:"9 digits" },
+        "+263":  { min:9,  max:9,  ph:"71 234 5678",     note:"9 digits" },
+        "+267":  { min:8,  max:8,  ph:"7123 4567",       note:"8 digits" },
+        "+268":  { min:8,  max:8,  ph:"7612 3456",       note:"8 digits" },
+        "+291":  { min:7,  max:7,  ph:"712 3456",        note:"7 digits" },
+        "+297":  { min:7,  max:7,  ph:"560 1234",        note:"7 digits" },
+        "+298":  { min:6,  max:6,  ph:"212 345",         note:"6 digits" },
+        "+351":  { min:9,  max:9,  ph:"912 345 678",     note:"9 digits" },
+        "+352":  { min:9,  max:9,  ph:"621 234 567",     note:"9 digits" },
+        "+353":  { min:9,  max:9,  ph:"87 123 4567",     note:"9 digits" },
+        "+354":  { min:7,  max:9,  ph:"611 2345",        note:"7–9 digits" },
+        "+355":  { min:9,  max:9,  ph:"672 123 456",     note:"9 digits" },
+        "+356":  { min:8,  max:8,  ph:"7912 3456",       note:"8 digits" },
+        "+357":  { min:8,  max:8,  ph:"9612 3456",       note:"8 digits" },
+        "+358":  { min:9,  max:11, ph:"41 234 5678",     note:"9–11 digits" },
+        "+359":  { min:8,  max:9,  ph:"87 123 456",      note:"8–9 digits" },
+        "+370":  { min:8,  max:8,  ph:"6012 3456",       note:"8 digits" },
+        "+371":  { min:8,  max:8,  ph:"2112 3456",       note:"8 digits" },
+        "+372":  { min:7,  max:8,  ph:"5123 4567",       note:"7–8 digits" },
+        "+373":  { min:8,  max:8,  ph:"6012 3456",       note:"8 digits" },
+        "+374":  { min:8,  max:8,  ph:"77 123 456",      note:"8 digits" },
+        "+375":  { min:9,  max:9,  ph:"29 123 4567",     note:"9 digits" },
+        "+380":  { min:9,  max:9,  ph:"50 123 4567",     note:"9 digits" },
+        "+381":  { min:8,  max:9,  ph:"60 123 4567",     note:"8–9 digits" },
+        "+385":  { min:8,  max:9,  ph:"91 234 5678",     note:"8–9 digits" },
+        "+386":  { min:8,  max:8,  ph:"31 234 567",      note:"8 digits" },
+        "+387":  { min:8,  max:8,  ph:"61 123 456",      note:"8 digits" },
+        "+420":  { min:9,  max:9,  ph:"601 234 567",     note:"9 digits" },
+        "+421":  { min:9,  max:9,  ph:"912 345 678",     note:"9 digits" },
+        "+501":  { min:7,  max:7,  ph:"622 3456",        note:"7 digits" },
+        "+502":  { min:8,  max:8,  ph:"5123 4567",       note:"8 digits" },
+        "+503":  { min:8,  max:8,  ph:"7012 3456",       note:"8 digits" },
+        "+504":  { min:8,  max:8,  ph:"9123 4567",       note:"8 digits" },
+        "+505":  { min:8,  max:8,  ph:"8123 4567",       note:"8 digits" },
+        "+506":  { min:8,  max:8,  ph:"8312 3456",       note:"8 digits" },
+        "+507":  { min:8,  max:8,  ph:"6123 4567",       note:"8 digits" },
+        "+509":  { min:8,  max:8,  ph:"3412 3456",       note:"8 digits" },
+        "+591":  { min:8,  max:8,  ph:"7123 4567",       note:"8 digits" },
+        "+593":  { min:9,  max:9,  ph:"99 123 4567",     note:"9 digits" },
+        "+595":  { min:9,  max:10, ph:"961 234 567",     note:"9–10 digits" },
+        "+597":  { min:7,  max:7,  ph:"741 2345",        note:"7 digits" },
+        "+598":  { min:8,  max:9,  ph:"94 123 456",      note:"8–9 digits" },
+        "+670":  { min:7,  max:8,  ph:"771 2345",        note:"7–8 digits" },
+        "+673":  { min:7,  max:7,  ph:"712 3456",        note:"7 digits" },
+        "+675":  { min:8,  max:8,  ph:"7123 4567",       note:"8 digits" },
+        "+679":  { min:7,  max:7,  ph:"701 2345",        note:"7 digits" },
+        "+680":  { min:7,  max:7,  ph:"488 1234",        note:"7 digits" },
+        "+685":  { min:7,  max:7,  ph:"601 2345",        note:"7 digits" },
+        "+852":  { min:8,  max:8,  ph:"9123 4567",       note:"8 digits" },
+        "+853":  { min:8,  max:8,  ph:"6612 3456",       note:"8 digits" },
+        "+855":  { min:8,  max:9,  ph:"12 345 678",      note:"8–9 digits" },
+        "+856":  { min:8,  max:10, ph:"20 2345 6789",    note:"8–10 digits" },
+        "+880":  { min:10, max:10, ph:"1812 345678",     note:"10 digits" },
+        "+886":  { min:9,  max:9,  ph:"912 345 678",     note:"9 digits" },
+        "+960":  { min:7,  max:7,  ph:"777 1234",        note:"7 digits" },
+        "+961":  { min:8,  max:8,  ph:"71 123 456",      note:"8 digits" },
+        "+962":  { min:9,  max:9,  ph:"79 123 4567",     note:"9 digits" },
+        "+963":  { min:9,  max:9,  ph:"944 123 456",     note:"9 digits" },
+        "+964":  { min:10, max:10, ph:"781 234 5678",    note:"10 digits" },
+        "+965":  { min:8,  max:8,  ph:"5012 3456",       note:"8 digits" },
+        "+966":  { min:9,  max:9,  ph:"51 234 5678",     note:"9 digits" },
+        "+967":  { min:9,  max:9,  ph:"712 345 678",     note:"9 digits" },
+        "+968":  { min:8,  max:8,  ph:"9212 3456",       note:"8 digits" },
+        "+970":  { min:9,  max:9,  ph:"599 234 567",     note:"9 digits" },
+        "+971":  { min:9,  max:9,  ph:"50 123 4567",     note:"9 digits" },
+        "+972":  { min:9,  max:9,  ph:"50 234 5678",     note:"9 digits" },
+        "+973":  { min:8,  max:8,  ph:"3600 1234",       note:"8 digits" },
+        "+974":  { min:8,  max:8,  ph:"5051 2345",       note:"8 digits" },
+        "+975":  { min:8,  max:8,  ph:"1712 3456",       note:"8 digits" },
+        "+976":  { min:8,  max:8,  ph:"8812 3456",       note:"8 digits" },
+        "+977":  { min:9,  max:10, ph:"984 123 4567",    note:"9–10 digits" },
+        "+992":  { min:9,  max:9,  ph:"937 12 3456",     note:"9 digits" },
+        "+993":  { min:8,  max:8,  ph:"6512 3456",       note:"8 digits" },
+        "+994":  { min:9,  max:9,  ph:"40 123 4567",     note:"9 digits" },
+        "+995":  { min:9,  max:9,  ph:"555 12 34 56",    note:"9 digits" },
+        "+996":  { min:9,  max:9,  ph:"700 123 456",     note:"9 digits" },
+        "+998":  { min:9,  max:9,  ph:"90 123 4567",     note:"9 digits" },
+        // Caribbean +1 area codes
+        "+1242": { min:7, max:7, ph:"359 1234",  note:"7 digits" },
+        "+1246": { min:7, max:7, ph:"250 1234",  note:"7 digits" },
+        "+1264": { min:7, max:7, ph:"235 1234",  note:"7 digits" },
+        "+1268": { min:7, max:7, ph:"464 1234",  note:"7 digits" },
+        "+1284": { min:7, max:7, ph:"346 1234",  note:"7 digits" },
+        "+1345": { min:7, max:7, ph:"323 1234",  note:"7 digits" },
+        "+1441": { min:7, max:7, ph:"370 1234",  note:"7 digits" },
+        "+1473": { min:7, max:7, ph:"403 1234",  note:"7 digits" },
+        "+1649": { min:7, max:7, ph:"241 1234",  note:"7 digits" },
+        "+1664": { min:7, max:7, ph:"491 1234",  note:"7 digits" },
+        "+1721": { min:7, max:7, ph:"520 1234",  note:"7 digits" },
+        "+1758": { min:7, max:7, ph:"284 1234",  note:"7 digits" },
+        "+1767": { min:7, max:7, ph:"235 1234",  note:"7 digits" },
+        "+1784": { min:7, max:7, ph:"430 1234",  note:"7 digits" },
+        "+1787": { min:7, max:7, ph:"234 5678",  note:"7 digits" },
+        "+1809": { min:7, max:7, ph:"234 5678",  note:"7 digits" },
+        "+1868": { min:7, max:7, ph:"290 1234",  note:"7 digits" },
+        "+1869": { min:7, max:7, ph:"765 1234",  note:"7 digits" },
+        "+1876": { min:7, max:7, ph:"210 1234",  note:"7 digits" },
+      };
+      const PHONE_FORMAT_DEFAULT = { min: 6, max: 15, ph: "number", note: "" };
+
+      function getFormat(code) { return PHONE_FORMATS[code] || PHONE_FORMAT_DEFAULT; }
+
+      function validatePhoneNumber(code, localDigits) {
+        const fmt = getFormat(code);
+        if (localDigits.length < fmt.min)
+          return `Too short — ${code} numbers need at least ${fmt.min} digits (e.g. ${fmt.ph})`;
+        if (localDigits.length > fmt.max)
+          return `Too long — ${code} numbers have at most ${fmt.max} digits`;
+        return null; // valid
+      }
+
+      // ── Global phone country list ───────────────────────────────────────────
+      // [dial_code, iso2_lowercase, country_name]
+      // Pakistan first; rest alphabetical.
+      const PHONE_COUNTRIES = [
+        ["+92","pk","Pakistan"],
+        ["+93","af","Afghanistan"],
+        ["+355","al","Albania"],
+        ["+213","dz","Algeria"],
+        ["+376","ad","Andorra"],
+        ["+244","ao","Angola"],
+        ["+1264","ai","Anguilla"],
+        ["+1268","ag","Antigua & Barbuda"],
+        ["+54","ar","Argentina"],
+        ["+374","am","Armenia"],
+        ["+297","aw","Aruba"],
+        ["+61","au","Australia"],
+        ["+43","at","Austria"],
+        ["+994","az","Azerbaijan"],
+        ["+1242","bs","Bahamas"],
+        ["+973","bh","Bahrain"],
+        ["+880","bd","Bangladesh"],
+        ["+1246","bb","Barbados"],
+        ["+375","by","Belarus"],
+        ["+32","be","Belgium"],
+        ["+501","bz","Belize"],
+        ["+229","bj","Benin"],
+        ["+1441","bm","Bermuda"],
+        ["+975","bt","Bhutan"],
+        ["+591","bo","Bolivia"],
+        ["+387","ba","Bosnia & Herzegovina"],
+        ["+267","bw","Botswana"],
+        ["+55","br","Brazil"],
+        ["+673","bn","Brunei"],
+        ["+359","bg","Bulgaria"],
+        ["+226","bf","Burkina Faso"],
+        ["+257","bi","Burundi"],
+        ["+238","cv","Cabo Verde"],
+        ["+855","kh","Cambodia"],
+        ["+237","cm","Cameroon"],
+        ["+1","ca","Canada"],
+        ["+236","cf","Central African Republic"],
+        ["+235","td","Chad"],
+        ["+56","cl","Chile"],
+        ["+86","cn","China"],
+        ["+57","co","Colombia"],
+        ["+269","km","Comoros"],
+        ["+242","cg","Congo"],
+        ["+243","cd","Congo (DRC)"],
+        ["+682","ck","Cook Islands"],
+        ["+506","cr","Costa Rica"],
+        ["+385","hr","Croatia"],
+        ["+53","cu","Cuba"],
+        ["+599","cw","Curaçao"],
+        ["+357","cy","Cyprus"],
+        ["+420","cz","Czech Republic"],
+        ["+45","dk","Denmark"],
+        ["+253","dj","Djibouti"],
+        ["+1767","dm","Dominica"],
+        ["+1809","do","Dominican Republic"],
+        ["+593","ec","Ecuador"],
+        ["+20","eg","Egypt"],
+        ["+503","sv","El Salvador"],
+        ["+240","gq","Equatorial Guinea"],
+        ["+291","er","Eritrea"],
+        ["+372","ee","Estonia"],
+        ["+268","sz","Eswatini"],
+        ["+251","et","Ethiopia"],
+        ["+500","fk","Falkland Islands"],
+        ["+298","fo","Faroe Islands"],
+        ["+679","fj","Fiji"],
+        ["+358","fi","Finland"],
+        ["+33","fr","France"],
+        ["+594","gf","French Guiana"],
+        ["+689","pf","French Polynesia"],
+        ["+241","ga","Gabon"],
+        ["+220","gm","Gambia"],
+        ["+995","ge","Georgia"],
+        ["+49","de","Germany"],
+        ["+233","gh","Ghana"],
+        ["+350","gi","Gibraltar"],
+        ["+30","gr","Greece"],
+        ["+299","gl","Greenland"],
+        ["+1473","gd","Grenada"],
+        ["+590","gp","Guadeloupe"],
+        ["+1671","gu","Guam"],
+        ["+502","gt","Guatemala"],
+        ["+224","gn","Guinea"],
+        ["+245","gw","Guinea-Bissau"],
+        ["+592","gy","Guyana"],
+        ["+509","ht","Haiti"],
+        ["+504","hn","Honduras"],
+        ["+852","hk","Hong Kong"],
+        ["+36","hu","Hungary"],
+        ["+354","is","Iceland"],
+        ["+91","in","India"],
+        ["+62","id","Indonesia"],
+        ["+98","ir","Iran"],
+        ["+964","iq","Iraq"],
+        ["+353","ie","Ireland"],
+        ["+972","il","Israel"],
+        ["+39","it","Italy"],
+        ["+225","ci","Ivory Coast"],
+        ["+1876","jm","Jamaica"],
+        ["+81","jp","Japan"],
+        ["+962","jo","Jordan"],
+        ["+7","kz","Kazakhstan"],
+        ["+254","ke","Kenya"],
+        ["+686","ki","Kiribati"],
+        ["+965","kw","Kuwait"],
+        ["+996","kg","Kyrgyzstan"],
+        ["+856","la","Laos"],
+        ["+371","lv","Latvia"],
+        ["+961","lb","Lebanon"],
+        ["+266","ls","Lesotho"],
+        ["+231","lr","Liberia"],
+        ["+218","ly","Libya"],
+        ["+423","li","Liechtenstein"],
+        ["+370","lt","Lithuania"],
+        ["+352","lu","Luxembourg"],
+        ["+853","mo","Macau"],
+        ["+261","mg","Madagascar"],
+        ["+265","mw","Malawi"],
+        ["+60","my","Malaysia"],
+        ["+960","mv","Maldives"],
+        ["+223","ml","Mali"],
+        ["+356","mt","Malta"],
+        ["+692","mh","Marshall Islands"],
+        ["+596","mq","Martinique"],
+        ["+222","mr","Mauritania"],
+        ["+230","mu","Mauritius"],
+        ["+52","mx","Mexico"],
+        ["+691","fm","Micronesia"],
+        ["+373","md","Moldova"],
+        ["+377","mc","Monaco"],
+        ["+976","mn","Mongolia"],
+        ["+382","me","Montenegro"],
+        ["+1664","ms","Montserrat"],
+        ["+212","ma","Morocco"],
+        ["+258","mz","Mozambique"],
+        ["+95","mm","Myanmar"],
+        ["+264","na","Namibia"],
+        ["+674","nr","Nauru"],
+        ["+977","np","Nepal"],
+        ["+31","nl","Netherlands"],
+        ["+687","nc","New Caledonia"],
+        ["+64","nz","New Zealand"],
+        ["+505","ni","Nicaragua"],
+        ["+227","ne","Niger"],
+        ["+234","ng","Nigeria"],
+        ["+683","nu","Niue"],
+        ["+850","kp","North Korea"],
+        ["+389","mk","North Macedonia"],
+        ["+47","no","Norway"],
+        ["+968","om","Oman"],
+        ["+680","pw","Palau"],
+        ["+970","ps","Palestine"],
+        ["+507","pa","Panama"],
+        ["+675","pg","Papua New Guinea"],
+        ["+595","py","Paraguay"],
+        ["+51","pe","Peru"],
+        ["+63","ph","Philippines"],
+        ["+48","pl","Poland"],
+        ["+351","pt","Portugal"],
+        ["+1787","pr","Puerto Rico"],
+        ["+974","qa","Qatar"],
+        ["+262","re","Réunion"],
+        ["+40","ro","Romania"],
+        ["+7","ru","Russia"],
+        ["+250","rw","Rwanda"],
+        ["+290","sh","Saint Helena"],
+        ["+1869","kn","Saint Kitts & Nevis"],
+        ["+1758","lc","Saint Lucia"],
+        ["+508","pm","Saint Pierre & Miquelon"],
+        ["+1784","vc","Saint Vincent & Grenadines"],
+        ["+685","ws","Samoa"],
+        ["+378","sm","San Marino"],
+        ["+239","st","São Tomé & Príncipe"],
+        ["+966","sa","Saudi Arabia"],
+        ["+221","sn","Senegal"],
+        ["+381","rs","Serbia"],
+        ["+248","sc","Seychelles"],
+        ["+232","sl","Sierra Leone"],
+        ["+65","sg","Singapore"],
+        ["+1721","sx","Sint Maarten"],
+        ["+421","sk","Slovakia"],
+        ["+386","si","Slovenia"],
+        ["+677","sb","Solomon Islands"],
+        ["+252","so","Somalia"],
+        ["+27","za","South Africa"],
+        ["+82","kr","South Korea"],
+        ["+211","ss","South Sudan"],
+        ["+34","es","Spain"],
+        ["+94","lk","Sri Lanka"],
+        ["+249","sd","Sudan"],
+        ["+597","sr","Suriname"],
+        ["+46","se","Sweden"],
+        ["+41","ch","Switzerland"],
+        ["+963","sy","Syria"],
+        ["+886","tw","Taiwan"],
+        ["+992","tj","Tajikistan"],
+        ["+255","tz","Tanzania"],
+        ["+66","th","Thailand"],
+        ["+670","tl","Timor-Leste"],
+        ["+228","tg","Togo"],
+        ["+690","tk","Tokelau"],
+        ["+676","to","Tonga"],
+        ["+1868","tt","Trinidad & Tobago"],
+        ["+216","tn","Tunisia"],
+        ["+90","tr","Turkey"],
+        ["+993","tm","Turkmenistan"],
+        ["+1649","tc","Turks & Caicos"],
+        ["+688","tv","Tuvalu"],
+        ["+1","us","USA"],
+        ["+256","ug","Uganda"],
+        ["+380","ua","Ukraine"],
+        ["+971","ae","UAE"],
+        ["+44","gb","United Kingdom"],
+        ["+598","uy","Uruguay"],
+        ["+998","uz","Uzbekistan"],
+        ["+678","vu","Vanuatu"],
+        ["+58","ve","Venezuela"],
+        ["+84","vn","Vietnam"],
+        ["+1284","vg","Virgin Islands (British)"],
+        ["+1340","vi","Virgin Islands (US)"],
+        ["+681","wf","Wallis & Futuna"],
+        ["+967","ye","Yemen"],
+        ["+260","zm","Zambia"],
+        ["+263","zw","Zimbabwe"],
+      ];
+
+      // ── Custom phone-code dropdown ───────────────────────────────────────────
+      (function() {
+        const btn    = document.getElementById("phone-code-btn");
+        const drop   = document.getElementById("phone-code-drop");
+        const search = document.getElementById("phone-code-search");
+        const list   = document.getElementById("phone-code-list");
+        const valEl  = document.getElementById("phone-code-val");
+        const dispEl = document.getElementById("phone-code-display");
+        if (!btn) return;
+
+        // Derive sorted-longest-first dial codes for prefix matching
+        const DIAL_CODES_SORTED = [...new Set(PHONE_COUNTRIES.map(c => c[0]))]
+          .sort((a, b) => b.length - a.length);
+
+        const hintEl = document.getElementById("phone-hint");
+        const errEl  = document.getElementById("phone-err");
+        const numInpEl = document.getElementById("phone-number-inp");
+
+        function applyFormat(code) {
+          const fmt = getFormat(code);
+          if (numInpEl) numInpEl.placeholder = fmt.ph;
+          if (hintEl) hintEl.textContent = fmt.note ? fmt.note + " after " + code : "";
+        }
+
+        function clearPhoneError() {
+          if (errEl) { errEl.hidden = true; errEl.textContent = ""; }
+          if (numInpEl) { numInpEl.classList.remove("invalid", "valid"); }
+        }
+
+        function checkPhoneValid(showOk) {
+          if (!numInpEl) return true;
+          const raw = numInpEl.value.trim();
+          const digits = raw.replace(/\D/g, "");
+          const err = validatePhoneNumber(valEl.value, digits);
+          if (err) {
+            errEl.textContent = err; errEl.hidden = false;
+            numInpEl.classList.add("invalid"); numInpEl.classList.remove("valid");
+            return false;
+          }
+          errEl.hidden = true; errEl.textContent = "";
+          numInpEl.classList.remove("invalid");
+          if (showOk && digits.length) numInpEl.classList.add("valid");
+          return true;
+        }
+
+        function selectCode(code, iso2, name) {
+          valEl.value = code;
+          dispEl.innerHTML = '<span class="fi fi-' + iso2 + '"></span> ' + code;
+          btn.setAttribute("aria-expanded", "false");
+          drop.hidden = true;
+          search.value = "";
+          renderList("");
+          applyFormat(code);
+          clearPhoneError();
+          // sync the combined hidden field
+          const form = document.getElementById("pf-form");
+          if (form && form.phone_number && form.phone)
+            form.phone.value = (code + " " + form.phone_number.value.trim()).trim();
+        }
+
+        function syncPhone() {
+          const form = document.getElementById("pf-form");
+          if (form && form.phone_number && form.phone)
+            form.phone.value = (valEl.value + " " + form.phone_number.value.trim()).trim();
+        }
+
+        function renderList(q) {
+          const lq = q.toLowerCase();
+          const matches = q
+            ? PHONE_COUNTRIES.filter(([code, , name]) =>
+                name.toLowerCase().includes(lq) || code.includes(lq))
+            : PHONE_COUNTRIES;
+          list.innerHTML = matches.map(([code, iso2, name]) =>
+            `<li role="option" data-code="${code}" data-iso2="${iso2}" data-name="${name}"
+                 class="${valEl.value === code ? "active" : ""}">
+               <span class="fi fi-${iso2}"></span>
+               <span>${name}</span>
+               <span class="pc-code">${code}</span>
+             </li>`
+          ).join("");
+          list.querySelectorAll("li").forEach(li =>
+            li.addEventListener("mousedown", e => {
+              e.preventDefault(); // don't blur the search
+              selectCode(li.dataset.code, li.dataset.iso2, li.dataset.name);
+            })
+          );
+        }
+
+        renderList("");
+
+        btn.addEventListener("click", () => {
+          const open = btn.getAttribute("aria-expanded") === "true";
+          if (open) { btn.setAttribute("aria-expanded","false"); drop.hidden = true; }
+          else {
+            btn.setAttribute("aria-expanded","true"); drop.hidden = false;
+            search.focus();
+            // Scroll active item into view
+            const active = list.querySelector(".active");
+            if (active) active.scrollIntoView({ block: "nearest" });
+          }
+        });
+
+        search.addEventListener("input", e => renderList(e.target.value));
+
+        // Close on outside click
+        document.addEventListener("mousedown", e => {
+          if (!btn.closest(".phone-code-wrap").contains(e.target)) {
+            btn.setAttribute("aria-expanded","false"); drop.hidden = true;
+          }
+        });
+
+        // Close on Escape
+        search.addEventListener("keydown", e => {
+          if (e.key === "Escape") { btn.setAttribute("aria-expanded","false"); drop.hidden = true; btn.focus(); }
+        });
+
+        // Pre-populate from stored user.phone
+        const stored = (user.phone || "").trim();
+        let matched = "+92", matchedIso2 = "pk", matchedName = "Pakistan", local = stored;
+        for (const code of DIAL_CODES_SORTED) {
+          if (stored.startsWith(code)) {
+            const entry = PHONE_COUNTRIES.find(c => c[0] === code);
+            if (entry) { matched = entry[0]; matchedIso2 = entry[1]; matchedName = entry[2]; }
+            local = stored.slice(code.length).trim();
+            break;
+          }
+        }
+        selectCode(matched, matchedIso2, matchedName);
+        if (numInpEl) {
+          numInpEl.value = local;
+          numInpEl.addEventListener("input", () => { syncPhone(); clearPhoneError(); });
+          numInpEl.addEventListener("blur", () => { if (numInpEl.value.trim()) checkPhoneValid(true); });
+        }
+      })();
+
       // Form elements
       const form    = document.getElementById("pf-form");
       const alertEl = document.getElementById("pf-alert");
@@ -1084,8 +1705,23 @@
           }, 300);
           return;
         }
+        // Sync + validate phone before submit
+        const _codeVal = document.getElementById("phone-code-val");
+        if (_codeVal && form.phone_number)
+          form.phone.value = (_codeVal.value + " " + form.phone_number.value.trim()).trim();
         const phoneVal = form.phone.value.trim();
-        if (!phoneVal) { showMsg("fail", "WhatsApp number is required so your tutor can reach you."); return; }
+        if (!phoneVal || !form.phone_number?.value.trim()) { showMsg("fail", "WhatsApp number is required so your tutor can reach you."); return; }
+        // Validate digit count for selected country
+        const _numDigits = (form.phone_number?.value || "").replace(/\D/g,"");
+        const _fmtErr = _codeVal ? validatePhoneNumber(_codeVal.value, _numDigits) : null;
+        if (_fmtErr) {
+          const _numInp = document.getElementById("phone-number-inp");
+          if (_numInp) { _numInp.classList.add("invalid"); _numInp.focus(); }
+          const _errEl = document.getElementById("phone-err");
+          if (_errEl) { _errEl.textContent = _fmtErr; _errEl.hidden = false; }
+          showMsg("fail", "Please fix the phone number first.");
+          return;
+        }
         submitEl.disabled = true;
         submitEl.textContent = "Saving…";
         try {

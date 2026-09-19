@@ -101,6 +101,46 @@ def _store(con, question_id: int, rec: dict, backend: str):
                       question_id=question_id)
 
 
+def run_subtopics_only(con, syllabus: str):
+    """Heuristic subtopic pass on questions that already have a topic classification.
+
+    Reads the winning topic from the existing classifications row and scores
+    that topic's subtopic keywords against the question text.  Does NOT touch
+    the topic, confidence, backend, or any other field.
+
+    Safe to run any number of times (idempotent: overwrites subtopic column).
+    """
+    taxonomy = heuristics.load_taxonomy(syllabus)
+    rows = con.execute(
+        """
+        SELECT q.id, q.text, c.topic
+        FROM questions q
+        JOIN papers   p ON p.id = q.paper_id
+        JOIN classifications c ON c.question_id = q.id
+        WHERE p.syllabus = ? AND p.kind = 'qp'
+          AND q.status IS NOT 'excluded'
+        ORDER BY q.id
+        """,
+        (syllabus,),
+    ).fetchall()
+    updated = skipped = 0
+    for row in rows:
+        subtopic = heuristics.classify_subtopic(
+            row["text"] or "", taxonomy, row["topic"]
+        )
+        if subtopic is None:
+            skipped += 1
+            continue
+        con.execute(
+            "UPDATE classifications SET subtopic = ? WHERE question_id = ?",
+            (subtopic, row["id"]),
+        )
+        updated += 1
+    con.commit()
+    log.info("subtopics-only: %d updated, %d no signal, out of %d classified questions",
+             updated, skipped, len(rows))
+
+
 def run_heuristic(con, syllabus: str, force: bool):
     taxonomy = heuristics.load_taxonomy(syllabus)
     rows = _pending_questions(con, syllabus, force)
@@ -140,6 +180,10 @@ def run_session_prepare(con, syllabus: str, force: bool):
     out = {
         "syllabus": syllabus,
         "valid_topics": [t["name"] for t in taxonomy["topics"]],
+        "topic_subtopics": {
+            t["name"]: [s["name"] for s in t.get("subtopics", [])]
+            for t in taxonomy["topics"]
+        },
         "questions": [
             {"id": r["id"], "paper": r["filename"], "number": r["number"],
              "text": r["text"]}
@@ -157,6 +201,10 @@ def run_session_prepare(con, syllabus: str, force: bool):
 def run_session_ingest(con, syllabus: str, results_path):
     taxonomy = heuristics.load_taxonomy(syllabus)
     valid = {t["name"] for t in taxonomy["topics"]}
+    valid_subtopics = {
+        t["name"]: {s["name"] for s in t.get("subtopics", [])}
+        for t in taxonomy["topics"]
+    }
     records = json.loads(results_path.read_text(encoding="utf-8"))
     known_ids = {r["id"] for r in con.execute(
         """SELECT q.id FROM questions q JOIN papers p ON p.id = q.paper_id
@@ -173,7 +221,13 @@ def run_session_ingest(con, syllabus: str, results_path):
                         rec["id"], rec["topic"], rec.get("secondary_topic"))
             bad += 1
             continue
+        # Validate subtopic against the winning topic's subtopic list (warn, don't skip)
+        subtopic = rec.get("subtopic")
+        if subtopic and subtopic not in valid_subtopics.get(rec["topic"], set()):
+            log.warning("ingest: subtopic %r not in %s taxonomy — storing anyway",
+                        subtopic, rec["topic"])
         rec.setdefault("secondary_topic", None)
+        rec.setdefault("subtopic", None)
         rec.setdefault("difficulty", None)
         rec.setdefault("confidence", 1.0)
         rec.setdefault("rationale", "classified in Claude Code session")
@@ -195,6 +249,9 @@ def main():
                    choices=("heuristic", "session", "api"))
     p.add_argument("--force", action="store_true",
                    help="re-classify questions that already have a classification")
+    p.add_argument("--subtopics-only", action="store_true",
+                   help="re-run subtopic heuristics on all classified questions "
+                        "(updates subtopic column only, leaves topic/confidence untouched)")
     p.add_argument("--prepare", action="store_true",
                    help="session backend: export pending questions to data/batches/")
     p.add_argument("--ingest", type=Path,
@@ -202,6 +259,10 @@ def main():
     args = p.parse_args()
 
     con = db.connect()
+    if args.subtopics_only:
+        run_subtopics_only(con, args.syllabus)
+        con.close()
+        return
     if args.backend == "heuristic":
         run_heuristic(con, args.syllabus, args.force)
     elif args.backend == "session":

@@ -450,10 +450,19 @@ def main():
         raise SystemExit(1)
 
     total = 0
+    skipped = 0
     for row in rows:
-        total += segment_paper(con, row)
+        try:
+            total += segment_paper(con, row)
+        except RuntimeError as exc:
+            log.error("%s: MuPDF error, skipping — %s", row["filename"], exc)
+            db.add_review(con, f"{row['filename']}: MuPDF crash ({exc}), skipped",
+                          paper_id=row["id"])
+            con.commit()
+            skipped += 1
     con.close()
-    log.info("done: %d papers, %d questions segmented", len(rows), total)
+    log.info("done: %d papers, %d questions segmented, %d skipped (MuPDF error)",
+             len(rows), total, skipped)
 
 
 if __name__ == "__main__":

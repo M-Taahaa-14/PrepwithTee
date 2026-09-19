@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -68,11 +68,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
-<script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-<link rel="stylesheet" href="styles.css?v=20260907a">
+<script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="styles.css?v=20260919a">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260906a">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <link rel="stylesheet" href="tools.css?v=20260906gwb">
+<link rel="stylesheet" href="papers-ui.css?v=1">
 
 </head>
 <body>
@@ -113,7 +114,7 @@
   </div>
 </section>
 
-<div class="centered" style="margin-top: 30px; margin-bottom: 34px;">
+<div class="centered paper-toggle-wrap">
   <div class="seg-large" id="paper-toggle">
     <button class="active" data-tab="topical">Topical Builder</button>
     <button data-tab="yearly">Yearly Library</button>
@@ -123,22 +124,41 @@
 
 <main id="topical-container" class="container">
   <section class="card" id="generator">
-    <h2>Build your paper</h2>
+    <div class="builder-header">
+      <div>
+        <h2>Build your paper</h2>
+        <p class="builder-sub">Real Cambridge questions, filtered to exactly what you need.</p>
+      </div>
+      <div class="builder-stats" id="builder-stats-display">
+        <!-- JS populates this via gen-summary -->
+      </div>
+    </div>
 
     <div class="field">
-      <label class="field-label">1 · Subject</label>
+      <div class="step-label">
+        <span class="step-num"></span>
+        <span class="step-title">Subject</span>
+      </div>
       <div class="subject-groups" id="subjects"></div>
     </div>
 
     <div class="field hidden" id="component-field">
-      <label class="field-label">2 · Paper component</label>
+      <div class="step-label">
+        <span class="step-num"></span>
+        <span class="step-title">Paper component</span>
+      </div>
       <div class="pill-row" id="components"></div>
     </div>
 
     <div class="field">
       <div class="field-label-row">
-        <label class="field-label" id="topics-label">
-          <span id="topics-step">2 · Topics</span>
+        <!-- #topics-label / #topics-step stay put: app.js writes the old
+             "3 · Topics" string into #topics-step, which .step-legacy hides.
+             The visible number is a CSS counter (see papers-ui.css). -->
+        <label class="field-label step-label" id="topics-label">
+          <span class="step-num"></span>
+          <span class="step-title">Topics</span>
+          <span id="topics-step" class="step-legacy">2 · Topics</span>
           <span class="topic-note" id="topic-note"></span>
         </label>
         <span class="mini-actions">
@@ -153,13 +173,21 @@
 
     <div class="field split">
       <div>
-        <label class="field-label" id="years-label">3 · Years</label>
+        <div class="step-label">
+          <span class="step-num"></span>
+          <span class="step-title">Years</span>
+        </div>
+        <label class="field-label step-legacy" id="years-label">3 · Years</label>
         <div class="inline">
           <select id="yfrom"></select><span class="dash">to</span><select id="yto"></select>
         </div>
       </div>
       <div>
-        <label class="field-label" id="format-label">4 · Format</label>
+        <div class="step-label">
+          <span class="step-num"></span>
+          <span class="step-title">Format</span>
+        </div>
+        <label class="field-label step-legacy" id="format-label">4 · Format</label>
         <div class="pill-row">
           <button type="button" class="pill mode active" data-mode="topical">Topical booklet</button>
           <button type="button" class="pill mode" data-mode="test">Topic test</button>
@@ -168,7 +196,11 @@
     </div>
 
     <div class="field" id="filter-field">
-      <label class="field-label" id="filter-label">5 · Narrow by session / variant</label>
+      <div class="step-label">
+        <span class="step-num"></span>
+        <span class="step-title">Narrow by session / variant</span>
+      </div>
+      <label class="field-label step-legacy" id="filter-label">5 · Narrow by session / variant</label>
       <div class="filter-grid">
         <div>
           <div class="filter-sub-label">Session</div>
@@ -182,11 +214,19 @@
     </div>
 
     <div class="field" id="topical-opts">
+      <div class="step-label">
+        <span class="step-num"></span>
+        <span class="step-title">Mark scheme</span>
+      </div>
       <label class="check"><input type="checkbox" id="inc-ms" checked>
         Mark scheme after each question</label>
     </div>
 
     <div class="field split hidden" id="test-opts">
+      <div class="step-label">
+        <span class="step-num"></span>
+        <span class="step-title">Test length</span>
+      </div>
       <div>
         <label class="field-label">Questions</label>
         <input type="number" id="count" value="6" min="1" max="40">
@@ -456,7 +496,7 @@
 </div>
 
 <script src="main.js?v=20260907c"></script>
-<script src="app.js?v=20260831a"></script>
+<script src="app.js?v=20260907a"></script>
 <script src="library.js?v=20260906gwb"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {

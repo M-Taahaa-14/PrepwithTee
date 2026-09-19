@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>Admin — PrepWithTee</title>
-  <script>try{var t=localStorage.getItem("theme")||"dark";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="/admin.css?v=20260905a">
+  <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+  <link rel="stylesheet" href="/admin.css?v=20260909c">
 </head>
 <body>
 
@@ -68,10 +69,12 @@
       <button class="nav-item" data-tab="contacts"><span class="ni">✉️</span>Contacts<b data-count="contacts">0</b></button>
       <button class="nav-item" data-tab="newsletter"><span class="ni">📬</span>Newsletter<b data-count="newsletter">0</b></button>
       <button class="nav-item" data-tab="feedback"><span class="ni">💬</span>Feedback<b data-count="feedback">0</b></button>
+      <button class="nav-item" data-tab="emails"><span class="ni">📧</span>Emails</button>
     </nav>
 
     <div class="side-foot">
       <button class="side-btn" id="refresh-btn">↻ Refresh data</button>
+      <button class="side-btn side-theme-btn" id="theme-toggle-side" type="button" aria-label="Toggle theme">🌙 Dark mode</button>
       <button class="side-btn danger" id="lock-btn">⌁ Lock</button>
     </div>
   </aside>
@@ -106,6 +109,7 @@
       <section class="view" id="view-newsletter"></section>
       <section class="view" id="view-feedback"></section>
       <section class="view" id="view-student"></section>
+      <section class="view" id="view-emails"></section>
     </div>
   </main>
 </div>
@@ -124,6 +128,49 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module" src="/admin.js?v=20260905a"></script>
+<!-- Email preview modal -->
+<div id="email-modal" class="email-modal-overlay" hidden>
+  <div class="email-modal-panel">
+    <div class="email-modal-head">
+      <div>
+        <h3 id="email-modal-subj">Email Preview</h3>
+        <p>This is how the email looks in the recipient's inbox.</p>
+      </div>
+      <button id="email-modal-close" aria-label="Close">✕</button>
+    </div>
+    <iframe id="email-modal-iframe" class="email-modal-frame" sandbox="allow-same-origin" title="Email preview"></iframe>
+  </div>
+</div>
+
+<style>
+.email-modal-overlay {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(0,0,0,.6); display: flex;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.email-modal-panel {
+  background: var(--paper, #fff); border-radius: 16px;
+  width: min(660px, 100%); max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+.email-modal-head {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 20px; border-bottom: 1px solid var(--line, #eee);
+  flex-shrink: 0;
+}
+.email-modal-head h3 { margin: 0; font-size: .95rem; font-weight: 700; }
+.email-modal-head p  { margin: 3px 0 0; font-size: .78rem; color: var(--muted, #888); }
+.email-modal-head button {
+  margin-left: auto; flex-shrink: 0;
+  background: none; border: none; font-size: 1.1rem;
+  cursor: pointer; color: var(--muted, #888); padding: 2px 8px; border-radius: 6px;
+}
+.email-modal-head button:hover { background: var(--line-2, #f5f5f5); color: var(--ink, #111); }
+.email-modal-frame { flex: 1; border: none; width: 100%; min-height: 520px; }
+</style>
+
+<script type="module" src="/admin.js?v=20260909c"></script>
 </body>
 </html>

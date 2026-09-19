@@ -143,6 +143,13 @@ def cover(doc, args, subject, topics, chosen, *, is_ms):
         topic_str = topics[0] + (f"  ·  +{len(topics) - 1} more" if len(topics) > 1 else "")
     page.insert_text((MARGIN_X, y), prefix + topic_str,
                      fontsize=9.5, fontname="helv", color=(0.15, 0.15, 0.15))
+    subtopics_active = getattr(args, "subtopics", None)
+    if subtopics_active:
+        y += 13
+        sub_str = "Subtopic: " + ", ".join(subtopics_active)
+        if fitz.get_text_length(sub_str, fontname="helv", fontsize=8.5) > CONTENT_W:
+            sub_str = "Subtopic: " + subtopics_active[0] + (f"  +{len(subtopics_active) - 1} more" if len(subtopics_active) > 1 else "")
+        page.insert_text((MARGIN_X, y), sub_str, fontsize=8.5, fontname="helv", color=GREY)
     y += 14
     meta = (f"{len(chosen)} question{'s' if len(chosen) != 1 else ''}  ·  "
             f"{total_m} marks  ·  Past papers {span}")
@@ -437,7 +444,7 @@ def main():
     taxonomy = heuristics.load_taxonomy(args.syllabus)
     valid = {t["name"].lower(): t["name"] for t in taxonomy["topics"]}
     topics = []
-    for raw in args.topics.split(","):
+    for raw in args.topics.split("|"):
         name = valid.get(raw.strip().lower())
         if name is None:
             raise SystemExit(
@@ -476,6 +483,9 @@ def main():
     ms_doc, missing = render_ms(con, args, subject, topics, chosen, cache)
 
     slug = re.sub(r"[^a-z0-9]+", "-", ",".join(topics).lower()).strip("-")
+    if getattr(args, "subtopics", None):
+        sub_slug = re.sub(r"[^a-z0-9]+", "-", ",".join(args.subtopics).lower()).strip("-")
+        slug = slug + "_" + sub_slug
     base = config.ROOT / (args.out or f"data/output/{args.syllabus}_{slug}_test.pdf")
     base = base.with_suffix(".pdf")
     ms_path = base.with_name(base.stem + "_ms.pdf")

@@ -33,15 +33,51 @@
       "subtopics": [
         {
           "name": "Data Representation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "binary",
+            "hexadecimal",
+            "denary",
+            "two's complement",
+            "sign and magnitude",
+            "BCD",
+            "ASCII",
+            "Unicode",
+            "convert to binary",
+            "number representation"
+          ]
         },
         {
           "name": "Multimedia",
-          "links": []
+          "links": [],
+          "keywords": [
+            "bitmap",
+            "image file",
+            "resolution",
+            "pixel",
+            "colour depth",
+            "bit depth",
+            "sampling rate",
+            "sampling frequency",
+            "sound file",
+            "audio",
+            "MIDI",
+            "vector graphic"
+          ]
         },
         {
           "name": "Compression",
-          "links": []
+          "links": [],
+          "keywords": [
+            "compression",
+            "lossless",
+            "lossy",
+            "run-length encoding",
+            "RLE",
+            "file size",
+            "compress",
+            "Huffman"
+          ]
         }
       ]
     },
@@ -79,7 +115,32 @@
       "subtopics": [
         {
           "name": "Networks including the internet",
-          "links": []
+          "links": [],
+          "keywords": [
+            "protocol",
+            "TCP/IP",
+            "HTTP",
+            "HTTPS",
+            "FTP",
+            "SMTP",
+            "DNS",
+            "URL",
+            "IP address",
+            "MAC address",
+            "LAN",
+            "WAN",
+            "packet",
+            "router",
+            "switch",
+            "bandwidth",
+            "internet",
+            "network topology",
+            "client-server",
+            "peer-to-peer",
+            "OSI model",
+            "firewall",
+            "network interface card"
+          ]
         }
       ]
     },
@@ -137,11 +198,44 @@
       "subtopics": [
         {
           "name": "Computers and their components",
-          "links": []
+          "links": [],
+          "keywords": [
+            "CPU",
+            "processor",
+            "RAM",
+            "ROM",
+            "cache",
+            "register",
+            "ALU",
+            "control unit",
+            "fetch-execute cycle",
+            "bus",
+            "motherboard",
+            "secondary storage",
+            "hard disk",
+            "solid state",
+            "optical disk",
+            "input device",
+            "output device",
+            "memory hierarchy"
+          ]
         },
         {
           "name": "Logic Gates and Logic Circuits",
-          "links": []
+          "links": [],
+          "keywords": [
+            "logic gate",
+            "AND gate",
+            "OR gate",
+            "NOT gate",
+            "NAND gate",
+            "NOR gate",
+            "XOR gate",
+            "truth table",
+            "logic circuit",
+            "logic diagram",
+            "Boolean expression from gate"
+          ]
         }
       ]
     },
@@ -188,15 +282,65 @@
       "subtopics": [
         {
           "name": "Central Processing Unit (CPU) Architecture",
-          "links": []
+          "links": [],
+          "keywords": [
+            "fetch-execute cycle",
+            "fetch decode execute",
+            "program counter",
+            "memory address register",
+            "memory data register",
+            "accumulator",
+            "instruction register",
+            "control unit",
+            "ALU",
+            "register",
+            "bus",
+            "interrupt",
+            "interrupt service routine",
+            "von Neumann"
+          ]
         },
         {
           "name": "Assembly Language",
-          "links": []
+          "links": [],
+          "keywords": [
+            "assembly language",
+            "assembly code",
+            "LDD",
+            "STO",
+            "ADD",
+            "SUB",
+            "MUL",
+            "DIV",
+            "CMP",
+            "JMP",
+            "JGT",
+            "JEQ",
+            "JNE",
+            "MOV",
+            "opcode",
+            "operand",
+            "mnemonic",
+            "machine code",
+            "trace the execution"
+          ]
         },
         {
           "name": "Bit manipulation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "bit mask",
+            "bit shift",
+            "left shift",
+            "right shift",
+            "AND mask",
+            "OR mask",
+            "XOR mask",
+            "masking",
+            "set a bit",
+            "clear a bit",
+            "test a bit"
+          ]
         }
       ]
     },
@@ -223,11 +367,42 @@
       "subtopics": [
         {
           "name": "Operating Systems",
-          "links": []
+          "links": [],
+          "keywords": [
+            "operating system",
+            "OS",
+            "process management",
+            "memory management",
+            "scheduling",
+            "round robin",
+            "priority scheduling",
+            "deadlock",
+            "semaphore",
+            "virtual memory",
+            "paging",
+            "file management",
+            "user interface",
+            "device driver"
+          ]
         },
         {
           "name": "Language Translators",
-          "links": []
+          "links": [],
+          "keywords": [
+            "compiler",
+            "interpreter",
+            "assembler",
+            "lexical analysis",
+            "tokenise",
+            "syntax analysis",
+            "parse tree",
+            "semantic analysis",
+            "code generation",
+            "linker",
+            "loader",
+            "object code",
+            "symbol table"
+          ]
         }
       ]
     },
@@ -261,11 +436,36 @@
       "subtopics": [
         {
           "name": "Data Security",
-          "links": []
+          "links": [],
+          "keywords": [
+            "encryption",
+            "firewall",
+            "authentication",
+            "password",
+            "biometric",
+            "malware",
+            "virus",
+            "phishing",
+            "hacking",
+            "intrusion detection",
+            "digital certificate",
+            "data security"
+          ]
         },
         {
           "name": "Data Integrity",
-          "links": []
+          "links": [],
+          "keywords": [
+            "checksum",
+            "validation",
+            "verification",
+            "parity bit",
+            "hash function",
+            "data integrity",
+            "error detection",
+            "error correction",
+            "check digit"
+          ]
         }
       ]
     },
@@ -296,7 +496,20 @@
       "subtopics": [
         {
           "name": "Ethics and Ownership",
-          "links": []
+          "links": [],
+          "keywords": [
+            "ethical",
+            "copyright",
+            "intellectual property",
+            "open source",
+            "privacy",
+            "data protection",
+            "environmental impact",
+            "digital divide",
+            "moral",
+            "legal",
+            "plagiarism"
+          ]
         }
       ]
     },
@@ -341,15 +554,59 @@
       "subtopics": [
         {
           "name": "Database Concepts",
-          "links": []
+          "links": [],
+          "keywords": [
+            "relational database",
+            "table",
+            "record",
+            "field",
+            "primary key",
+            "foreign key",
+            "entity",
+            "attribute",
+            "entity-relationship diagram",
+            "ER diagram",
+            "relationship",
+            "one-to-many",
+            "many-to-many"
+          ]
         },
         {
           "name": "Database Management Systems (DBMS)",
-          "links": []
+          "links": [],
+          "keywords": [
+            "DBMS",
+            "normalisation",
+            "first normal form",
+            "1NF",
+            "2NF",
+            "3NF",
+            "data redundancy",
+            "anomaly",
+            "integrity constraint",
+            "transaction",
+            "ACID"
+          ]
         },
         {
           "name": "Data Definition Language (DDL) and Data Manipulation Language (DML)",
-          "links": []
+          "links": [],
+          "keywords": [
+            "SQL",
+            "CREATE TABLE",
+            "SELECT",
+            "INSERT INTO",
+            "UPDATE",
+            "DELETE",
+            "WHERE",
+            "JOIN",
+            "GROUP BY",
+            "ORDER BY",
+            "COUNT",
+            "SUM",
+            "query",
+            "database query"
+          ]
         }
       ]
     },
@@ -396,11 +653,36 @@
       "subtopics": [
         {
           "name": "Computational Thinking Skills",
-          "links": []
+          "links": [],
+          "keywords": [
+            "abstraction",
+            "decomposition",
+            "stepwise refinement",
+            "pattern recognition",
+            "algorithmic thinking",
+            "problem solving",
+            "represent",
+            "model"
+          ]
         },
         {
           "name": "Algorithms",
-          "links": []
+          "links": [],
+          "keywords": [
+            "algorithm",
+            "pseudocode",
+            "flowchart",
+            "trace table",
+            "dry run",
+            "bubble sort",
+            "insertion sort",
+            "merge sort",
+            "quicksort",
+            "binary search",
+            "linear search",
+            "sort",
+            "search algorithm"
+          ]
         }
       ]
     },
@@ -459,19 +741,66 @@
       "subtopics": [
         {
           "name": "Data Types and Records",
-          "links": []
+          "links": [],
+          "keywords": [
+            "data type",
+            "integer",
+            "real",
+            "boolean",
+            "string",
+            "character",
+            "user-defined type",
+            "record",
+            "TYPE",
+            "DECLARE",
+            "composite data type"
+          ]
         },
         {
           "name": "Arrays",
-          "links": []
+          "links": [],
+          "keywords": [
+            "array",
+            "1D array",
+            "2D array",
+            "index",
+            "subscript",
+            "element",
+            "FOR loop with array",
+            "array of records"
+          ]
         },
         {
           "name": "Files",
-          "links": []
+          "links": [],
+          "keywords": [
+            "file handling",
+            "OPENFILE",
+            "READFILE",
+            "WRITEFILE",
+            "CLOSEFILE",
+            "EOF",
+            "text file",
+            "binary file",
+            "sequential file"
+          ]
         },
         {
           "name": "Introduction to Abstract Data Types (ADT)",
-          "links": []
+          "links": [],
+          "keywords": [
+            "abstract data type",
+            "ADT",
+            "stack",
+            "queue",
+            "linked list",
+            "binary tree",
+            "push",
+            "pop",
+            "enqueue",
+            "dequeue",
+            "data structure"
+          ]
         }
       ]
     },
@@ -511,15 +840,53 @@
       "subtopics": [
         {
           "name": "Programming Basics",
-          "links": []
+          "links": [],
+          "keywords": [
+            "variable",
+            "constant",
+            "DECLARE",
+            "assignment",
+            "RECEIVES",
+            "RETURNS",
+            "procedure",
+            "function",
+            "parameter",
+            "local variable",
+            "global variable",
+            "scope"
+          ]
         },
         {
           "name": "Constructs",
-          "links": []
+          "links": [],
+          "keywords": [
+            "IF",
+            "THEN",
+            "ELSE",
+            "WHILE",
+            "FOR",
+            "REPEAT UNTIL",
+            "CASE OF",
+            "nested loop",
+            "selection",
+            "iteration",
+            "condition",
+            "loop construct"
+          ]
         },
         {
           "name": "Structured Programming",
-          "links": []
+          "links": [],
+          "keywords": [
+            "modular programming",
+            "subroutine",
+            "recursion",
+            "recursive",
+            "library",
+            "top-down design",
+            "procedure call",
+            "return value"
+          ]
         }
       ]
     },
@@ -552,15 +919,50 @@
       "subtopics": [
         {
           "name": "Program Development Life cycle",
-          "links": []
+          "links": [],
+          "keywords": [
+            "software development lifecycle",
+            "SDLC",
+            "analysis",
+            "design",
+            "implementation",
+            "testing",
+            "maintenance",
+            "waterfall",
+            "agile",
+            "user requirements"
+          ]
         },
         {
           "name": "Program Design",
-          "links": []
+          "links": [],
+          "keywords": [
+            "structure chart",
+            "pseudocode",
+            "flowchart",
+            "top-down design",
+            "module",
+            "decompose the problem",
+            "program design"
+          ]
         },
         {
           "name": "Program Testing and Maintenance",
-          "links": []
+          "links": [],
+          "keywords": [
+            "test plan",
+            "test data",
+            "white box testing",
+            "black box testing",
+            "alpha testing",
+            "beta testing",
+            "trace table",
+            "debug",
+            "dry run",
+            "normal data",
+            "boundary data",
+            "erroneous data"
+          ]
         }
       ]
     },
@@ -591,15 +993,45 @@
       "subtopics": [
         {
           "name": "User-defined data types",
-          "links": []
+          "links": [],
+          "keywords": [
+            "user-defined type",
+            "enumerated type",
+            "pointer",
+            "record",
+            "TYPE...ENDTYPE",
+            "DEFINE"
+          ]
         },
         {
           "name": "File organisation and access",
-          "links": []
+          "links": [],
+          "keywords": [
+            "sequential access",
+            "random access",
+            "indexed sequential",
+            "hashing",
+            "hash function",
+            "overflow",
+            "collision",
+            "binary search on file"
+          ]
         },
         {
           "name": "Floating-point numbers, representation and manipulation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "floating point",
+            "mantissa",
+            "exponent",
+            "normalised form",
+            "overflow",
+            "underflow",
+            "IEEE 754",
+            "precision",
+            "rounding error",
+            "floating-point arithmetic"
+          ]
         }
       ]
     },
@@ -655,11 +1087,38 @@
       "subtopics": [
         {
           "name": "Protocols",
-          "links": []
+          "links": [],
+          "keywords": [
+            "protocol",
+            "TCP",
+            "UDP",
+            "IP",
+            "HTTP",
+            "HTTPS",
+            "FTP",
+            "SMTP",
+            "POP3",
+            "IMAP",
+            "protocol stack",
+            "handshaking",
+            "encapsulation",
+            "packet header"
+          ]
         },
         {
           "name": "Circuit switching, packet switching",
-          "links": []
+          "links": [],
+          "keywords": [
+            "packet switching",
+            "circuit switching",
+            "packet",
+            "header",
+            "router",
+            "path",
+            "latency",
+            "reassemble",
+            "switching"
+          ]
         }
       ]
     },
@@ -704,11 +1163,33 @@
       "subtopics": [
         {
           "name": "Processors, Parallel Processing and Virtual Machines",
-          "links": []
+          "links": [],
+          "keywords": [
+            "pipelining",
+            "parallel processing",
+            "multicore",
+            "RISC",
+            "CISC",
+            "virtual machine",
+            "emulation",
+            "superscalar",
+            "clock speed"
+          ]
         },
         {
           "name": "Boolean Algebra and Logic Circuits",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Boolean algebra",
+            "De Morgan's law",
+            "simplify Boolean",
+            "Karnaugh map",
+            "sum of products",
+            "product of sums",
+            "Boolean expression",
+            "minimise",
+            "canonical form"
+          ]
         }
       ]
     },
@@ -784,11 +1265,31 @@
       "subtopics": [
         {
           "name": "Purposes of an Operating System (OS)",
-          "links": []
+          "links": [],
+          "keywords": [
+            "operating system purpose",
+            "resource management",
+            "multitasking",
+            "memory management",
+            "process scheduling",
+            "interrupt handling",
+            "OS kernel"
+          ]
         },
         {
           "name": "Translation Software",
-          "links": []
+          "links": [],
+          "keywords": [
+            "compiler stages",
+            "linker",
+            "loader",
+            "symbol table",
+            "lexical analysis",
+            "syntax analysis",
+            "semantic analysis",
+            "code optimisation",
+            "intermediate code"
+          ]
         }
       ]
     },
@@ -826,7 +1327,20 @@
       "subtopics": [
         {
           "name": "Encryption, Encryption Protocols and Digital Certificates",
-          "links": []
+          "links": [],
+          "keywords": [
+            "symmetric encryption",
+            "asymmetric encryption",
+            "public key",
+            "private key",
+            "digital signature",
+            "digital certificate",
+            "SSL",
+            "TLS",
+            "RSA",
+            "key exchange",
+            "certificate authority"
+          ]
         }
       ]
     },
@@ -869,7 +1383,20 @@
       "subtopics": [
         {
           "name": "Artificial Intelligence (AI)",
-          "links": []
+          "links": [],
+          "keywords": [
+            "artificial intelligence",
+            "machine learning",
+            "neural network",
+            "expert system",
+            "knowledge base",
+            "inference engine",
+            "heuristic",
+            "natural language processing",
+            "image recognition",
+            "supervised learning",
+            "unsupervised learning"
+          ]
         }
       ]
     },
@@ -920,11 +1447,37 @@
       "subtopics": [
         {
           "name": "Algorithms",
-          "links": []
+          "links": [],
+          "keywords": [
+            "complexity",
+            "time complexity",
+            "O(n)",
+            "O(n^2)",
+            "O(n log n)",
+            "Big O notation",
+            "efficiency",
+            "merge sort",
+            "quicksort",
+            "binary search tree",
+            "traversal",
+            "sort algorithm analysis"
+          ]
         },
         {
           "name": "Recursion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "recursive",
+            "recursion",
+            "base case",
+            "recursive call",
+            "call stack",
+            "stack overflow",
+            "trace recursion",
+            "recursive algorithm",
+            "towers of Hanoi",
+            "Fibonacci recursive"
+          ]
         }
       ]
     },
@@ -982,11 +1535,38 @@
       "subtopics": [
         {
           "name": "Programming Paradigms",
-          "links": []
+          "links": [],
+          "keywords": [
+            "object-oriented",
+            "OOP",
+            "class",
+            "object",
+            "method",
+            "attribute",
+            "encapsulation",
+            "inheritance",
+            "polymorphism",
+            "procedural",
+            "functional programming",
+            "declarative",
+            "logic programming"
+          ]
         },
         {
           "name": "File Processing and Exception Handling",
-          "links": []
+          "links": [],
+          "keywords": [
+            "exception handling",
+            "try",
+            "catch",
+            "throw",
+            "raise",
+            "error handling",
+            "exception",
+            "runtime error",
+            "file exception",
+            "handle errors"
+          ]
         }
       ]
     }

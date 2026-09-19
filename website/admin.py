@@ -1,4 +1,4 @@
-"""Admin API for PrepWithTee — everything the tutor needs behind one key.
+﻿"""Admin API for PrepWithTee — everything the tutor needs behind one key.
 
 Surfaces every form the site collects (demo bookings, feedback/issues, subject
 requests, teacher applications), the Calendly booking calendar, per-student
@@ -250,7 +250,100 @@ def students(_: bool = _Admin):
     for r in rows:
         r["subject_names"] = [SUBJECT_NAMES.get(s, s) for s in r.get("subjects", [])]
         r["open_homework"] = open_hw.get(r["id"], 0)
+        r["missing_fields"] = _missing_fields(r)
     return {"students": rows}
+
+
+def _missing_fields(s: dict) -> list[str]:
+    """Return the list of profile fields this student still needs to fill."""
+    missing = []
+    if not (s.get("name") or "").strip():
+        missing.append("name")
+    if not s.get("grade"):
+        missing.append("qualification")
+    if not s.get("phone"):
+        missing.append("WhatsApp number")
+    if not s.get("subjects"):
+        missing.append("subjects")
+    return missing
+
+
+@router.post("/students/nudge-incomplete")
+def nudge_incomplete(key: str | None = None, _: bool = _Admin):
+    """Email every student who has an incomplete profile."""
+    from app import _notify
+
+    rows = _udb.list_students()
+    base = "https://prepwithtee.com"
+    sent: list[str] = []
+    skipped: list[str] = []
+
+    for s in rows:
+        missing = _missing_fields(s)
+        if not missing:
+            skipped.append(s["id"])
+            continue
+
+        email = (s.get("email") or "").strip()
+        if not email:
+            continue
+
+        first = (s.get("name") or "there").split()[0]
+        missing_str = ", ".join(missing)
+        subject = "[PrepWithTee] Please complete your profile"
+        body = (
+            f"Hi {first},\n\n"
+            f"We noticed your PrepWithTee profile is missing: {missing_str}.\n\n"
+            f"Complete your profile so your tutor can reach you and so your "
+            f"dashboard is fully personalised for your subjects:\n\n"
+            f"  {base}/profile.html?setup=1\n\n"
+            f"It only takes a minute!\n\n"
+            f"Tee  ·  PrepWithTee\n"
+            f"{base}"
+        )
+
+        missing_items_html = "".join(
+            f'<li style="margin:4px 0;font-size:.88rem;color:#555">{m}</li>'
+            for m in missing
+        )
+        html = f"""<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#f4f0ea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:32px 16px">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto">
+  <tr><td style="background:#2E1B4A;border-radius:12px 12px 0 0;padding:22px 28px">
+    <p style="color:#C9BDF0;font-size:.75rem;margin:0;letter-spacing:.06em;text-transform:uppercase">PrepWithTee</p>
+    <h1 style="color:#fff;font-size:1.1rem;margin:6px 0 0;font-weight:700">Complete your profile, {first} 🦉</h1>
+  </td></tr>
+  <tr><td style="background:#fff;padding:24px 28px 28px;border-radius:0 0 12px 12px;box-shadow:0 2px 16px rgba(0,0,0,.08)">
+    <p style="margin:0 0 14px;font-size:.9rem;color:#333;line-height:1.6">
+      Hi {first}, your PrepWithTee account is set up but a few details are still missing:
+    </p>
+    <ul style="margin:0 0 18px;padding-left:20px;line-height:1.7">
+      {missing_items_html}
+    </ul>
+    <p style="margin:0 0 20px;font-size:.88rem;color:#555;line-height:1.6">
+      Filling these in lets your tutor reach you on WhatsApp and makes your dashboard
+      fully personalised to your subjects and level.
+    </p>
+    <p style="margin:0 0 8px;text-align:center">
+      <a href="{base}/profile.html?setup=1"
+         style="display:inline-block;background:#E8913A;color:#fff;text-decoration:none;
+                font-weight:700;font-size:.92rem;padding:12px 28px;border-radius:10px">
+        Complete my profile →
+      </a>
+    </p>
+    <p style="margin:20px 0 0;font-size:.78rem;color:#aaa;text-align:center">
+      PrepWithTee &nbsp;·&nbsp; <a href="{base}" style="color:#aaa">{base}</a>
+    </p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>"""
+
+        ok = _notify(subject, body, to=email, html_override=html)
+        if ok:
+            sent.append(email)
+
+    return {"sent": len(sent), "skipped": len(skipped), "emails": sent}
 
 
 @router.get("/students/{user_id}")
@@ -1606,3 +1699,374 @@ def admin_broadcast_newsletter(req: NewsletterBroadcastReq, _: bool = _Admin):
                 sent_count += 1
 
     return {"ok": True, "sent": sent_count, "total": len(subs)}
+
+
+# ── Email Admin ───────────────────────────────────────────────────────────────
+
+import html as _html_mod
+
+_MAIL_LOGO  = "https://prepwithtee.com/logo.png"
+_MAIL_SITE  = "https://prepwithtee.com"
+_MAIL_WA    = "https://wa.me/923204884375"
+_MAIL_UNSUB = "mailto:nexgentutors6@gmail.com?subject=Unsubscribe%20PrepWithTee"
+
+
+def _mail_p(text: str) -> str:
+    return f'<p style="margin:0 0 14px">{text}</p>'
+
+
+def _mail_html(body_html: str, cta_label: str = "", cta_url: str = "") -> str:
+    """Branded PrepWithTee email card — matches email_lifecycle._letter_html."""
+    cta_block = (
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation"'
+        f' style="margin-top:28px"><tr><td style="text-align:center">'
+        f'<a href="{_html_mod.escape(cta_url)}"'
+        f' style="display:inline-block;background:#E8913A;color:#fff;text-decoration:none;'
+        f'font-weight:700;font-size:.9rem;padding:13px 32px;border-radius:8px;letter-spacing:.02em">'
+        f'{_html_mod.escape(cta_label)} &rarr;</a></td></tr></table>'
+        if cta_label else ""
+    )
+    cta_divider = '<div style="border-top:1px solid #f0ece6;margin:26px 0 0"></div>' if cta_label else ""
+    return (
+        f'<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+        f'<meta name="viewport" content="width=device-width,initial-scale=1"></head>'
+        f'<body style="margin:0;padding:0;background:#edeae5;'
+        f'font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+        f'<tr><td style="padding:32px 16px 48px">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:520px;margin:0 auto">'
+        f'<tr><td style="background:#2E1B4A;border-radius:16px 16px 0 0;padding:28px 32px 22px;text-align:center">'
+        f'<a href="{_MAIL_SITE}" style="text-decoration:none;display:block">'
+        f'<img src="{_MAIL_LOGO}" width="72" height="72"'
+        f' style="display:block;margin:0 auto 12px;border-radius:50%;border:3px solid rgba(201,168,76,.45)" alt="">'
+        f'<p style="margin:0;color:#fff;font-size:1.05rem;font-weight:700">PrepWithTee</p>'
+        f'<p style="margin:4px 0 0;color:#C9BDF0;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase">'
+        f'Cambridge Exam Prep</p></a></td></tr>'
+        f'<tr><td style="background:#C9A84C;height:3px;font-size:1px;line-height:1px">&nbsp;</td></tr>'
+        f'<tr><td style="background:#fff;padding:34px 38px 38px;border-radius:0 0 16px 16px;'
+        f'box-shadow:0 6px 32px rgba(46,27,74,.12)">'
+        f'<div style="font-size:.93rem;color:#1e1b30;line-height:1.85">{body_html}</div>'
+        f'{cta_divider}'
+        f'{cta_block}</td></tr>'
+        f'<tr><td style="padding:22px 0 4px;text-align:center">'
+        f'<table width="100%" cellpadding="0" cellspacing="0" role="presentation">'
+        f'<tr><td style="text-align:center;padding-bottom:8px">'
+        f'<img src="{_MAIL_LOGO}" alt="" width="26" height="26" style="border-radius:50%;opacity:.4;vertical-align:middle">'
+        f'</td></tr>'
+        f'<tr><td style="font-size:.7rem;color:#aaa;line-height:1.7;text-align:center">'
+        f'<strong style="color:#888">PrepWithTee</strong> &middot; Lahore, Pakistan<br>'
+        f'Questions or need tutoring? <a href="{_MAIL_WA}" style="color:#aaa;text-decoration:underline">WhatsApp us</a><br>'
+        f'<a href="{_MAIL_UNSUB}" style="color:#aaa;text-decoration:underline">Unsubscribe</a>'
+        f'</td></tr></table></td></tr>'
+        f'</table></td></tr></table></body></html>'
+    )
+
+
+def _build_template(template_id: str, name: str) -> tuple[str, str]:
+    """Return (subject, html) for the given template id and recipient name."""
+    first = _html_mod.escape((name or "there").split()[0])
+    p = _mail_p
+    lib = "https://prepwithtee.com/library.html"
+    ask = "https://prepwithtee.com/ask.html"
+
+    if template_id == "W1":
+        return (
+            f"You're in, {first} — here's your first move.",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("Welcome to PrepWithTee.")
+                + p("Every question in this library is a real Cambridge exam question, sorted by topic, "
+                    "with the mark scheme right next to it. No hunting through PDFs.")
+                + p("<strong>Pick your subject &rarr; pick a topic &rarr; download a question set.</strong> "
+                    "It takes 30 seconds.")
+                + p("See you inside,<br><strong>Tee</strong>")
+                + '<p style="margin:16px 0 0;font-size:.8rem;color:#999">P.S. If you\'re not sure where '
+                  'to start, just reply to this email &mdash; I read every reply.</p>',
+                "Open the Library", lib,
+            ),
+        )
+
+    if template_id == "W2":
+        return (
+            "The revision habit that actually works (10 min today)",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("Most students revise by reading their notes.")
+                + p("The problem? Reading <em>feels</em> like progress but it isn't. Your brain needs to "
+                    "<em>retrieve</em> information under pressure &mdash; that's what the exam tests.")
+                + p("<strong>Practice questions, by topic, from day one.</strong>")
+                + p("Open the Library, pick any topic you covered this week, work through the question set "
+                    "with pen and paper, then check the mark scheme.")
+                + p("Ten minutes of active recall beats an hour of passive reading every time.")
+                + p("&mdash; <strong>Tee</strong>"),
+                "Open the Library", lib,
+            ),
+        )
+
+    if template_id == "W3":
+        return (
+            "Stuck at midnight on a question? This helps.",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("Ever been working through a past paper at 11&nbsp;PM and hit a question you just "
+                    "can't crack &mdash; with no one to ask?")
+                + p("That's exactly why we built the <strong>AI Tutor</strong>.")
+                + p("It knows the Cambridge syllabus inside out. Ask it to explain a concept, walk you "
+                    "through a worked example, or tell you why your answer missed the marks.")
+                + p("Click <strong>Ask AI</strong> on any question page and give it a go.")
+                + p("&mdash; <strong>Tee</strong>"),
+                "Try the AI Tutor", ask,
+            ),
+        )
+
+    if template_id == "R1":
+        return (
+            f"{first}, is everything okay?",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("I noticed you haven't been on in a few days. That's completely fine &mdash; life gets busy.")
+                + p("But I also know how easy it is for revision to quietly slip off the list. "
+                    "Before you know it, three days turns into three weeks.")
+                + p("You don't need a big session today. Just open one topic set, do three questions, "
+                    "check the mark schemes. Literally ten minutes.")
+                + p("Small consistent sessions beat a panic cram every single time.")
+                + p("Come back when you're ready.")
+                + p("&mdash; <strong>Tee</strong>"),
+                "Continue where you left off", lib,
+            ),
+        )
+
+    if template_id == "R2":
+        return (
+            "I'll be honest with you.",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("A week away from revision. I get it &mdash; sometimes the hardest part is just "
+                    "starting again.")
+                + p("Here's what works: <strong>don't try to catch up.</strong> Forget the time you've "
+                    "missed. Just open one topic set &mdash; any topic &mdash; and do the first question.")
+                + p("By the time you've done five questions you'll have forgotten you were even putting it off.")
+                + p("The library is right where you left it.")
+                + p("&mdash; <strong>Tee</strong>")
+                + '<p style="margin:16px 0 0;font-size:.8rem;color:#999">P.S. If something specific is '
+                  'blocking you &mdash; just reply. I mean that.</p>',
+                "Pick up where you left off", lib,
+            ),
+        )
+
+    if template_id == "R3":
+        return (
+            "One thing before I leave you alone",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("I'm not going to keep sending you emails you're not finding useful. "
+                    "This one's the last one for a while.")
+                + p("Cambridge exams reward students who have <em>seen lots of questions</em> on a topic "
+                    "&mdash; not students who memorised a textbook. Every session on PrepWithTee builds "
+                    "that pattern recognition.")
+                + p("When you're ready to come back &mdash; whether that's tomorrow or in a month &mdash; "
+                    "everything will be here waiting.")
+                + p("Rooting for you,<br><strong>Tee</strong>"),
+                "I'm ready — take me back", lib,
+            ),
+        )
+
+    if template_id == "F1":
+        from datetime import date as _d
+        week = _d.today().isocalendar()[1]
+        tips = [
+            ("mark scheme first",
+             "<strong>Try &ldquo;mark scheme first&rdquo; on one question this week.</strong><br><br>"
+             "Before you attempt a question, read the mark scheme. See what Cambridge is looking for. "
+             "Then close it, answer, and compare."),
+            ("blank-page recall",
+             "<strong>This week: replace one re-reading session with a blank-page test.</strong><br><br>"
+             "Close your notes. Pick a topic. Write down everything you remember. "
+             "Then check the gaps &mdash; those are your actual revision list."),
+        ]
+        tip_label, tip_body = tips[week % len(tips)]
+        return (
+            f"Your study tip this week: {tip_label}",
+            _mail_html(
+                p(f"Hi {first},")
+                + p("Quick one this week.")
+                + f'<p style="margin:0 0 14px;padding:16px 18px;background:#faf8f5;'
+                  f'border-left:3px solid #C9A84C;border-radius:0 6px 6px 0;'
+                  f'font-size:.9rem;color:#1e1b30;line-height:1.8">{tip_body}</p>'
+                + p("Give it a go this week.")
+                + p("Have a good week,<br><strong>Tee</strong>"),
+                "Open the Library", lib,
+            ),
+        )
+
+    return "Message from PrepWithTee", _mail_html(p(f"Hi {first},") + p("&mdash; <strong>Tee</strong>"))
+
+
+class AdminSendEmailReq(BaseModel):
+    user_ids: list[str]
+    template: str
+    subject: str = ""
+    body: str = ""
+    log_send: bool = False
+
+
+@router.get("/email-activity")
+def admin_email_activity(_: bool = _Admin):
+    """All students with last-active date and full email_log history."""
+    from datetime import date
+    today = date.today()
+
+    if _udb._USE_SUPABASE:
+        cl = _udb._client()
+        students = cl.table("profiles").select("*").eq("role", "student").execute().data or []
+        log_rows  = cl.table("email_log").select("user_id,template_id,sent_at").execute().data or []
+        ts_rows   = cl.table("daily_time_spent").select("user_id,date").execute().data or []
+    else:
+        with _udb._local() as c:
+            students = [dict(r) for r in c.execute(
+                "SELECT * FROM profiles WHERE role='student' OR role IS NULL")]
+            log_rows = [dict(r) for r in c.execute(
+                "SELECT user_id,template_id,sent_at FROM email_log")]
+            ts_rows  = [{"user_id": r[0], "date": r[1]} for r in c.execute(
+                "SELECT user_id,MAX(date) FROM daily_time_spent GROUP BY user_id")]
+
+    from collections import defaultdict
+    log_by_user: dict[str, list] = defaultdict(list)
+    for row in log_rows:
+        log_by_user[row["user_id"]].append({
+            "template_id": row["template_id"],
+            "sent_at": (row.get("sent_at") or "")[:16],
+        })
+
+    last_active: dict[str, str] = {}
+    for r in ts_rows:
+        uid, d = r["user_id"], (r.get("date") or "")[:10]
+        if d and (uid not in last_active or d > last_active[uid]):
+            last_active[uid] = d
+
+    result = []
+    for s in students:
+        uid     = s.get("id", "")
+        created = (s.get("created_at") or "")[:10]
+        la      = last_active.get(uid) or (s.get("updated_at") or created)[:10]
+        inactive_days = 0
+        if la:
+            try:
+                inactive_days = max(0, (today - date.fromisoformat(la[:10])).days)
+            except (ValueError, TypeError):
+                pass
+        result.append({
+            "id":            uid,
+            "name":          s.get("name") or "",
+            "email":         s.get("email") or "",
+            "picture_url":   s.get("picture_url") or "",
+            "created_at":    created,
+            "last_active":   la[:10] if la else "",
+            "inactive_days": inactive_days,
+            "emails_sent":   sorted(log_by_user.get(uid, []), key=lambda x: x["sent_at"]),
+        })
+
+    result.sort(key=lambda x: x["inactive_days"], reverse=True)
+    return {"students": result}
+
+
+@router.get("/email-preview")
+def admin_email_preview(
+    template: str = Query("R1"),
+    name: str = Query("Ahmed"),
+    subject: str = Query(""),
+    body: str = Query(""),
+    _: bool = _Admin,
+):
+    if template == "custom":
+        if not subject:
+            raise HTTPException(400, "subject required")
+        first = _html_mod.escape((name or "Student").split()[0])
+        p = _mail_p
+        body_html = (
+            p(f"Hi {first},")
+            + "".join(
+                p(_html_mod.escape(line)) if line.strip() else "<br>"
+                for line in (body or "").split("\n")
+            )
+            + p("&mdash; <strong>Tee</strong>")
+        )
+        return {"subject": subject, "html": _mail_html(body_html)}
+    subj, html = _build_template(template, name)
+    return {"subject": subj, "html": html}
+
+
+@router.post("/send-email")
+def admin_send_email(req: AdminSendEmailReq, _: bool = _Admin):
+    from app import _notify
+    from datetime import datetime, timezone
+
+    if not req.user_ids:
+        raise HTTPException(400, "No users selected")
+    if not req.template:
+        raise HTTPException(400, "Template required")
+    if req.template == "custom" and not (req.subject or "").strip():
+        raise HTTPException(400, "Subject required for custom emails")
+
+    if _udb._USE_SUPABASE:
+        profs = _udb._client().table("profiles").select("*").in_("id", req.user_ids).execute().data or []
+        profiles = {p["id"]: p for p in profs}
+    else:
+        profiles = {}
+        with _udb._local() as c:
+            ph = ",".join("?" * len(req.user_ids))
+            for row in c.execute(f"SELECT * FROM profiles WHERE id IN ({ph})", req.user_ids):
+                d = dict(row); profiles[d["id"]] = d
+
+    now     = datetime.now(timezone.utc).isoformat()
+    results = []
+
+    for uid in req.user_ids:
+        user  = profiles.get(uid)
+        if not user:
+            results.append({"user_id": uid, "ok": False, "error": "not found"}); continue
+        email = (user.get("email") or "").strip()
+        name  = user.get("name") or "there"
+        if not email:
+            results.append({"user_id": uid, "ok": False, "error": "no email"}); continue
+
+        if req.template == "custom":
+            first = _html_mod.escape(name.split()[0])
+            body_html = (
+                _mail_p(f"Hi {first},")
+                + "".join(
+                    _mail_p(_html_mod.escape(line)) if line.strip() else "<br>"
+                    for line in (req.body or "").split("\n")
+                )
+                + _mail_p("&mdash; <strong>Tee</strong>")
+            )
+            html  = _mail_html(body_html)
+            subj  = req.subject
+            plain = req.body or req.subject
+        else:
+            subj, html = _build_template(req.template, name)
+            plain = subj
+
+        ok = _notify(subj, plain, to=email, html_override=html)
+
+        if ok and req.log_send:
+            tpl_id = req.template if req.template != "custom" else "MANUAL"
+            try:
+                if _udb._USE_SUPABASE:
+                    _udb._client().table("email_log").insert(
+                        {"user_id": uid, "template_id": tpl_id, "sent_at": now}
+                    ).execute()
+                else:
+                    with _udb._local() as c:
+                        c.execute(
+                            "INSERT INTO email_log (user_id,template_id,sent_at) VALUES (?,?,?)",
+                            (uid, tpl_id, now),
+                        )
+                        c.commit()
+            except Exception:
+                pass
+
+        results.append({"user_id": uid, "email": email, "ok": ok})
+
+    sent = sum(1 for r in results if r["ok"])
+    return {"sent": sent, "total": len(req.user_ids), "results": results}

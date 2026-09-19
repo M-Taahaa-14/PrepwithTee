@@ -33,23 +33,131 @@
         "vernier scale",
         "calibration",
         "parallax error",
-        "zero error"
+        "zero error",
+        "distinguish between scalar",
+        "distinguish between vector",
+        "scalars and vectors",
+        "scalar or vector",
+        "draw a vector triangle",
+        "draw a scale diagram",
+        "find the resultant",
+        "magnitude and direction of the resultant",
+        "resultant velocity",
+        "resultant force on",
+        "which of the following is a scalar",
+        "which of the following is a vector",
+        "base quantities",
+        "SI base quantity",
+        "order of magnitude",
+        "percentage error",
+        "fractional uncertainty",
+        "uncertainty in the value",
+        "uncertainty of",
+        "error in the measurement",
+        "reading error",
+        "instrumental error"
       ],
       "subtopics": [
         {
           "name": "Physical quantities",
+          "keywords": [
+            "SI base quantity",
+            "base quantity",
+            "order of magnitude",
+            "estimate of",
+            "reasonable estimate",
+            "physical quantity",
+            "scalar or vector",
+            "is a scalar",
+            "is a vector"
+          ],
           "links": []
         },
         {
           "name": "SI units",
+          "keywords": [
+            "SI unit",
+            "base unit",
+            "derived unit",
+            "show that the unit",
+            "base units of",
+            "SI base units",
+            "unit of",
+            "homogeneous",
+            "dimensions of",
+            "the unit is",
+            "SI base quantity",
+            "base quantities",
+            "fundamental unit",
+            "prefix",
+            "unit for",
+            "unit of the quantity"
+          ],
           "links": []
         },
         {
           "name": "Errors and uncertainties",
+          "keywords": [
+            "percentage uncertainty",
+            "absolute uncertainty",
+            "random error",
+            "systematic error",
+            "combining uncertainties",
+            "percentage error",
+            "fractional uncertainty",
+            "uncertainty in",
+            "uncertainty of",
+            "uncertainty when",
+            "micrometer",
+            "vernier caliper",
+            "vernier scale",
+            "parallax error",
+            "zero error",
+            "calibration",
+            "precision",
+            "accuracy",
+            "reading error",
+            "instrumental error",
+            "uncertainty in the measurement",
+            "error in the measurement",
+            "significant figures",
+            "sources of error",
+            "source of uncertainty",
+            "reduce the uncertainty",
+            "improve the accuracy",
+            "uncertainty is"
+          ],
           "links": []
         },
         {
           "name": "Scalars and vectors",
+          "keywords": [
+            "resultant",
+            "vector diagram",
+            "vector triangle",
+            "horizontal component",
+            "vertical component",
+            "resolve",
+            "component of",
+            "magnitude and direction",
+            "distinguish between scalar",
+            "distinguish between vector",
+            "scalars and vectors",
+            "scalar quantity",
+            "vector quantity",
+            "draw a scale diagram",
+            "find the resultant",
+            "resultant velocity",
+            "the wind",
+            "at an angle of",
+            "direction of motion",
+            "bearing",
+            "north",
+            "east of north",
+            "draw a vector",
+            "addition of vectors",
+            "subtraction of vectors"
+          ],
           "links": []
         }
       ]
@@ -84,7 +192,31 @@
       "subtopics": [
         {
           "name": "Equations of motion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "v = u + at",
+            "s = ut",
+            "v2 = u2 + 2as",
+            "suvat",
+            "uniform acceleration",
+            "equations of motion",
+            "acceleration of free fall",
+            "free fall",
+            "g = 9.81",
+            "projectile",
+            "horizontal motion",
+            "vertical motion",
+            "time of flight",
+            "range of projectile",
+            "velocity-time graph",
+            "distance-time graph",
+            "displacement-time graph",
+            "instantaneous velocity",
+            "average velocity",
+            "the ball is projected",
+            "thrown horizontally",
+            "thrown vertically"
+          ]
         }
       ]
     },
@@ -121,11 +253,29 @@
         },
         {
           "name": "Non-uniform motion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "terminal velocity",
+            "drag force",
+            "viscous force",
+            "non-uniform acceleration",
+            "varying force",
+            "reaches terminal velocity"
+          ]
         },
         {
           "name": "Linear momentum and its conservation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "conservation of momentum",
+            "momentum is conserved",
+            "collision",
+            "coalesce",
+            "perfectly inelastic",
+            "elastic collision",
+            "change in momentum",
+            "total momentum"
+          ]
         }
       ]
     },
@@ -160,15 +310,51 @@
       "subtopics": [
         {
           "name": "Turning effects of forces",
-          "links": []
+          "links": [],
+          "keywords": [
+            "moment",
+            "torque",
+            "couple",
+            "principle of moments",
+            "resultant moment",
+            "turning effect",
+            "pivot",
+            "sum of the clockwise moments",
+            "sum of anticlockwise"
+          ]
         },
         {
           "name": "Equilibrium of forces",
-          "links": []
+          "links": [],
+          "keywords": [
+            "equilibrium",
+            "centre of gravity",
+            "in equilibrium",
+            "resolving forces",
+            "triangle of forces",
+            "no resultant force",
+            "balanced forces",
+            "three forces",
+            "object is in equilibrium"
+          ]
         },
         {
           "name": "Density and pressure",
-          "links": []
+          "links": [],
+          "keywords": [
+            "density",
+            "pressure",
+            "upthrust",
+            "Archimedes",
+            "buoyancy",
+            "buoyant force",
+            "p = rho g h",
+            "Pascal",
+            "pascal",
+            "pressure in a fluid",
+            "manometer",
+            "atmospheric pressure"
+          ]
         }
       ]
     },
@@ -201,11 +387,35 @@
       "subtopics": [
         {
           "name": "Energy conservation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "conservation of energy",
+            "energy is conserved",
+            "energy transfer",
+            "dissipated as heat",
+            "lost as thermal",
+            "efficiency"
+          ]
         },
         {
           "name": "Gravitational potential energy and kinetic energy",
-          "links": []
+          "links": [],
+          "keywords": [
+            "kinetic energy",
+            "gravitational PE",
+            "gravitational potential energy",
+            "1/2 mv",
+            "mgh",
+            "work-energy theorem",
+            "gain in kinetic energy",
+            "loss in potential energy",
+            "elastic PE",
+            "elastic potential energy",
+            "power",
+            "P = Fv",
+            "work done",
+            "watt"
+          ]
         }
       ]
     },
@@ -238,11 +448,38 @@
       "subtopics": [
         {
           "name": "Stress and strain",
-          "links": []
+          "links": [],
+          "keywords": [
+            "stress",
+            "strain",
+            "Young modulus",
+            "force-extension graph",
+            "cross-sectional area",
+            "original length",
+            "extension",
+            "load-extension",
+            "tensile stress",
+            "tensile strain",
+            "modulus of elasticity"
+          ]
         },
         {
           "name": "Elastic and plastic behaviour",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Hooke's law",
+            "spring constant",
+            "elastic limit",
+            "limit of proportionality",
+            "plastic deformation",
+            "brittle",
+            "ductile",
+            "elastic strain energy",
+            "1/2 ke squared",
+            "elastic potential energy",
+            "ultimate tensile stress",
+            "permanently deformed"
+          ]
         }
       ]
     },
@@ -284,23 +521,78 @@
       "subtopics": [
         {
           "name": "Progressive waves",
-          "links": []
+          "links": [],
+          "keywords": [
+            "wavelength",
+            "frequency",
+            "amplitude",
+            "wave speed",
+            "period",
+            "progressive wave",
+            "v = f lambda",
+            "oscillating particles",
+            "the intensity of the wave",
+            "wavefront",
+            "intensity"
+          ]
         },
         {
           "name": "Transverse and longitudinal waves",
-          "links": []
+          "links": [],
+          "keywords": [
+            "transverse wave",
+            "longitudinal wave",
+            "direction of oscillation",
+            "direction of propagation",
+            "compression",
+            "rarefaction",
+            "transverse or longitudinal"
+          ]
         },
         {
           "name": "Doppler effect for sound waves",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Doppler",
+            "doppler effect",
+            "moving source",
+            "frequency of the sound",
+            "observer hears",
+            "recession",
+            "approaching"
+          ]
         },
         {
           "name": "Electromagnetic spectrum",
-          "links": []
+          "links": [],
+          "keywords": [
+            "electromagnetic spectrum",
+            "electromagnetic wave",
+            "infrared",
+            "ultraviolet",
+            "radio wave",
+            "microwave",
+            "X-ray",
+            "gamma ray",
+            "visible light",
+            "speed of light",
+            "c = 3"
+          ]
         },
         {
           "name": "Polarisation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "polarisation",
+            "polarised light",
+            "plane-polarised",
+            "polaroid",
+            "Malus's law",
+            "analyser",
+            "polariser",
+            "intensity of the transmitted",
+            "transverse wave polarised"
+          ]
         }
       ]
     },
@@ -335,19 +627,62 @@
       "subtopics": [
         {
           "name": "Stationary waves",
-          "links": []
+          "links": [],
+          "keywords": [
+            "stationary wave",
+            "standing wave",
+            "node",
+            "antinode",
+            "fundamental frequency",
+            "harmonics",
+            "resonance",
+            "natural frequency",
+            "vibrating string",
+            "pipe",
+            "distance between nodes"
+          ]
         },
         {
           "name": "Diffraction",
-          "links": []
+          "links": [],
+          "keywords": [
+            "diffraction",
+            "single slit",
+            "diffraction pattern",
+            "central maximum",
+            "secondary maximum",
+            "waves spread out",
+            "aperture"
+          ]
         },
         {
           "name": "Interference",
-          "links": []
+          "links": [],
+          "keywords": [
+            "interference",
+            "coherent sources",
+            "constructive interference",
+            "destructive interference",
+            "fringe spacing",
+            "fringe width",
+            "path difference equal to",
+            "phase difference",
+            "two-slit",
+            "superposition"
+          ]
         },
         {
           "name": "The diffraction grating",
-          "links": []
+          "links": [],
+          "keywords": [
+            "diffraction grating",
+            "d sin theta = n lambda",
+            "grating",
+            "orders of diffraction",
+            "first order",
+            "second order",
+            "number of lines per mm"
+          ]
         }
       ]
     },
@@ -385,15 +720,51 @@
       "subtopics": [
         {
           "name": "Electric current",
-          "links": []
+          "links": [],
+          "keywords": [
+            "electric current",
+            "I = Q/t",
+            "drift velocity",
+            "free electron",
+            "charge carriers",
+            "charge flow",
+            "conventional current",
+            "number of electrons",
+            "current in the wire"
+          ]
         },
         {
           "name": "Potential difference and power",
-          "links": []
+          "links": [],
+          "keywords": [
+            "potential difference",
+            "electromotive force",
+            "e.m.f.",
+            "power dissipated",
+            "P = IV",
+            "P = I squared R",
+            "P = V squared / R",
+            "energy per unit charge",
+            "work done per unit charge"
+          ]
         },
         {
           "name": "Resistance and resistivity",
-          "links": []
+          "links": [],
+          "keywords": [
+            "resistance",
+            "resistivity",
+            "rho",
+            "Ohm's law",
+            "V = IR",
+            "I-V characteristic",
+            "ohmic conductor",
+            "diode",
+            "filament lamp",
+            "thermistor",
+            "conductance",
+            "cross-sectional area of the wire"
+          ]
         }
       ]
     },
@@ -428,7 +799,20 @@
       "subtopics": [
         {
           "name": "Practical circuits",
-          "links": []
+          "links": [],
+          "keywords": [
+            "series circuit",
+            "parallel circuit",
+            "combined resistance",
+            "total resistance",
+            "current in circuit",
+            "voltmeter reading",
+            "ammeter reading",
+            "battery",
+            "terminal p.d.",
+            "lost volts",
+            "internal resistance"
+          ]
         },
         {
           "name": "Kirchhoff’s laws",
@@ -436,7 +820,16 @@
         },
         {
           "name": "Potential dividers",
-          "links": []
+          "links": [],
+          "keywords": [
+            "potential divider",
+            "potentiometer",
+            "balance point",
+            "Wheatstone bridge",
+            "output voltage",
+            "divides the voltage",
+            "ratio of resistances"
+          ]
         }
       ]
     },
@@ -483,11 +876,48 @@
       "subtopics": [
         {
           "name": "Atoms, nuclei and radiation",
-          "links": []
+          "links": [],
+          "keywords": [
+            "proton",
+            "neutron",
+            "electron",
+            "nucleus",
+            "nucleon",
+            "atomic number",
+            "proton number",
+            "nucleon number",
+            "mass number",
+            "isotope",
+            "nuclide",
+            "alpha particle",
+            "beta particle",
+            "gamma radiation",
+            "nuclear equation",
+            "alpha-particle scattering",
+            "penetrating power",
+            "deflected by an electric field"
+          ]
         },
         {
           "name": "Fundamental particles",
-          "links": []
+          "links": [],
+          "keywords": [
+            "quark",
+            "lepton",
+            "hadron",
+            "baryon",
+            "meson",
+            "positron",
+            "antiparticle",
+            "neutrino",
+            "antineutrino",
+            "fundamental particle",
+            "up quark",
+            "down quark",
+            "conservation of charge",
+            "conservation of lepton number",
+            "strangeness"
+          ]
         }
       ]
     },
@@ -520,11 +950,34 @@
       "subtopics": [
         {
           "name": "Kinematics of uniform circular motion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "angular velocity",
+            "angular speed",
+            "angular frequency",
+            "omega",
+            "radian per second",
+            "revolution",
+            "period of rotation",
+            "arc length"
+          ]
         },
         {
           "name": "Centripetal acceleration",
-          "links": []
+          "links": [],
+          "keywords": [
+            "centripetal",
+            "centripetal acceleration",
+            "centripetal force",
+            "a = v squared / r",
+            "F = mv squared / r",
+            "circular motion",
+            "moves in a circle",
+            "banking",
+            "conical pendulum",
+            "satellite orbit",
+            "geostationary"
+          ]
         }
       ]
     },
@@ -554,19 +1007,50 @@
       "subtopics": [
         {
           "name": "Gravitational field",
-          "links": []
+          "links": [],
+          "keywords": [
+            "gravitational field",
+            "gravitational field strength",
+            "field lines",
+            "uniform gravitational field",
+            "g = GM / r squared"
+          ]
         },
         {
           "name": "Gravitational force between point masses",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Newton's law of gravitation",
+            "gravitational force",
+            "F = GMm / r squared",
+            "gravitational constant G",
+            "inverse square law"
+          ]
         },
         {
           "name": "Gravitational field of a point mass",
-          "links": []
+          "links": [],
+          "keywords": [
+            "g = GM / r squared",
+            "field strength at a distance",
+            "gravitational field outside",
+            "point mass"
+          ]
         },
         {
           "name": "Gravitational potential",
-          "links": []
+          "links": [],
+          "keywords": [
+            "gravitational potential",
+            "gravitational potential energy",
+            "escape velocity",
+            "orbital speed",
+            "T squared proportional to r cubed",
+            "Kepler's third law",
+            "satellite",
+            "weightlessness",
+            "geostationary orbit"
+          ]
         }
       ]
     },
@@ -601,15 +1085,48 @@
       "subtopics": [
         {
           "name": "Thermal equilibrium",
-          "links": []
+          "links": [],
+          "keywords": [
+            "thermal equilibrium",
+            "zeroth law",
+            "net heat transfer",
+            "temperature is the same",
+            "thermal contact"
+          ]
         },
         {
           "name": "Temperature scales",
-          "links": []
+          "links": [],
+          "keywords": [
+            "temperature scale",
+            "thermodynamic scale",
+            "absolute zero",
+            "Kelvin",
+            "Celsius",
+            "thermometer",
+            "thermometric",
+            "thermometric property",
+            "calibration of thermometer"
+          ]
         },
         {
           "name": "Specific heat capacity and specific latent heat",
-          "links": []
+          "links": [],
+          "keywords": [
+            "specific heat capacity",
+            "specific latent heat",
+            "latent heat of fusion",
+            "latent heat of vaporisation",
+            "heating curve",
+            "cooling curve",
+            "Q = mc",
+            "energy required to raise the temperature",
+            "melting",
+            "boiling",
+            "change of state",
+            "heater of power",
+            "thermal energy transfer"
+          ]
         }
       ]
     },
@@ -642,15 +1159,45 @@
       "subtopics": [
         {
           "name": "The mole",
-          "links": []
+          "links": [],
+          "keywords": [
+            "mole",
+            "molar gas constant",
+            "Avogadro constant",
+            "molar mass",
+            "amount of substance",
+            "number of molecules",
+            "number of moles"
+          ]
         },
         {
           "name": "Equation of state",
-          "links": []
+          "links": [],
+          "keywords": [
+            "pV = nRT",
+            "equation of state",
+            "Boyle's law",
+            "fixed mass of gas",
+            "pressure of the gas",
+            "volume of the gas",
+            "gas law",
+            "ideal gas",
+            "isothermal",
+            "pressure-volume"
+          ]
         },
         {
           "name": "Kinetic theory of gases",
-          "links": []
+          "links": [],
+          "keywords": [
+            "kinetic theory",
+            "mean square speed",
+            "root mean square speed",
+            "pV = 1/3 Nm",
+            "molecules of the gas",
+            "average kinetic energy",
+            "temperature and kinetic energy"
+          ]
         }
       ]
     },
@@ -676,11 +1223,27 @@
       "subtopics": [
         {
           "name": "Internal energy",
-          "links": []
+          "links": [],
+          "keywords": [
+            "internal energy",
+            "microscopic kinetic and potential energies",
+            "sum of the kinetic and potential energies",
+            "random distribution",
+            "increase in internal energy"
+          ]
         },
         {
           "name": "The first law of thermodynamics",
-          "links": []
+          "links": [],
+          "keywords": [
+            "first law of thermodynamics",
+            "work done on the gas",
+            "work done by the gas",
+            "change in internal energy",
+            "W = p delta V",
+            "heating the system",
+            "compressed at constant pressure"
+          ]
         }
       ]
     },
@@ -717,15 +1280,43 @@
       "subtopics": [
         {
           "name": "Simple harmonic oscillations",
-          "links": []
+          "links": [],
+          "keywords": [
+            "simple harmonic motion",
+            "SHM",
+            "acceleration proportional to displacement",
+            "restoring force",
+            "x = x0 sin",
+            "v = v0 cos",
+            "period of oscillation",
+            "angular frequency"
+          ]
         },
         {
           "name": "Energy in simple harmonic motion",
-          "links": []
+          "links": [],
+          "keywords": [
+            "energy of oscillation",
+            "kinetic energy maximum",
+            "potential energy maximum",
+            "total energy of SHM",
+            "maximum speed",
+            "amplitude"
+          ]
         },
         {
           "name": "Damped and forced oscillations, resonance",
-          "links": []
+          "links": [],
+          "keywords": [
+            "damping",
+            "damped oscillation",
+            "resonance",
+            "natural frequency",
+            "forced oscillation",
+            "free oscillation",
+            "driving frequency",
+            "amplitude of forced oscillation"
+          ]
         }
       ]
     },
@@ -756,23 +1347,62 @@
       "subtopics": [
         {
           "name": "Electric fields and field lines",
-          "links": []
+          "links": [],
+          "keywords": [
+            "electric field",
+            "field line",
+            "field pattern",
+            "radial field",
+            "electric field lines"
+          ]
         },
         {
           "name": "Uniform electric fields",
-          "links": []
+          "links": [],
+          "keywords": [
+            "uniform electric field",
+            "field between plates",
+            "E = V/d",
+            "parallel plates",
+            "electron in electric field",
+            "motion between plates",
+            "potential difference between the plates"
+          ]
         },
         {
           "name": "Electric force between point charges",
-          "links": []
+          "links": [],
+          "keywords": [
+            "Coulomb's law",
+            "electric force",
+            "force between charges",
+            "Q = 4 pi epsilon",
+            "permittivity",
+            "epsilon",
+            "inverse square"
+          ]
         },
         {
           "name": "Electric field of a point charge",
-          "links": []
+          "links": [],
+          "keywords": [
+            "field strength",
+            "E = Q / 4 pi epsilon",
+            "electric field at a distance",
+            "point charge"
+          ]
         },
         {
           "name": "Electric potential",
-          "links": []
+          "links": [],
+          "keywords": [
+            "electric potential",
+            "equipotential",
+            "electric flux",
+            "potential at a point",
+            "work done moving charge",
+            "potential energy of charge"
+          ]
         }
       ]
     },
@@ -804,15 +1434,43 @@
       "subtopics": [
         {
           "name": "Capacitors and capacitance",
-          "links": []
+          "links": [],
+          "keywords": [
+            "capacitor",
+            "capacitance",
+            "C = Q/V",
+            "charge stored",
+            "plates of the capacitor",
+            "the charge on the capacitor",
+            "dielectric",
+            "relative permittivity",
+            "parallel plate capacitor",
+            "series capacitors",
+            "parallel capacitors"
+          ]
         },
         {
           "name": "Energy stored in a capacitor",
-          "links": []
+          "links": [],
+          "keywords": [
+            "energy stored",
+            "1/2 QV",
+            "1/2 CV squared",
+            "energy in the capacitor"
+          ]
         },
         {
           "name": "Discharging a capacitor",
-          "links": []
+          "links": [],
+          "keywords": [
+            "charging and discharging",
+            "time constant",
+            "RC circuit",
+            "exponential decay of charge",
+            "discharge of capacitor",
+            "charge-time graph",
+            "discharges through"
+          ]
         }
       ]
     },
@@ -861,23 +1519,74 @@
       "subtopics": [
         {
           "name": "Concept of a magnetic field",
-          "links": []
+          "links": [],
+          "keywords": [
+            "magnetic field",
+            "flux density",
+            "tesla",
+            "magnetic field lines",
+            "field pattern of magnet"
+          ]
         },
         {
           "name": "Force on a current-carrying conductor",
-          "links": []
+          "links": [],
+          "keywords": [
+            "F = BIL",
+            "force on current",
+            "Fleming's left-hand rule",
+            "the wire carries a current",
+            "force on a wire",
+            "current in a magnetic field"
+          ]
         },
         {
           "name": "Force on a moving charge",
-          "links": []
+          "links": [],
+          "keywords": [
+            "F = Bqv",
+            "force on moving charge",
+            "deflection of charged particle",
+            "velocity selector",
+            "Hall effect",
+            "Hall voltage",
+            "charged particle in field"
+          ]
         },
         {
           "name": "Magnetic fields due to currents",
-          "links": []
+          "links": [],
+          "keywords": [
+            "solenoid",
+            "magnetic field due to current",
+            "field inside solenoid",
+            "straight wire"
+          ]
         },
         {
           "name": "Electromagnetic induction",
-          "links": []
+          "links": [],
+          "keywords": [
+            "electromagnetic induction",
+            "Faraday's law",
+            "Lenz's law",
+            "induced e.m.f.",
+            "flux linkage",
+            "magnetic flux",
+            "rate of change of flux",
+            "transformer",
+            "turns ratio",
+            "primary coil",
+            "secondary coil",
+            "step-up",
+            "step-down",
+            "eddy currents",
+            "induced current direction",
+            "generator",
+            "dynamo",
+            "rotating coil",
+            "the flux through the coil"
+          ]
         }
       ]
     },
@@ -915,11 +1624,33 @@
       "subtopics": [
         {
           "name": "Characteristics of alternating currents",
-          "links": []
+          "links": [],
+          "keywords": [
+            "alternating current",
+            "a.c.",
+            "r.m.s.",
+            "root mean square",
+            "peak value",
+            "I0",
+            "V0",
+            "peak current",
+            "I0 / root 2",
+            "frequency of a.c.",
+            "the current varies sinusoidally"
+          ]
         },
         {
           "name": "Rectification and smoothing",
-          "links": []
+          "links": [],
+          "keywords": [
+            "rectification",
+            "half-wave rectifier",
+            "full-wave rectifier",
+            "smoothing",
+            "capacitor smoothing",
+            "diode bridge",
+            "ripple"
+          ]
         }
       ]
     },
@@ -953,19 +1684,56 @@
       "subtopics": [
         {
           "name": "Energy and momentum of a photon",
-          "links": []
+          "links": [],
+          "keywords": [
+            "photon",
+            "E = hf",
+            "E = hc/lambda",
+            "Planck constant",
+            "the energy of a photon",
+            "momentum of a photon"
+          ]
         },
         {
           "name": "Photoelectric effect",
-          "links": []
+          "links": [],
+          "keywords": [
+            "photoelectric effect",
+            "threshold frequency",
+            "work function",
+            "stopping potential",
+            "photoelectron",
+            "maximum kinetic energy of electron",
+            "photoelectric"
+          ]
         },
         {
           "name": "Wave-particle duality",
-          "links": []
+          "links": [],
+          "keywords": [
+            "wave-particle duality",
+            "de Broglie wavelength",
+            "lambda = h/mv",
+            "electron diffraction",
+            "matter wave",
+            "particle behaves as wave"
+          ]
         },
         {
           "name": "Energy levels in atoms and line spectra",
-          "links": []
+          "links": [],
+          "keywords": [
+            "emission spectrum",
+            "absorption spectrum",
+            "energy level",
+            "line spectrum",
+            "X-ray spectrum",
+            "ground state",
+            "excited state",
+            "energy level diagram",
+            "photon emitted",
+            "transition between levels"
+          ]
         }
       ]
     },
@@ -1008,11 +1776,43 @@
       "subtopics": [
         {
           "name": "Mass defect and nuclear binding energy",
-          "links": []
+          "links": [],
+          "keywords": [
+            "binding energy",
+            "binding energy per nucleon",
+            "nuclear binding energy",
+            "mass defect",
+            "E = mc squared",
+            "mass-energy",
+            "nuclear fission",
+            "nuclear fusion",
+            "chain reaction"
+          ]
         },
         {
           "name": "Radioactive decay",
-          "links": []
+          "links": [],
+          "keywords": [
+            "radioactive",
+            "radioactive decay",
+            "alpha decay",
+            "beta decay",
+            "gamma emission",
+            "half-life",
+            "activity",
+            "decay constant",
+            "count rate",
+            "A = lambda N",
+            "N = N0",
+            "spontaneous and random",
+            "becquerel",
+            "ionising radiation",
+            "background radiation",
+            "radiation dose",
+            "Geiger-Muller tube",
+            "exponential decay of activity",
+            "nuclear reaction"
+          ]
         }
       ]
     },
@@ -1044,15 +1844,42 @@
       "subtopics": [
         {
           "name": "Production and use of ultrasound",
-          "links": []
+          "links": [],
+          "keywords": [
+            "ultrasound imaging",
+            "ultrasound pulse",
+            "acoustic impedance",
+            "reflection coefficient",
+            "piezoelectric",
+            "A-scan",
+            "B-scan"
+          ]
         },
         {
           "name": "Production and use of X-rays",
-          "links": []
+          "links": [],
+          "keywords": [
+            "X-ray imaging",
+            "attenuation coefficient",
+            "I = I0 e",
+            "half-thickness",
+            "transmitted intensity",
+            "CT scan",
+            "X-ray tube",
+            "the image is formed"
+          ]
         },
         {
           "name": "PET scanning",
-          "links": []
+          "links": [],
+          "keywords": [
+            "PET scan",
+            "positron emission tomography",
+            "radiotracer",
+            "annihilation",
+            "gamma photon pairs",
+            "MRI"
+          ]
         }
       ]
     },
@@ -1090,11 +1917,27 @@
       "subtopics": [
         {
           "name": "Standard candles",
-          "links": []
+          "links": [],
+          "keywords": [
+            "standard candle",
+            "luminosity",
+            "radiant flux intensity",
+            "distance to the star",
+            "apparent brightness"
+          ]
         },
         {
           "name": "Stellar radii",
-          "links": []
+          "links": [],
+          "keywords": [
+            "stellar radius",
+            "stellar radii",
+            "Stefan-Boltzmann",
+            "Wien's displacement law",
+            "black body",
+            "surface temperature of the star",
+            "total power radiated"
+          ]
         },
         {
           "name": "Hubble’s law and the Big Bang theory",

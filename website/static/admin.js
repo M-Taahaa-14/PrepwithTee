@@ -29,6 +29,7 @@ const state = {
 };
 
 const PAGES = {
+  emails:       ["Emails", "Monitor automated sends and dispatch campaigns to students."],
   overview:     ["Overview", "Everything happening across PrepWithTee."],
   leads:        ["Demo Requests", "Parents and students asking for a trial lesson."],
   calendly:     ["Calendly Meetings", "Sessions booked through your Calendly link."],
@@ -133,9 +134,72 @@ function tsCell(value) {
     t ? '<span class="today-pill">Today</span>' : ""}</td>`;
 }
 
+// Dial-code → ISO-2 map — sorted longest-first so prefix matching is unambiguous.
+const DIAL_FLAGS = [
+  ["+1242","bs"],["+1246","bb"],["+1264","ai"],["+1268","ag"],["+1284","vg"],
+  ["+1340","vi"],["+1345","ky"],["+1441","bm"],["+1473","gd"],["+1649","tc"],
+  ["+1664","ms"],["+1671","gu"],["+1721","sx"],["+1758","lc"],["+1767","dm"],
+  ["+1784","vc"],["+1787","pr"],["+1809","do"],["+1868","tt"],["+1869","kn"],
+  ["+1876","jm"],["+1939","pr"],
+  ["+211","ss"],["+212","ma"],["+213","dz"],["+216","tn"],["+218","ly"],
+  ["+220","gm"],["+221","sn"],["+222","mr"],["+223","ml"],["+224","gn"],
+  ["+225","ci"],["+226","bf"],["+227","ne"],["+228","tg"],["+229","bj"],
+  ["+230","mu"],["+231","lr"],["+232","sl"],["+233","gh"],["+234","ng"],
+  ["+235","td"],["+236","cf"],["+237","cm"],["+238","cv"],["+239","st"],
+  ["+240","gq"],["+241","ga"],["+242","cg"],["+243","cd"],["+244","ao"],
+  ["+245","gw"],["+248","sc"],["+249","sd"],["+250","rw"],["+251","et"],
+  ["+252","so"],["+253","dj"],["+254","ke"],["+255","tz"],["+256","ug"],
+  ["+257","bi"],["+258","mz"],["+260","zm"],["+261","mg"],["+262","re"],
+  ["+263","zw"],["+264","na"],["+265","mw"],["+266","ls"],["+267","bw"],
+  ["+268","sz"],["+269","km"],["+290","sh"],["+291","er"],["+297","aw"],
+  ["+298","fo"],["+299","gl"],
+  ["+350","gi"],["+351","pt"],["+352","lu"],["+353","ie"],["+354","is"],
+  ["+355","al"],["+356","mt"],["+357","cy"],["+358","fi"],["+359","bg"],
+  ["+370","lt"],["+371","lv"],["+372","ee"],["+373","md"],["+374","am"],
+  ["+375","by"],["+376","ad"],["+377","mc"],["+378","sm"],["+380","ua"],
+  ["+381","rs"],["+382","me"],["+385","hr"],["+386","si"],["+387","ba"],
+  ["+389","mk"],["+420","cz"],["+421","sk"],["+423","li"],
+  ["+500","fk"],["+501","bz"],["+502","gt"],["+503","sv"],["+504","hn"],
+  ["+505","ni"],["+506","cr"],["+507","pa"],["+508","pm"],["+509","ht"],
+  ["+590","gp"],["+591","bo"],["+592","gy"],["+593","ec"],["+594","gf"],
+  ["+595","py"],["+596","mq"],["+597","sr"],["+598","uy"],["+599","cw"],
+  ["+670","tl"],["+673","bn"],["+674","nr"],["+675","pg"],["+676","to"],
+  ["+677","sb"],["+678","vu"],["+679","fj"],["+680","pw"],["+681","wf"],
+  ["+682","ck"],["+683","nu"],["+685","ws"],["+686","ki"],["+687","nc"],
+  ["+688","tv"],["+689","pf"],["+690","tk"],["+691","fm"],["+692","mh"],
+  ["+850","kp"],["+852","hk"],["+853","mo"],["+855","kh"],["+856","la"],
+  ["+880","bd"],["+886","tw"],
+  ["+960","mv"],["+961","lb"],["+962","jo"],["+963","sy"],["+964","iq"],
+  ["+965","kw"],["+966","sa"],["+967","ye"],["+968","om"],["+970","ps"],
+  ["+971","ae"],["+972","il"],["+973","bh"],["+974","qa"],["+975","bt"],
+  ["+976","mn"],["+977","np"],
+  ["+992","tj"],["+993","tm"],["+994","az"],["+995","ge"],["+996","kg"],
+  ["+998","uz"],
+  ["+20","eg"],["+27","za"],["+30","gr"],["+31","nl"],["+32","be"],
+  ["+33","fr"],["+34","es"],["+36","hu"],["+39","it"],["+40","ro"],
+  ["+41","ch"],["+43","at"],["+44","gb"],["+45","dk"],["+46","se"],
+  ["+47","no"],["+48","pl"],["+49","de"],
+  ["+51","pe"],["+52","mx"],["+53","cu"],["+54","ar"],["+55","br"],
+  ["+56","cl"],["+57","co"],["+58","ve"],
+  ["+60","my"],["+61","au"],["+62","id"],["+63","ph"],["+64","nz"],
+  ["+65","sg"],["+66","th"],
+  ["+7","ru"],
+  ["+81","jp"],["+82","kr"],["+84","vn"],["+86","cn"],
+  ["+90","tr"],["+91","in"],["+92","pk"],["+93","af"],["+94","lk"],
+  ["+95","mm"],["+98","ir"],
+  ["+1","us"],
+];
+function phoneFlag(phone) {
+  const s = String(phone ?? "").trim();
+  if (!s.startsWith("+")) return '<span class="fi fi-un"></span>';
+  for (const [code, iso2] of DIAL_FLAGS) if (s.startsWith(code)) return '<span class="fi fi-' + iso2 + '"></span>';
+  return '<span class="fi fi-un"></span>';
+}
+
 function waHref(contact) {
   let d = String(contact ?? "").replace(/\D/g, "");
   if (d.length < 7 || d.length > 15) return null;
+  // If no country code prefix, assume Pakistan
   if (d.startsWith("0")) d = "92" + d.slice(1);
   else if (!d.startsWith("92") && d.length <= 11) d = "92" + d;
   return `https://wa.me/${d}`;
@@ -278,6 +342,7 @@ function go(tab) {
   if (tab === "students") mountStudentSearch();
   if (tab === "homework") loadHomework();
   if (tab === "calendly" && !state.calendly) loadCalendly();
+  if (tab === "emails") loadEmailActivity();
   closeSidebar();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -566,17 +631,32 @@ function renderStudents() {
   const q = studentFilter.trim().toLowerCase();
   const list = q
     ? state.students.filter(s =>
-        `${s.name} ${s.email} ${s.grade || ""}`.toLowerCase().includes(q))
+        `${s.name} ${s.email} ${s.grade || ""} ${s.phone || ""}`.toLowerCase().includes(q))
     : state.students;
+
+  const incomplete = state.students.filter(s => (s.missing_fields || []).length > 0);
 
   const rows = list.map(s => {
     const pct = s.topics_tracked
       ? Math.round(s.topics_confident / s.topics_tracked * 100) : 0;
+    const waUrl = s.phone ? waHref(s.phone) : null;
+    const wa = s.phone
+      ? `<div class="phone-cell">
+           <span class="phone-flag">${phoneFlag(s.phone)}</span>
+           <span class="phone-num">${esc(s.phone)}</span>
+           ${waUrl ? `<a class="wa-btn-sm" href="${waUrl}" target="_blank" rel="noopener" title="Chat on WhatsApp" onclick="event.stopPropagation()">💬</a>` : ""}
+         </div>`
+      : "—";
+    const mf = s.missing_fields || [];
+    const incBadge = mf.length
+      ? `<span class="incomplete-badge" title="Missing: ${mf.join(', ')}">⚠ ${mf.length}</span>`
+      : "";
     return `
-      <tr class="clickable" data-student="${esc(s.id)}">
+      <tr class="clickable${mf.length ? " row-incomplete" : ""}" data-student="${esc(s.id)}">
         <td><div class="who">${avatar(s)}<div><strong>${esc(s.name || "—")}</strong>
-          <div class="ts">${esc(s.email || "")}</div></div></div></td>
+          <div class="ts">${esc(s.email || "")} ${incBadge}</div></div></div></td>
         <td>${esc(s.grade || "—")}</td>
+        <td>${wa}</td>
         <td><div class="pill-row">${(s.subject_names || [])
           .map(n => `<span class="pill">${esc(n)}</span>`).join("") || "—"}</div></td>
         <td><strong>${pct}%</strong><div class="ts">${s.topics_confident}/${s.topics_tracked} topics</div></td>
@@ -586,13 +666,38 @@ function renderStudents() {
       </tr>`;
   }).join("");
 
+  const nudgeBtn = incomplete.length
+    ? `<button class="btn btn-warn" id="nudge-btn" style="font-size:.8rem;padding:6px 14px">
+         ✉ Nudge ${incomplete.length} incomplete${incomplete.length === 1 ? "" : "s"}
+       </button>`
+    : "";
+
   $("view-students").innerHTML = list.length
     ? panel(`${list.length} student${list.length === 1 ? "" : "s"}`,
-        table(["Student", "Grade", "Subjects", "Confident", "Quizzes", "Avg", "Last active"], rows))
+        table(["Student", "Grade", "Phone", "Subjects", "Confident", "Quizzes", "Avg", "Last active"], rows),
+        nudgeBtn)
     : panel("Students", empty("🎓",
         q ? "No student matches that search." : "No students registered yet."));
 
   wireStudentRows($("view-students"));
+
+  document.getElementById("nudge-btn")?.addEventListener("click", nudgeIncomplete);
+}
+
+async function nudgeIncomplete() {
+  const btn = document.getElementById("nudge-btn");
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+  try {
+    const r = await api("/api/admin/students/nudge-incomplete", { method: "POST" });
+    toast(`✉ ${r.sent} email${r.sent !== 1 ? "s" : ""} sent (${r.skipped} already complete)`);
+    btn.textContent = `✓ ${r.sent} sent`;
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Retry nudge";
+    toast("Failed to send nudge emails — check the server log");
+  }
 }
 
 async function openStudent(userId) {
@@ -2612,6 +2717,352 @@ function renderNewsletter() {
   });
 }
 
+/* ---- Emails -------------------------------------------------------------- */
+
+let _emailData   = null;   // null = not yet loaded
+let _emailSel    = new Set();
+let _emailSub    = "activity";  // "activity" | "send"
+let _emailFilter = { q: "", inactive: "all" };
+
+async function loadEmailActivity(force = false) {
+  if (_emailData && !force) { renderEmails(); return; }
+  $("view-emails").innerHTML =
+    `<div class="empty-state"><span>📧</span><p>Loading email activity…</p></div>`;
+  try {
+    const data = await api("/api/admin/email-activity");
+    _emailData = data.students || [];
+    renderEmails();
+  } catch (ex) {
+    $("view-emails").innerHTML =
+      `<div class="empty-state"><span>⚠️</span><p>${esc(ex.message)}</p></div>`;
+  }
+}
+
+function renderEmails() {
+  const v = $("view-emails");
+  const tabs = `<div class="email-subtabs">
+    <button class="email-stab${_emailSub==="activity"?" active":""}" data-stab="activity">📊 Activity</button>
+    <button class="email-stab${_emailSub==="send"?" active":""}"     data-stab="send">✉️ Send Email</button>
+  </div>`;
+
+  if (_emailSub === "activity") {
+    v.innerHTML = tabs + renderEmailActivity();
+    wireEmailActivity();
+  } else {
+    v.innerHTML = tabs + renderEmailSend();
+    wireEmailSend();
+  }
+
+  v.querySelectorAll(".email-stab").forEach(b => b.addEventListener("click", () => {
+    _emailSub = b.dataset.stab; renderEmails();
+  }));
+}
+
+/* ---- Activity sub-tab ---- */
+
+function renderEmailActivity() {
+  const students = _emailData || [];
+  const SEQTPL   = ["W1","W2","W3","R1","R2","R3","F1"];
+  const BADGE_CLS = { W1:"lav",W2:"lav",W3:"lav",R1:"pending",R2:"pending",R3:"issue",F1:"ok" };
+
+  // Activity bucket counts (over all students, not just filtered)
+  const week1  = students.filter(s => s.inactive_days <=  7).length;
+  const week2  = students.filter(s => s.inactive_days >  7 && s.inactive_days <= 14).length;
+  const month1 = students.filter(s => s.inactive_days > 30).length;
+
+  const statsRow = `
+    <div class="ea-stats-row">
+      <div class="ea-stat ea-stat-green" title="Seen in the last 7 days">
+        <span class="ea-stat-num">${week1}</span>
+        <span class="ea-stat-lbl">Active this week</span>
+      </div>
+      <div class="ea-stat ea-stat-amber" title="Last seen 8–14 days ago">
+        <span class="ea-stat-num">${week2}</span>
+        <span class="ea-stat-lbl">Active 2 weeks ago</span>
+      </div>
+      <div class="ea-stat ea-stat-red" title="Inactive for more than 30 days">
+        <span class="ea-stat-num">${month1}</span>
+        <span class="ea-stat-lbl">Inactive 1 month+</span>
+      </div>
+    </div>`;
+
+  const filterBar = `
+    <div class="email-filter-bar">
+      <input type="search" id="ea-search" placeholder="Search name or email…"
+             value="${esc(_emailFilter.q)}" style="flex:1;min-width:150px">
+      <select id="ea-inactive">
+        <option value="all" ${_emailFilter.inactive==="all"?"selected":""}>All students</option>
+        <option value="3"   ${_emailFilter.inactive==="3"  ?"selected":""}>3+ days inactive</option>
+        <option value="7"   ${_emailFilter.inactive==="7"  ?"selected":""}>7+ days inactive</option>
+        <option value="14"  ${_emailFilter.inactive==="14" ?"selected":""}>14+ days inactive</option>
+        <option value="30"  ${_emailFilter.inactive==="30" ?"selected":""}>30+ days inactive</option>
+      </select>
+      <button class="btn" id="ea-refresh" title="Reload from server">↻</button>
+    </div>`;
+
+  let rows = students;
+  if (_emailFilter.q) {
+    const q = _emailFilter.q.toLowerCase();
+    rows = rows.filter(s =>
+      (s.name||"").toLowerCase().includes(q) || (s.email||"").toLowerCase().includes(q));
+  }
+  if (_emailFilter.inactive !== "all") {
+    const min = parseInt(_emailFilter.inactive, 10);
+    rows = rows.filter(s => s.inactive_days >= min);
+  }
+
+  const rowsHtml = rows.map(s => {
+    const d = s.inactive_days;
+    const inactCls = d >= 30 ? "badge-issue" : d >= 14 ? "badge-pending" : d >= 7 ? "badge-lav" : "badge-ok";
+    const badges = SEQTPL.map(t => {
+      const sent = (s.emails_sent||[]).filter(e => e.template_id === t);
+      if (!sent.length) return `<span class="pill ea-pill-unsent">${t}</span>`;
+      const latest = sent[sent.length-1];
+      return `<span class="pill badge-${BADGE_CLS[t]||"neutral"}" title="Sent ${latest.sent_at}">${t}</span>`;
+    });
+    const manuals = (s.emails_sent||[]).filter(e => e.template_id === "MANUAL");
+    if (manuals.length) badges.push(
+      `<span class="pill badge-neutral" title="${manuals.length} manual email(s)">+${manuals.length}</span>`);
+    return `<tr>
+      <td><div class="who">${avatar(s)}
+        <div><strong>${esc(s.name||"—")}</strong>
+          <div class="ts">${esc(s.email||"")}</div>
+        </div></div></td>
+      <td class="ts">${esc(s.created_at||"—")}</td>
+      <td class="ts">${esc(s.last_active||"—")}</td>
+      <td><span class="badge ${inactCls}">${d}d</span></td>
+      <td><div class="pill-row">${badges.join("")}</div></td>
+    </tr>`;
+  }).join("");
+
+  const tbl = rows.length
+    ? table(["Student","Joined","Last Active","Inactive","Emails Sent"], rowsHtml)
+    : empty("📭","No students match your filter.","Try adjusting the search or inactivity filter.");
+
+  return `${statsRow}${filterBar}
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head">
+        <h2>All students — ${rows.length} shown</h2>
+        <div class="sp"></div>
+        <span class="badge badge-lav">${students.length} total</span>
+      </div>${tbl}
+    </div>`;
+}
+
+function wireEmailActivity() {
+  $("ea-search")?.addEventListener("input", e => {
+    _emailFilter.q = e.target.value; renderEmails();
+  });
+  $("ea-inactive")?.addEventListener("change", e => {
+    _emailFilter.inactive = e.target.value; renderEmails();
+  });
+  $("ea-refresh")?.addEventListener("click", () => loadEmailActivity(true));
+}
+
+/* ---- Send sub-tab ---- */
+
+const EMAIL_TEMPLATES = [
+  { id:"R1", label:"R1 — We Miss You (3 days inactive)" },
+  { id:"R2", label:"R2 — Still Procrastinating? (7 days)" },
+  { id:"R3", label:"R3 — Last Nudge (14 days inactive)" },
+  { id:"W1", label:"W1 — Welcome (signup day)" },
+  { id:"W2", label:"W2 — Your First Step (day 1)" },
+  { id:"W3", label:"W3 — Meet the AI Tutor (day 3)" },
+  { id:"F1", label:"F1 — Weekly Study Tip (this week's)" },
+  { id:"custom", label:"✏️  Custom — write your own" },
+];
+
+function renderEmailSend() {
+  const students = state.students || [];
+  const n = _emailSel.size;
+
+  const items = students.map(s => `
+    <label class="es-student${_emailSel.has(s.id)?" checked":""}">
+      <input type="checkbox" value="${esc(s.id)}" ${_emailSel.has(s.id)?"checked":""}>
+      <div class="who" style="pointer-events:none">
+        ${avatar(s)}
+        <div><strong>${esc(s.name||"—")}</strong>
+          <div class="ts">${esc(s.email||"")}</div></div>
+      </div>
+    </label>`).join("");
+
+  const tplOpts = EMAIL_TEMPLATES.map(t =>
+    `<option value="${t.id}">${t.label}</option>`).join("");
+
+  return `<div class="email-send-wrap">
+    <!-- Student picker -->
+    <div class="panel es-picker">
+      <div class="panel-head">
+        <h2>Students</h2><div class="sp"></div>
+        <span id="es-count" class="badge badge-lav">${n} selected</span>
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid var(--line)">
+        <input type="search" id="es-search" placeholder="Search…" style="width:100%">
+      </div>
+      <div style="padding:6px 14px;border-bottom:1px solid var(--line);display:flex;gap:8px">
+        <button class="btn btn-xs" id="es-sel-all">Select All</button>
+        <button class="btn btn-xs" id="es-clear">Clear</button>
+      </div>
+      <div class="es-list" id="es-list">${items}</div>
+    </div>
+
+    <!-- Compose -->
+    <div class="panel es-compose">
+      <div class="panel-head"><h2>Compose</h2></div>
+      <div class="es-compose-body">
+        <div class="field-row">
+          <label>Template</label>
+          <select id="es-tpl">${tplOpts}</select>
+        </div>
+        <div id="es-custom" hidden>
+          <div class="field-row">
+            <label>Subject</label>
+            <input type="text" id="es-subj" placeholder="Subject line…">
+          </div>
+          <div class="field-row">
+            <label>Body</label>
+            <textarea id="es-body" rows="8"
+              placeholder="Write your message here…&#10;&#10;The student's name is added automatically at the top. Use plain text — it wraps in the PrepWithTee card automatically."></textarea>
+          </div>
+        </div>
+        <label class="field-row" style="flex-direction:row;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="es-log" style="accent-color:var(--navy);width:15px;height:15px;flex-shrink:0">
+          <span style="font-size:.82rem;color:var(--muted)">
+            Log as sent — prevents the cron from auto-sending the same template again
+          </span>
+        </label>
+        <div class="es-compose-actions">
+          <button class="btn" id="es-preview">Preview email →</button>
+          <button class="btn btn-primary" id="es-send">Send to ${n} student${n!==1?"s":""}</button>
+        </div>
+        <div id="es-result"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function wireEmailSend() {
+  // Search
+  $("es-search")?.addEventListener("input", e => {
+    const q = e.target.value.toLowerCase();
+    $("es-list")?.querySelectorAll(".es-student").forEach(l => {
+      l.hidden = !!(q && !l.textContent.toLowerCase().includes(q));
+    });
+  });
+
+  // Select all / clear
+  $("es-sel-all")?.addEventListener("click", () => {
+    $("es-list")?.querySelectorAll(".es-student:not([hidden]) input").forEach(cb => {
+      cb.checked = true; _emailSel.add(cb.value);
+      cb.closest(".es-student").classList.add("checked");
+    });
+    _updateSendCount();
+  });
+  $("es-clear")?.addEventListener("click", () => {
+    _emailSel.clear();
+    $("es-list")?.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      cb.checked = false; cb.closest(".es-student").classList.remove("checked");
+    });
+    _updateSendCount();
+  });
+
+  // Checkboxes
+  $("es-list")?.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      if (cb.checked) _emailSel.add(cb.value); else _emailSel.delete(cb.value);
+      cb.closest(".es-student").classList.toggle("checked", cb.checked);
+      _updateSendCount();
+    });
+  });
+
+  // Template dropdown → show/hide custom fields
+  $("es-tpl")?.addEventListener("change", () => {
+    const cust = $("es-custom");
+    if (cust) cust.hidden = $("es-tpl").value !== "custom";
+  });
+
+  // Preview
+  $("es-preview")?.addEventListener("click", async () => {
+    const tpl  = $("es-tpl")?.value || "R1";
+    const name = [..._emailSel]
+      .map(id => (state.students||[]).find(s => s.id === id)?.name)
+      .filter(Boolean)[0] || "Ahmed";
+    const subj = $("es-subj")?.value || "";
+    const body = $("es-body")?.value || "";
+    try {
+      const p = new URLSearchParams({ template: tpl, name, subject: subj, body });
+      const data = await api(`/api/admin/email-preview?${p}`);
+      openEmailPreview(data.subject, data.html);
+    } catch (ex) { toast(ex.message, true); }
+  });
+
+  // Send
+  $("es-send")?.addEventListener("click", async () => {
+    const ids = [..._emailSel];
+    if (!ids.length) { toast("Select at least one student first.", true); return; }
+    const tpl  = $("es-tpl")?.value;
+    const subj = $("es-subj")?.value || "";
+    const body = $("es-body")?.value || "";
+    const log  = !!$("es-log")?.checked;
+    if (tpl === "custom" && !subj.trim()) { toast("Enter a subject line.", true); return; }
+
+    const btn = $("es-send");
+    btn.disabled = true; btn.textContent = "Sending…";
+    const resultEl = $("es-result");
+    if (resultEl) resultEl.innerHTML = "";
+
+    try {
+      const data = await api("/api/admin/send-email", {
+        method: "POST",
+        body: { user_ids: ids, template: tpl, subject: subj, body, log_send: log },
+      });
+      const failed = data.total - data.sent;
+      if (resultEl) {
+        resultEl.innerHTML = `<div class="badge ${data.sent>0?"badge-ok":"badge-issue"}"
+          style="font-size:.85rem;padding:8px 14px;margin-top:4px">
+          ✓ Sent to ${data.sent} student${data.sent!==1?"s":""}${
+            failed ? ` &nbsp;·&nbsp; ${failed} failed` : ""}
+        </div>`;
+        if (failed) {
+          const failList = (data.results||[]).filter(r=>!r.ok)
+            .map(r=>`${r.email||r.user_id}: ${r.error||"failed"}`).join("; ");
+          resultEl.innerHTML += `<p style="font-size:.78rem;color:var(--muted);margin:6px 0 0">${esc(failList)}</p>`;
+        }
+      }
+      toast(`Sent ${data.sent}/${data.total} emails.`);
+      if (log) loadEmailActivity(true);
+    } catch (ex) {
+      if (resultEl) resultEl.innerHTML = `<p style="color:var(--pink);font-size:.85rem;margin-top:8px">${esc(ex.message)}</p>`;
+      toast(ex.message, true);
+    } finally {
+      btn.disabled = false; _updateSendCount();
+    }
+  });
+}
+
+function _updateSendCount() {
+  const n = _emailSel.size;
+  const c = $("es-count");  if (c) c.textContent = `${n} selected`;
+  const s = $("es-send");   if (s) s.textContent = `Send to ${n} student${n!==1?"s":""}`;
+}
+
+/* ---- Preview modal ---- */
+
+function openEmailPreview(subject, html) {
+  const modal = $("email-modal");
+  const subj  = $("email-modal-subj");
+  const frame = $("email-modal-iframe");
+  if (!modal || !frame) return;
+  if (subj) subj.textContent = subject || "Email Preview";
+  frame.srcdoc = html;
+  modal.hidden = false;
+}
+
+$("email-modal-close")?.addEventListener("click", () => { $("email-modal").hidden = true; });
+$("email-modal")?.addEventListener("click", e => {
+  if (e.target === $("email-modal")) $("email-modal").hidden = true;
+});
+
 /* ---- Boot ---------------------------------------------------------------- */
 
 // The student console gets this page's helpers rather than importing its own,
@@ -2623,20 +3074,23 @@ StudentConsole.init({
 });
 
 (function initTheme() {
-  const toggleBtn = $("theme-toggle");
-  if (!toggleBtn) return;
-  const updateBtn = () => {
+  const updateBtns = () => {
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    toggleBtn.innerHTML = isDark ? "☀️ Light Mode" : "🌙 Night Mode";
+    const topBtn  = $("theme-toggle");
+    const sideBtn = $("theme-toggle-side");
+    if (topBtn)  topBtn.innerHTML  = isDark ? "☀️ Light Mode" : "🌙 Night Mode";
+    if (sideBtn) sideBtn.innerHTML = isDark ? "☀️ Light mode" : "🌙 Dark mode";
   };
-  updateBtn();
-  toggleBtn.addEventListener("click", () => {
+  const applyToggle = () => {
     const isDark = document.documentElement.getAttribute("data-theme") === "dark";
     const next = isDark ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try { localStorage.setItem("theme", next); } catch (e) {}
-    updateBtn();
-  });
+    updateBtns();
+  };
+  updateBtns();
+  $("theme-toggle")?.addEventListener("click", applyToggle);
+  $("theme-toggle-side")?.addEventListener("click", applyToggle);
 })();
 
 (async function boot() {

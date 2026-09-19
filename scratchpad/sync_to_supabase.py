@@ -1,4 +1,4 @@
-"""Sync index.db papers + classifications to Supabase.
+"""Sync index.db papers, questions, and classifications to Supabase.
 
 Run from project root with .env loaded:
     export $(grep -v '^#' .env | grep '=' | xargs -d '\n')
@@ -57,7 +57,42 @@ pg.commit()
 cur.execute("SELECT COUNT(*) FROM papers")
 print(f"Supabase papers after: {cur.fetchone()[0]}")
 
-# ── 2. Classifications ─────────────────────────────────────────────────────
+# ── 2. Questions ───────────────────────────────────────────────────────────
+print("\n=== Syncing questions ===")
+local_qs = local.execute(
+    "SELECT id, paper_id, number, sub_part, text, marks, crop_path, debug_png, rects_json, status "
+    "FROM questions ORDER BY id"
+).fetchall()
+print(f"Local questions: {len(local_qs)}")
+cur.execute("SELECT COUNT(*) FROM questions")
+print(f"Supabase questions before: {cur.fetchone()[0]}")
+
+def _clean(s):
+    return s.replace("\x00", "") if s else s
+
+qs_data = [
+    (r["id"], r["paper_id"], r["number"], r["sub_part"], _clean(r["text"]), r["marks"],
+     r["crop_path"].replace("\\", "/") if r["crop_path"] else r["crop_path"],
+     r["debug_png"].replace("\\", "/") if r["debug_png"] else r["debug_png"],
+     _clean(r["rects_json"]), r["status"])
+    for r in local_qs
+]
+
+execute_values(cur,
+    """INSERT INTO questions
+       (id, paper_id, number, sub_part, text, marks, crop_path, debug_png, rects_json, status)
+       VALUES %s
+       ON CONFLICT (id) DO UPDATE SET
+         paper_id=EXCLUDED.paper_id, number=EXCLUDED.number, sub_part=EXCLUDED.sub_part,
+         text=EXCLUDED.text, marks=EXCLUDED.marks,
+         crop_path=EXCLUDED.crop_path, debug_png=EXCLUDED.debug_png,
+         rects_json=EXCLUDED.rects_json, status=EXCLUDED.status""",
+    qs_data, page_size=500)
+
+pg.commit()
+cur.execute("SELECT COUNT(*) FROM questions")
+print(f"Supabase questions after: {cur.fetchone()[0]}")
+
 print("\n=== Syncing classifications ===")
 local_cls = local.execute(
     "SELECT question_id, topic, secondary_topic, subtopic, difficulty, confidence, rationale, backend, classified_at "

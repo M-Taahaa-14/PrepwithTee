@@ -30,7 +30,7 @@ log = setup_logging("compose")
 PAGE_W, PAGE_H = 595.28, 841.89          # A4 portrait
 MARGIN_X = 24.0
 TOP_Y = 40.0
-BOTTOM_Y = PAGE_H - 40.0
+BOTTOM_Y = PAGE_H - 72.0          # 62 footer band + 10px gap
 CONTENT_W = PAGE_W - 2 * MARGIN_X
 Q_HEADER_H = 18.0
 MS_LABEL_H = 14.0
@@ -45,6 +45,7 @@ CREAM = config.BRAND_CREAM
 
 
 _WM_CACHE: dict = {}
+_WM_XREF: dict[int, int] = {}   # doc id → image xref (reuse avoids embedding once per page)
 WM_STRENGTH = 0.12     # max ink of the owl watermark (0..1); lower = fainter
 WM_TEXT_GREY = 0.92    # wordmark grey (on white, this reads ~8% ink)
 
@@ -85,7 +86,12 @@ def page_watermark(page):
         w = h * pix.width / pix.height
         r = fitz.Rect((PAGE_W - w) / 2, (PAGE_H - h) / 2 - 26,
                       (PAGE_W + w) / 2, (PAGE_H + h) / 2 - 26)
-        page.insert_image(r, pixmap=pix)
+        doc_id = id(page.parent)
+        xref = _WM_XREF.get(doc_id)
+        if xref:
+            page.insert_image(r, xref=xref)
+        else:
+            _WM_XREF[doc_id] = page.insert_image(r, pixmap=pix)
         ty = r.y1 + 40
     else:
         ty = PAGE_H / 2
@@ -109,14 +115,7 @@ class Booklet:
         self.page = self.doc.new_page(width=PAGE_W, height=PAGE_H)
         self.body_pages += 1
         page_watermark(self.page)   # first, so all content paints over it
-        self.page.insert_text(
-            (MARGIN_X, PAGE_H - 22), config.BRAND_NAME,
-            fontsize=7.5, fontname="hebo", color=ACCENT)
-        num = f"Page {self.body_pages}"
-        w = fitz.get_text_length(num, fontname="helv", fontsize=7)
-        self.page.insert_text(
-            ((PAGE_W - w) / 2, PAGE_H - 22), num,
-            fontsize=7, fontname="helv", color=GREY)
+        footer_band(self.page, right_text=f"Page {self.body_pages}")
         self.y = TOP_Y
 
     def ensure(self, height: float):
@@ -191,10 +190,20 @@ class Booklet:
         self.y += MS_LABEL_H
 
     def place_rects(self, src_doc, rects: list[dict], scale: float = 1.0):
-        for r in rects:
+        for i, r in enumerate(rects):
             w = (r["x1"] - r["x0"]) * scale
             h = (r["y1"] - r["y0"]) * scale
-            self.ensure(h)
+            # Never paginate the first rect when we are right at the top of a fresh
+            # page (question header was just placed there). Without this guard, a
+            # question whose first rect height > max_keep (~712 pt) triggers a new
+            # page here even though question_header already started a fresh page,
+            # leaving an orphan near-empty header page before every tall question.
+            at_page_top = (i == 0 and self.page is not None
+                           and self.y <= TOP_Y + Q_HEADER_H + 2)
+            if not at_page_top:
+                self.ensure(h)
+            if self.page is None:
+                self.new_page()
             target = fitz.Rect(MARGIN_X, self.y, MARGIN_X + w, self.y + h)
             clip = fitz.Rect(r["x0"], r["y0"], r["x1"], r["y1"])
             self.page.show_pdf_page(target, src_doc, r["page"], clip=clip)
@@ -296,16 +305,48 @@ def brand_backdrop(doc):
 
 
 def footer_band(page, right_text=None):
-    """Navy footer band with the brand name and an optional right-aligned note
-    (defaults to today's generation date)."""
-    page.draw_rect(fitz.Rect(0, PAGE_H - 46, PAGE_W, PAGE_H), color=None,
+    """Navy footer band — three rows: brand+tagline, website+email, phone."""
+    BAND_H = 62
+    page.draw_rect(fitz.Rect(0, PAGE_H - BAND_H, PAGE_W, PAGE_H), color=None,
                    fill=ACCENT)
-    page.insert_text((MARGIN_X + 14, PAGE_H - 26), config.BRAND_NAME,
+    LX = MARGIN_X + 14
+    # ── Row 1: brand name (left) | tagline (centre-ish) | generated date (right)
+    page.insert_text((LX, PAGE_H - BAND_H + 17), config.BRAND_NAME,
                      fontsize=11, fontname="hebo", color=CREAM)
+    tag = config.BRAND_TAGLINE
+    tw = fitz.get_text_length(tag, fontname="helv", fontsize=7.5)
+    page.insert_text(((PAGE_W - tw) / 2, PAGE_H - BAND_H + 17), tag,
+                     fontsize=7.5, fontname="helv", color=(0.85, 0.83, 0.75))
     stamp = right_text or f"Generated {date.today().isoformat()}"
-    sw = fitz.get_text_length(stamp, fontname="helv", fontsize=8.5)
-    page.insert_text((PAGE_W - MARGIN_X - 14 - sw, PAGE_H - 26), stamp,
-                     fontsize=8.5, fontname="helv", color=(0.75, 0.78, 0.85))
+    sw = fitz.get_text_length(stamp, fontname="helv", fontsize=7.5)
+    page.insert_text((PAGE_W - MARGIN_X - 14 - sw, PAGE_H - BAND_H + 17), stamp,
+                     fontsize=7.5, fontname="helv", color=(0.65, 0.68, 0.76))
+    # ── Row 2: website (left, clickable) | email (centre)
+    DIM = (0.55, 0.62, 0.80)
+    GOLD = (0.957, 0.651, 0.196)
+    site_label = config.BRAND_WEBSITE
+    page.insert_text((LX, PAGE_H - BAND_H + 34), site_label,
+                     fontsize=8.5, fontname="helv", color=GOLD)
+    site_w = fitz.get_text_length(site_label, fontname="helv", fontsize=8.5)
+    page.insert_link({"kind": fitz.LINK_URI, "uri": config.BRAND_WEBSITE_URL,
+                      "from": fitz.Rect(LX - 1, PAGE_H - BAND_H + 24,
+                                        LX + site_w + 2, PAGE_H - BAND_H + 38)})
+    wa = "WhatsApp: " + config.BRAND_WHATSAPP
+    ww = fitz.get_text_length(wa, fontname="helv", fontsize=8)
+    page.insert_text(((PAGE_W - ww) / 2, PAGE_H - BAND_H + 34), wa,
+                     fontsize=8, fontname="helv", color=DIM)
+    page.insert_link({"kind": fitz.LINK_URI,
+                      "uri": config.BRAND_WHATSAPP_URL,
+                      "from": fitz.Rect((PAGE_W - ww) / 2 - 1, PAGE_H - BAND_H + 24,
+                                        (PAGE_W - ww) / 2 + ww + 2, PAGE_H - BAND_H + 38)})
+    # ── phone (right)
+    ph = config.BRAND_PHONE
+    phw = fitz.get_text_length(ph, fontname="helv", fontsize=8)
+    page.insert_text((PAGE_W - MARGIN_X - 14 - phw, PAGE_H - BAND_H + 34),
+                     ph, fontsize=8, fontname="helv", color=DIM)
+    # ── Separator gold rule above band
+    page.draw_line((0, PAGE_H - BAND_H), (PAGE_W, PAGE_H - BAND_H),
+                   color=(0.957, 0.651, 0.196), width=1.5)
 
 
 # Syllabuses where the question paper has lined answer pages that should be
@@ -403,7 +444,7 @@ BUBBLE_R = 6.5
 BUBBLE_GAP = 22.0
 ROW_H = 24.0
 SHEET_TOP = 150.0                 # y of the first row on a printable page
-SHEET_BOTTOM = PAGE_H - 62.0      # last row must clear the footer band
+SHEET_BOTTOM = PAGE_H - 70.0      # last row must clear the footer band (BAND_H=62 + 8px margin)
 BUBBLE_COLS = 3                   # question columns per bubble-sheet page
 KEY_COLS = 3                      # answer-grid table blocks per page
 
@@ -562,6 +603,9 @@ def build_cover(doc, args, subject, sections, contents=None):
     page = brand_backdrop(doc)
     y = 270
     title = " · ".join(name for name, _ in sections)
+    subtopics_active = getattr(args, "subtopics", None)
+    if subtopics_active:
+        title += "  —  " + ", ".join(subtopics_active)
     size = 25 if len(title) < 34 else (19 if len(title) < 62 else 15)
     for line in _wrap(title, "hebo", size, CONTENT_W - 60)[:3]:
         _centre(page, line, y, size, "hebo", ACCENT)
@@ -815,7 +859,7 @@ def main():
             valid.setdefault(t["name"].lower(), t["name"])
             known.append(f"{syl}: {t['name']}")
     topics = []
-    for raw in args.topics.split(","):
+    for raw in args.topics.split("|"):
         name = valid.get(raw.strip().lower())
         if name is None:
             raise SystemExit(
@@ -986,6 +1030,9 @@ def main():
             booklet.doc.move_page(base + i, 1 + i)
 
     slug = re.sub(r"[^a-z0-9]+", "-", ",".join(topics).lower()).strip("-")
+    if getattr(args, "subtopics", None):
+        sub_slug = re.sub(r"[^a-z0-9]+", "-", ",".join(args.subtopics).lower()).strip("-")
+        slug = slug + "_" + sub_slug
     out = config.ROOT / (args.out or
                          f"data/output/{'-'.join(args.syllabuses)}_{slug}_"
                          f"{args.year_from}-{args.year_to}.pdf")

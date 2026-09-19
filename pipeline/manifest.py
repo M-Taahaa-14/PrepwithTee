@@ -19,6 +19,8 @@ log = logging.getLogger(__name__)
 FILENAME_RE = re.compile(r"^(\d{4})_([smw])(\d{2})_(qp|ms)_(\d{1,2})\.pdf$", re.I)
 # 9702_s23_er.pdf -> session-level examiner report (one per session, no paper/variant).
 ER_RE = re.compile(r"^(\d{4})_([smw])(\d{2})_er\.pdf$", re.I)
+# 4024_s25_gt.pdf -> grade threshold document (one per session).
+GT_RE = re.compile(r"^(\d{4})_([smw])(\d{2})_gt\.pdf$", re.I)
 
 
 def load(refresh: bool = False) -> list:
@@ -108,6 +110,47 @@ def iter_syllabus_docs(tree: list, syllabus: str):
     for f in syl.get("children", []):
         if f.get("type") == "file":
             yield {"filename": f["name"].strip(), "bucket_path": f["path"]}
+
+
+def iter_gt_files(
+    tree: list,
+    syllabus: str,
+    year_from: int = config.YEAR_MIN,
+    year_to: int = config.YEAR_MAX,
+    sessions: tuple = config.SESSION_CODES,
+):
+    """Yield metadata for grade threshold PDFs (one per session, no variant)."""
+    subj = subject_node(tree, syllabus)
+    pp = _find_child(subj.get("children", []), "past papers")
+    if pp is None:
+        return
+    for year_node in pp.get("children", []):
+        name = year_node["name"].strip()
+        if year_node.get("type") != "folder" or not name.isdigit():
+            continue
+        year = int(name)
+        if not (year_from <= year <= year_to):
+            continue
+        for sess_node in year_node.get("children", []):
+            session = config.folder_to_session(sess_node["name"])
+            if session is None or session not in sessions:
+                continue
+            for f in sess_node.get("children", []):
+                if f.get("type") != "file":
+                    continue
+                m = GT_RE.match(f["name"].strip())
+                if not m:
+                    continue
+                syl = m.group(1)
+                if syl != syllabus:
+                    continue
+                yield {
+                    "syllabus": syllabus,
+                    "year": year,
+                    "session": session,
+                    "filename": f["name"].strip(),
+                    "bucket_path": f["path"],
+                }
 
 
 def iter_er_files(

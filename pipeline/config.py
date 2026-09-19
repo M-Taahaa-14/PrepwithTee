@@ -22,6 +22,12 @@ LOGO_PATH = ROOT / "website" / "static" / "prepwithtee-logo.png"
 # (measured from the artwork). Used for the cover watermark.
 LOGO_OWL_CLIP = (414, 252, 786, 834)
 BRAND_NAME = "PrepWithTee"
+BRAND_TAGLINE = "Expert Cambridge Tutoring · Lahore"
+BRAND_WEBSITE = "prepwithtee.com"
+BRAND_WEBSITE_URL = "https://prepwithtee.com"
+BRAND_WHATSAPP = "03204884375"
+BRAND_WHATSAPP_URL = "https://wa.me/923204884375"
+BRAND_PHONE = "+92 320 488 4375"
 BRAND_CREAM = (0.984, 0.953, 0.851)   # #FBF3D9 - the logo's own background
 BRAND_NAVY = (0.161, 0.208, 0.329)    # #293554
 BRAND_GOLD = (0.957, 0.651, 0.196)    # #F4A632
@@ -88,8 +94,11 @@ def is_mcq(syllabus: str, paper: int | None) -> bool:
     return (syllabus, paper) in MCQ_PAPERS
 
 
-YEAR_MIN = 2015
-YEAR_MAX = 2025
+YEAR_MIN = 2010
+YEAR_MAX = 2026
+
+GT_DIR = DATA_DIR / "grade_thresholds"   # downloaded gt PDFs
+ER_DIR = DATA_DIR / "examiner_reports"   # downloaded er PDFs
 
 SESSION_CODES = ("s", "w", "m")
 

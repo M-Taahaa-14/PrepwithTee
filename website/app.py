@@ -1746,6 +1746,36 @@ def _build_meta():
                    GROUP BY c.topic, c.subtopic""", (syl,)):
             subtopic_counts.setdefault(r["topic"], {})[r["subtopic"]] = r["n"]
 
+        # Per-year counts for topics (all papers combined) — lets the frontend
+        # update the displayed count when the user changes the year range.
+        topic_year: dict[str, dict[str, int]] = {}   # topic -> {str(year): n}
+        paper_year: dict[str, dict[str, dict[str, int]]] = {}  # topic -> {paper -> {year: n}}
+        for r in con.execute(
+                """SELECT c.topic AS t, p.year AS yr, p.paper AS pp, COUNT(*) AS n
+                   FROM classifications c
+                   JOIN questions q ON q.id = c.question_id
+                   JOIN papers p ON p.id = q.paper_id
+                   WHERE p.syllabus = ?
+                   GROUP BY c.topic, p.year, p.paper""", (syl,)):
+            yk = str(r["yr"])
+            pk = str(r["pp"])
+            ty = topic_year.setdefault(r["t"], {})
+            ty[yk] = ty.get(yk, 0) + r["n"]
+            py = paper_year.setdefault(r["t"], {}).setdefault(pk, {})
+            py[yk] = py.get(yk, 0) + r["n"]
+
+        # Per-year counts for subtopics
+        subtopic_year: dict[str, dict[str, dict[str, int]]] = {}  # topic->subtopic->{year:n}
+        for r in con.execute(
+                """SELECT c.topic, c.subtopic, p.year AS yr, COUNT(*) AS n
+                   FROM classifications c
+                   JOIN questions q ON q.id = c.question_id
+                   JOIN papers p ON p.id = q.paper_id
+                   WHERE p.syllabus = ? AND c.subtopic IS NOT NULL
+                   GROUP BY c.topic, c.subtopic, p.year""", (syl,)):
+            subtopic_year.setdefault(r["topic"], {}).setdefault(
+                r["subtopic"], {})[str(r["yr"])] = r["n"]
+
         topics = []
         for t in tax["topics"]:
             total = pool.get(t["name"], 0)
@@ -1760,11 +1790,13 @@ def _build_meta():
             # Build subtopic list from taxonomy (preserving order) with question counts
             raw_subs = t.get("subtopics", [])
             sc = subtopic_counts.get(t["name"], {})
+            sy = subtopic_year.get(t["name"], {})
             subtopics = [
                 # `detail` is the verbatim syllabus statement behind the short
                 # label, so the tracker can show a student exactly what
                 # Cambridge expects; `tier` is Core vs Supplement.
                 {"name": s["name"], "count": sc.get(s["name"], 0),
+                 "counts_by_year": sy.get(s["name"], {}),
                  "detail": s.get("detail"), "tier": s.get("tier")}
                 for s in raw_subs
             ] if raw_subs else []
@@ -1775,6 +1807,8 @@ def _build_meta():
                            # ("Trigonometry (P3)" -> "Trigonometry").
                            "display": t.get("display") or t["name"],
                            "papers": seen, "subtopics": subtopics,
+                           "counts_by_year": topic_year.get(t["name"], {}),
+                           "paper_year": paper_year.get(t["name"], {}),
                            # Which components examine this chapter, straight
                            # from the syllabus — NOT derived from question
                            # counts. `papers` above says where questions were
@@ -1911,7 +1945,10 @@ def generate(req: GenerateReq,
     tmp = Path(tempfile.mkdtemp(prefix="pwt_"))
     cleanup = BackgroundTask(shutil.rmtree, tmp, ignore_errors=True)
     slug = re.sub(r"[^a-z0-9]+", "-", "-".join(req.topics).lower()).strip("-")[:60]
-    topics_arg = ",".join(req.topics)
+    if req.subtopics:
+        sub_slug = re.sub(r"[^a-z0-9]+", "-", ",".join(req.subtopics).lower()).strip("-")[:40]
+        slug = (slug + "_" + sub_slug)[:100]
+    topics_arg = "|".join(req.topics)
     span = [f"--from={req.year_from}", f"--to={req.year_to}"]
 
     # Merge papers: new list wins, legacy single value falls back

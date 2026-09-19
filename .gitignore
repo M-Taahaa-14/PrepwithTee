@@ -11,6 +11,7 @@ data/
 # Claude Code session files
 .claude/
 claude_code_kickoff_prompt.md
-/scratchpadwebsite/public/
+/scratchpad
+website/public/
 scratchpad/classify_cs_rules.py
 scratchpad/digest_cs.py

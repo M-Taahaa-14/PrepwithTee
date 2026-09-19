@@ -51,8 +51,12 @@ SUB_PART_MS_SYLLABUSES = {"2059"}
 def table_pages(doc) -> list[int]:
     pages = []
     for pno in range(doc.page_count):
-        t = doc[pno].get_text()
-        if "Question" in t and "Answer" in t and "Marks" in t:
+        try:
+            t = doc[pno].get_text()
+        except RuntimeError:
+            continue
+        if (("Question" in t and "Answer" in t and "Marks" in t)
+                or ("Qu" in t and "Answers" in t and "Mark" in t)):
             pages.append(pno)
     # Older MS format (pre-2022): header repeats on some but not all pages;
     # or Section B starts without a header. Extend coverage from the first
@@ -70,7 +74,7 @@ def header_bottom(page) -> float:
             continue
         for l in b["lines"]:
             for s in l["spans"]:
-                if s["text"].strip() == "Answer" and s["bbox"][1] < 100:
+                if s["text"].strip() in ("Answer", "Answers", "Mark", "Marks") and s["bbox"][1] < 260:
                     return s["bbox"][3] + 4.0
     return HEADER_FALLBACK_BOTTOM
 
@@ -454,7 +458,14 @@ def main():
         raise SystemExit(1)
 
     for row in rows:
-        numbers = segment_ms(con, row)
+        try:
+            numbers = segment_ms(con, row)
+        except RuntimeError as exc:
+            log.error("%s: skipped (corrupt PDF: %s)", row["filename"], exc)
+            db.add_review(con, f"{row['filename']}: corrupt PDF skipped ({exc})",
+                          paper_id=row["id"])
+            con.commit()
+            continue
         if numbers:
             link_to_questions(con, row, numbers)
     con.close()

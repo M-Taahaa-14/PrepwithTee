@@ -63,6 +63,8 @@ def main():
                    help="also download the subject's official syllabus PDFs")
     p.add_argument("--er", action="store_true",
                    help="also download examiner report PDFs (used for difficulty classification)")
+    p.add_argument("--gt", action="store_true",
+                   help="also download grade threshold PDFs")
     args = p.parse_args()
 
     sessions = tuple(s.strip() for s in args.sessions.split(",") if s.strip())
@@ -126,8 +128,31 @@ def main():
                 log.info("fetched: %s (%d KB)", doc["filename"], size // 1024)
                 stats["fetched"] += 1
 
+    if args.gt:
+        dest_dir = config.GT_DIR / args.syllabus
+        for gt in manifest.iter_gt_files(tree, args.syllabus,
+                                          year_from=args.year_from, year_to=args.year_to,
+                                          sessions=sessions):
+            dest = dest_dir / str(gt["year"]) / gt["filename"]
+            if dest.exists() and dest.stat().st_size > 0:
+                log.info("skipped (exists): %s", gt["filename"])
+                stats["skipped"] += 1
+                continue
+            try:
+                size = download(http, gt["bucket_path"], dest)
+            except Exception as e:
+                log.error("failed: %s (%s)", gt["filename"], e)
+                stats["failed"] += 1
+                continue
+            if size is None:
+                log.warning("missing on server: %s", gt["bucket_path"])
+                stats["missing"] += 1
+            else:
+                log.info("fetched GT: %s (%d KB)", gt["filename"], size // 1024)
+                stats["fetched"] += 1
+
     if args.er:
-        dest_dir = config.RAW_DIR / args.syllabus / "examiner_reports"
+        dest_dir = config.ER_DIR / args.syllabus
         for er in manifest.iter_er_files(tree, args.syllabus,
                                           year_from=args.year_from, year_to=args.year_to,
                                           sessions=sessions):

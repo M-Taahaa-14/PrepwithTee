@@ -1,12 +1,96 @@
-"""SQLite storage (data/index.db).
+"""SQLite storage (data/index.db), with optional Supabase/Postgres backend.
 
-Schema is kept Postgres-portable for a later Supabase migration: plain column
-types, no SQLite-specific features beyond AUTOINCREMENT-style rowid PKs.
+If DATABASE_URL is set in the environment the pipeline reads from Supabase
+so that compose/testgen on the server see the same data as the meta endpoint.
+Write-heavy stages (fetch, segment, classify) are only run locally where
+DATABASE_URL is absent, so they always use SQLite as before.
 """
 
+import os
 import sqlite3
 
 from . import config
+
+USE_PG: bool = bool(os.environ.get("DATABASE_URL"))
+
+if USE_PG:
+    import psycopg2  # type: ignore
+    from psycopg2.extras import RealDictCursor  # type: ignore
+
+
+class _Row(dict):
+    """Dict that also supports positional [0] indexing (like sqlite3.Row)."""
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return list(self.values())[key]
+        return super().__getitem__(key)
+    def keys(self):
+        return super().keys()
+
+
+class _PgResult:
+    """Wraps a psycopg2 cursor so it behaves like a sqlite3 cursor."""
+    def __init__(self, rows):
+        self._rows = [_Row(r) for r in (rows or [])]
+
+    def fetchall(self):
+        return self._rows
+
+    def fetchone(self):
+        return self._rows[0] if self._rows else None
+
+    def __iter__(self):
+        return iter(self._rows)
+
+
+class _PgConn:
+    """sqlite3-compatible wrapper around a psycopg2 connection."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql, params=()):
+        sql = _pg_sql(sql)
+        cur = self._conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(sql, list(params) if params else [])
+        try:
+            rows = cur.fetchall()
+        except psycopg2.ProgrammingError:
+            rows = []
+        return _PgResult(rows)
+
+    def executemany(self, sql, params_seq):
+        sql = _pg_sql(sql)
+        cur = self._conn.cursor()
+        cur.executemany(sql, params_seq)
+
+    def executescript(self, _sql):
+        pass  # Schema is managed by Supabase; skip DDL on Postgres
+
+    def commit(self):
+        self._conn.commit()
+
+    def close(self):
+        self._conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, *_):
+        if exc_type is None:
+            self._conn.commit()
+        else:
+            self._conn.rollback()
+        self.close()
+
+
+def _pg_sql(sql: str) -> str:
+    """Adapt SQLite SQL syntax to Postgres."""
+    sql = sql.replace("?", "%s")
+    sql = sql.replace("IS NOT 'excluded'", "IS DISTINCT FROM 'excluded'")
+    sql = sql.replace("IS NOT 'segmented'", "IS DISTINCT FROM 'segmented'")
+    sql = sql.replace("datetime('now')", "now()::text")
+    return sql
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS papers (
@@ -68,6 +152,30 @@ CREATE TABLE IF NOT EXISTS review_queue (
     created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
     resolved    INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS examiner_reports (
+    id          INTEGER PRIMARY KEY,
+    syllabus    TEXT NOT NULL,
+    year        INTEGER NOT NULL,
+    session     TEXT NOT NULL,
+    filename    TEXT NOT NULL,
+    rel_path    TEXT NOT NULL,
+    fetched_at  TEXT,
+    UNIQUE (syllabus, year, session)
+);
+
+CREATE TABLE IF NOT EXISTS grade_thresholds (
+    id          INTEGER PRIMARY KEY,
+    syllabus    TEXT NOT NULL,
+    year        INTEGER NOT NULL,
+    session     TEXT NOT NULL,
+    component   TEXT NOT NULL,   -- e.g. 'Paper 2', 'Overall'
+    grade       TEXT NOT NULL,   -- 'A*', 'A', 'B', 'C', 'D', 'E', 'U'
+    mark        INTEGER,
+    max_mark    INTEGER,
+    gt_file     TEXT,            -- rel path to the source gt PDF
+    UNIQUE (syllabus, year, session, component, grade)
+);
 """
 
 
@@ -107,6 +215,37 @@ def _migrate(con: sqlite3.Connection):
         con.execute("ALTER TABLE classifications ADD COLUMN subtopic TEXT")
         con.commit()
 
+    # create examiner_reports and grade_thresholds if they don't exist yet
+    # (CREATE TABLE IF NOT EXISTS in SCHEMA handles new DBs; existing DBs need the migration)
+    tables = {r[0] for r in con.execute(
+        "SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+    if "examiner_reports" not in tables:
+        con.executescript("""
+            CREATE TABLE examiner_reports (
+                id          INTEGER PRIMARY KEY,
+                syllabus    TEXT NOT NULL,
+                year        INTEGER NOT NULL,
+                session     TEXT NOT NULL,
+                filename    TEXT NOT NULL,
+                rel_path    TEXT NOT NULL,
+                fetched_at  TEXT,
+                UNIQUE (syllabus, year, session)
+            );
+            CREATE TABLE grade_thresholds (
+                id          INTEGER PRIMARY KEY,
+                syllabus    TEXT NOT NULL,
+                year        INTEGER NOT NULL,
+                session     TEXT NOT NULL,
+                component   TEXT NOT NULL,
+                grade       TEXT NOT NULL,
+                mark        INTEGER,
+                max_mark    INTEGER,
+                gt_file     TEXT,
+                UNIQUE (syllabus, year, session, component, grade)
+            );
+        """)
+        con.commit()
+
     # ms_entries: add sub_part and change UNIQUE to (paper_id, question_number, sub_part)
     ms_cols = {r[1] for r in con.execute("PRAGMA table_info(ms_entries)").fetchall()}
     if "sub_part" not in ms_cols:
@@ -132,7 +271,12 @@ def _migrate(con: sqlite3.Connection):
         con.execute("PRAGMA foreign_keys = ON")
 
 
-def connect() -> sqlite3.Connection:
+def connect():
+    """Return a sqlite3-compatible connection (SQLite locally; Supabase on server)."""
+    if USE_PG:
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        conn.autocommit = False
+        return _PgConn(conn)
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(config.DB_PATH)
     con.row_factory = sqlite3.Row
