@@ -45,6 +45,6 @@ def test_enrol_build_and_view(student, shots):
     viewer.wait_for_timeout(900)
     viewer.locator(".vw-chips").nth(2).get_by_role("button", name=re.compile("Mark scheme")).click()
     expect(viewer.locator(".vw-panel")).to_be_visible()
-    expect(viewer.locator(".vw-panel-body img, .vw-answer, .vw-muted").first).to_be_visible()
+    expect(viewer.locator(".ai-body .ai-ms, .ai-body .ai-mcq-key, .ai-body .ai-muted").first).to_be_visible()
     viewer.wait_for_timeout(800)
     viewer.screenshot(path=str(shots / "viewer_question.png"))

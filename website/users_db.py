@@ -82,6 +82,29 @@ else:
         added_at   TEXT DEFAULT (datetime('now')),
         PRIMARY KEY (user_id, board)
     );
+    -- AI help on questions (migrations/021_ai_help.sql)
+    CREATE TABLE IF NOT EXISTS explanation_unlocks (
+        user_id     TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        question_id INTEGER NOT NULL,
+        unlocked_at TEXT DEFAULT (datetime('now')),
+        PRIMARY KEY (user_id, question_id)
+    );
+    CREATE TABLE IF NOT EXISTS explanation_messages (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        question_id INTEGER NOT NULL,
+        role        TEXT NOT NULL,
+        quoted_text TEXT,
+        content     TEXT NOT NULL,
+        created_at  TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS explanation_reports (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     TEXT,
+        question_id INTEGER NOT NULL,
+        reason      TEXT,
+        created_at  TEXT DEFAULT (datetime('now'))
+    );
     -- Web-builder topical booklets (migrations/020_booklets.sql)
     CREATE TABLE IF NOT EXISTS booklets (
         id            TEXT PRIMARY KEY,
@@ -1275,6 +1298,67 @@ def set_boards(user_id: str, boards: list[str], primary: str) -> None:
                 "INSERT INTO student_boards (user_id, board, is_primary) VALUES (?,?,?)",
                 [(r["user_id"], r["board"], int(r["is_primary"])) for r in rows])
             c.commit()
+
+
+# ── AI help: explanation unlocks, follow-up threads, reports ─────────────────
+
+def unlocked_explanations(user_id: str) -> set[int]:
+    if _USE_SUPABASE:
+        r = (_client().table("explanation_unlocks").select("question_id")
+             .eq("user_id", user_id).execute())
+        return {int(x["question_id"]) for x in (r.data or [])}
+    with _local() as c:
+        return {r[0] for r in c.execute(
+            "SELECT question_id FROM explanation_unlocks WHERE user_id=?", (user_id,))}
+
+
+def unlock_explanation(user_id: str, question_id: int) -> None:
+    if _USE_SUPABASE:
+        (_client().table("explanation_unlocks")
+         .upsert({"user_id": user_id, "question_id": question_id},
+                 on_conflict="user_id,question_id").execute())
+        return
+    with _local() as c:
+        c.execute("INSERT OR IGNORE INTO explanation_unlocks (user_id, question_id) VALUES (?,?)",
+                  (user_id, question_id))
+        c.commit()
+
+
+def thread_messages(user_id: str, question_id: int, limit: int = 40) -> list[dict]:
+    cols = "id,role,quoted_text,content,created_at"
+    if _USE_SUPABASE:
+        r = (_client().table("explanation_messages").select(cols)
+             .eq("user_id", user_id).eq("question_id", question_id)
+             .order("id", desc=False).limit(limit).execute())
+        return r.data or []
+    with _local() as c:
+        return [dict(x) for x in c.execute(
+            f"SELECT {cols} FROM explanation_messages WHERE user_id=? AND question_id=? "
+            "ORDER BY id LIMIT ?", (user_id, question_id, limit)).fetchall()]
+
+
+def add_thread_message(user_id: str, question_id: int, role: str, content: str,
+                       quoted_text: str | None = None) -> None:
+    row = {"user_id": user_id, "question_id": question_id, "role": role,
+           "content": content, "quoted_text": quoted_text}
+    if _USE_SUPABASE:
+        _client().table("explanation_messages").insert(row).execute()
+        return
+    with _local() as c:
+        c.execute("INSERT INTO explanation_messages (user_id, question_id, role, content, quoted_text) "
+                  "VALUES (?,?,?,?,?)", (user_id, question_id, role, content, quoted_text))
+        c.commit()
+
+
+def report_explanation(user_id: str | None, question_id: int, reason: str | None) -> None:
+    row = {"user_id": user_id, "question_id": question_id, "reason": (reason or "")[:1000]}
+    if _USE_SUPABASE:
+        _client().table("explanation_reports").insert(row).execute()
+        return
+    with _local() as c:
+        c.execute("INSERT INTO explanation_reports (user_id, question_id, reason) VALUES (?,?,?)",
+                  (user_id, question_id, row["reason"]))
+        c.commit()
 
 
 # ── Booklets (web topical builder) ────────────────────────────────────────────

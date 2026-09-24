@@ -85,24 +85,8 @@
 .vw-chip.is-soon { color: var(--grey); }
 
 /* ── side panel ───────────────────────────────────────────────────── */
-.vw-panel { width: 400px; flex: none; border-left: 1px solid var(--line); background: var(--white);
-  display: flex; flex-direction: column; min-height: 0; }
-.vw-panel-head { display: flex; justify-content: space-between; gap: .6rem; align-items: start;
-  padding: .8rem .9rem; border-bottom: 1px solid var(--line); }
-.vw-panel-head b { color: var(--purple); font-size: 1rem; }
-.vw-panel-head span { font: .8rem ui-monospace, Consolas, monospace; color: var(--grey); }
-.vw-panel-head em { display: block; font-style: normal; font-size: .78rem; color: var(--orange-ink); }
-.vw-tabs { display: flex; gap: .2rem; padding: .5rem .9rem 0; border-bottom: 1px solid var(--line); }
-.vw-tabs button { border: 0; background: none; padding: .55rem .7rem; cursor: pointer; color: var(--grey);
-  font: 600 .86rem/1 "Hanken Grotesk", sans-serif; border-bottom: 2px solid transparent; }
-.vw-tabs [aria-selected="true"] { color: var(--purple); border-bottom-color: var(--gold); }
-.vw-panel-body { flex: 1; overflow: auto; padding: 1rem .9rem; }
-.vw-ms { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
-.vw-muted { color: var(--grey); font-size: .84rem; }
-.vw-answer { display: flex; align-items: center; justify-content: space-between; background: var(--green);
-  color: var(--green-ink); border-radius: 14px; padding: 1rem 1.2rem; }
-.vw-answer b { font: 800 2.2rem/1 "Archivo", sans-serif; }
-
+.vw-panel { width: 440px; flex: none; border-left: 1px solid var(--line); background: var(--white);
+  display: flex; flex-direction: column; min-height: 0; position: relative; }
 .vw-qbar { display: none; }
 .vw-toast { position: fixed; left: 50%; bottom: 1.2rem; transform: translate(-50%, 150%);
   background: var(--ink); color: var(--page); padding: .65rem 1rem; border-radius: 12px;

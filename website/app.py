@@ -102,6 +102,8 @@ import catalog as _catalog_mod
 import booklets as _booklets_mod
 # booklets first: /papers/view/{id} must win over catalog's /papers/{board}/{subject}
 app.include_router(_booklets_mod.router)
+import ai_help as _ai_help_mod
+app.include_router(_ai_help_mod.router)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────

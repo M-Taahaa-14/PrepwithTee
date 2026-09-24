@@ -47,7 +47,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260924c"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260925b"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 
@@ -374,13 +374,18 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={_catalog.STYLES_V}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <link rel="stylesheet" href="/viewer.css?v={VIEWER_V}">
+  <link rel="stylesheet" href="/ai-panel.css?v={VIEWER_V}">
 </head>
 <body class="vw-page">
 {_blog._nav()}
 <main id="vw" class="vw" data-state="loading"></main>
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260924a"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>

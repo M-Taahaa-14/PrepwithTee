@@ -352,8 +352,25 @@ linked), not agreement with any external file.
       `/papers.html` 302s to the new builder except `?tab=yearly|mcq` and
       `?mode=test`. E2E: `pytest -m e2e tests/e2e` against prepwithtee-local
       (screenshots in e2e-shots/). NOTE pytest-playwright wipes test-results/.
+    - **P1-c (local, not deployed)**: AI help panel. `pipeline/explain.py`
+      pre-generates ONE structured explanation per question (parts/steps/answer/
+      marking, 3 Guide-me hints, MCQ option reasons, common mistakes) from the
+      question crop + official MS crop/letter; modes --pilot/--estimate/--submit
+      (Batch API, 800/batch)/--status/--collect; results in
+      question_explanations (index.db) -> scripts/sync_explanations_to_supabase.py.
+      Model = EXPLAIN_MODEL/--model (default claude-opus-5; tutor to choose after
+      pilot). `website/ai_help.py`: /api/questions/{qid}/explain|hints|thread|ask|
+      report. Rules (tutor 2026-09-25): free = ONE explanation (reopenable, via
+      explanation_unlocks), hints + follow-ups need a plan; trial 5/20/20; paid
+      explain+hints unlimited, follow-ups FOLLOWUP_MONTHLY_CAP (300). Follow-ups
+      stream live (FOLLOWUP_MODEL). `static/ai-panel.js` (+css) is the shared
+      panel (KaTeX + marked + DOMPurify; math is lifted out before Markdown with
+      a letters-only placeholder - NUL placeholders get eaten by marked).
+      **No ANTHROPIC_API_KEY exists locally or on the server yet** (Photo Solver
+      has been falling back to Groq).
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
-      (done 2026-09-24) and `020_booklets.sql` on Supabase BEFORE deploying code;
+      (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
+      `021_ai_help.sql` on Supabase BEFORE deploying code;
       the server runs **Python 3.10** - no 3.12-only f-string syntax
       (py_compile new files with the server venv).
 

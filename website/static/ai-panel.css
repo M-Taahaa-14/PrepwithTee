@@ -1,0 +1,95 @@
+/* ai-panel.css — Explain · Guide me · Mark scheme · Ask (ai-panel.js).
+ * styles.css tokens only; big, calm reading type for worked solutions. */
+
+.ai-head { display: flex; justify-content: space-between; gap: .6rem; align-items: start;
+  padding: .85rem 1rem .6rem; }
+.ai-head b { color: var(--purple); font: 800 1.1rem/1.2 "Archivo", sans-serif; }
+.ai-head span { font: .8rem ui-monospace, Consolas, monospace; color: var(--grey); }
+.ai-head em { display: block; font-style: normal; font-size: .8rem; color: var(--orange-ink); margin-top: .15rem; }
+.ai-x { border: 1px solid var(--line); background: var(--white); color: var(--ink); border-radius: 9px;
+  width: 2rem; height: 2rem; cursor: pointer; }
+.ai-tabs { display: flex; gap: .15rem; padding: 0 .8rem; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.ai-tabs button { border: 0; background: none; padding: .6rem .7rem; cursor: pointer; color: var(--grey);
+  font: 700 .88rem/1 "Hanken Grotesk", sans-serif; border-bottom: 2px solid transparent; white-space: nowrap; }
+.ai-tabs button:hover { color: var(--purple); }
+.ai-tabs [aria-selected="true"] { color: var(--purple); border-bottom-color: var(--gold); }
+.ai-tabs button:focus-visible, .ai-btn:focus-visible, .ai-x:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.ai-body { flex: 1; overflow: auto; padding: 1rem 1.05rem 1.4rem; font-size: 1.02rem; line-height: 1.7;
+  position: relative; outline: none; }
+.ai-muted { color: var(--grey); font-size: .9rem; }
+.ai-summary { background: var(--lav); color: var(--lav-ink); border-radius: 12px; padding: .7rem .9rem;
+  margin: 0 0 1rem; font-weight: 600; }
+.ai-warn { background: var(--yellow); color: var(--yellow-ink); border-radius: 10px; padding: .55rem .8rem;
+  font-size: .88rem; margin: 0 0 .8rem; }
+.ai-part { margin: 0 0 1.2rem; }
+.ai-part h4 { margin: 0 0 .5rem; font: 800 1rem/1.2 "Archivo", sans-serif; color: var(--purple); }
+.ai-step { border: 1px solid var(--line); background: var(--page); border-radius: 12px; padding: .65rem .85rem;
+  margin-bottom: .5rem; }
+.ai-step-k { font: 700 .72rem/1.3 "Hanken Grotesk", sans-serif; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--orange-ink); margin-bottom: .25rem; }
+.ai-answer { display: grid; gap: .1rem; background: var(--green); color: var(--green-ink); border-radius: 12px;
+  padding: .6rem .85rem; margin: .5rem 0; }
+.ai-answer > span { font: 700 .72rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.ai-answer .ai-rich { font-size: 1.08rem; font-weight: 700; }
+.ai-marking { border-left: 3px solid var(--gold); padding: .2rem 0 .2rem .8rem; font-size: .93rem; color: var(--ink); }
+.ai-marking b { display: block; font-size: .78rem; color: var(--grey); text-transform: uppercase; letter-spacing: .06em; }
+.ai-opt { display: grid; grid-template-columns: 1.8rem 1fr; gap: .5rem; align-items: start; border-radius: 11px;
+  padding: .5rem .7rem; margin-bottom: .4rem; }
+.ai-opt b { font: 800 1.05rem/1.4 "Archivo", sans-serif; }
+.ai-opt.is-right { background: var(--green); color: var(--green-ink); }
+.ai-opt.is-wrong { background: var(--cream); }
+.ai-mistakes ul { margin: 0; padding-left: 1.2rem; }
+.ai-rich p { margin: 0 0 .45rem; }
+.ai-rich p:last-child { margin-bottom: 0; }
+.ai-rich .katex { font-size: 1.08em; }
+.ai-rich .katex-display { margin: .45rem 0; overflow-x: auto; overflow-y: hidden; }
+.ai-foot { margin-top: 1rem; font-size: .82rem; color: var(--grey); }
+.ai-link { border: 0; background: none; padding: 0; color: var(--purple); font: inherit; text-decoration: underline; cursor: pointer; }
+.ai-explain ::selection { background: color-mix(in srgb, var(--gold) 40%, transparent); }
+
+.ai-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border: 0; border-radius: 11px;
+  background: var(--purple); color: var(--page); padding: .65rem 1.05rem; font: 700 .92rem/1 "Hanken Grotesk", sans-serif;
+  text-decoration: none; cursor: pointer; }
+.ai-btn-ghost { background: var(--white); color: var(--purple); border: 1px solid var(--line); }
+.ai-guide { display: grid; gap: .8rem; justify-items: start; }
+.ai-hints { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .6rem; }
+.ai-hints li { background: var(--yellow); color: var(--yellow-ink); border-radius: 12px; padding: .65rem .85rem; }
+.ai-hint-n { display: block; font: 800 .72rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: .3rem; }
+.ai-ms { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.ai-mcq-key { display: flex; align-items: center; justify-content: space-between; background: var(--green);
+  color: var(--green-ink); border-radius: 14px; padding: 1rem 1.2rem; }
+.ai-mcq-key b { font: 800 2.2rem/1 "Archivo", sans-serif; }
+
+.ai-plan { text-align: center; display: grid; gap: .6rem; justify-items: center; padding: 1.4rem .6rem;
+  border: 1px dashed var(--line); border-radius: 16px; background: var(--cream); }
+.ai-plan-ico { font-size: 1.8rem; }
+.ai-plan h3 { margin: 0; font: 800 1.15rem/1.25 "Archivo", sans-serif; color: var(--purple); }
+.ai-plan p { margin: 0; color: var(--grey); font-size: .93rem; max-width: 36ch; }
+
+.ai-chat { display: grid; gap: .6rem; align-content: start; padding-bottom: .6rem; }
+.ai-msg { max-width: 92%; border-radius: 14px; padding: .55rem .8rem; font-size: .97rem; line-height: 1.6; }
+.ai-msg-u { justify-self: end; background: var(--purple); color: var(--page); border-bottom-right-radius: 4px;
+  white-space: pre-wrap; }
+.ai-msg-u .ai-quote { color: inherit; opacity: .85; }
+.ai-msg-a { background: var(--white); border: 1px solid var(--line); border-bottom-left-radius: 4px; white-space: pre-wrap; }
+.ai-msg-a.ai-rich { white-space: normal; }
+.ai-typing { color: var(--grey); }
+.ai-quote { position: relative; border-left: 3px solid var(--gold); background: var(--cream); color: var(--grey);
+  font-size: .85rem; padding: .35rem 1.6rem .35rem .6rem; border-radius: 0 8px 8px 0; margin-bottom: .35rem; }
+.ai-quote button { position: absolute; right: .3rem; top: .15rem; border: 0; background: none; cursor: pointer;
+  color: var(--grey); font-size: 1rem; }
+.ai-compose { position: sticky; bottom: -1.4rem; display: grid; grid-template-columns: 1fr auto; gap: .4rem;
+  align-items: end; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: .45rem;
+  margin: 0 -.2rem -.8rem; }
+.ai-compose .ai-quote { grid-column: 1 / -1; margin: 0; }
+.ai-compose textarea { border: 0; resize: none; background: transparent; color: var(--ink); font: inherit;
+  font-size: .95rem; padding: .35rem .45rem; outline: none; min-height: 2.4rem; }
+.ai-send { width: 2.3rem; height: 2.3rem; border-radius: 50%; border: 0; background: var(--gold); color: #2a1606;
+  font-weight: 800; cursor: pointer; }
+
+.ai-pill { position: absolute; z-index: 5; }
+.ai-pill button { border: 0; border-radius: 999px; background: var(--ink); color: var(--page); padding: .4rem .8rem;
+  font: 700 .8rem/1 "Hanken Grotesk", sans-serif; cursor: pointer; box-shadow: 0 8px 22px rgba(0, 0, 0, .25); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

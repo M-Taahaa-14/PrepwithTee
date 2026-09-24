@@ -153,6 +153,20 @@ CREATE TABLE IF NOT EXISTS review_queue (
     resolved    INTEGER NOT NULL DEFAULT 0
 );
 
+-- AI worked solutions + Guide-me hints, one per question (pipeline/explain.py).
+-- CAUTION: cascades with questions, so re-segmenting a paper drops its
+-- explanations too (new question ids) - re-run explain for that paper.
+CREATE TABLE IF NOT EXISTS question_explanations (
+    question_id    INTEGER PRIMARY KEY REFERENCES questions(id) ON DELETE CASCADE,
+    content_json   TEXT    NOT NULL,
+    model          TEXT,
+    prompt_version INTEGER NOT NULL DEFAULT 1,
+    input_tokens   INTEGER,
+    output_tokens  INTEGER,
+    flagged        INTEGER NOT NULL DEFAULT 0,
+    created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS examiner_reports (
     id          INTEGER PRIMARY KEY,
     syllabus    TEXT NOT NULL,

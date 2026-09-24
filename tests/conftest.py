@@ -48,6 +48,13 @@ for p in (ROOT, ROOT / "website"):
         sys.path.insert(0, str(p))
 
 INDEX_DB = ROOT / "data" / "index.db"
+# The website reads a throwaway copy, so tests may write (explanations,
+# flags) without touching the real archive. pipeline subprocesses (compose)
+# still read the original - same data, read-only.
+if INDEX_DB.exists():
+    import shutil
+    shutil.copyfile(INDEX_DB, _TMP / "index.db")
+    os.environ["INDEX_DB_PATH"] = str(_TMP / "index.db")
 needs_index_db = pytest.mark.skipif(
     not INDEX_DB.exists(), reason="data/index.db (pipeline archive) not present")
 

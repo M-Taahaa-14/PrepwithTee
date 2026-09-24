@@ -9,6 +9,7 @@
  *            official mark scheme (or the MCQ answer letter).
  */
 import { api } from "/auth.js?v=20260829a";
+import { openAiPanel } from "/ai-panel.js?v=20260925b";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");
@@ -55,8 +56,8 @@ function loader(st) {
             <span class="vw-dot" aria-hidden="true">${i < done ? "✓" : ""}</span>
             ${label}${i === done && detail && i === 2 ? ` <b>${esc(detail)}</b>` : ""}
           </li>`).join("")}</ol>
-        <p class="vw-tip">Tip: open a question's <b>Mark scheme</b> from the chip beside it —
-           Explain and Guide me are coming next.</p>
+        <p class="vw-tip">Tip: stuck on a question? Tap <b>Guide me</b> for a hint before
+           you open the full <b>Explain</b>.</p>
       </div>
     </section>`;
 }
@@ -178,9 +179,9 @@ function layout() {
       chips.className = "vw-chips";
       chips.style.top = `${q.y * V.scale}px`;
       chips.innerHTML = `
-        <button type="button" data-ms="${q.seq}" class="vw-chip">✓ Mark scheme</button>
-        <button type="button" data-soon="explain" class="vw-chip is-soon" title="Coming next">✦ Explain</button>
-        <button type="button" data-soon="hint" class="vw-chip is-soon" title="Coming next">💡 Guide me</button>`;
+        <button type="button" data-open="explain" data-seq="${q.seq}" class="vw-chip">✦ Explain</button>
+        <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Guide me</button>
+        <button type="button" data-open="ms" data-seq="${q.seq}" class="vw-chip">✓ Mark scheme</button>`;
       pg.appendChild(chips);
     }
     stage.appendChild(pg);
@@ -271,12 +272,12 @@ function qbar() {
   if (!q) { bar.hidden = true; return; }
   bar.hidden = false;
   bar.innerHTML = `<b>Q${q.seq}</b><span>${esc(q.topic || "")}</span>
-    <button type="button" data-ms="${q.seq}" class="vw-chip">✓ Mark scheme</button>
-    <button type="button" data-soon="explain" class="vw-chip is-soon">✦ Explain</button>`;
+    <button type="button" data-open="explain" data-seq="${q.seq}" class="vw-chip">✦ Explain</button>
+    <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Hint</button>`;
 }
 
-// ── Side panel ──────────────────────────────────────────────────────────────
-async function openPanel(seq) {
+// ── Side panel (ai-panel.js: Explain · Guide me · Mark scheme · Ask) ─────────
+function openPanel(seq, tab = "explain") {
   const q = (V.map.questions || []).find((x) => x.seq === +seq);
   if (!q) return;
   const panel = document.getElementById("vw-panel");
@@ -284,33 +285,7 @@ async function openPanel(seq) {
   panel.hidden = false;
   root.classList.add("has-panel");
   if (wasHidden && window.innerWidth >= 1000) refit();
-  panel.innerHTML = `
-    <div class="vw-panel-head">
-      <div><b>Q${q.seq}</b> <span>${esc(q.ref)}</span><em>${esc(q.topic || "")}</em></div>
-      <button type="button" class="vw-tbtn" data-act="close" aria-label="Close panel">✕</button>
-    </div>
-    <div class="vw-tabs" role="tablist">
-      <button role="tab" aria-selected="true" type="button">Mark scheme</button>
-      <button role="tab" aria-selected="false" type="button" data-soon="explain">Explain</button>
-      <button role="tab" aria-selected="false" type="button" data-soon="hint">Guide me</button>
-    </div>
-    <div class="vw-panel-body" id="vw-pbody"><p class="vw-muted">Loading the mark scheme…</p></div>`;
-  const body = document.getElementById("vw-pbody");
-  try {
-    const ans = await api(`/api/mcq/answer/${q.qid}`);
-    if (ans.has_answer) {
-      body.innerHTML = `<div class="vw-answer"><span>Correct answer</span><b>${esc(ans.answer)}</b></div>
-        <p class="vw-muted">From the official Cambridge mark scheme.</p>`;
-      return;
-    }
-  } catch { /* not MCQ, or no key: fall through to the MS crop */ }
-  const img = new Image();
-  img.alt = `Official mark scheme for question ${q.seq}`;
-  img.className = "vw-ms";
-  img.onload = () => { body.innerHTML = ""; body.appendChild(img);
-    body.insertAdjacentHTML("beforeend", `<p class="vw-muted">Official Cambridge mark scheme · ${esc(q.ref)}</p>`); };
-  img.onerror = () => { body.innerHTML = `<p class="vw-muted">No mark scheme is available for this question yet.</p>`; };
-  img.src = `/api/question/${q.qid}/ms-preview`;
+  openAiPanel(panel, q, { tab, onClose: closePanel });
 }
 
 function closePanel() {
@@ -340,12 +315,8 @@ root.addEventListener("click", (e) => {
     if (q) scrollToPage(q.page, q.y);
     if (window.innerWidth < 900) document.getElementById("vw-toc").hidden = true;
   }
-  const ms = e.target.closest("[data-ms]");
-  if (ms) openPanel(ms.dataset.ms);
-  const soon = e.target.closest("[data-soon]");
-  if (soon) toast(soon.dataset.soon === "hint"
-    ? "Guide me (step-by-step hints) is coming in the next update."
-    : "Explain (full worked solutions) is coming in the next update.");
+  const open = e.target.closest("[data-open]");
+  if (open) openPanel(open.dataset.seq, open.dataset.open);
 });
 
 document.addEventListener("keydown", (e) => {
