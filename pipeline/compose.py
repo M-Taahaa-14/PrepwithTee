@@ -18,6 +18,7 @@ the first selected topic it matches (primary preferred).
 
 import argparse
 import json
+import os
 import re
 from datetime import date
 
@@ -1237,10 +1238,12 @@ def fetch_by_ids(con, ids: list[int], topics: list[str]):
                 or next((t for t in topics if r["secondary_topic"] == t), None)
                 or r["topic"])
         ordered.append((home, r))
-    by_topic: dict[str, list] = {}
+    # Sections follow the order the topics were PICKED (it names the cover),
+    # not the order they first appear in the shuffled paper.
+    by_topic: dict[str, list] = {t: [] for t in topics}
     for home, r in ordered:
         by_topic.setdefault(home, []).append(r)
-    return list(by_topic.items()), ordered
+    return [(t, rows) for t, rows in by_topic.items() if rows], ordered
 
 
 # Sessions run Feb/March, then May/June, then Oct/Nov. Sorting the codes would
@@ -1408,6 +1411,14 @@ def main(argv=None):
     else:
         groups = render_groups(sections, getattr(args, "order", "session"))
     qmeta = []   # one entry per placed question, for contents + page map
+    total_q = sum(len(qs) for _h, qs in groups)
+    # The web builder's loader reads these lines from stdout (PWT_PROGRESS=1).
+    progress = bool(os.environ.get("PWT_PROGRESS"))
+
+    def report(stage: str, done: int | None = None):
+        if progress:
+            print(f"PROGRESS {stage} {done if done is not None else ''} {total_q}".rstrip(),
+                  flush=True)
     for heading, questions in groups:
         if heading:
             first = json.loads(questions[0][1]["rects_json"] or "[]")
@@ -1451,6 +1462,7 @@ def main(argv=None):
                     booklet.place_insert(ins_doc)
 
             seq += 1
+            report("question", seq)
             rects = json.loads(q["rects_json"])
             if syl in _ESSAY_SYLLABUSES:
                 rects = _trim_essay_rects(src(q["rel_path"]), rects)
@@ -1464,7 +1476,7 @@ def main(argv=None):
                                     q["year"], q["number"], q["sub_part"] or "")
             plain_ref = ref
             if q["marks"]:
-                ref += f"   [{q['marks']} marks]"
+                ref += f"   [{q['marks']} mark{'' if q['marks'] == 1 else 's'}]"
             if q["topic"] != topic:
                 ref += f"   (also covers {q['topic']})"
             first_h = (rects[0]["y1"] - rects[0]["y0"]) if rects else 40.0
@@ -1542,6 +1554,7 @@ def main(argv=None):
         for i in range(len(sheets)):           # ...then moved to follow the cover
             booklet.doc.move_page(base + i, 1 + i)
         n_front += len(sheets)
+    report("contents")
     n_toc = 0
     if not args.no_contents:
         n_toc = contents_pages(booklet.doc, qmeta, booklet.anchors,
@@ -1560,6 +1573,7 @@ def main(argv=None):
                          f"data/output/{'-'.join(args.syllabuses)}_{slug}_"
                          f"{args.year_from}-{args.year_to}.pdf")
     out.parent.mkdir(parents=True, exist_ok=True)
+    report("saving")
     booklet.doc.save(out, deflate=True, garbage=3)
     n_q = sum(len(qs) for _, qs in sections)
     log.info("wrote %s: %d questions in %d sections, %d pages%s",

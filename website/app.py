@@ -99,6 +99,9 @@ app.include_router(_teacher_mod.router)
 app.include_router(_blog_mod.router)
 app.include_router(_fc_mod.router)
 import catalog as _catalog_mod
+import booklets as _booklets_mod
+# booklets first: /papers/view/{id} must win over catalog's /papers/{board}/{subject}
+app.include_router(_booklets_mod.router)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
@@ -4121,7 +4124,7 @@ app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 # ── SEO: robots.txt + sitemap.xml ─────────────────────────────────────────────
 
 _PUBLIC_PATHS = [
-    "/", "/subjects.html", "/papers.html", "/resources.html",
+    "/", "/subjects.html", "/resources.html",
     "/pricing.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/blog",
     # Study tools — each has a distinct meta description and real student value

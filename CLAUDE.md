@@ -338,9 +338,24 @@ linked), not agreement with any external file.
       `/papers/{board}`, `/papers/{board}/{subject}`, `/papers/{b}/{s}/{chapter}`
       (+ sitemap). Students pick multiple boards (modal, pre-ticked from their
       enrolments). Nav "Past Papers" now points at /papers.
+    - **P1-b (local, not deployed)**: topical builder + viewer.
+      `website/selection.py` (pure: quotas + recursive interleave + guarded
+      shake = every picked chapter/subtopic present, optimal max run),
+      `website/booklets.py` (tree/count/create/status/pdf API, thread-pool job
+      running `compose --ids --page-map` with PROGRESS lines -> status in DB),
+      `static/builder.js` (on the subject page for enrolled students; <=4
+      chapters, any subtopics, years/paper filters, live pool count, opens a new
+      tab), `/papers/view/{id}` + `static/viewer.js` (loader with real stages,
+      PDF.js lazy pages + annotation layer so contents links and the answer
+      sheet work, contents drawer, per-question chips -> side panel with the
+      official MS / MCQ letter; Explain + Guide me are stubs for P1-c).
+      `/papers.html` 302s to the new builder except `?tab=yearly|mcq` and
+      `?mode=test`. E2E: `pytest -m e2e tests/e2e` against prepwithtee-local
+      (screenshots in e2e-shots/). NOTE pytest-playwright wipes test-results/.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
-      on Supabase BEFORE deploying code; the server runs **Python 3.10** - no
-      3.12-only f-string syntax (py_compile new files with the server venv).
+      (done 2026-09-24) and `020_booklets.sql` on Supabase BEFORE deploying code;
+      the server runs **Python 3.10** - no 3.12-only f-string syntax
+      (py_compile new files with the server venv).
 
 ## Ground rules for future sessions
 

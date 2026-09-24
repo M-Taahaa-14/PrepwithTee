@@ -111,3 +111,20 @@ def test_sitemap_lists_catalogue_pages(client):
     xml = client.get("/sitemap.xml").text
     assert "/papers/o-level/physics-5054</loc>" in xml
     assert "/papers/igcse/mathematics-0580/" in xml
+
+
+@pytest.mark.parametrize("url,where", [
+    ("/papers.html", "/papers"),
+    ("/papers.html?syllabus=0625&topics=Motion,Forces", "/papers/igcse/physics-0625?pick=Motion#builder"),
+    ("/papers.html?syllabus=nope", "/papers"),
+])
+def test_legacy_builder_redirects(client, url, where):
+    r = client.get(url, follow_redirects=False)
+    assert r.status_code == 302 and r.headers["location"] == where
+
+
+@pytest.mark.parametrize("url", ["/papers.html?tab=yearly", "/papers.html?tab=mcq",
+                                 "/papers.html?mode=test"])
+def test_legacy_tabs_still_served(client, url):
+    r = client.get(url)
+    assert r.status_code == 200 and "<html" in r.text.lower()

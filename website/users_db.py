@@ -5,6 +5,7 @@ connection string is needed.  Falls back to a local SQLite file
 (data/users.db) when SUPABASE_URL is not set (pure local dev).
 """
 
+import json
 import os
 import sqlite3
 import uuid
@@ -80,6 +81,23 @@ else:
         is_primary INTEGER NOT NULL DEFAULT 0,
         added_at   TEXT DEFAULT (datetime('now')),
         PRIMARY KEY (user_id, board)
+    );
+    -- Web-builder topical booklets (migrations/020_booklets.sql)
+    CREATE TABLE IF NOT EXISTS booklets (
+        id            TEXT PRIMARY KEY,
+        user_id       TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        syllabus      TEXT NOT NULL,
+        title         TEXT,
+        params_json   TEXT NOT NULL DEFAULT '{}',
+        question_ids  TEXT NOT NULL DEFAULT '[]',
+        seed          INTEGER,
+        status        TEXT NOT NULL DEFAULT 'queued',
+        progress      INTEGER NOT NULL DEFAULT 0,
+        stage         TEXT,
+        page_map_json TEXT,
+        error         TEXT,
+        created_at    TEXT DEFAULT (datetime('now')),
+        updated_at    TEXT DEFAULT (datetime('now'))
     );
     -- subtopic is NOT NULL DEFAULT '' on purpose: a chapter-level row used to
     -- store NULL, and neither SQLite nor Postgres treats two NULLs as equal in
@@ -1257,6 +1275,75 @@ def set_boards(user_id: str, boards: list[str], primary: str) -> None:
                 "INSERT INTO student_boards (user_id, board, is_primary) VALUES (?,?,?)",
                 [(r["user_id"], r["board"], int(r["is_primary"])) for r in rows])
             c.commit()
+
+
+# ── Booklets (web topical builder) ────────────────────────────────────────────
+# JSON columns are JSONB on Supabase and TEXT locally; callers always get
+# Python lists/dicts back.
+_BOOKLET_JSON = ("params_json", "question_ids", "page_map_json")
+
+
+def _booklet_out(row: dict | None) -> dict | None:
+    if not row:
+        return None
+    row = dict(row)
+    for k in _BOOKLET_JSON:
+        if isinstance(row.get(k), str):
+            try:
+                row[k] = json.loads(row[k])
+            except ValueError:
+                pass
+    return row
+
+
+def create_booklet(row: dict) -> dict:
+    if _USE_SUPABASE:
+        r = _client().table("booklets").insert(row).execute()
+        return _booklet_out(r.data[0])
+    local = {k: (json.dumps(v) if k in _BOOKLET_JSON and v is not None else v)
+             for k, v in row.items()}
+    cols = ", ".join(local)
+    with _local() as c:
+        c.execute(f"INSERT INTO booklets ({cols}) VALUES ({', '.join('?' for _ in local)})",
+                  list(local.values()))
+        c.commit()
+    return get_booklet(row["id"])
+
+
+def update_booklet(booklet_id: str, fields: dict) -> None:
+    fields = {**fields, "updated_at": datetime.now(timezone.utc).isoformat()}
+    if _USE_SUPABASE:
+        _client().table("booklets").update(fields).eq("id", booklet_id).execute()
+        return
+    local = {k: (json.dumps(v) if k in _BOOKLET_JSON and v is not None else v)
+             for k, v in fields.items()}
+    with _local() as c:
+        c.execute(f"UPDATE booklets SET {', '.join(f'{k}=?' for k in local)} WHERE id=?",
+                  [*local.values(), booklet_id])
+        c.commit()
+
+
+def get_booklet(booklet_id: str) -> dict | None:
+    if _USE_SUPABASE:
+        r = _client().table("booklets").select("*").eq("id", booklet_id).limit(1).execute()
+        return _booklet_out((r.data or [None])[0])
+    with _local() as c:
+        row = c.execute("SELECT * FROM booklets WHERE id=?", (booklet_id,)).fetchone()
+        return _booklet_out(dict(row) if row else None)
+
+
+def list_booklets(user_id: str, limit: int = 30) -> list[dict]:
+    cols = "id,syllabus,title,status,created_at,question_ids"
+    if _USE_SUPABASE:
+        r = (_client().table("booklets").select(cols).eq("user_id", user_id)
+             .order("created_at", desc=True).limit(limit).execute())
+        rows = r.data or []
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                f"SELECT {cols} FROM booklets WHERE user_id=? "
+                "ORDER BY created_at DESC LIMIT ?", (user_id, limit)).fetchall()]
+    return [_booklet_out(r) for r in rows]
 
 
 def restore_enrollment(user_id: str, syllabus: str):

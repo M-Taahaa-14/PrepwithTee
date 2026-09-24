@@ -25,6 +25,8 @@ import html as _html
 import json
 import os
 import re
+from pathlib import Path
+from urllib.parse import quote
 from typing import Callable
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -37,7 +39,7 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260924a"       # bump with catalog.css / catalog.js (immutable caching)
+CSS_V = "20260924c"       # bump with catalog.css / catalog.js (immutable caching)
 STYLES_V = "20260919a"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
@@ -244,7 +246,8 @@ def _e(s) -> str:
 
 
 def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[str, str]],
-           state: dict, noindex: bool = False, ld: list | None = None) -> str:
+           state: dict, noindex: bool = False, ld: list | None = None,
+           scripts: tuple[str, ...] = ()) -> str:
     import blog as _blog                      # shared navbar + footer
     canonical = f"{SITE_ORIGIN}{path}"
     crumb_ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
@@ -298,6 +301,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
+{''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>
 </html>"""
 
@@ -441,7 +445,6 @@ def _subject_or_404(board: str, subject: str) -> dict:
 
 def _subject_actions(s: dict, state: dict, chapter: str | None = None) -> str:
     code = s["code"]
-    topics_q = f"&amp;topics={_e(chapter)}" if chapter else ""
     if not state["user"]:
         nxt = subject_url(code)
         return (f'<a class="cat-btn cat-btn-gold" href="/login.html?signup=1&amp;next={nxt}">'
@@ -450,7 +453,9 @@ def _subject_actions(s: dict, state: dict, chapter: str | None = None) -> str:
         return (f'<button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">'
                 f'🔒 Enrol free to unlock {_e(s["plain"])}</button>')
     st = subject_stats(code)
-    return (f'<a class="cat-btn" href="/papers.html?syllabus={code}{topics_q}">Build a topical paper</a>'
+    build = (f"{subject_url(code)}?pick={_e(quote(chapter))}#builder" if chapter
+             else "#builder")
+    return (f'<a class="cat-btn" href="{build}">Build a topical paper</a>'
             f'<a class="cat-btn cat-btn-ghost" href="/papers.html?tab=yearly&amp;syllabus={code}">Yearly papers</a>'
             + (f'<a class="cat-btn cat-btn-ghost" href="/mcq-solver.html?syllabus={code}">MCQ practice</a>'
                if st["has_mcq"] else "")
@@ -475,6 +480,12 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
           </a>
           {f'<ul class="cat-subs">{subs}</ul>' if subs else ''}
         </li>""")
+    can_build = bool(state["user"]) and (
+        code in state["enrolled"] or state["user"].get("role") in ("teacher", "admin"))
+    static_list = (f'<h2 class="cat-group">Syllabus chapters</h2>'
+                   f'<ol class="cat-chapters">{"".join(rows)}</ol>')
+    builder = (f'<section id="builder" class="bld" data-syllabus="{code}" aria-label="Paper builder">'
+               f'<noscript>{static_list}</noscript></section>' if can_build else static_list)
     yrs = _years(st)
     lede = (f"Every Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) past-paper question"
             f"{f' from {yrs}' if yrs else ''}, sorted into {st['chapters']} syllabus chapters"
@@ -491,8 +502,7 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
       </dl>
       <div class="cat-actions">{_subject_actions(s, state)}</div>
     </header>
-    <h2 class="cat-group">Syllabus chapters</h2>
-    <ol class="cat-chapters">{''.join(rows)}</ol>"""
+    {builder}"""
     ld = [{"@context": "https://schema.org", "@type": "Course",
            "name": f"Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) topical past papers",
            "description": lede,
@@ -500,6 +510,7 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
     return _respond(_shell(
         title=f"{s['plain']} {code} Topical Past Papers | Cambridge {BOARD_SHORT[board]} — PrepWithTee",
         desc=lede[:300], path=base, body=body, state=state, ld=ld,
+        scripts=(f"/builder.js?v={CSS_V}",) if can_build else (),
         crumbs=[("Home", "/"), ("Past papers", "/papers"),
                 (BOARD_SHORT[board], f"/papers/{board}"), (f"{s['plain']} {code}", base)]),
         bool(user))
@@ -536,6 +547,22 @@ def page_chapter(board: str, subject: str, chapter: str,
         crumbs=[("Home", "/"), ("Past papers", "/papers"),
                 (BOARD_SHORT[board], f"/papers/{board}"), (f"{s['plain']} {code}", base),
                 (ch["display"], f"{base}/{ch['slug']}")]), bool(user))
+
+
+@router.get("/papers.html", include_in_schema=False)
+def legacy_papers(tab: str = "", mode: str = "", syllabus: str = "", topics: str = ""):
+    """The old single-page builder. Its topical tab now lives at
+    /papers/{board}/{subject}; yearly, MCQ and the test builder still render
+    here until they get their own pages (P1-d). 302 while both exist."""
+    from fastapi.responses import FileResponse
+    if tab in ("yearly", "mcq") or mode == "test":
+        return FileResponse(Path(__file__).resolve().parent / "static" / "papers.html",
+                            headers={"Cache-Control": "no-cache"})
+    if syllabus in SUBJECTS:
+        first = next((t.strip() for t in re.split(r"[,|]", topics) if t.strip()), "")
+        pick = f"?pick={quote(first)}" if first else ""
+        return RedirectResponse(f"{subject_url(syllabus)}{pick}#builder", 302)
+    return RedirectResponse("/papers", 302)
 
 
 def sitemap_paths() -> list[str]:
