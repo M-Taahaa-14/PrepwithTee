@@ -98,6 +98,8 @@ app.include_router(_admin_mod.router)
 app.include_router(_teacher_mod.router)
 app.include_router(_blog_mod.router)
 app.include_router(_fc_mod.router)
+import catalog as _catalog_mod
+app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
 
@@ -1653,6 +1655,18 @@ def _meta_response(request: Request):
     return JSONResponse(_META_CACHE["data"], headers=headers)
 
 
+def _meta_data() -> dict:
+    """The /api/meta payload without the HTTP wrapper (catalog pages use it)."""
+    if _META_CACHE["data"] is None and not _meta_load_disk():
+        with _META_LOCK:
+            if _META_CACHE["data"] is None:
+                _meta_store(_build_meta())
+    return _META_CACHE["data"]
+
+
+_catalog_mod.set_meta_provider(_meta_data)
+
+
 @app.post("/api/meta/refresh")
 def meta_refresh(_: bool = _admin_mod._Admin):
     """Bust the cache after a pipeline run / an index.db sync, without a
@@ -2021,30 +2035,9 @@ def generate(req: GenerateReq,
 
 SESSION_NAMES = {"s": "May/June", "w": "Oct/Nov", "m": "Feb/March"}
 
-# Board and display name per syllabus. Not every syllabus has a taxonomy file
-# (0478 has none yet), so the library cannot rely on taxonomy["subject"] alone
-# — without this, 0478 rendered as "0478 — 0478".
-BOARDS = [
-    ("Cambridge O Level", [
-        ("4024", "Mathematics (Syllabus D)"),
-        ("5054", "Physics"),
-        ("5070", "Chemistry"),
-        ("2210", "Computer Science"),
-        ("2058", "Islamiyat"),
-        ("2059", "Pakistan Studies"),
-    ]),
-    ("Cambridge IGCSE", [
-        ("0580", "Mathematics"),
-        ("0625", "Physics"),
-        ("0620", "Chemistry"),
-        ("0478", "Computer Science"),
-    ]),
-    ("Cambridge A Level", [
-        ("9709", "Mathematics"),
-        ("9702", "Physics"),
-        ("9618", "Computer Science"),
-    ]),
-]
+# Board and display name per syllabus live in catalog.py (one registry for the
+# library, meta, generator and the /papers SEO pages).
+from catalog import BOARDS  # noqa: E402
 
 
 @app.get("/api/library")
@@ -4192,6 +4185,15 @@ def sitemap_xml():
             f"<changefreq>{freq}</changefreq>"
             f"<priority>{pri}</priority></url>"
         )
+    # Catalogue pages: boards, every subject, every chapter
+    try:
+        for p in _catalog_mod.sitemap_paths():
+            depth = p.count("/")
+            pri = {1: "0.95", 2: "0.90", 3: "0.85"}.get(depth, "0.70")
+            entries.append(f"  <url><loc>{origin}{p}</loc>"
+                           f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
+    except Exception:
+        pass
     try:
         for post in _blog_mod.get_published_posts():
             lastmod = (post.get("updated_at") or post.get("published_at") or "")[:10]

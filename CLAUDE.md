@@ -303,6 +303,45 @@ linked), not agreement with any external file.
       (one long pseudocode question → many row fragments); those fragments get classified as
       Programming or Algorithm but have no MS link — acceptable, they show the question crop.
 
+25. **Improvements plan (IMPROVEMENTS_PLAN.md, approved 2026-09-24) - P0 done
+    locally, NOT deployed:**
+    - **Environments**: `APP_ENV=local|test|staging` makes `website/env_guard.py`
+      refuse any DB setting that points at the production Supabase project.
+      Local dev = `--env-file .env.local` (SQLite: data/index.db + data/users.db,
+      no email). `.claude/launch.json`: `prepwithtee-local` (safe default),
+      `prepwithtee-staging`, `prepwithtee-PROD-DATA` (explicit).
+    - **Tests**: `pytest` (unit/api/pdf; LLM + email keys blanked, throwaway
+      users DB). `-m e2e` / `-m live` are opt-in. Nothing ships until green.
+    - **Old mark schemes**: production lacked 16,173 of the 2010-19 `ms_entries`
+      rows (every MCQ key) and 6,136 crop PDFs. Fix is ready but awaits the
+      tutor's go-ahead: `scripts/sync_ms_to_supabase.py --apply`, then upload
+      `data/output/missing_crops.tar.gz` (`scripts/bundle_crops.py`).
+    - **compose layout**: crops too tall for the page are scaled to fit (they
+      used to run under the footer band); crop edges grow up to 14 pt to take in
+      any text line they slice (`_fit_rect_to_text` - this was cutting fraction
+      numerators and powers); section/insert headings stay with what follows;
+      answer-line-only continuation rects are dropped (topical only - testgen
+      keeps them); clickable contents pages + PDF outline; `--ids` (exact order)
+      and `--page-map` for the web viewer.
+    - **Old mark schemes SYNCED to production 2026-09-24** (tutor approved):
+      16,383 ms_entries rows (10,937 old MCQ keys) + 6,136 crop PDFs; server now
+      has 58,794 crops. Verified live: 2016 MCQ answers + 2015 MS previews.
+    - **PDF extras**: navy/cream redesigned cover (clickable wordmark + owl
+      medallion, stat tiles, fillable Name/Class/Date); body-page watermark
+      wordmark links to the site (not the whole owl - it would hijack clicks);
+      MCQ answer sheet is fillable: one radio group per question built by
+      `_group_radio_fields` (PyMuPDF alone makes 4 linked "Yes" boxes; keys must
+      be removed by rewriting the object - "null" breaks pdf.js).
+    - **P1-a (local, not deployed)**: `website/catalog.py` = board/subject
+      registry (BOARDS moved here from app.py), `/api/boards`, `/api/me/boards`,
+      `/api/catalogue`, and server-rendered SEO pages `/papers`,
+      `/papers/{board}`, `/papers/{board}/{subject}`, `/papers/{b}/{s}/{chapter}`
+      (+ sitemap). Students pick multiple boards (modal, pre-ticked from their
+      enrolments). Nav "Past Papers" now points at /papers.
+    - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
+      on Supabase BEFORE deploying code; the server runs **Python 3.10** - no
+      3.12-only f-string syntax (py_compile new files with the server venv).
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

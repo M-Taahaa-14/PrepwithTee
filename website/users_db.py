@@ -12,9 +12,13 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-_USERS_DB = ROOT / "data" / "users.db"
+import env_guard as _env_guard
 
+ROOT = Path(__file__).resolve().parent.parent
+# Overridable so the test suite gets a throwaway file instead of the dev one.
+_USERS_DB = Path(os.environ.get("USERS_DB_PATH") or ROOT / "data" / "users.db")
+
+_env_guard.check()
 _USE_SUPABASE = bool(os.environ.get("SUPABASE_URL"))
 
 if _USE_SUPABASE:
@@ -68,6 +72,14 @@ else:
         enrolled_at TEXT DEFAULT (datetime('now')),
         status      TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
         UNIQUE(user_id, syllabus)
+    );
+    -- Which Cambridge boards a student studies (migrations/019_student_boards.sql)
+    CREATE TABLE IF NOT EXISTS student_boards (
+        user_id    TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        board      TEXT NOT NULL CHECK (board IN ('o-level', 'igcse', 'a-level')),
+        is_primary INTEGER NOT NULL DEFAULT 0,
+        added_at   TEXT DEFAULT (datetime('now')),
+        PRIMARY KEY (user_id, board)
     );
     -- subtopic is NOT NULL DEFAULT '' on purpose: a chapter-level row used to
     -- store NULL, and neither SQLite nor Postgres treats two NULLs as equal in
@@ -1210,6 +1222,40 @@ def archive_all_enrollments(user_id: str):
         with _local() as c:
             c.execute("UPDATE enrollments SET status='inactive' WHERE user_id=? AND status='active'",
                       (user_id,))
+            c.commit()
+
+
+# ── Boards ────────────────────────────────────────────────────────────────────
+
+def get_boards(user_id: str) -> tuple[list[str], str | None]:
+    """(boards, primary) for a student; ([], None) until they have chosen."""
+    if _USE_SUPABASE:
+        r = (_client().table("student_boards").select("board,is_primary")
+             .eq("user_id", user_id).execute())
+        rows = r.data or []
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                "SELECT board, is_primary FROM student_boards WHERE user_id=?",
+                (user_id,)).fetchall()]
+    order = ["o-level", "igcse", "a-level"]
+    boards = sorted((x["board"] for x in rows), key=order.index)
+    primary = next((x["board"] for x in rows if x["is_primary"]), None)
+    return boards, primary
+
+
+def set_boards(user_id: str, boards: list[str], primary: str) -> None:
+    """Replace the student's boards (the set is small, so delete + insert)."""
+    rows = [{"user_id": user_id, "board": b, "is_primary": b == primary} for b in boards]
+    if _USE_SUPABASE:
+        (_client().table("student_boards").delete().eq("user_id", user_id).execute())
+        _client().table("student_boards").insert(rows).execute()
+    else:
+        with _local() as c:
+            c.execute("DELETE FROM student_boards WHERE user_id=?", (user_id,))
+            c.executemany(
+                "INSERT INTO student_boards (user_id, board, is_primary) VALUES (?,?,?)",
+                [(r["user_id"], r["board"], int(r["is_primary"])) for r in rows])
             c.commit()
 
 

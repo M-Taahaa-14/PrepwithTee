@@ -12,9 +12,12 @@ import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-_INDEX_DB = ROOT / "data" / "index.db"
+import env_guard as _env_guard
 
+ROOT = Path(__file__).resolve().parent.parent
+_INDEX_DB = Path(os.environ.get("INDEX_DB_PATH") or ROOT / "data" / "index.db")
+
+_env_guard.check()
 USE_PG: bool = bool(os.environ.get("DATABASE_URL"))
 
 if USE_PG:

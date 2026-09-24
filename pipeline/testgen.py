@@ -29,7 +29,8 @@ from .compose import (Booklet, brand_backdrop, footer_band, fetch_sections,
                       ACCENT, GOLD, GREY, CREAM,
                       _trim_essay_rects, _ESSAY_SYLLABUSES,
                       _trim_total_marker_rects, _TOTAL_MARKER_SYLLABUSES,
-                      _p2_insert_question_pages, _needs_insert)
+                      _p2_insert_question_pages, _needs_insert,
+                      _fit_rect_to_text)
 
 log = setup_logging("testgen")
 
@@ -311,6 +312,9 @@ def render_test(con, args, subject, topics, chosen, cache):
             rects = _trim_essay_rects(_src(cache, q["rel_path"]), rects)
         if syl in _TOTAL_MARKER_SYLLABUSES and q["sub_part"]:
             rects = _trim_total_marker_rects(_src(cache, q["rel_path"]), rects)
+        # A test keeps its answer lines (students write on it), but crop edges
+        # still must not slice through fractions or the final [marks] line.
+        rects = [_fit_rect_to_text(_src(cache, q["rel_path"]), r) for r in rects]
         code = f"{q['paper']}{q['variant']}"
         ref = config.source_ref(syl, code, q["session"], q["year"],
                                 q["number"], q["sub_part"] or "")
@@ -390,6 +394,7 @@ def render_ms(con, args, subject, topics, chosen, cache):
         # No row at all, or a row whose crop is empty - either way there is
         # nothing to show, so say so rather than emitting a silent gap.
         ms_rects = json.loads(ms["rects_json"]) if ms is not None else []
+        ms_rects = [_fit_rect_to_text(_src(cache, ms["rel_path"]), r) for r in ms_rects]
         if not ms_rects:
             missing += 1
             b.question_header(seq, ref, 0)

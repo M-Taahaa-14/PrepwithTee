@@ -4,6 +4,10 @@ __pycache__/
 *.pyc
 .env
 .env.example
+.env.*
+!.env.*.example
+.pytest_cache/
+test-results/
 data/
 *.xlsx
 ~$*
