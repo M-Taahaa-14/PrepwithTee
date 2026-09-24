@@ -53,11 +53,16 @@ PROVIDERS = {
              "model": os.environ.get("EXPLAIN_GROQ_MODEL", "qwen/qwen3.8-27b"),
              # Reasoning burns the 8k tokens/minute budget and truncates the JSON;
              # the step-by-step prompt gives the working instead.
-             "extra": {"reasoning_effort": "none"}},
+             "extra": {"reasoning_effort": "none"},
+             # Free tier: 7000 INPUT tokens/minute and a question is ~4.5k (the
+             # page images), so the drip paces itself to stay under it.
+             "itpm": 7000},
     "gemini": {"env": "GEMINI_API_KEY",
                "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-               "model": os.environ.get("EXPLAIN_GEMINI_MODEL", "gemini-2.0-flash"),
-               "extra": {}},
+               # 2.0/2.5-flash are retired; 3.x flash thinks before answering, so
+               # keep reasoning low and leave room for it in the token budget.
+               "model": os.environ.get("EXPLAIN_GEMINI_MODEL", "gemini-3.8-flash"),
+               "extra": {"reasoning_effort": "low", "max_tokens": 8000}},
 }
 
 SYSTEM = """You are Tee, an expert Cambridge O Level / IGCSE / A Level tutor in Lahore. \
@@ -253,9 +258,10 @@ def store(con, qid: int, data: dict, model: str, usage: dict | None) -> None:
 # ── Provider calls ────────────────────────────────────────────────────────────
 
 class RateLimited(Exception):
-    def __init__(self, wait: float, daily: bool):
-        super().__init__(f"rate limited ({'daily' if daily else 'per-minute'}), wait {wait:.0f}s")
-        self.wait, self.daily = wait, daily
+    def __init__(self, wait: float, daily: bool, busy: bool = False):
+        kind = "over capacity" if busy else "daily" if daily else "per-minute"
+        super().__init__(f"rate limited ({kind}), wait {wait:.0f}s")
+        self.wait, self.daily, self.busy = wait, daily, busy
 
 
 def _seconds(v: str | None) -> float:
@@ -293,14 +299,19 @@ def call(messages: list[dict], provider: str | None = None, timeout: int = 90):
                                 # repairs and validates instead.
                                 "max_tokens": MAX_TOKENS, "temperature": 0.2, **p["extra"]})
         if r.status_code == 429:
-            daily = r.headers.get("x-ratelimit-remaining-requests") == "0"
-            wait = float(r.headers.get("retry-after") or 0) or _seconds(
-                r.headers.get("x-ratelimit-reset-requests" if daily else "x-ratelimit-reset-tokens"))
+            # Groq says so in headers; Gemini only names the quota in the body.
+            daily = (r.headers.get("x-ratelimit-remaining-requests") == "0"
+                     or "perday" in r.text.replace(" ", "").lower())
+            said = re.search(r"try again in ([\d.hms]+)", r.text)
+            wait = (float(r.headers.get("retry-after") or 0)
+                    or (_seconds(said.group(1)) if said else 0)
+                    or _seconds(r.headers.get("x-ratelimit-reset-requests" if daily
+                                              else "x-ratelimit-reset-tokens")))
             last = RateLimited(max(wait, 2.0), daily)
             continue
         if r.status_code in (500, 502, 503, 504):
             # Free tiers go "over capacity" regularly; back off and retry.
-            last = RateLimited(30.0, False)
+            last = RateLimited(30.0, False, busy=True)
             continue
         if r.status_code >= 400:
             last = RuntimeError(f"{name} {r.status_code}: {r.text[:300]}")
@@ -344,44 +355,124 @@ def run_pilot(con, args):
                  len(data["parts"]), data["confidence"], usage.get("total_tokens"))
 
 
-def run_drip(con, args):
-    """Work through the backlog inside the free quota, newest papers first."""
-    done = fails = 0
-    for q in pending(con, args.syllabus, None, args.force):
-        if done >= args.per_day:
-            log.info("daily share reached (%d) - run again tomorrow", done)
-            break
-        for attempt in range(3):
-            try:
-                data, usage, model, headers = generate_one(q, args.provider)
-                break
-            except RateLimited as e:
-                if e.daily:
-                    log.info("provider daily limit reached after %d today - stopping", done)
+DAY = 24 * 3600
+
+
+def _drip_worker(provider, work, args, lock, totals, stop):
+    """One provider's share of the backlog. Each free provider has its own quota,
+    so they run side by side and pull from the same queue."""
+    import queue
+    con = db.connect()
+    done_today, day_start, strikes = 0, time.time(), 0
+    try:
+        while not stop.is_set():
+            if time.time() - day_start >= DAY:
+                done_today, day_start = 0, time.time()
+            if done_today >= args.per_day:
+                if not args.loop:
+                    log.info("%s: daily share reached (%d)", provider, done_today)
                     return
-                log.info("per-minute limit, sleeping %.0fs", e.wait)
-                time.sleep(min(e.wait + 1, 120))
-            except Exception as e:                     # network / 5xx: skip this one
-                log.warning("q%s: %s", q["id"], e)
-                data, headers = None, {}
-                break
-        else:
-            continue
-        if data is None:
-            fails += 1
-            continue
-        store(con, q["id"], data, model, usage)
-        done += 1
-        # Leave room for the live site, which shares the key and its daily quota.
-        remaining = int(headers.get("x-ratelimit-remaining-requests") or 10**6)
-        if remaining <= args.reserve:
-            log.info("only %d requests left today - leaving them for the live site", remaining)
-            break
-        # Pace on the per-minute token budget instead of hammering into 429s.
-        left_tokens = int(headers.get("x-ratelimit-remaining-tokens") or 10**6)
-        if left_tokens < 4000:
-            time.sleep(min(_seconds(headers.get("x-ratelimit-reset-tokens")) + 0.5, 60))
-    log.info("drip: stored %d, unusable %d", done, fails)
+                rest = DAY - (time.time() - day_start)
+                log.info("%s: daily share reached, resting %.1fh", provider, rest / 3600)
+                stop.wait(rest)
+                continue
+            try:
+                q = work.get_nowait()
+            except queue.Empty:
+                return
+            try:
+                data, usage, model, headers = generate_one(q, provider)
+            except RateLimited as e:
+                work.put(q)                          # someone (or we) retry it later
+                if e.daily:
+                    if not args.loop:
+                        log.info("%s: provider daily limit reached - stopping", provider)
+                        return
+                    log.info("%s: provider daily limit, resting %.1fh", provider,
+                             max(e.wait, 3600) / 3600)
+                    stop.wait(max(e.wait, 3600))
+                    done_today, day_start = 0, time.time()
+                else:
+                    # Per-minute: the provider says exactly how long. Over capacity:
+                    # back off harder each time in a row.
+                    strikes += 1
+                    wait = (min(e.wait * 2 ** min(strikes - 1, 5), 600) if e.busy
+                            else min(e.wait, 300)) + 1
+                    log.info("%s: busy/limited (%s), retry in %.0fs", provider, e, wait)
+                    stop.wait(wait)
+                continue
+            except Exception as e:                   # bad request, network: skip it
+                log.warning("%s q%s: %s", provider, q["id"], e)
+                with lock:
+                    totals["errors"] += 1
+                continue
+            strikes = 0
+            if data is None:
+                log.warning("%s q%s: unusable response", provider, q["id"])
+                with lock:
+                    totals["unusable"] += 1
+                continue
+            with lock:
+                store(con, q["id"], data, model, usage)
+                totals["stored"] += 1
+                totals[provider] = totals.get(provider, 0) + 1
+                n = totals["stored"]
+            done_today += 1
+            if n % 25 == 0:
+                log.info("drip: %d stored (%s)", n, ", ".join(
+                    f"{p} {totals.get(p, 0)}" for p in args.providers))
+            # Groq's key is shared with the live site: leave it the reserve.
+            remaining = int(headers.get("x-ratelimit-remaining-requests") or 10**6)
+            if remaining <= args.reserve:
+                wait = max(_seconds(headers.get("x-ratelimit-reset-requests")), 3600)
+                if not args.loop:
+                    log.info("%s: %d requests left today - leaving them for the site",
+                             provider, remaining)
+                    return
+                log.info("%s: %d left today, resting %.1fh", provider, remaining, wait / 3600)
+                stop.wait(wait)
+                done_today, day_start = 0, time.time()
+                continue
+            # Pace on the per-minute input budget instead of hammering into 429s.
+            itpm = PROVIDERS[provider].get("itpm")
+            # Only half of it: the live Photo Solver uses the same key and model.
+            pace = (usage.get("prompt_tokens") or 0) / itpm * 60 * 2 if itpm else 0
+            if max(pace, args.gap):
+                stop.wait(max(pace, args.gap))
+    finally:
+        con.close()
+
+
+def run_drip(con, args):
+    """Work through the backlog inside the free quotas, newest papers first."""
+    import queue
+    import threading
+    args.providers = [args.provider] if args.provider else available_providers()
+    if not args.providers:
+        raise SystemExit("No free AI provider key set (GROQ_API_KEY or GEMINI_API_KEY).")
+    work = queue.Queue()
+    for q in pending(con, args.syllabus, None, args.force):
+        work.put(q)
+    log.info("drip: %d pending, providers %s, %d/day each%s", work.qsize(),
+             ", ".join(args.providers), args.per_day, " (looping)" if args.loop else "")
+    lock, stop = threading.Lock(), threading.Event()
+    totals = {"stored": 0, "unusable": 0, "errors": 0}
+    threads = [threading.Thread(target=_drip_worker, name=p, daemon=True,
+                                args=(p, work, args, lock, totals, stop))
+               for p in args.providers]
+    for t in threads:
+        t.start()
+    try:
+        while any(t.is_alive() for t in threads):
+            time.sleep(1)
+    except KeyboardInterrupt:
+        log.info("stopping after the current requests...")
+        stop.set()
+        for t in threads:
+            t.join(120)
+    log.info("drip: stored %d (%s), unusable %d, errors %d", totals["stored"],
+             ", ".join(f"{p} {totals.get(p, 0)}" for p in args.providers),
+             totals["unusable"], totals["errors"])
 
 
 def run_stats(con, _args):
@@ -409,8 +500,17 @@ def main(argv=None):
                     help="max explanations this run (free daily quota is shared with the site)")
     ap.add_argument("--reserve", type=int, default=300,
                     help="stop when the provider has this many requests left today")
+    ap.add_argument("--loop", action="store_true",
+                    help="drip: keep running, resting through each provider's daily reset")
+    ap.add_argument("--gap", type=float, default=0,
+                    help="drip: seconds to wait between requests per provider")
     ap.add_argument("--force", action="store_true", help="redo questions already explained")
     args = ap.parse_args(argv)
+    try:                                   # keys live in .env; never override the shell
+        from dotenv import load_dotenv
+        load_dotenv(config.ROOT / ".env", override=False)
+    except ImportError:
+        pass
     con = db.connect()
     try:
         if args.pilot:

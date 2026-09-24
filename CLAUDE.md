@@ -368,13 +368,22 @@ linked), not agreement with any external file.
       Rules: free = ONE explanation (reopenable, explanation_unlocks; a busy provider
       never spends it), hints + follow-ups need a plan; trial 5/20/20; paid
       unlimited explain+hints, follow-ups capped FOLLOWUP_MONTHLY_CAP (300).
+      **Drip (2026-09-25)**: `python -m pipeline.explain --drip --loop --per-day 1500
+      --reserve 300` runs one thread per provider (Groq + Gemini `gemini-3.8-flash`;
+      2.0/2.5-flash are retired) off one shared queue, log in data/logs/. Groq free
+      also caps **7000 INPUT tokens/min** and a question is ~4.5k (images), so the
+      drip paces itself to HALF of that - the local .env GROQ key IS the production
+      key, and the live Photo Solver uses the same model. Prod hotfix applied:
+      `GROQ_VISION_MODEL=qwen/qwen3.8-27b` in /etc/prepwithtee.env (backup
+      .bak-20260925). Explanations are generated locally; push them with
+      `scripts/sync_explanations_to_supabase.py` at deploy time (migration 021 applied).
       `static/ai-panel.js` (+css) = shared panel (KaTeX + marked + DOMPurify, math
       lifted out with a letters-only placeholder). Pilot 2026-09-25: 3 x 5054
       explanations matched the official MS. **Groq retired qwen3.6-27b** (live
       Photo Solver/tutor vision default) - app.py now defaults to qwen3.8-27b.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
-      `021_ai_help.sql` on Supabase BEFORE deploying code;
+      `021_ai_help.sql` (done 2026-09-25) on Supabase BEFORE deploying code;
       the server runs **Python 3.10** - no 3.12-only f-string syntax
       (py_compile new files with the server venv).
 

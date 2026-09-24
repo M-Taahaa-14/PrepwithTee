@@ -36,6 +36,7 @@ os.environ.update({
     "SMTP_PASS": "",
     "ANTHROPIC_API_KEY": "",
     "GROQ_API_KEY": "",
+    "GEMINI_API_KEY": "",
     "OPENROUTER_API_KEY": "",
     "CEREBRAS_API_KEY": "",
     "SECRET_KEY": "test-secret-not-for-production",
