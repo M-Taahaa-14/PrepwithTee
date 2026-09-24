@@ -1,5 +1,5 @@
 """Explain / Guide me / follow-ups: the plan rules, and the follow-up stream.
-No real model calls - the Anthropic client is replaced with a fake."""
+No real model calls - the free-provider calls are replaced with fakes."""
 
 import json
 import os
@@ -65,11 +65,45 @@ def test_free_student_gets_one_explanation_and_can_reopen_it(client, new_student
 
 
 def test_not_ready_does_not_use_up_the_free_one(client, new_student, qids):
-    new_student()
+    new_student()                      # no provider key in tests -> cannot generate
     a, _, missing = qids
     r = client.get(f"/api/questions/{missing}/explain")
-    assert r.status_code == 404 and r.json()["detail"]["code"] == "not_ready"
+    assert r.status_code == 404 and "being prepared" in r.json()["detail"]
     assert client.get(f"/api/questions/{a}/explain").status_code == 200
+
+
+def test_missing_explanation_is_generated_once_and_stored(client, new_student, qids, monkeypatch):
+    from pipeline import explain as ex
+    calls = []
+    monkeypatch.setattr(ex, "available_providers", lambda: ["groq"])
+    monkeypatch.setattr(ex, "generate_one",
+                        lambda q, provider=None: calls.append(q["id"]) or
+                        (SAMPLE, {"prompt_tokens": 10, "completion_tokens": 20}, "groq:test", {}))
+    new_student()
+    missing = qids[-1]
+    assert client.get(f"/api/questions/{missing}/explain").status_code == 200
+    assert client.get(f"/api/questions/{missing}/explain").status_code == 200   # now stored
+    assert calls == [missing]
+    con = sqlite3.connect(os.environ["INDEX_DB_PATH"])
+    assert con.execute("SELECT model FROM question_explanations WHERE question_id=?",
+                       (missing,)).fetchone()[0] == "groq:test"
+    con.execute("DELETE FROM question_explanations WHERE question_id=?", (missing,))
+    con.commit()
+    con.close()
+
+
+def test_busy_provider_does_not_spend_the_free_one(client, new_student, qids, monkeypatch):
+    from pipeline import explain as ex
+    monkeypatch.setattr(ex, "available_providers", lambda: ["groq"])
+
+    def busy(q, provider=None):
+        raise ex.RateLimited(30, False)
+
+    monkeypatch.setattr(ex, "generate_one", busy)
+    new_student()
+    r = client.get(f"/api/questions/{qids[-1]}/explain")
+    assert r.status_code == 503 and "busy" in r.json()["detail"]
+    assert client.get(f"/api/questions/{qids[0]}/explain").status_code == 200   # still free
 
 
 def test_hints_and_followups_need_a_plan(client, new_student, qids):
@@ -89,33 +123,21 @@ def test_paid_student_explains_everything_and_gets_hints_one_at_a_time(client, n
     assert len(h1) == 1 and len(h3) == 3
 
 
-class _FakeStream:
-    def __init__(self, chunks): self.text_stream = iter(chunks)
-    def __enter__(self): return self
-    def __exit__(self, *a): return False
-
-
-class _FakeClient:
-    def __init__(self):
-        self.calls = []
-        self.messages = self
-
-    def stream(self, **kw):
-        self.calls.append(kw)
-        return _FakeStream(["Because ", "area must be ", "in $\\mathrm{m^2}$."])
-
-
 def test_followup_streams_is_saved_and_quotes_the_selection(client, new_student, qids, monkeypatch):
     import ai_help
     make_paid(new_student())
-    fake = _FakeClient()
-    monkeypatch.setattr(ai_help, "_client", lambda: fake)
+    sent = []
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    monkeypatch.setattr(ai_help, "_stream_chat",
+                        lambda msgs, key: sent.append(msgs) or
+                        iter(["Because ", "area must be ", "in $\\mathrm{m^2}$."]))
     a = qids[0]
     r = client.post(f"/api/questions/{a}/ask",
                     json={"message": "Why convert?", "quoted_text": "Check your area is in m²."})
     assert r.status_code == 200 and r.text == "Because area must be in $\\mathrm{m^2}$."
-    sent = fake.calls[0]["messages"][-1]["content"]
-    assert sent.startswith('About this part: "Check your area is in m²."')
+    msgs = sent[0]
+    assert msgs[0]["role"] == "system" and "Worked solution the student read" in msgs[0]["content"]
+    assert msgs[-1]["content"].startswith('About this part: "Check your area is in m²."')
     thread = client.get(f"/api/questions/{a}/thread").json()["messages"]
     assert [m["role"] for m in thread] == ["user", "assistant"]
     assert thread[0]["quoted_text"] == "Check your area is in m²."

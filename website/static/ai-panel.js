@@ -105,10 +105,10 @@ function gated(P, err) {
   return false;
 }
 
-async function load(P, path, what) {
+async function load(P, path, what, timeout = 20000) {
   loading(P, what);
   try {
-    return await api(path);
+    return await api(path, { timeout });
   } catch (err) {
     if (gated(P, err)) return null;
     body(P).innerHTML = `<p class="ai-muted">${esc(err.message)}</p>`;
@@ -118,7 +118,9 @@ async function load(P, path, what) {
 
 // Explain
 async function renderExplain(P) {
-  const d = await load(P, `/api/questions/${P.q.qid}/explain`, "the worked solution");
+  const d = await load(P, `/api/questions/${P.q.qid}/explain`,
+    "the worked solution (the first time anyone opens a question this can take up to a minute)",
+    95000);
   if (!d || P.tab !== "explain") return;
   const parts = (d.parts || []).map((p) => `
     <section class="ai-part">
@@ -160,7 +162,7 @@ async function renderHints(P) {
 
 async function nextHint(P, redraw = false) {
   const level = redraw ? P.hints : Math.min(3, P.hints + 1);
-  const d = await load(P, `/api/questions/${P.q.qid}/hints?level=${level}`, "your hint");
+  const d = await load(P, `/api/questions/${P.q.qid}/hints?level=${level}`, "your hint", 95000);
   if (!d || P.tab !== "hint") return;
   P.hints = level;
   body(P).innerHTML = `

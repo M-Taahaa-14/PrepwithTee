@@ -352,22 +352,26 @@ linked), not agreement with any external file.
       `/papers.html` 302s to the new builder except `?tab=yearly|mcq` and
       `?mode=test`. E2E: `pytest -m e2e tests/e2e` against prepwithtee-local
       (screenshots in e2e-shots/). NOTE pytest-playwright wipes test-results/.
-    - **P1-c (local, not deployed)**: AI help panel. `pipeline/explain.py`
-      pre-generates ONE structured explanation per question (parts/steps/answer/
-      marking, 3 Guide-me hints, MCQ option reasons, common mistakes) from the
-      question crop + official MS crop/letter; modes --pilot/--estimate/--submit
-      (Batch API, 800/batch)/--status/--collect; results in
-      question_explanations (index.db) -> scripts/sync_explanations_to_supabase.py.
-      Model = EXPLAIN_MODEL/--model (default claude-opus-5; tutor to choose after
-      pilot). `website/ai_help.py`: /api/questions/{qid}/explain|hints|thread|ask|
-      report. Rules (tutor 2026-09-25): free = ONE explanation (reopenable, via
-      explanation_unlocks), hints + follow-ups need a plan; trial 5/20/20; paid
-      explain+hints unlimited, follow-ups FOLLOWUP_MONTHLY_CAP (300). Follow-ups
-      stream live (FOLLOWUP_MODEL). `static/ai-panel.js` (+css) is the shared
-      panel (KaTeX + marked + DOMPurify; math is lifted out before Markdown with
-      a letters-only placeholder - NUL placeholders get eaten by marked).
-      **No ANTHROPIC_API_KEY exists locally or on the server yet** (Photo Solver
-      has been falling back to Groq).
+    - **P1-c (local, not deployed)**: AI help panel. **FREE PROVIDERS ONLY** (tutor,
+      2026-09-25: paid Claude ruled out on cost). `pipeline/explain.py` writes ONE
+      structured explanation per question (parts/steps/answer/marking, 3 Guide-me
+      hints, MCQ option reasons, common mistakes) from the question crop + official
+      MS crop/letter, on Groq `qwen/qwen3.8-27b` (vision; Gemini drops in with
+      GEMINI_API_KEY). Free Groq = 1000 requests/day + 8000 tokens/min PER MODEL,
+      shared with the live site, so: `--drip --per-day 600 --reserve 300` works
+      newest-first inside the quota, and `website/ai_help.py` generates on demand
+      the first time anyone opens a question, then stores it for everyone. Output
+      is NOT requested in strict JSON mode (it 400s on LaTeX backslashes);
+      `parse_text` doubles single-backslash LaTeX commands (`rac` would decode as
+      form-feed+"rac") and validates. Follow-ups stream from Groq
+      `openai/gpt-oss-120b` (text-only; context = question text + stored solution).
+      Rules: free = ONE explanation (reopenable, explanation_unlocks; a busy provider
+      never spends it), hints + follow-ups need a plan; trial 5/20/20; paid
+      unlimited explain+hints, follow-ups capped FOLLOWUP_MONTHLY_CAP (300).
+      `static/ai-panel.js` (+css) = shared panel (KaTeX + marked + DOMPurify, math
+      lifted out with a letters-only placeholder). Pilot 2026-09-25: 3 x 5054
+      explanations matched the official MS. **Groq retired qwen3.6-27b** (live
+      Photo Solver/tutor vision default) - app.py now defaults to qwen3.8-27b.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
       `021_ai_help.sql` on Supabase BEFORE deploying code;

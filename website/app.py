@@ -2509,7 +2509,7 @@ def chatbot_reply(req: ChatbotReq, request: Request):
 SOLVE_VISION_PROVIDERS = [
     {"name": "groq", "env": "GROQ_API_KEY",
      "url": "https://api.groq.com/openai/v1/chat/completions",
-     "model": os.environ.get("GROQ_VISION_MODEL", "qwen/qwen3.6-27b"),
+     "model": os.environ.get("GROQ_VISION_MODEL", "qwen/qwen3.8-27b"),
      "extra": {"reasoning_effort": "none"}},
     {"name": "openrouter", "env": "OPENROUTER_API_KEY",
      "url": "https://openrouter.ai/api/v1/chat/completions",
@@ -2620,7 +2620,7 @@ VISION_PROVIDERS = [
     # the working detailed without it. Groq accepts only "none" or "default".
     {"name": "groq-vision", "env": "GROQ_API_KEY",
      "url": "https://api.groq.com/openai/v1/chat/completions",
-     "model": os.environ.get("GROQ_VISION_MODEL", "qwen/qwen3.6-27b"),
+     "model": os.environ.get("GROQ_VISION_MODEL", "qwen/qwen3.8-27b"),
      "extra": {"reasoning_effort": "none"},
      "timeout": 30},   # fail fast so text fallback kicks in quickly
     {"name": "gemini-vision", "env": "GEMINI_API_KEY",
