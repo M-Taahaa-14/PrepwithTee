@@ -33,6 +33,16 @@
 .an-pop [data-color].is-on { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--c); }
 .an-pop [data-size] i { width: var(--d); height: var(--d); border-radius: 50%; background: var(--ink); display: block; }
 .an-pop [data-size].is-on { background: var(--lav); }
+.an-bar [data-tool="eraser"] { position: relative; }
+.an-mode { position: absolute; right: 4px; bottom: 3px; font-size: 14px; line-height: 0; color: var(--lav-ink); }
+.an-pop-list { flex-direction: column; gap: 4px; min-width: 15rem; }
+.an-bar .an-pop-list button { width: 100%; height: auto; border-radius: 10px; display: grid; gap: 2px; justify-items: start;
+  text-align: left; padding: .5rem .65rem; color: var(--ink); }
+.an-pop-list b { font: 700 .84rem/1.2 "Hanken Grotesk", sans-serif; }
+.an-pop-list span { font-size: .72rem; color: var(--grey); }
+.an-bar .an-pop-list button.is-on { background: var(--lav); }
+.an-bar .an-del { color: var(--pink-ink); }
+.an-bar .an-del[hidden] { display: none; }
 .an-saved { font-size: .72rem; color: var(--green-ink); min-width: 0; max-width: 9rem; white-space: nowrap;
   overflow: hidden; padding: 0 .2rem; }
 .an-saved:empty { display: none; }
@@ -45,10 +55,15 @@
 
 /* the drawing layer over each page */
 .an-layer { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
-.an-layer.is-active { pointer-events: auto; touch-action: none; cursor: crosshair; }
-.an-pen .an-layer.is-active { touch-action: pan-x pan-y pinch-zoom; }   /* stylus seen: fingers scroll */
-.an-layer.is-active[data-tool="eraser"] { cursor: cell; }
+/* touch-action stays none even after a stylus is seen: with pan allowed, Chrome/Edge
+   turn a pen stroke into a scroll (the Wacom "page jumps while writing" bug).
+   annotate.js scrolls the page itself for a finger once a pen has been used. */
+.an-layer.is-active { pointer-events: auto; touch-action: none; cursor: crosshair;
+  -webkit-user-select: none; user-select: none; }
+.an-layer.is-active[data-tool^="eraser"] { cursor: none; }
 .an-layer.is-active[data-tool="text"] { cursor: text; }
+.an-layer.is-active[data-tool="select"] { cursor: default; }
+.an-drawing .vw-stage, .an-drawing .mq-stage { overscroll-behavior: contain; }
 .an-text { position: absolute; z-index: 6; min-width: 8rem; border: 1.5px dashed currentColor; border-radius: 6px;
   background: rgba(255, 255, 255, .92); font: 600 14px/1.25 "Hanken Grotesk", system-ui, sans-serif;
   padding: 2px 6px; resize: none; outline: none; }

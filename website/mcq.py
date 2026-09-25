@@ -34,7 +34,7 @@ from selection import select_mixed
 
 router = APIRouter()
 
-SESSION_V = "20260927d"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20260927e"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,

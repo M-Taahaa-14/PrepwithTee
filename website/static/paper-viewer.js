@@ -12,7 +12,7 @@
 import { api } from "/auth.js?v=20260927b";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
-import { createAnnotator } from "/annotate.js?v=20260927b";
+import { createAnnotator } from "/annotate.js?v=20260927e";
 
 let ann = null;                  // the annotation bar, created with the shell
 
