@@ -83,3 +83,7 @@
 @media print { .an-bar, .an-fab { display: none !important; } }
 /* phones: the pen button sits bottom-left, clear of the site's chat / note buttons */
 @media (max-width: 999px) { .an-fab { left: .8rem; transform: none; } }
+
+/* scratch layer over a whole web page (every non-PDF page; never saved) */
+.an-viewport { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
+.an-viewport .an-layer:not(.is-active) { pointer-events: none; }

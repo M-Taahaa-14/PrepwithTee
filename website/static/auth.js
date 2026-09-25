@@ -548,3 +548,6 @@ export function showAuthRequiredModal({ heading, text, nextUrl, container }) {
 if (typeof window !== "undefined") {
   window.showAuthRequiredModal = showAuthRequiredModal;
 }
+
+// The pen button on every non-PDF page (scratch ink, never saved).
+import("/scratch-pen.js?v=20260927i").catch(() => {});

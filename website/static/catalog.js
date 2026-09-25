@@ -4,7 +4,7 @@
  *     signed-in student with no saved boards, and from "Edit my boards".
  * Page state is embedded by catalog.py as JSON in #cat-state.
  */
-import { api } from "/auth.js?v=20260927b";
+import { api } from "/auth.js?v=20260927i";
 
 const state = JSON.parse(document.getElementById("cat-state")?.textContent || "{}");
 

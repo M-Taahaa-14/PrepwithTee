@@ -116,3 +116,37 @@ def test_pen_select_text_and_partial_eraser(student, shots):
     page.locator('.an-bar [data-tool="pen"]').click()
     expect(opts).to_be_hidden()
     expect(page.locator(".an-bar .an-swatch")).to_be_visible()
+
+
+def test_scratch_pen_on_every_other_page_is_never_saved(student, shots):
+    page = student.new_page()
+    puts = []
+    page.on("request", lambda r: puts.append(r.url) if "/api/annotations" in r.url else None)
+    for url in ("/tools.html", "/papers/igcse", "/yearly"):
+        page.goto(url)
+        expect(page.locator(".an-fab")).to_be_visible(timeout=10_000)
+        assert page.locator(".an-bar").count() == 1, url
+    # draw on /yearly, scroll: the ink moves with the page
+    page.locator(".an-fab").click()
+    page.locator('.an-bar [data-tool="pen"]').click()
+    page.mouse.move(400, 500); page.mouse.down(); page.mouse.move(600, 520, steps=10); page.mouse.up()
+    expect(page.locator(".an-saved")).to_contain_text("not saved")
+    ink_at = lambda y: page.evaluate(
+        f"(() => {{ const c = document.querySelector('.an-viewport canvas'); const d = devicePixelRatio;"
+        f" return [...c.getContext('2d').getImageData(500 * d, {y} * d, 1, 1).data][3] > 0; }})()")
+    assert ink_at(510)
+    page.locator('.an-bar [data-tool="pointer"]').click()
+    page.mouse.wheel(0, 200); page.wait_for_timeout(400)
+    moved = page.evaluate("scrollY")
+    assert moved > 0 and ink_at(round(510 - moved)) and not ink_at(510)
+    page.screenshot(path=str(shots / "scratch_pen.png"))
+    page.reload()
+    expect(page.locator(".an-fab")).to_be_visible()
+    assert not ink_at(510)
+    assert puts == [], puts                                    # nothing ever sent
+
+    # PDF viewers keep their own, saved annotator - only one bar
+    student.request.post("/api/enrollments", data={"syllabus": "5054"})
+    page.goto(f"/yearly/view/{_paper_id()}")
+    expect(page.locator("#pv-qp .vw-pg canvas").first).to_be_visible(timeout=30_000)
+    assert page.locator(".an-bar").count() == 1 and page.locator(".an-viewport").count() == 0

@@ -814,3 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
   s.defer = true;
   document.head.appendChild(s);
 })();
+
+// The pen button on every non-PDF page (scratch ink, never saved). auth.js loads it too;
+// scratch-pen.js starts only once.
+import("/scratch-pen.js?v=20260927i").catch(function () {});

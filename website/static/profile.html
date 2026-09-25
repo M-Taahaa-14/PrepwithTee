@@ -504,13 +504,13 @@
   </footer>
 <!--FOOT:END-->
 
-  <script src="main.js?v=20260831a"></script>
+  <script src="main.js?v=20260927i"></script>
   <script src="styled-dropdown.js?v=20260828a"></script>
   <script src="tools-core.js?v=20260927b"></script>
   <script src="tools-nav.js?v=20260811d"></script>
 
   <script type="module">
-    import { requireAuth, api, getUser } from "/auth.js?v=20260927b";
+    import { requireAuth, api, getUser } from "/auth.js?v=20260927i";
 
     const root = document.getElementById("profile-root");
 
@@ -1793,7 +1793,7 @@
       const signoutBtn = document.getElementById("pf-signout");
       if (signoutBtn) {
         signoutBtn.addEventListener("click", async () => {
-          const { logout } = await import("/auth.js?v=20260927b");
+          const { logout } = await import("/auth.js?v=20260927i");
           logout();
         });
       }

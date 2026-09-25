@@ -17,6 +17,9 @@
  * seen, a finger or palm does not draw: it scrolls the page, done here by hand.
  * Drawing is frame-throttled over a cached image of the finished strokes, so a
  * long stroke on a busy page stays smooth.
+ * Scratch mode (createAnnotator({ persist: false }) + attachViewport()): one
+ * layer over the whole web page, ink moving with the content as you scroll,
+ * NEVER saved - main.js puts it on every page that isn't a PDF viewer.
  * Keys: V pointer · S select · P pen · H highlighter · E eraser · T text ·
  *       Delete remove selection · Ctrl+Z / Ctrl+Y.
  */
@@ -57,7 +60,8 @@ async function req(method, url, body) {
   return r.json();
 }
 
-export function createAnnotator({ mount = document.body, position = "bottom" } = {}) {
+export function createAnnotator({ mount = document.body, position = "bottom", persist: saveInk = true,
+                                  collapsed = false } = {}) {
   const A = {
     tool: "pointer", color: COLORS[0], size: 1, collapsed: false, eraseMode: "partial", eraseSize: 1,
     docs: new Map(),      // doc -> Promise<{page: strokes[]}>
@@ -271,6 +275,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
 
   // ── pages ──────────────────────────────────────────────────────────────────
   function load(doc) {
+    if (!saveInk) return Promise.resolve({});
     if (!A.docs.has(doc)) {
       A.docs.set(doc, req("GET", `/api/annotations?doc=${encodeURIComponent(doc)}`)
         .then((d) => d.pages || {}).catch(() => ({})));
@@ -301,27 +306,32 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
   }
 
   function size(p) {
-    const w = p.el.clientWidth, h = p.el.clientHeight;
     const dpr = window.devicePixelRatio || 1;
+    // Whole-page layer: the canvas is the viewport; coordinates are fractions of
+    // the page WIDTH on both axes (y can pass 1), so ink stays put when the
+    // page grows, and scrolling just shifts the view.
+    const cw = p.el.clientWidth, ch = p.el.clientHeight;
+    const w = cw, h = p.view ? cw : ch;
     let changed = false;
-    if (p.canvas.width !== Math.round(w * dpr) || p.canvas.height !== Math.round(h * dpr)) {
-      p.canvas.width = Math.round(w * dpr);
-      p.canvas.height = Math.round(h * dpr);
+    if (p.canvas.width !== Math.round(cw * dpr) || p.canvas.height !== Math.round(ch * dpr)) {
+      p.canvas.width = Math.round(cw * dpr);
+      p.canvas.height = Math.round(ch * dpr);
       changed = true;
     }
-    return { w, h, dpr, changed };
+    return { w, h, dpr, changed, ox: p.view ? window.scrollX : 0, oy: p.view ? window.scrollY : 0 };
   }
 
   /** Full repaint: rebuild the cached image of the finished strokes, then show it. */
   function paintLayer(p) {
     if (!p.strokes) return;
-    const { w, h, dpr } = size(p);
+    const { w, h, dpr, ox, oy } = size(p);
     if (!p.base) p.base = document.createElement("canvas");
     p.base.width = p.canvas.width;
     p.base.height = p.canvas.height;
     const b = p.base.getContext("2d");
-    b.setTransform(dpr, 0, 0, dpr, 0, 0);
-    b.clearRect(0, 0, w, h);
+    b.setTransform(1, 0, 0, 1, 0, 0);
+    b.clearRect(0, 0, p.base.width, p.base.height);
+    b.setTransform(dpr, 0, 0, dpr, -ox * dpr, -oy * dpr);
     for (const s of p.strokes) draw(b, s, w, h);
     blit(p);
     p.canvas.classList.toggle("is-active", DRAWS.has(A.tool));
@@ -330,13 +340,13 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
 
   /** Cheap per-frame paint: cached strokes + the stroke being drawn + selection. */
   function blit(p) {
-    const { w, h, dpr, changed } = size(p);
+    const { w, h, dpr, changed, ox, oy } = size(p);
     if (changed || !p.base) return paintLayer(p);
     const ctx = p.canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
     ctx.drawImage(p.base, 0, 0);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, -ox * dpr, -oy * dpr);
     if (p.live) draw(ctx, p.live, w, h);
     if (A.sel?.key === p.key && p.strokes[A.sel.i]) drawSelection(ctx, p.strokes[A.sel.i], w, h);
     if (p.eraserAt && A.tool === "eraser") {
@@ -517,16 +527,21 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
       [cx + rx * Math.cos((i / n) * Math.PI * 2), cy + ry * Math.sin((i / n) * Math.PI * 2), 0.5]);
   }
 
-  function translate(s, dx, dy) {
-    const mv = (q) => [clamp(q[0] + dx), clamp(q[1] + dy), ...q.slice(2)];
+  function translate(s, dx, dy, free = false) {
+    const cy = free ? (v) => Math.max(0, v) : clamp;
+    const mv = (q) => [clamp(q[0] + dx), cy(q[1] + dy), ...q.slice(2)];
     if (s.pts) return { ...s, pts: s.pts.map(mv) };
-    if (s.t === "text") return { ...s, x: clamp(s.x + dx), y: clamp(s.y + dy) };
+    if (s.t === "text") return { ...s, x: clamp(s.x + dx), y: cy(s.y + dy) };
     return { ...s, a: mv(s.a), b: mv(s.b) };
   }
 
   function pt(p, e) {
     const r = p.canvas.getBoundingClientRect();
     const pressure = e.pointerType === "pen" && e.pressure > 0 ? e.pressure : 0.5;
+    if (p.view) {
+      return [clamp((e.clientX - r.left + window.scrollX) / r.width),
+              Math.max(0, (e.clientY - r.top + window.scrollY) / r.width), +pressure.toFixed(2)];
+    }
     return [clamp((e.clientX - r.left) / r.width), clamp((e.clientY - r.top) / r.height), +pressure.toFixed(2)];
   }
 
@@ -652,7 +667,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     const dx = q[0] - d.start[0], dy = q[1] - d.start[1];
     if (!d.moved && Math.hypot(dx, dy) < 0.002) return;
     d.moved = true;
-    p.strokes[A.sel.i] = translate(d.orig, dx, dy);
+    p.strokes[A.sel.i] = translate(d.orig, dx, dy, !!p.view);
   }
 
   function deleteSelected() {
@@ -732,7 +747,10 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     box.placeholder = "Type · Enter to finish · Shift+Enter new line";
     box.value = s.txt || "";
     const fs = Math.max(12, s.s * p.el.clientWidth);
-    Object.assign(box.style, { left: `${s.x * 100}%`, top: `${s.y * 100}%`, color: s.c, fontSize: `${fs}px` });
+    Object.assign(box.style, p.view
+      ? { position: "absolute", left: `${s.x * p.el.clientWidth}px`, top: `${s.y * p.el.clientWidth}px`,
+          color: s.c, fontSize: `${fs}px`, zIndex: 66 }
+      : { left: `${s.x * 100}%`, top: `${s.y * 100}%`, color: s.c, fontSize: `${fs}px` });
     // hide the canvas copy while it is being edited
     let hidden = null;
     if (index != null) {
@@ -741,7 +759,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
       paintLayer(p);
       p.strokes = p.strokes.map((x, j) => (j === index ? hidden : x));
     }
-    p.el.appendChild(box);
+    (p.view ? document.body : p.el).appendChild(box);
     // focus now, not on a timer: the first key typed must not reach the tool hotkeys
     box.focus({ preventScroll: true });
     box.select();
@@ -830,6 +848,10 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
   }
 
   function save(p) {
+    if (!saveInk) {
+      if (!A.warned) { A.warned = true; flash("Scratch ink — not saved"); }
+      return;
+    }
     clearTimeout(A.saveTimers.get(p.key));
     A.saveTimers.set(p.key, setTimeout(async () => {
       try {
@@ -846,7 +868,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
   // Phones: start as the small pen button, the full bar would cover the page.
   let remembered = null;
   try { remembered = JSON.parse(localStorage.getItem("pwt-annot") || "{}").open; } catch { /* ignore */ }
-  if (window.innerWidth < 700 && remembered !== true) setCollapsed(true);
+  if (collapsed || (window.innerWidth < 700 && remembered !== true)) setCollapsed(true);
   fab.addEventListener("click", () => {
     try {
       const s = JSON.parse(localStorage.getItem("pwt-annot") || "{}");
@@ -861,8 +883,24 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     if (!v && A.tool !== "pointer") setTool("pointer");
   }
 
+  /** One layer over the whole web page (scratch mode). */
+  function attachViewport(doc = "scratch") {
+    const el = document.createElement("div");
+    el.className = "an-viewport";
+    mount.appendChild(el);
+    const canvas = document.createElement("canvas");
+    canvas.className = "an-layer";
+    el.appendChild(canvas);
+    const p = { el, canvas, doc, page: 0, key: `${doc}|0`, strokes: [], view: true };
+    A.pages.set(p.key, p);
+    bind(p);
+    window.addEventListener("scroll", () => schedule(p, true), { passive: true });
+    paintLayer(p);
+    return p;
+  }
+
   return {
-    attach, detachWithin, setVisible,
+    attach, attachViewport, detachWithin, setVisible,
     repaint: () => { for (const p of A.pages.values()) if (p.el.isConnected) paintLayer(p); },
     setTool, get tool() { return A.tool; },
     onTool: (fn) => A.listeners.add(fn),
