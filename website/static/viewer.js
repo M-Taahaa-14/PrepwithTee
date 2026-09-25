@@ -7,9 +7,9 @@
  *   chips    per question: Explain / Guide me / Mark scheme -> ai-panel.js
  */
 import { api } from "/auth.js?v=20260829a";
-import { openAiPanel } from "/ai-panel.js?v=20260926p";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260926p";
-import { createAnnotator } from "/annotate.js?v=20260926p";
+import { openAiPanel } from "/ai-panel.js?v=20260926r";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260926r";
+import { createAnnotator } from "/annotate.js?v=20260926r";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");

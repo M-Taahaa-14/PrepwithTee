@@ -10,9 +10,9 @@
  *            thresholds for the sitting (same data the old library showed)
  */
 import { api } from "/auth.js?v=20260829a";
-import { openAiPanel } from "/ai-panel.js?v=20260926p";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260926p";
-import { createAnnotator } from "/annotate.js?v=20260926p";
+import { openAiPanel } from "/ai-panel.js?v=20260926r";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260926r";
+import { createAnnotator } from "/annotate.js?v=20260926r";
 
 let ann = null;                  // the annotation bar, created with the shell
 

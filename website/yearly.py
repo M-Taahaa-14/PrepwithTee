@@ -1,4 +1,4 @@
-﻿"""Yearly past papers and MCQ practice as their own pages (P1-d).
+"""Yearly past papers and MCQ practice as their own pages (P1-d).
 
     /yearly                                   boards -> subjects
     /yearly/{board}                           one board's subjects
@@ -27,7 +27,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260926p"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260926r"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -188,20 +188,26 @@ def _sitting_rows(code: str, items: list[dict]) -> str:
         if not main:
             continue
         mcq = is_mcq(code, e["paper"])
-        chips = "".join(
-            f'<a class="yr-file yr-{k}" href="/yearly/view/{main["id"]}?doc={k}">{lab}</a>'
-            for k, lab in (("qp", "QP"), ("ms", "MS"), ("in", "Insert")) if k in files)
-        if mcq and "qp" in files:
-            chips += (f'<a class="yr-file yr-practise" href="{mcq_url(code)}?paper={files["qp"]["id"]}#start"'
-                      f' title="Sit this paper in the MCQ solver">▶ Practise</a>')
+        # Fixed slots (QP · MS · Practise · Insert) so the buttons line up down a
+        # column; an absent file leaves its slot empty rather than shifting the rest,
+        # and inserts come last because most papers have none.
+        empty = '<span class="yr-file yr-none" aria-hidden="true"></span>'
+
+        def doc(k, lab, title):
+            return (f'<a class="yr-file yr-{k}" href="/yearly/view/{main["id"]}?doc={k}" '
+                    f'title="{title}">{lab}</a>') if k in files else empty
+        slots = [doc("qp", "QP", "Question paper"), doc("ms", "MS", "Mark scheme"),
+                 (f'<a class="yr-file yr-practise" href="{mcq_url(code)}?paper={files["qp"]["id"]}#start" '
+                  f'title="Practise it in the MCQ solver" aria-label="Practise this paper">▶</a>'
+                  if mcq and "qp" in files else empty),
+                 doc("in", "IN", "Insert")]
         rows.append(f"""
           <li class="yr-row" data-key="{e['year']}|{e['session']}|{e['paper']}|{_e(e['variant'])}">
             <a class="yr-main" href="/yearly/view/{main['id']}">
-              <b>Paper {e['code']}</b>
-              <span>{code}/{e['code']} {SESSION_SHORT.get(e['session'], '')} {e['year']}</span>
-              {'<em class="yr-mcq">MCQ</em>' if mcq else ''}
+              <span class="yr-name"><b>Paper {e['code']}</b>{'<em class="yr-mcq">MCQ</em>' if mcq else ''}</span>
+              <span class="yr-code">{code}/{e['code']} · {SESSION_SHORT.get(e['session'], '')} {e['year']}</span>
             </a>
-            <span class="yr-files">{chips}</span>
+            <span class="yr-files">{''.join(slots)}</span>
             <span class="yr-done" aria-hidden="true"></span>
           </li>""")
     return "".join(rows)
