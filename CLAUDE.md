@@ -437,6 +437,20 @@ linked), not agreement with any external file.
       tools-core SOURCES entries may be arrays (loaded in order); tools-core.js and
       tools.css versions bumped on every page. Tests: tests/unit/test_math_expr.py
       (Node, ~60 values at x=2 + errors + relations), tests/e2e/test_graph_plotter.py.
+    - **Free explanation providers + official-answer gate (2026-09-26)**. Groq's free
+      vision model is capped at **200k tokens/DAY (~30 explanations)** and is the live
+      Photo Solver's budget, so it is OUT of the background job. `pipeline/ai_providers.py`
+      = registry (mistral [workhorse, vision], nvidia, openrouter, groq_text [gpt-oss,
+      capped 40/day - shared with live follow-up chat], gemini, groq [site only],
+      cloudflare, ollama), each enabled by its key in .env, model overridable with
+      EXPLAIN_<NAME>_MODEL. `pipeline/explain_check.py`: route() text vs vision (maths
+      4024/0580/9709 always vision; figures, "Fig./diagram" wording, drawn MCQ options,
+      image-only mark schemes -> vision); pdf_text() keeps ^superscripts/_subscripts;
+      check() = MCQ exactly one correct option == key; structured = mark-scheme values
+      (ignoring question refs, mark codes, "M1 for ..." partial credit; "a to b" ranges as
+      intervals; en-dash minus) present in the working. Then a second model must agree
+      (mark-scheme IMAGE for maths). Failing explanations are retried elsewhere, never
+      stored. `python -m pipeline.explain --probe` tests every configured provider.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
       `021_ai_help.sql` (done 2026-09-25) and `022_mcq_sessions_annotations.sql`

@@ -508,3 +508,16 @@ def test_build_and_explain(page, logged_in_as):
 6. **Free-plan limits after enrolment**: is enrolling in *all* subjects fine for a Free user (the lock is only about enrolling), with quotas as the only limit? (Matches your answer; confirming because today the "3 Subjects" plan implies a subject cap.)
 7. **Board list**: just O Level / IGCSE / A Level (Cambridge) for now, or do you also want Edexcel/AS as separate boards later (affects slugs)?
 8. **Difficulty colours** (later): classify by AI, or by your judgement in an admin screen, or both (AI suggests, you confirm)?
+
+### Answers (tutor, 2026-09-26)
+- **MCQ "Something else"**: nothing extra - a mis-tick while adding a note.
+- **Explanations**: one per question, first one free for free users, then a plan; generated
+  in bulk on FREE providers only and served to everyone; every explanation must agree with
+  the official Cambridge mark scheme (enforced: pipeline/explain_check.py + a verifier model).
+- **Difficulty**: primarily from the **examiner reports** (ER) - parse and analyse each
+  yearly paper's ER, store a difficulty against every question; the tutor can override it
+  from the admin side. Colours in the booklet contents page come from that.
+- **Booklet PDFs**: Claude's call - keep each built PDF on the server for **30 days after it
+  was last opened**, then delete the file only; the booklet row keeps its question ids, so
+  opening an old link rebuilds the same paper (same order) in ~20 s.
+- **Boards**: Cambridge only (O Level / IGCSE / A Level) for now.

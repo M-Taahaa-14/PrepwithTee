@@ -1,31 +1,33 @@
-"""Stage: AI worked solutions + Guide-me hints, generated once per question (free tier).
+"""Stage: AI worked solutions + Guide-me hints, generated once per question (free tiers).
 
-    python -m pipeline.explain --pilot 5 --syllabus 0625      # a few, printed + stored
-    python -m pipeline.explain --drip --per-day 600           # background: newest papers first,
-                                                              # stays inside the free daily quota
+    python -m pipeline.explain --probe                        # which free providers answer
+    python -m pipeline.explain --pilot 5 --syllabus 0625      # a few, stored
+    python -m pipeline.explain --drip --loop                  # background, every provider
     python -m pipeline.explain --stats                        # how many are done
 
 Tutor's decisions: every question gets ONE explanation, generated once and
-served to every student (2026-09-25); and no paid models - free tiers only
-(2026-09-25). So generation runs on free OpenAI-compatible providers (Groq by
-default; Gemini drops in with GEMINI_API_KEY) and is spread over time:
+served to every student; free tiers only; and every explanation must agree with
+the OFFICIAL Cambridge mark scheme (2026-09-26).
 
-  * --drip works through the backlog newest-first, pacing itself on the
-    provider's rate-limit headers and leaving `--reserve` daily requests free
-    for the live site, which shares the same key;
-  * the website generates on demand when a student opens a question that is
-    not done yet (website/ai_help.py calls generate_one), then stores it.
+How a question is written up (pipeline/ai_providers.py has the providers):
 
-One call per question produces everything the viewer's AI panel shows:
+  1. route   explain_check.route(): questions whose text and mark scheme read
+             cleanly go the TEXT route (any free text model - Mistral, NVIDIA,
+             OpenRouter, Groq gpt-oss ...); figures, drawn options and maths
+             layout go the VISION route (Mistral, Gemini; Groq's vision model is
+             the live Photo Solver's budget and stays out of the background job).
+             A text model that finds it needs the diagram says so and the
+             question moves to the vision route.
+  2. write   one JSON per question: parts[] (steps, answer, how marks are given),
+             hints[3], mcq_options[] (why each option), common_mistakes.
+  3. check   explain_check.check(): MCQ - exactly one option marked correct and
+             it is the official key; structured - the mark scheme's values are in
+             the working. Then a second model reads the official mark scheme and
+             the solution's final answers and must say they agree (the mark-scheme
+             IMAGE for maths). Anything that fails is retried elsewhere, never stored.
 
-    parts[]          worked solution per sub-part (steps, answer, how marks are given)
-    hints[3]         Guide me: what is asked -> first step -> next step
-    mcq_options[]    MCQ only: why each option is right or wrong
-    common_mistakes  misconceptions examiners report
-
-The model sees the question crop and the OFFICIAL mark scheme (crop or MCQ
-letter), so the explanation must arrive at Cambridge's answer; when it can't,
-`confidence` says so.
+The website generates on demand (website/ai_help.py -> generate_one) the first
+time a student opens a question that is not done yet, with the same checks.
 """
 
 import argparse
@@ -37,7 +39,9 @@ import time
 
 import fitz
 
+from . import ai_providers as ap
 from . import config, db, setup_logging
+from . import explain_check as ck
 
 log = setup_logging("explain")
 
@@ -45,26 +49,8 @@ PROMPT_VERSION = 1
 RENDER_DPI = 100
 MAX_IMAGES = 3                     # per side (question / mark scheme)
 MAX_TOKENS = 3500
-
-# Free OpenAI-compatible vision providers, in order of preference.
-PROVIDERS = {
-    "groq": {"env": "GROQ_API_KEY",
-             "url": "https://api.groq.com/openai/v1/chat/completions",
-             "model": os.environ.get("EXPLAIN_GROQ_MODEL", "qwen/qwen3.8-27b"),
-             # Reasoning burns the 8k tokens/minute budget and truncates the JSON;
-             # the step-by-step prompt gives the working instead.
-             "extra": {"reasoning_effort": "none"},
-             # Free tier: 7000 INPUT tokens/minute and a question is ~4.5k (the
-             # page images), so the drip paces itself to stay under it.
-             "itpm": 7000},
-    "gemini": {"env": "GEMINI_API_KEY",
-               "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-               # 2.0/2.5-flash are retired; 3.x flash thinks before answering, so
-               # keep reasoning low and leave room for it in the token budget.
-               "model": os.environ.get("EXPLAIN_GEMINI_MODEL", "gemini-3.8-flash"),
-               "fallback": ["gemini-3.5-flash"],
-               "extra": {"reasoning_effort": "low", "max_tokens": 8000}},
-}
+RateLimited = ap.RateLimited
+_seconds = ap.seconds
 
 SYSTEM = """You are Tee, an expert Cambridge O Level / IGCSE / A Level tutor in Lahore. \
 You write the worked solution a strong student would want after attempting a past-paper \
@@ -82,6 +68,8 @@ significant figures, key phrases from the mark scheme).
 - Maths notation: LaTeX inside $...$ (inline) or $$...$$ (display). Units in \\mathrm{}. \
 No LaTeX in step titles. Because the reply is JSON, write every LaTeX backslash \
 DOUBLED, e.g. "$\\\\frac{F}{A}$".
+- "parts" is never empty: a multiple-choice question has one part (label "") with the \
+working that leads to the correct option, and "answer" is that option's letter.
 - "marking": how the marks are earned for that part, in plain words.
 - "hints": exactly three, increasingly specific, WITHOUT the final answer: 1) what the \
 question is really asking, 2) the first step, 3) the next step plus a self-check.
@@ -230,7 +218,17 @@ def parse_text(text: str) -> dict | None:
         data = json.loads(text[start:end + 1])
     except ValueError:
         return None
-    if not isinstance(data, dict) or not data.get("parts") or len(data.get("hints") or []) < 3:
+    if not isinstance(data, dict):
+        return None
+    if not data.get("parts") and data.get("mcq_options"):
+        # Some models put the whole MCQ working into the options: make it the part.
+        right = [o for o in data["mcq_options"] if isinstance(o, dict) and o.get("correct") is True]
+        if len(right) == 1:
+            data["parts"] = [{"label": "", "steps": [{"title": f"Why {right[0].get('letter')} is correct",
+                                                      "body": str(right[0].get("why", ""))}],
+                              "answer": str(right[0].get("letter", "")),
+                              "marking": "1 mark for the correct option."}]
+    if not data.get("parts") or len(data.get("hints") or []) < 3:
         return None
     data["hints"] = [str(h) for h in data["hints"][:3]]
     data.setdefault("mcq_options", [])
@@ -256,215 +254,339 @@ def store(con, qid: int, data: dict, model: str, usage: dict | None) -> None:
     con.commit()
 
 
-# ── Provider calls ────────────────────────────────────────────────────────────
 
-class RateLimited(Exception):
-    def __init__(self, wait: float, daily: bool, busy: bool = False):
-        kind = "over capacity" if busy else "daily" if daily else "per-minute"
-        super().__init__(f"rate limited ({kind}), wait {wait:.0f}s")
-        self.wait, self.daily, self.busy = wait, daily, busy
+# ── Text route ────────────────────────────────────────────────────────────────
 
+TEXT_NOTE = """
 
-def _seconds(v: str | None) -> float:
-    """Groq reset headers look like '7.66s', '2m59.56s' or '1h2m3s'."""
-    if not v:
-        return 0.0
-    total, num = 0.0, ""
-    for ch in v:
-        if ch.isdigit() or ch == ".":
-            num += ch
-        else:
-            total += float(num or 0) * {"h": 3600, "m": 60, "s": 1}.get(ch, 0)
-            num = ""
-    return total + (float(num) if num else 0.0)
+The question and mark scheme below are TEXT extracted from the PDF: superscripts are
+written with ^ (m/s^2, 3.0 x 10^8), subscripts with _ (CH_3), and answer lines/dots
+are omitted. If the question cannot be answered correctly without seeing a diagram,
+graph or picture that the text does not describe, reply with exactly
+{"needs_diagram": true} and nothing else."""
 
 
-def available_providers() -> list[str]:
-    return [n for n, p in PROVIDERS.items() if os.environ.get(p["env"])]
+def build_text_messages(q, qtext: str, mstext: str) -> list[dict]:
+    syl, paper = q["syllabus"], q["paper"]
+    mcq = config.is_mcq(syl, paper)
+    ref = config.source_ref(syl, f"{paper}{q['variant']}", q["session"], q["year"],
+                            q["number"], q["sub_part"] or "")
+    header = (f"Subject: {_subject(syl)} ({syl})\nSource: {ref}\nChapter: {q['topic']}"
+              + (f"\nSubtopic: {q['subtopic']}" if q["subtopic"] else "")
+              + (f"\nMarks: {q['marks']}" if q["marks"] else "")
+              + f"\nType: {'multiple choice' if mcq else 'structured'}")
+    key = (f"OFFICIAL MARK SCHEME: the correct option is {q['mcq_answer']}."
+           if mcq else f"OFFICIAL MARK SCHEME (text):\n{mstext[:6000]}")
+    user = (f"{header}\n\nQUESTION (text):\n{qtext[:8000]}\n\n{key}\n\n"
+            "Reply with the JSON object now.")
+    return [{"role": "system", "content": SYSTEM + TEXT_NOTE}, {"role": "user", "content": user}]
 
 
-def call(messages: list[dict], provider: str | None = None, timeout: int = 90):
-    """(text, usage, model, headers) from the first configured provider."""
-    import requests
-    names = [provider] if provider else available_providers()
-    if not names:
-        raise RuntimeError("No free AI provider key set (GROQ_API_KEY or GEMINI_API_KEY).")
-    last = None
-    # A provider's backup models are tried when its main one is over capacity.
-    tries = [(n, m) for n in names
-             for m in [PROVIDERS[n]["model"], *PROVIDERS[n].get("fallback", [])]]
-    for name, model in tries:
-        p = PROVIDERS[name]
-        if last is not None and not getattr(last, "busy", False) and model != p["model"]:
-            continue                       # backups only help with "over capacity"
-        r = requests.post(p["url"], timeout=timeout,
-                          headers={"Authorization": f"Bearer {os.environ[p['env']]}"},
-                          json={"model": model, "messages": messages,
-                                # No response_format: strict JSON mode rejects the
-                                # whole answer over one LaTeX backslash; parse_text
-                                # repairs and validates instead.
-                                "max_tokens": MAX_TOKENS, "temperature": 0.2, **p["extra"]})
-        if r.status_code == 429:
-            # Groq says so in headers; Gemini only names the quota in the body.
-            daily = (r.headers.get("x-ratelimit-remaining-requests") == "0"
-                     or "perday" in r.text.replace(" ", "").lower())
-            said = re.search(r"try again in ([\d.hms]+)", r.text)
-            wait = (float(r.headers.get("retry-after") or 0)
-                    or (_seconds(said.group(1)) if said else 0)
-                    or _seconds(r.headers.get("x-ratelimit-reset-requests" if daily
-                                              else "x-ratelimit-reset-tokens")))
-            last = RateLimited(max(wait, 2.0), daily)
+def _vision_verify_messages(data: dict, q) -> list[dict]:
+    answers = "\n".join(f"{p.get('label') or 'Answer'}: {p.get('answer', '')}"
+                        for p in data.get("parts", []))
+    content = [{"type": "text", "text": "OFFICIAL MARK SCHEME:"}] + _image_parts(q["ms_crop"])
+    content.append({"type": "text", "text": f"SOLUTION'S FINAL ANSWERS:\n{answers[:6000]}"})
+    return [{"role": "system", "content": ck.VERIFY_SYSTEM}, {"role": "user", "content": content}]
+
+
+# ── Generating one explanation ───────────────────────────────────────────────
+
+class NeedsVision(Exception):
+    """A text model said it cannot answer without the diagram."""
+
+
+class KeyMismatch(Exception):
+    """The explanation disagrees with the official Cambridge answer."""
+
+
+def available_providers(purpose: str = "site") -> list[str]:
+    return ap.configured(purpose)
+
+
+def route_of(q) -> str:
+    try:
+        return ck.route(q)
+    except Exception as exc:                  # unreadable crop: let a vision model look
+        log.debug("q%s route: %s", q["id"], exc)
+        return "vision"
+
+
+def providers_for(route: str, purpose: str = "site", exclude=()) -> list[str]:
+    reg = ap.registry()
+    return [n for n in ap.configured(purpose)
+            if n not in exclude and (reg[n]["vision"] if route == "vision" else reg[n]["text"])]
+
+
+def attempt(q, name: str, route: str, ms: str | None = None):
+    """One provider, one try: (data, usage, model, headers). Raises RateLimited,
+    NeedsVision, KeyMismatch (with the reason) or RuntimeError."""
+    if route == "text":
+        messages = build_text_messages(q, ck.question_text(q), ms if ms is not None else ck.ms_text(q))
+    else:
+        messages = build_messages(q)
+    text, usage, model, headers = ap.call(name, messages)
+    if route == "text" and '"needs_diagram"' in (text or "").replace(" ", "") and len(text) < 80:
+        raise NeedsVision(model)
+    data = parse_text(text)
+    if data is None:
+        raise KeyMismatch(f"{model}: unusable reply")
+    ok, why = ck.check(data, q, ms)
+    if not ok:
+        raise KeyMismatch(f"{model}: {why}")
+    data["check"] = {"route": route, "key": why, "writer": model}
+    return data, usage, model, headers
+
+
+def verify(data: dict, q, route: str, ms: str | None, purpose: str, prefer=()) -> tuple[bool | None, str]:
+    """A second model compares the solution's final answers with the official mark
+    scheme. MCQ needs no model (the key check is exact). None = nobody free to ask."""
+    if config.is_mcq(q["syllabus"], q["paper"]):
+        return True, "key letter"
+    maths = q["syllabus"] in ck.VISION_SUBJECTS
+    ms = ms if ms is not None else ck.ms_text(q)
+    if maths or not ms:
+        if not q["ms_crop"]:
+            return None, "no mark scheme"
+        need, messages = "vision", _vision_verify_messages(data, q)
+    else:
+        need, messages = "text", ck.verify_messages(data, q, ms)
+    names = providers_for(need, purpose)
+    names = [n for n in prefer if n in names] + [n for n in names if n not in prefer]
+    for name in names:
+        try:
+            text, _u, model, _h = ap.call(name, messages, max_tokens=400, temperature=0)
+        except (RateLimited, RuntimeError):
             continue
-        if r.status_code in (500, 502, 503, 504):
-            # Free tiers go "over capacity" regularly; back off and retry.
-            last = RateLimited(30.0, False, busy=True)
+        verdict = ck.parse_verdict(text)
+        if verdict is None:
             continue
-        if r.status_code >= 400:
-            last = RuntimeError(f"{name} {r.status_code}: {r.text[:300]}")
-            continue
-        j = r.json()
-        return (j["choices"][0]["message"].get("content") or "", j.get("usage") or {},
-                f"{name}:{model}", r.headers)
-    raise last
+        agrees, problem = verdict
+        data.setdefault("check", {})["verified_by"] = model
+        return agrees, problem or "agrees with the mark scheme"
+    return None, "no verifier available"
 
 
-def generate_one(q, provider: str | None = None):
-    """(data, usage, model, headers) for one question; data None if unusable."""
-    text, usage, model, headers = call(build_messages(q), provider)
-    return parse_text(text), usage, model, headers
+def generate_one(q, provider: str | None = None, route: str | None = None,
+                 purpose: str = "site", check_with_model: bool = True):
+    """(data, usage, model, headers) for one question; data None if no provider
+    produced an explanation that agrees with the official answer. Raises
+    RateLimited when every provider that could do it is rate limited."""
+    route = route or route_of(q)
+    ms = ck.ms_text(q) if not config.is_mcq(q["syllabus"], q["paper"]) else None
+    names = [provider] if provider else providers_for(route, purpose)
+    limited = None
+    for name in names:
+        try:
+            data, usage, model, headers = attempt(q, name, route, ms)
+        except NeedsVision:
+            if route == "text" and not provider:
+                return generate_one(q, None, "vision", purpose, check_with_model)
+            continue
+        except RateLimited as e:
+            limited = e
+            continue
+        except KeyMismatch as e:
+            log.info("q%s rejected: %s", q["id"], e)
+            continue
+        except RuntimeError as e:
+            log.warning("q%s %s: %s", q["id"], name, e)
+            continue
+        if check_with_model:
+            agrees, why = verify(data, q, route, ms, purpose, prefer=[n for n in names if n != name])
+            if agrees is False:
+                log.info("q%s rejected by the verifier: %s", q["id"], why)
+                continue
+            data["check"]["verdict"] = why if agrees else "not model-verified"
+        return data, usage, model, headers
+    if limited is not None:
+        raise limited
+    return None, {}, "", {}
 
 
 # ── Modes ─────────────────────────────────────────────────────────────────────
+
+def run_probe(_con, _args):
+    rows = ap.probe()
+    if not rows:
+        print("No free AI provider keys in .env yet.")
+    for name, status in rows:
+        print(f"  {name:11s} {status}")
+    missing = [n for n in ap.registry() if n not in ap.configured()]
+    if missing:
+        print("\nNot configured:", ", ".join(missing))
+
 
 def run_pilot(con, args):
     import random
     rows = pending(con, args.syllabus, None, args.force)
     random.Random(7).shuffle(rows)
     for q in rows[:args.pilot]:
-        for _attempt in range(3):
-            try:
-                data, usage, model, _h = generate_one(q, args.provider)
-                break
-            except RateLimited as e:
-                if e.daily:
-                    log.warning("daily limit reached - stopping pilot")
-                    return
-                log.info("per-minute limit, waiting %.0fs", e.wait)
-                time.sleep(min(e.wait + 1, 90))
-        else:
+        route = route_of(q)
+        try:
+            data, usage, model, _h = generate_one(q, args.provider, route, purpose="drip")
+        except RateLimited as e:
+            log.warning("q%s: every provider is rate limited (%s)", q["id"], e)
             continue
         if data is None:
-            log.warning("q%s: unusable response", q["id"])
+            log.warning("q%s (%s): no explanation agreed with the official answer", q["id"], route)
             continue
         store(con, q["id"], data, model, usage)
-        log.info("q%s %s: %d parts, confidence %s, %s tokens", q["id"], q["syllabus"],
-                 len(data["parts"]), data["confidence"], usage.get("total_tokens"))
+        log.info("q%s %s %s via %s: %s", q["id"], q["syllabus"], route, model,
+                 data.get("check", {}).get("verdict", ""))
 
 
 DAY = 24 * 3600
+MAX_TRIES = 4                       # different providers / routes before giving up this run
 
 
-def _drip_worker(provider, work, args, lock, totals, stop):
-    """One provider's share of the backlog. Each free provider has its own quota,
-    so they run side by side and pull from the same queue."""
+class Pacer:
+    """One provider's pace: minimum gap, input-token budget per minute, a daily
+    share, and a rest after a daily limit. Shared by generation and checking."""
+
+    def __init__(self, name: str, per_day_default: int):
+        p = ap.registry()[name]
+        self.name, self.p = name, p
+        self.per_day = p.get("per_day", per_day_default)
+        self.done, self.day0, self.next_ok, self.strikes = 0, time.time(), 0.0, 0
+
+    def ready(self) -> float:
+        """Seconds until this provider may be used (0 = now)."""
+        now = time.time()
+        if now - self.day0 >= DAY:
+            self.done, self.day0 = 0, now
+        if self.done >= self.per_day:
+            return self.day0 + DAY - now
+        return max(0.0, self.next_ok - now)
+
+    def used(self, usage: dict | None):
+        self.done += 1
+        self.strikes = 0
+        gap = self.p.get("min_gap", 0)
+        itpm = self.p.get("itpm")
+        if itpm and usage:
+            gap = max(gap, (usage.get("prompt_tokens") or 0) / itpm * 60)
+        self.next_ok = time.time() + gap
+
+    def limited(self, e: RateLimited):
+        self.strikes += 1
+        if e.daily:
+            self.next_ok = time.time() + max(e.wait, 3600)
+        else:
+            self.next_ok = time.time() + (min(e.wait * 2 ** min(self.strikes - 1, 5), 900)
+                                          if e.busy else min(e.wait, 300)) + 1
+
+
+def _drip_worker(name, queues, pacer, args, lock, totals, stop, tries):
+    """One provider: takes vision work if it can see, else text work."""
     import queue
     con = db.connect()
-    done_today, day_start, strikes = 0, time.time(), 0
+    reg = ap.registry()[name]
+    order = (["vision", "text"] if reg["vision"] else []) if reg["text"] else ["vision"]
+    if reg["text"] and not reg["vision"]:
+        order = ["text"]
     try:
         while not stop.is_set():
-            if time.time() - day_start >= DAY:
-                done_today, day_start = 0, time.time()
-            if done_today >= args.per_day:
-                if not args.loop:
-                    log.info("%s: daily share reached (%d)", provider, done_today)
+            wait = pacer.ready()
+            if wait > 0:
+                if not args.loop and pacer.done >= pacer.per_day:
                     return
-                rest = DAY - (time.time() - day_start)
-                log.info("%s: daily share reached, resting %.1fh", provider, rest / 3600)
-                stop.wait(rest)
+                stop.wait(min(wait, 600))
                 continue
-            try:
-                q = work.get_nowait()
-            except queue.Empty:
-                return
-            try:
-                data, usage, model, headers = generate_one(q, provider)
-            except RateLimited as e:
-                work.put(q)                          # someone (or we) retry it later
-                if e.daily:
-                    if not args.loop:
-                        log.info("%s: provider daily limit reached - stopping", provider)
+            item = None
+            for r in order:
+                try:
+                    item = queues[r].get_nowait()
+                    break
+                except queue.Empty:
+                    continue
+            if item is None:
+                # Nothing routed for us yet: route a fresh one from the backlog.
+                try:
+                    q = queues["new"].get_nowait()
+                except queue.Empty:
+                    if all(queues[k].empty() for k in queues):
                         return
-                    log.info("%s: provider daily limit, resting %.1fh", provider,
-                             max(e.wait, 3600) / 3600)
-                    stop.wait(max(e.wait, 3600))
-                    done_today, day_start = 0, time.time()
-                else:
-                    # Per-minute: the provider says exactly how long. Over capacity:
-                    # back off harder each time in a row.
-                    strikes += 1
-                    wait = (min(e.wait * 2 ** min(strikes - 1, 5), 600) if e.busy
-                            else min(e.wait, 300)) + 1
-                    log.info("%s: busy/limited (%s), retry in %.0fs", provider, e, wait)
-                    stop.wait(wait)
+                    stop.wait(5)
+                    continue
+                route = route_of(q)
+                if route not in order:
+                    queues[route].put((q, route))
+                    continue
+                item = (q, route)
+            q, route = item
+            try:
+                data, usage, model, _h = attempt(q, name, route)
+            except NeedsVision:
+                queues["vision"].put((q, "vision"))
+                pacer.used(None)
                 continue
-            except Exception as e:                   # bad request, network: skip it
-                log.warning("%s q%s: %s", provider, q["id"], e)
+            except RateLimited as e:
+                queues[route].put(item)
+                pacer.limited(e)
+                log.info("%s: %s", name, e)
+                continue
+            except (KeyMismatch, RuntimeError) as e:
+                pacer.used(None)
                 with lock:
-                    totals["errors"] += 1
+                    tries[q["id"]] = tries.get(q["id"], 0) + 1
+                    n = tries[q["id"]]
+                    totals["rejected"] += 1
+                log.info("%s q%s rejected (%d): %s", name, q["id"], n, e)
+                if n < MAX_TRIES:
+                    # Another provider next time; after two text misses, show it the images.
+                    queues["vision" if n >= 2 else route].put((q, "vision" if n >= 2 else route))
                 continue
-            strikes = 0
-            if data is None:
-                log.warning("%s q%s: unusable response", provider, q["id"])
+            pacer.used(usage)
+            agrees, why = verify(data, q, route, None, "drip", prefer=[name])
+            if agrees is False:
                 with lock:
-                    totals["unusable"] += 1
+                    tries[q["id"]] = tries.get(q["id"], 0) + 1
+                    totals["rejected"] += 1
+                log.info("%s q%s rejected by the verifier: %s", name, q["id"], why)
+                if tries[q["id"]] < MAX_TRIES:
+                    queues["vision"].put((q, "vision"))
                 continue
+            if agrees is None and not config.is_mcq(q["syllabus"], q["paper"]):
+                queues[route].put(item)                  # can't confirm yet: later
+                stop.wait(30)
+                continue
+            data["check"]["verdict"] = why
             with lock:
                 store(con, q["id"], data, model, usage)
                 totals["stored"] += 1
-                totals[provider] = totals.get(provider, 0) + 1
+                totals[name] = totals.get(name, 0) + 1
+                totals[route] = totals.get(route, 0) + 1
                 n = totals["stored"]
-            done_today += 1
             if n % 25 == 0:
                 log.info("drip: %d stored (%s)", n, ", ".join(
                     f"{p} {totals.get(p, 0)}" for p in args.providers))
-            # Groq's key is shared with the live site: leave it the reserve.
-            remaining = int(headers.get("x-ratelimit-remaining-requests") or 10**6)
-            if remaining <= args.reserve:
-                wait = max(_seconds(headers.get("x-ratelimit-reset-requests")), 3600)
-                if not args.loop:
-                    log.info("%s: %d requests left today - leaving them for the site",
-                             provider, remaining)
-                    return
-                log.info("%s: %d left today, resting %.1fh", provider, remaining, wait / 3600)
-                stop.wait(wait)
-                done_today, day_start = 0, time.time()
-                continue
-            # Pace on the per-minute input budget instead of hammering into 429s.
-            itpm = PROVIDERS[provider].get("itpm")
-            # Only half of it: the live Photo Solver uses the same key and model.
-            pace = (usage.get("prompt_tokens") or 0) / itpm * 60 * 2 if itpm else 0
-            if max(pace, args.gap):
-                stop.wait(max(pace, args.gap))
     finally:
         con.close()
 
 
 def run_drip(con, args):
-    """Work through the backlog inside the free quotas, newest papers first."""
+    """Work through the backlog on every free provider at once, newest papers first."""
     import queue
     import threading
-    args.providers = [args.provider] if args.provider else available_providers()
+    args.providers = [args.provider] if args.provider else available_providers("drip")
     if not args.providers:
-        raise SystemExit("No free AI provider key set (GROQ_API_KEY or GEMINI_API_KEY).")
-    work = queue.Queue()
+        raise SystemExit("No free AI provider keys in .env (see pipeline/ai_providers.py).")
+    queues = {"new": queue.Queue(), "text": queue.Queue(), "vision": queue.Queue()}
     for q in pending(con, args.syllabus, None, args.force):
-        work.put(q)
-    log.info("drip: %d pending, providers %s, %d/day each%s", work.qsize(),
-             ", ".join(args.providers), args.per_day, " (looping)" if args.loop else "")
+        # Only questions with an official answer to check against.
+        if config.is_mcq(q["syllabus"], q["paper"]) and not q["mcq_answer"]:
+            continue
+        if not config.is_mcq(q["syllabus"], q["paper"]) and not q["ms_crop"]:
+            continue
+        queues["new"].put(q)
+    log.info("drip: %d pending with an official answer; providers %s%s", queues["new"].qsize(),
+             ", ".join(args.providers), " (looping)" if args.loop else "")
     lock, stop = threading.Lock(), threading.Event()
-    totals = {"stored": 0, "unusable": 0, "errors": 0}
+    totals = {"stored": 0, "rejected": 0}
+    tries: dict[int, int] = {}
     threads = [threading.Thread(target=_drip_worker, name=p, daemon=True,
-                                args=(p, work, args, lock, totals, stop))
+                                args=(p, queues, Pacer(p, args.per_day), args, lock, totals, stop, tries))
                for p in args.providers]
     for t in threads:
         t.start()
@@ -475,10 +597,10 @@ def run_drip(con, args):
         log.info("stopping after the current requests...")
         stop.set()
         for t in threads:
-            t.join(120)
-    log.info("drip: stored %d (%s), unusable %d, errors %d", totals["stored"],
+            t.join(150)
+    log.info("drip: stored %d (%s; text %d, vision %d), rejected %d", totals["stored"],
              ", ".join(f"{p} {totals.get(p, 0)}" for p in args.providers),
-             totals["unusable"], totals["errors"])
+             totals.get("text", 0), totals.get("vision", 0), totals["rejected"])
 
 
 def run_stats(con, _args):
@@ -492,26 +614,26 @@ def run_stats(con, _args):
             "JOIN questions q ON q.id=e.question_id JOIN papers p ON p.id=q.paper_id "
             "WHERE e.prompt_version >= 1 GROUP BY 1 ORDER BY 1"):
         print(f"  {syl}: {n:,}")
+    for model, n in con.execute(
+            "SELECT model, COUNT(*) FROM question_explanations GROUP BY model ORDER BY 2 DESC"):
+        print(f"    {model}: {n:,}")
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    mode = ap.add_mutually_exclusive_group(required=True)
+    ap_ = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    mode = ap_.add_mutually_exclusive_group(required=True)
     mode.add_argument("--pilot", type=int, metavar="N")
     mode.add_argument("--drip", action="store_true")
     mode.add_argument("--stats", action="store_true")
-    ap.add_argument("--syllabus")
-    ap.add_argument("--provider", choices=sorted(PROVIDERS))
-    ap.add_argument("--per-day", type=int, default=600,
-                    help="max explanations this run (free daily quota is shared with the site)")
-    ap.add_argument("--reserve", type=int, default=300,
-                    help="stop when the provider has this many requests left today")
-    ap.add_argument("--loop", action="store_true",
-                    help="drip: keep running, resting through each provider's daily reset")
-    ap.add_argument("--gap", type=float, default=0,
-                    help="drip: seconds to wait between requests per provider")
-    ap.add_argument("--force", action="store_true", help="redo questions already explained")
-    args = ap.parse_args(argv)
+    mode.add_argument("--probe", action="store_true", help="test every configured provider")
+    ap_.add_argument("--syllabus")
+    ap_.add_argument("--provider", choices=sorted(ap.registry()))
+    ap_.add_argument("--per-day", type=int, default=2000,
+                     help="max explanations per provider per day (providers may set their own)")
+    ap_.add_argument("--loop", action="store_true",
+                     help="drip: keep running, resting through each provider's limits")
+    ap_.add_argument("--force", action="store_true", help="redo questions already explained")
+    args = ap_.parse_args(argv)
     try:                                   # keys live in .env; never override the shell
         from dotenv import load_dotenv
         load_dotenv(config.ROOT / ".env", override=False)
@@ -519,7 +641,9 @@ def main(argv=None):
         pass
     con = db.connect()
     try:
-        if args.pilot:
+        if args.probe:
+            run_probe(con, args)
+        elif args.pilot:
             run_pilot(con, args)
         elif args.drip:
             run_drip(con, args)
