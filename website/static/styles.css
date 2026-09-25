@@ -5732,12 +5732,14 @@ html[data-theme="dark"] .pm-note-banner {
 
 /* ── Notes + Past Papers dropdowns — 2-column variant ─────────── */
 .nav-mega-notes > .nav-group-panel,
-.nav-mega-papers > .nav-group-panel {
+.nav-mega-papers > .nav-group-panel,
+.nav-mega-tools > .nav-group-panel {
   min-width: 480px;
   max-width: 540px;
 }
 .nav-mega-notes .nav-mega-cols,
-.nav-mega-papers .nav-mega-cols {
+.nav-mega-papers .nav-mega-cols,
+.nav-mega-tools .nav-mega-cols {
   grid-template-columns: repeat(2, 1fr);
 }
 
@@ -5759,7 +5761,8 @@ html[data-theme="dark"] .pm-note-banner {
     max-height: 1300px;
   }
   .nav-mega-notes > .nav-group-panel,
-  .nav-mega-papers > .nav-group-panel {
+  .nav-mega-papers > .nav-group-panel,
+  .nav-mega-tools > .nav-group-panel {
     min-width: unset; max-width: unset;
   }
 }

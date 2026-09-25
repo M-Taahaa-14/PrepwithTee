@@ -55,7 +55,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260927f"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260927g"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 
