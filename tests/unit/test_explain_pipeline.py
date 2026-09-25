@@ -39,3 +39,9 @@ def test_bad_confidence_defaults_to_medium():
                                             ("1h2m3s", 3723), ("", 0), (None, 0)])
 def test_reset_header_parsing(header, seconds):
     assert explain._seconds(header) == pytest.approx(seconds)
+
+
+def test_double_escaped_latex_is_collapsed():
+    raw = GOOD.replace('"body":"b"', '"body":"$1.0 \\\\\\\\times 10^{3}$ and \\\\\\\\frac{1}{2}"')
+    body = explain.parse_text(raw)["parts"][0]["steps"][0]["body"]
+    assert "\\times" in body and "\\\\times" not in body and "\\frac" in body

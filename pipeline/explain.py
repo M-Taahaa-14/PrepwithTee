@@ -205,6 +205,21 @@ def _repair_latex(text: str) -> str:
     return _LATEX_RE.sub(lambda m: "\\\\", text)
 
 
+_OVER = re.compile(r"\\{2,}(?=[A-Za-z])")
+
+
+def _unescape_latex(v):
+    """Some models escape twice: after JSON decoding a string still holds '\\\\times'
+    (KaTeX reads '\\\\' as a line break). Collapse to one backslash before a command."""
+    if isinstance(v, str):
+        return _OVER.sub(lambda m: "\\", v)
+    if isinstance(v, list):
+        return [_unescape_latex(x) for x in v]
+    if isinstance(v, dict):
+        return {k: _unescape_latex(x) for k, x in v.items()}
+    return v
+
+
 def parse_text(text: str) -> dict | None:
     """The explanation JSON from model text, or None if unusable."""
     text = _repair_latex((text or "").strip())
@@ -230,6 +245,7 @@ def parse_text(text: str) -> dict | None:
                               "marking": "1 mark for the correct option."}]
     if not data.get("parts") or len(data.get("hints") or []) < 3:
         return None
+    data = _unescape_latex(data)
     data["hints"] = [str(h) for h in data["hints"][:3]]
     data.setdefault("mcq_options", [])
     data.setdefault("common_mistakes", [])

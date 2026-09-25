@@ -48,11 +48,22 @@ def registry() -> dict[str, dict]:
             "model": _env("EXPLAIN_NVIDIA_MODEL", "meta/llama-3.3-70b-instruct"),
             "vision": _flag("EXPLAIN_NVIDIA_VISION", False), "text": True,
             "min_gap": 1.8, "drip": True, "site": True, "max_tokens": 4000},
+        # OpenRouter's free models share ONE allowance per account (50 requests/day,
+        # 1000 after a one-off $10 top-up), split here between a text and a vision model.
         "openrouter": {
             "env": "OPENROUTER_API_KEY", "url": "https://openrouter.ai/api/v1/chat/completions",
-            "model": _env("EXPLAIN_OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
-            "vision": _flag("EXPLAIN_OPENROUTER_VISION", False), "text": True,
-            "min_gap": 3.5, "per_day": int(_env("EXPLAIN_OPENROUTER_PER_DAY", "45")),
+            "model": _env("EXPLAIN_OPENROUTER_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free"),
+            "fallback": ["nvidia/nemotron-3-super-120b-a12b:free"],
+            "vision": False, "text": True,
+            "min_gap": 3.5, "per_day": int(_env("EXPLAIN_OPENROUTER_PER_DAY", "30")),
+            "drip": True, "site": False, "max_tokens": 9000,     # it reasons first
+            "headers": {"HTTP-Referer": "https://prepwithtee.com", "X-Title": "PrepWithTee"}},
+        "openrouter_vision": {
+            "env": "OPENROUTER_API_KEY", "url": "https://openrouter.ai/api/v1/chat/completions",
+            "model": _env("EXPLAIN_OPENROUTER_VISION_MODEL", "qwen/qwen3.8-27b:free"),
+            "fallback": ["google/gemma-4-31b-it:free"],
+            "vision": True, "text": True,
+            "min_gap": 3.5, "per_day": int(_env("EXPLAIN_OPENROUTER_VISION_PER_DAY", "15")),
             "drip": True, "site": False, "max_tokens": 4000,
             "headers": {"HTTP-Referer": "https://prepwithtee.com", "X-Title": "PrepWithTee"}},
         "groq_text": {
