@@ -26,15 +26,62 @@ log = setup_logging("mcq")
 ANSWER_ROW = re.compile(r"(?<!\d)(\d{1,2})\s+([A-D])\s+1(?!\d)")
 
 
+def _key_pairs(text: str) -> dict[int, str] | None:
+    """Older (2010-2016) keys are a two-column "Question Number | Key" table with
+    no marks column: the text reads 1 D 21 C 2 A 22 B ... Pair every number with
+    the single letter straight after it. None if a number gets two letters."""
+    tokens = text.split()
+    out: dict[int, str] = {}
+    for a, b in zip(tokens, tokens[1:]):
+        if a.isdigit() and 1 <= int(a) <= 80 and b in ("A", "B", "C", "D"):
+            n = int(a)
+            if out.get(n, b) != b:
+                return None
+            out[n] = b
+    return out
+
+
+REMOVED = re.compile(r"(?<!\d)(\d{1,2})\s+Question\s+(?:removed|discounted)", re.I)
+_REMOVED_CACHE: dict[str, set[int]] = {}
+
+
+def removed_questions(pdf_path) -> set[int]:
+    """Questions Cambridge struck out of the key ("Question Removed/Discounted")."""
+    key = str(pdf_path)
+    if key not in _REMOVED_CACHE:
+        doc = fitz.open(pdf_path)
+        _REMOVED_CACHE[key] = {int(m.group(1)) for page in doc
+                               for m in REMOVED.finditer(page.get_text())}
+        doc.close()
+    return _REMOVED_CACHE[key]
+
+
 def parse_answers(pdf_path) -> dict[int, str]:
     """{question number: option letter} for one MCQ mark-scheme PDF."""
     doc = fitz.open(pdf_path)
     answers: dict[int, str] = {}
-    for page in doc:
-        for m in ANSWER_ROW.finditer(page.get_text()):
-            answers[int(m.group(1))] = m.group(2)
+    pages = [page.get_text() for page in doc]
     doc.close()
-    return answers
+    removed = removed_questions(pdf_path)
+    contiguous_ = lambda a: contiguous({**a, **{n: "-" for n in removed}})
+    for text in pages:
+        for m in ANSWER_ROW.finditer(text):
+            answers[int(m.group(1))] = m.group(2)
+    if contiguous_(answers):
+        return answers
+    # Fall back to the marks-less layout, only on pages that are the key table.
+    paired: dict[int, str] = {}
+    for text in pages:
+        if "Key" not in text and "Answer" not in text:
+            continue
+        got = _key_pairs(text)
+        if got is None:
+            return answers
+        for n, letter in got.items():
+            if paired.get(n, letter) != letter:
+                return answers
+            paired[n] = letter
+    return paired if contiguous_(paired) and len(paired) >= len(answers) else answers
 
 
 def contiguous(answers: dict[int, str]) -> bool:
@@ -71,8 +118,13 @@ def main():
 
     stored = skipped = unmatched = 0
     for row in papers:
-        answers = parse_answers(config.ROOT / row["rel_path"])
-        if not contiguous(answers):
+        path = config.ROOT / row["rel_path"]
+        answers = parse_answers(path)
+        # Numbers Cambridge struck out still count as present for the check.
+        whole = {**answers, **{n: "-" for n in removed_questions(path)}}
+        # A real key has 40 (at least 20) answers; a handful of "1 A 2 A" hits
+        # come from pre-2016 Paper 2 theory schemes, which were not MCQ then.
+        if not contiguous(whole) or len(answers) < 20:
             log.warning("%s: answer key is not contiguous (%d rows) - skipped",
                         row["filename"], len(answers))
             skipped += 1
@@ -82,10 +134,15 @@ def main():
                 """UPDATE ms_entries SET answer = ?
                    WHERE paper_id = ? AND question_number = ?""",
                 (letter, row["id"], number)).rowcount
-            if n:
-                stored += n
-            else:
+            if not n:
+                # link_ms never made a row for it (the old two-column keys lost
+                # questions 10-19): an MCQ row needs no crop, only the letter.
+                con.execute(
+                    """INSERT INTO ms_entries (paper_id, question_number, sub_part, answer)
+                       VALUES (?, ?, '', ?)""", (row["id"], number, letter))
+                n = 1
                 unmatched += 1
+            stored += n
         log.info("%s: %d answers", row["filename"], len(answers))
     con.commit()
 
@@ -94,7 +151,7 @@ def main():
            WHERE p.syllabus = ? AND p.paper = ? AND m.answer IS NOT NULL""",
         (args.syllabus, args.paper)).fetchone()["n"]
     log.info("stored %d answers across %d mark schemes (%d skipped, "
-             "%d had no matching ms_entries row); %d answers on file",
+             "%d ms_entries rows created); %d answers on file",
              stored, len(papers) - skipped, skipped, unmatched, have)
     con.close()
 
