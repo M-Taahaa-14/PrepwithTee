@@ -1,4 +1,4 @@
-"""Topical booklets built by the web builder, and the in-site viewer.
+﻿"""Topical booklets built by the web builder, and the in-site viewer.
 
     GET  /api/topical/{syllabus}/tree     chapters + subtopics with counts per year/paper
     POST /api/booklets/count              exact pool size for a selection (live counter)
@@ -47,7 +47,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260925b"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260926d"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 

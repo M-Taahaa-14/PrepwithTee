@@ -332,7 +332,7 @@ Suspected causes found in `pipeline/compose.py`:
 - MCQ (#6): same panel; "Why is B wrong?" per option, the correct option highlighted, misconception explained.
 - **Tests**: API with a **mocked Anthropic client** — cache miss calls model once, cache hit calls zero times; quota counted only for follow-ups; unenrolled 403. Prompt snapshot tests (the prompt includes the MS crop). E2E — click Explain → panel opens, stream renders, KaTeX renders; select text → pill → quoted message sent. One opt-in `@pytest.mark.live` test hits the real API for 3 fixture questions (run by hand, never in the default suite).
 
-### P1-d · #9 Yearly & MCQ as separate pages
+### P1-d · #9 Yearly & MCQ as separate pages — ✅ built locally 2026-09-26 (not deployed)
 - `/yearly/{board}/{subject}` — year grid → sitting → QP/MS/Insert/ER side-by-side in the same viewer component as topical (annotation + AI chips work there too because we have `questions` rows per paper).
 - `/mcq/{board}/{subject}` — own page, no tab switcher.
 - **Tests**: routes 200 + 301s; E2E open a 2016 paper and toggle QP↔MS.

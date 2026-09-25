@@ -62,6 +62,7 @@ PROVIDERS = {
                # 2.0/2.5-flash are retired; 3.x flash thinks before answering, so
                # keep reasoning low and leave room for it in the token budget.
                "model": os.environ.get("EXPLAIN_GEMINI_MODEL", "gemini-3.8-flash"),
+               "fallback": ["gemini-3.5-flash"],
                "extra": {"reasoning_effort": "low", "max_tokens": 8000}},
 }
 
@@ -289,11 +290,16 @@ def call(messages: list[dict], provider: str | None = None, timeout: int = 90):
     if not names:
         raise RuntimeError("No free AI provider key set (GROQ_API_KEY or GEMINI_API_KEY).")
     last = None
-    for name in names:
+    # A provider's backup models are tried when its main one is over capacity.
+    tries = [(n, m) for n in names
+             for m in [PROVIDERS[n]["model"], *PROVIDERS[n].get("fallback", [])]]
+    for name, model in tries:
         p = PROVIDERS[name]
+        if last is not None and not getattr(last, "busy", False) and model != p["model"]:
+            continue                       # backups only help with "over capacity"
         r = requests.post(p["url"], timeout=timeout,
                           headers={"Authorization": f"Bearer {os.environ[p['env']]}"},
-                          json={"model": p["model"], "messages": messages,
+                          json={"model": model, "messages": messages,
                                 # No response_format: strict JSON mode rejects the
                                 # whole answer over one LaTeX backslash; parse_text
                                 # repairs and validates instead.
@@ -318,7 +324,7 @@ def call(messages: list[dict], provider: str | None = None, timeout: int = 90):
             continue
         j = r.json()
         return (j["choices"][0]["message"].get("content") or "", j.get("usage") or {},
-                f"{name}:{p['model']}", r.headers)
+                f"{name}:{model}", r.headers)
     raise last
 
 

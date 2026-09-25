@@ -52,7 +52,7 @@ export function openAiPanel(el, q, { tab = "explain", onClose } = {}) {
   const P = { el, q, tab, hints: 0, quote: null, onClose };
   el.innerHTML = `
     <div class="ai-head">
-      <div><b>Q${q.seq}</b> <span>${esc(q.ref || "")}</span><em>${esc(q.topic || "")}</em></div>
+      <div><b>${esc(q.label || `Q${q.seq}`)}</b> <span>${esc(q.ref || "")}</span><em>${esc(q.topic || "")}</em></div>
       <button type="button" class="ai-x" data-ai="close" aria-label="Close panel">✕</button>
     </div>
     <div class="ai-tabs" role="tablist">${TABS.map(([k, label]) => `

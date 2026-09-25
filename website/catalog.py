@@ -1,4 +1,4 @@
-"""Boards, the subject catalogue, and the SEO pages built on them.
+﻿"""Boards, the subject catalogue, and the SEO pages built on them.
 
     /papers                                   board picker (logged-in -> their board)
     /papers/{board}                           subjects: yours first, the rest locked
@@ -106,6 +106,16 @@ for _board, _subs in BOARDS:
 def subject_url(code: str) -> str:
     s = SUBJECTS[code]
     return f"/papers/{s['board_slug']}/{s['slug']}"
+
+
+def _yearly_url(code: str) -> str:
+    import yearly                          # yearly imports this module
+    return yearly.yearly_url(code)
+
+
+def _mcq_url(code: str) -> str:
+    import yearly
+    return yearly.mcq_url(code)
 
 
 def board_of(code: str) -> str | None:
@@ -326,8 +336,8 @@ def _subject_card(code: str, state: dict) -> str:
     yrs = _years(st)
     if enrolled:
         actions = (f'<a class="cat-btn" href="{url}">Topical</a>'
-                   f'<a class="cat-btn cat-btn-ghost" href="/papers.html?tab=yearly&amp;syllabus={code}">Yearly</a>'
-                   + (f'<a class="cat-btn cat-btn-ghost" href="/mcq-solver.html?syllabus={code}">MCQ</a>'
+                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Yearly</a>'
+                   + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ</a>'
                       if st["has_mcq"] else ""))
         badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
     else:
@@ -456,8 +466,8 @@ def _subject_actions(s: dict, state: dict, chapter: str | None = None) -> str:
     build = (f"{subject_url(code)}?pick={_e(quote(chapter))}#builder" if chapter
              else "#builder")
     return (f'<a class="cat-btn" href="{build}">Build a topical paper</a>'
-            f'<a class="cat-btn cat-btn-ghost" href="/papers.html?tab=yearly&amp;syllabus={code}">Yearly papers</a>'
-            + (f'<a class="cat-btn cat-btn-ghost" href="/mcq-solver.html?syllabus={code}">MCQ practice</a>'
+            f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Yearly papers</a>'
+            + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ practice</a>'
                if st["has_mcq"] else "")
             + f'<a class="cat-btn cat-btn-ghost" href="/topical-progress.html?syllabus={code}">My progress</a>')
 
@@ -551,11 +561,15 @@ def page_chapter(board: str, subject: str, chapter: str,
 
 @router.get("/papers.html", include_in_schema=False)
 def legacy_papers(tab: str = "", mode: str = "", syllabus: str = "", topics: str = ""):
-    """The old single-page builder. Its topical tab now lives at
-    /papers/{board}/{subject}; yearly, MCQ and the test builder still render
-    here until they get their own pages (P1-d). 302 while both exist."""
+    """The old single-page builder. Topical now lives at /papers/{board}/{subject},
+    yearly at /yearly/..., MCQ at /mcq/... (301 - moved for good). Only the
+    test builder still renders here."""
     from fastapi.responses import FileResponse
-    if tab in ("yearly", "mcq") or mode == "test":
+    import yearly as _yearly
+    moved = _yearly.legacy_target(tab, syllabus)
+    if moved:
+        return RedirectResponse(moved, 301)
+    if mode == "test":
         return FileResponse(Path(__file__).resolve().parent / "static" / "papers.html",
                             headers={"Cache-Control": "no-cache"})
     if syllabus in SUBJECTS:

@@ -123,8 +123,15 @@ def test_legacy_builder_redirects(client, url, where):
     assert r.status_code == 302 and r.headers["location"] == where
 
 
-@pytest.mark.parametrize("url", ["/papers.html?tab=yearly", "/papers.html?tab=mcq",
-                                 "/papers.html?mode=test"])
-def test_legacy_tabs_still_served(client, url):
-    r = client.get(url)
+def test_legacy_test_builder_still_served(client):
+    r = client.get("/papers.html?mode=test")
     assert r.status_code == 200 and "<html" in r.text.lower()
+
+
+def test_subject_cards_link_to_the_new_yearly_and_mcq_pages(client, new_student):
+    new_student()
+    client.post("/api/enrollments", json={"syllabus": "5054"})
+    html = client.get("/papers/o-level").text
+    assert 'href="/yearly/o-level/physics-5054"' in html
+    assert 'href="/mcq/o-level/physics-5054"' in html
+    assert "tab=yearly" not in html and "mcq-solver.html" not in html

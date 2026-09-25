@@ -104,6 +104,8 @@ import booklets as _booklets_mod
 app.include_router(_booklets_mod.router)
 import ai_help as _ai_help_mod
 app.include_router(_ai_help_mod.router)
+import yearly as _yearly_mod
+app.include_router(_yearly_mod.router)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
@@ -4197,6 +4199,14 @@ def sitemap_xml():
             pri = {1: "0.95", 2: "0.90", 3: "0.85"}.get(depth, "0.70")
             entries.append(f"  <url><loc>{origin}{p}</loc>"
                            f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
+    except Exception:
+        pass
+    # Yearly papers (subject + year pages) and MCQ practice pages
+    try:
+        for p in _yearly_mod.sitemap_paths():
+            pri = "0.80" if p.count("/") <= 3 else "0.70"
+            entries.append(f"  <url><loc>{origin}{p}</loc>"
+                           f"<changefreq>monthly</changefreq><priority>{pri}</priority></url>")
     except Exception:
         pass
     try:

@@ -381,6 +381,23 @@ linked), not agreement with any external file.
       lifted out with a letters-only placeholder). Pilot 2026-09-25: 3 x 5054
       explanations matched the official MS. **Groq retired qwen3.6-27b** (live
       Photo Solver/tutor vision default) - app.py now defaults to qwen3.8-27b.
+    - **Groq blocks this PC's network (403 "Access denied. Please check your
+      network settings", 2026-09-26)** - the server reaches it fine. The drip
+      must therefore run ON THE SERVER after deploy (explain.store writes the
+      local SQLite pipeline DB today; needs a Postgres path for that).
+    - **P1-d (local, not deployed)**: `website/yearly.py` = `/yearly`,
+      `/yearly/{board}`, `/yearly/{board}/{subject}[/{year}]` (SSR, every sitting
+      as text, year chips open the collapsed `<details>`), `/yearly/view/{paper_id}`
+      (login + enrolled, noindex; `?doc=qp|ms|in`), `/mcq` + `/mcq/{board}/{subject}`
+      landing pages (solver itself is still mcq-solver.html until P1-e). Old
+      `/papers.html?tab=yearly|mcq` and `/library.html` 301 there. Viewer =
+      `static/paper-viewer.js` on the shared `static/pdf-pane.js` (viewer.js uses it
+      too): QP/MS/Insert tabs, side by side >=1280px with the MS following the
+      question being read (ms_entries.rects_json, ~2017+), chips from
+      questions.rects_json (page is 0-based there), Mark done + marks + official
+      thresholds (default "out of" = threshold max_mark - summing question marks
+      overcounts papers with optional sections). PdfPane sizes pages individually:
+      mark schemes are a portrait cover + landscape (rotate=90) pages.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
       `021_ai_help.sql` (done 2026-09-25) on Supabase BEFORE deploying code;
