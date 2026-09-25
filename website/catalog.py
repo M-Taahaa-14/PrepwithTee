@@ -1,4 +1,4 @@
-﻿"""Boards, the subject catalogue, and the SEO pages built on them.
+"""Boards, the subject catalogue, and the SEO pages built on them.
 
     /papers                                   board picker (logged-in -> their board)
     /papers/{board}                           subjects: yours first, the rest locked
@@ -307,7 +307,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
 <script src="/main.js?v=20260924a"></script>
-<script src="/tools-core.js?v=20260811d"></script>
+<script src="/tools-core.js?v=20260926a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>

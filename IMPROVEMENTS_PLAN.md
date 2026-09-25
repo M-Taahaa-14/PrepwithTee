@@ -349,7 +349,7 @@ Suspected causes found in `pipeline/compose.py`:
 - Pressure/smoothing (perfect-freehand-style algorithm, inline), palm rejection for stylus (`pointerType`).
 - **Tests**: E2E — draw a stroke, reload, stroke persists; eraser removes; keyboard shortcuts; visual snapshot of the bar at 375 px and 1440 px.
 
-### P2-b · #14 Graph plotter
+### P2-b · #14 Graph plotter — ✅ built locally 2026-09-26 (not deployed)
 - Replace the regex→`new Function` path with a small **tokenizer + Pratt parser** (unary minus precedence, implicit multiplication `2x`, `x(x+1)`, `sin x`, `sin^2 x`, `|x|`, `log_2(x)`, `√`, `π`, `e`) → safe AST evaluator (also removes `new Function` on user input).
 - Friendly inline error under the input ("Missing ')' after sin(") instead of raw JS errors; keeps the previous good graph drawn while typing.
 - Equation type icons (𝑦=, 𝑥=, parametric, inequality later) on each row, colour swatch, show/hide eye.

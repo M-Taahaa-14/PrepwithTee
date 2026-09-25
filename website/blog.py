@@ -350,7 +350,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
 <main class="{main_class}">{body}</main>
 {_foot()}
 <script src="/main.js?v=20260924a"></script>
-<script src="/tools-core.js?v=20260811d"></script>
+<script src="/tools-core.js?v=20260926a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260829a"></script>
 </body>

@@ -22,90 +22,43 @@
     { l:"2x+1",    e:"2x+1" },
     { l:"|x|",     e:"abs(x)" },
     { l:"tan(x)",  e:"tan(x)" },
-    { l:"x²+y²=r", e:"sqrt(25-x^2)" },
+    { l:"x²+y²=25", e:"x^2+y^2=25" },
+    { l:"sin²x",   e:"sin^2 x" },
+    { l:"log₂x",   e:"log_2(x)" },
   ];
 
   var KB_ROWS = [
     [["x","x"],["^","^"],["(","("],[")",")"],["⌫","DEL"]],
     [["sin","sin("],["cos","cos("],["tan","tan("],["√","sqrt("],["π","pi"]],
-    [["ln","ln("],["log","log10("],["abs","abs("],["e","e"],["÷","÷"]],
-    [["+","+"],["−","-"],["×","*"],["=","="],["Enter","ENTER"]],
+    [["ln","ln("],["log","log("],["|x|","|"],["e","e"],["÷","÷"]],
+    [["+","+"],["−","-"],["×","×"],["y","y"],["=","="],["Enter","ENTER"]],
   ];
 
-  // ── Safe math scope ────────────────────────────────────────────────────────
-  // Only these names are accessible inside user expressions; window/document etc are hidden.
-  var SK = ["PI","E","sin","cos","tan","asin","acos","atan","atan2",
-            "sinh","cosh","tanh","sqrt","cbrt","abs","log","log2","log10",
-            "exp","pow","ceil","floor","round","min","max","sign","hypot",
-            "ln","pi","euler","inf","Infinity"];
-  var SV = [Math.PI,Math.E,Math.sin,Math.cos,Math.tan,Math.asin,Math.acos,
-            Math.atan,Math.atan2,Math.sinh,Math.cosh,Math.tanh,Math.sqrt,
-            Math.cbrt,Math.abs,Math.log,Math.log2,Math.log10,Math.exp,
-            Math.pow,Math.ceil,Math.floor,Math.round,Math.min,Math.max,
-            Math.sign,Math.hypot,
-            Math.log,  // ln alias
-            Math.PI,   // pi alias
-            Math.E,    // euler (internal name for e)
-            Infinity,Infinity];
-
-  // ── Expression parser ──────────────────────────────────────────────────────
-  function preprocess(src) {
-    return src.trim()
-      .replace(/\s+/g,"")
-      .replace(/²/g,"^2").replace(/³/g,"^3")
-      .replace(/\bln\b/gi,"log")                     // natural log
-      .replace(/\bpi\b/gi,"PI").replace(/π/g,"PI")   // pi constant
-      .replace(/\be\b/g,"euler")                     // Euler's number (standalone)
-      .replace(/÷/g,"/").replace(/×/g,"*")
-      .replace(/\^/g,"**")
-      // implicit multiplication: 2x, 2( ,  2sqrt → 2*sqrt
-      .replace(/(\d)\s*([a-zA-Z_])/g,"$1*$2")
-      .replace(/(\d)\s*\(/g,"$1*(")
-      // )( → )*( ,  )x → )*x
-      .replace(/\)\s*\(/g,")*(")
-      .replace(/\)\s*([a-zA-Z_x])/g,")*$1");
-  }
-
+  // ── Expressions ────────────────────────────────────────────────────────────
+  // math-expr.js (loaded first by tools-core) parses and evaluates; nothing a
+  // student types is ever run as JavaScript.
+  //   explicit  y = f(x), f(x) = ..., or a bare f(x)
+  //   vertical  x = k
+  //   implicit  any equation in x and y (circles, x = y^2, ...)
   function compile(raw) {
-    var src = raw.trim();
-
-    // Vertical line: x = k
-    var vm = /^x\s*=\s*(.+)$/i.exec(src);
-    if (vm) {
-      var k = evalConst(vm[1]);
-      if (isFinite(k)) return { type:"vertical", x:k };
+    var r;
+    try { r = window.PWTMath.relation(raw); }
+    catch (e) {
+      var err = new Error(e && e.message ? e.message : "Check the expression");
+      err.pos = e && e.pos;
+      throw err;
     }
-
-    // Strip "y = " or "f(x) = "
-    src = src.replace(/^[yY]\s*=\s*/,"").replace(/^[a-zA-Z]\s*\([xX]\)\s*=\s*/,"");
-
-    var js = preprocess(src);
-    var body = "return (" + js + ");";
-    var fn;
-    try {
-      fn = new Function(...SK, "x", body);
-      fn(...SV, 1);  // probe — surfaces syntax errors
-    } catch(err) {
-      throw new Error(String(err.message)
-        .replace(/^.*?(SyntaxError|ReferenceError|TypeError)[:\s]*/i,"")
-        .replace(/\(anonymous\)/g,"")
-        .trim() || "Invalid expression");
+    if (r.kind === "vertical") {
+      if (!isFinite(r.x)) throw new Error("That line is at an undefined x");
+      return { type: "vertical", x: r.x };
     }
-
-    return {
-      type: "explicit",
-      fn: function(x) {
-        try { var r = fn(...SV, x); return typeof r === "number" ? r : NaN; }
-        catch(e) { return NaN; }
-      }
-    };
+    if (r.kind === "implicit") return { type: "implicit", F: r.F };
+    return { type: "explicit", fn: r.f };
   }
 
-  function evalConst(expr) {
-    var js = preprocess(expr);
-    try { return new Function(...SK, "return (" + js + ");")(...SV); }
-    catch(e) { return NaN; }
-  }
+  var TYPE_LABEL = { explicit: "y =", vertical: "x =", implicit: "⤳" };
+  var TYPE_TITLE = { explicit: "Function of x", vertical: "Vertical line",
+                     implicit: "Equation in x and y" };
 
   // ── Rendering helpers ──────────────────────────────────────────────────────
   function esc(s) {
@@ -218,9 +171,13 @@
     // ── recompile ────────────────────────────────────────────────────────────
     function recompile() {
       curves.forEach(function(c) {
-        if (!c.expr.trim()) { c.compiled = null; c.err = null; return; }
-        try { c.compiled = compile(c.expr); c.err = null; }
-        catch(e) { c.compiled = null; c.err = e.message || "Invalid"; }
+        if (!c.expr.trim()) { c.compiled = null; c.err = null; c.stale = false; return; }
+        try { c.compiled = compile(c.expr); c.err = null; c.stale = false; }
+        catch(e) {
+          // Half-typed: keep drawing the last good graph (faded) under the error.
+          c.err = e.message || "Check the expression";
+          c.stale = !!c.compiled;
+        }
       });
     }
 
@@ -228,11 +185,14 @@
     function drawExprs() {
       exprsEl.innerHTML = curves.map(function(c, i) {
         var col = COLOURS[c.ci % COLOURS.length];
+        var type = c.compiled && !c.err ? c.compiled.type : null;
         return '<div class="gp2-expr' + (c.err ? " gp2-bad" : "") + (c.visible ? "" : " gp2-hidden") + '" data-i="' + i + '">' +
           '<button class="gp2-swatch" data-swatch="' + i + '" style="background:' + col + '" title="Change colour"></button>' +
+          '<span class="gp2-type" data-type="' + i + '" title="' + (type ? TYPE_TITLE[type] : c.err ? "Needs fixing" : "") + '">' +
+            (type ? TYPE_LABEL[type] : c.err ? "!" : "") + '</span>' +
           '<div class="gp2-iw">' +
             '<input class="gp2-inp" data-curve="' + i + '" value="' + esc(c.expr) + '"' +
-              ' placeholder="e.g. sin(x),  x^2+1,  x=3,  y=2x-1"' +
+              ' placeholder="e.g. y = 2x - 1,  sin x,  x^2 + y^2 = 25,  x = 3"' +
               ' spellcheck="false" autocomplete="off" autocorrect="off">' +
             (c.err ? '<span class="gp2-errtxt">' + esc(c.err) + '</span>' : '') +
           '</div>' +
@@ -318,6 +278,13 @@
         ctx.strokeStyle = col;
         ctx.lineWidth = 2.5;
         ctx.lineJoin = "round";
+        ctx.globalAlpha = c.stale ? 0.3 : 1;
+
+        if (c.compiled.type === "implicit") {
+          drawImplicit(c.compiled.F);
+          ctx.globalAlpha = 1;
+          return;
+        }
 
         if (c.compiled.type === "vertical") {
           var vx = toX(c.compiled.x);
@@ -329,6 +296,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
           }
+          ctx.globalAlpha = 1;
           return;
         }
 
@@ -344,6 +312,7 @@
           pen = true; prevY = yv;
         }
         ctx.stroke();
+        ctx.globalAlpha = 1;
       });
 
       // trace
@@ -373,6 +342,41 @@
       }
     }
 
+    // ── implicit equations: marching squares on F(x, y) = 0 ─────────────────
+    // Sample F on a grid of ~4 px cells, and draw where it changes sign. Cells
+    // whose corners jump from huge + to huge − are asymptotes, not crossings.
+    function drawImplicit(F) {
+      var w = W(), h = H(), step = 4;
+      var cols = Math.ceil(w / step), rows = Math.ceil(h / step);
+      var vals = new Float64Array((cols + 1) * (rows + 1));
+      for (var j = 0; j <= rows; j++) {
+        var yv = frY(j * step);
+        for (var i = 0; i <= cols; i++) vals[j * (cols + 1) + i] = F(frX(i * step), yv);
+      }
+      var span = Math.max(view.xmax - view.xmin, view.ymax - view.ymin);
+      ctx.beginPath();
+      for (j = 0; j < rows; j++) {
+        for (i = 0; i < cols; i++) {
+          var a = vals[j * (cols + 1) + i], b = vals[j * (cols + 1) + i + 1];
+          var c2 = vals[(j + 1) * (cols + 1) + i + 1], d = vals[(j + 1) * (cols + 1) + i];
+          if (!(isFinite(a) && isFinite(b) && isFinite(c2) && isFinite(d))) continue;
+          var pts = [];
+          var x0 = i * step, y0 = j * step;
+          // edges: top a-b, right b-c, bottom d-c, left a-d
+          if ((a > 0) !== (b > 0)) pts.push([x0 + step * a / (a - b), y0]);
+          if ((b > 0) !== (c2 > 0)) pts.push([x0 + step, y0 + step * b / (b - c2)]);
+          if ((d > 0) !== (c2 > 0)) pts.push([x0 + step * d / (d - c2), y0 + step]);
+          if ((a > 0) !== (d > 0)) pts.push([x0, y0 + step * a / (a - d)]);
+          if (pts.length < 2) continue;
+          var big = Math.max(Math.abs(a), Math.abs(b), Math.abs(c2), Math.abs(d));
+          if (big > span * 50) continue;                      // asymptote
+          ctx.moveTo(pts[0][0], pts[0][1]); ctx.lineTo(pts[1][0], pts[1][1]);
+          if (pts.length === 4) { ctx.moveTo(pts[2][0], pts[2][1]); ctx.lineTo(pts[3][0], pts[3][1]); }
+        }
+      }
+      ctx.stroke();
+    }
+
     // ── resize ───────────────────────────────────────────────────────────────
     function resize() {
       var dpr = window.devicePixelRatio || 1;
@@ -384,7 +388,21 @@
       canvas.style.width  = cw + "px";
       canvas.style.height = ch + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!customWindow) fitAspect();
       draw();
+    }
+
+    // Same scale on both axes, so a circle looks like a circle. Skipped once
+    // the student has typed their own window.
+    var customWindow = false;
+    function fitAspect() {
+      var w = W(), h = H();
+      if (!w || !h) return;
+      var cy = (view.ymin + view.ymax) / 2;
+      var half = (view.xmax - view.xmin) * h / w / 2;
+      view.ymin = cy - half;
+      view.ymax = cy + half;
+      syncWindowInputs();
     }
 
     // ── analysis readout ─────────────────────────────────────────────────────
@@ -492,11 +510,19 @@
       curves[i].expr = inp.value;
       recompile();
       var c = curves[i];
+      // Update this row in place: re-rendering the list would steal the cursor.
       var wrap = inp.closest(".gp2-expr");
       wrap.classList.toggle("gp2-bad", !!c.err);
-      var errEl = inp.closest(".gp2-iw").querySelector(".gp2-errtxt");
-      if (c.err && !errEl) drawExprs();
-      else if (!c.err && errEl) errEl.remove();
+      var iw = inp.closest(".gp2-iw");
+      var errEl = iw.querySelector(".gp2-errtxt");
+      if (c.err) {
+        if (!errEl) { errEl = document.createElement("span"); errEl.className = "gp2-errtxt"; iw.appendChild(errEl); }
+        errEl.textContent = c.err + (c.stale ? " — showing your last graph" : "");
+      } else if (errEl) errEl.remove();
+      var chip = wrap.querySelector(".gp2-type");
+      var type = c.compiled && !c.err ? c.compiled.type : null;
+      chip.textContent = type ? TYPE_LABEL[type] : c.err ? "!" : "";
+      chip.title = type ? TYPE_TITLE[type] : c.err ? "Needs fixing" : "";
       draw(); showReadout();
     });
 
@@ -603,6 +629,7 @@
         var v = parseFloat(inp.value);
         if (!isFinite(v)) return;
         view[inp.dataset.win] = v;
+        customWindow = true;
         draw(); showReadout();
       });
     });
@@ -621,7 +648,8 @@
       if (!btn) return;
       if (btn.dataset.zoom === "reset") {
         view = { xmin:-10, xmax:10, ymin:-10, ymax:10 };
-        syncWindowInputs();
+        customWindow = false;
+        fitAspect();
       } else scaleView(btn.dataset.zoom === "in" ? 0.7 : 1 / 0.7);
       draw(); showReadout();
     });

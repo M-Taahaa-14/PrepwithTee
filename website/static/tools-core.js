@@ -1,4 +1,4 @@
-/* PrepWithTee — study tools core.
+﻿/* PrepWithTee — study tools core.
  *
  * Every tool is a widget that renders itself into a container, rather than a
  * script bound to one page's element IDs. That is what lets the same code run
@@ -18,12 +18,12 @@
   var registry = {};
   var loading = {};
 
-  // Tool id -> script file. Kept here so the dock can lazy-load without every
-  // page hard-coding a script tag for all six tools.
+  // Tool id -> script file(s), loaded in order. Kept here so the dock can
+  // lazy-load without every page hard-coding a script tag for all six tools.
   var SOURCES = {
     calculator: "tools-calculator.js",
     formulas: "tools-formulas.js",
-    graph: "tools-graph.js?u=20260826",
+    graph: ["math-expr.js", "tools-graph.js"],      // the safe expression parser first
     command: "tools-commandwords.js",
     periodic: "tools-periodic.js",
     logic: "tools-logic.js",
@@ -51,7 +51,7 @@
       href: "pseudocode.html", blurb: "Run it, trace it, fix it" }
   ];
 
-  var VERSION = "20260811d";
+  var VERSION = "20260926a";
 
   // ── Small shared helpers ────────────────────────────────────────────────
   function esc(s) {
@@ -133,19 +133,30 @@
     document.dispatchEvent(new CustomEvent("pwt:tool-ready", { detail: tool.id }));
   }
 
+  var scripts = {};
+  function script(file) {
+    if (!scripts[file]) {
+      scripts[file] = new Promise(function (resolve, reject) {
+        var s = document.createElement("script");
+        s.src = file + "?v=" + VERSION;
+        s.onload = resolve;
+        s.onerror = function () { delete scripts[file]; reject(new Error("could not load " + file)); };
+        document.head.appendChild(s);
+      });
+    }
+    return scripts[file];
+  }
+
   function load(id) {
     if (registry[id]) return Promise.resolve(registry[id]);
     if (!SOURCES[id]) return Promise.reject(new Error("unknown tool: " + id));
     if (!loading[id]) {
-      loading[id] = new Promise(function (resolve, reject) {
-        var s = document.createElement("script");
-        s.src = SOURCES[id] + "?v=" + VERSION;
-        s.onload = function () {
-          registry[id] ? resolve(registry[id])
-                       : reject(new Error(id + " loaded but did not register"));
-        };
-        s.onerror = function () { reject(new Error("could not load " + id)); };
-        document.head.appendChild(s);
+      var files = [].concat(SOURCES[id]);
+      loading[id] = files.reduce(function (prev, file) {
+        return prev.then(function () { return script(file); });
+      }, Promise.resolve()).then(function () {
+        if (!registry[id]) throw new Error(id + " loaded but did not register");
+        return registry[id];
       }).catch(function (e) { delete loading[id]; throw e; });
     }
     return loading[id];

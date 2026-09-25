@@ -420,6 +420,23 @@ linked), not agreement with any external file.
       `PDF_OPTS` (standardFontDataUrl) or symbol fonts go missing. NOTE the pane in
       the desktop app doesn't render while hidden (rAF/IntersectionObserver) - verify
       rendering with the Playwright e2e tests, not the hidden pane.
+    - **MCQ keys 2010-16 (2026-09-26)**: every old two-column "Question Number | Key"
+      scheme had lost questions 10-19 (link_ms never made the rows). `pipeline.mcq`
+      now pairs number+letter, inserts missing ms_entries rows, tolerates Cambridge
+      "Question removed/discounted", and ignores pre-2016 Paper 2 THEORY schemes
+      (0620/0625 P2 were not MCQ then; require >= 20 answers). Local 99.3% keyed.
+      **Production NOT yet synced**: run `scripts/sync_ms_to_supabase.py --apply`
+      (dry run: 1,949 inserts, 0 changes) - blocked for the agent, the tutor runs it.
+    - **P2-b (local, not deployed)**: `static/math-expr.js` (window.PWTMath) =
+      tokenizer + Pratt parser + closure evaluator, no eval/new Function; implicit
+      multiplication, `sin x`, `sin^2 x`, `sin^-1 x`, `|x|`, `log_2`, `√ ∛ π e ² ³ !`,
+      `-x^2 = -(x^2)`, friendly MathError messages with position; `relation()` gives
+      explicit / vertical / implicit (F(x,y)=0, drawn by marching squares). The graph
+      plotter keeps the last good curve (faded) while an expression is half-typed,
+      shows a y= / x= / relation chip per row, equal axis scales by default.
+      tools-core SOURCES entries may be arrays (loaded in order); tools-core.js and
+      tools.css versions bumped on every page. Tests: tests/unit/test_math_expr.py
+      (Node, ~60 values at x=2 + errors + relations), tests/e2e/test_graph_plotter.py.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
       `021_ai_help.sql` (done 2026-09-25) and `022_mcq_sessions_annotations.sql`
