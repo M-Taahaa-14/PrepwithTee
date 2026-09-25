@@ -10,8 +10,11 @@
  *            thresholds for the sitting (same data the old library showed)
  */
 import { api } from "/auth.js?v=20260829a";
-import { openAiPanel } from "/ai-panel.js?v=20260926d";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260926d";
+import { openAiPanel } from "/ai-panel.js?v=20260926p";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260926p";
+import { createAnnotator } from "/annotate.js?v=20260926p";
+
+let ann = null;                  // the annotation bar, created with the shell
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");
@@ -80,6 +83,8 @@ async function pane(kind) {
     onPage: (n) => { if (kind === primary()) document.getElementById("vw-pn").textContent = n; },
     onZoom: (label) => { if (kind === primary()) document.getElementById("vw-z").textContent = label; },
     onQuestion: kind === "qp" ? onQuestion : null,
+    // Drawings belong to the file: the same paper opened again shows them.
+    onPageEl: (el, n) => ann?.attach(el, `paper:${S.files[kind].id}`, n),
   });
   V.panes[kind] = p;
   p.ready = p.load(S.files[kind].url).then(() => {
@@ -360,6 +365,7 @@ function toast(msg) {
 
 // ── Start ───────────────────────────────────────────────────────────────────
 shell();
+ann = createAnnotator({ mount: document.body });
 // Wide screens open side by side when there is a mark scheme to show beside it.
 if (wide() && window.innerWidth >= 1280 && S.files.qp && V.right && !new URLSearchParams(location.search).has("doc")) {
   V.split = true;

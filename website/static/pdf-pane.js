@@ -10,6 +10,12 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+// Standard 14 fonts + Symbol for papers that don't embed them (Greek letters, units).
+export const PDF_OPTS = {
+  standardFontDataUrl: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/standard_fonts/",
+  cMapUrl: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/", cMapPacked: true,
+};
+
 const debounce = (fn, ms) => { let h; return (...a) => { clearTimeout(h); h = setTimeout(() => fn(...a), ms); }; };
 
 export class PdfPane {
@@ -26,7 +32,9 @@ export class PdfPane {
     this.questions = opts.questions || [];
     this.chips = opts.chips ?? this.questions.length > 0;
     this.gutter = opts.gutter;
-    this.on = { page: opts.onPage, question: opts.onQuestion, zoom: opts.onZoom };
+    this.chipHTML = opts.chipHTML;             // (q) => html, replaces the default chips
+    this.on = { page: opts.onPage, question: opts.onQuestion, zoom: opts.onZoom,
+                pageEl: opts.onPageEl };       // (el, n) for every page laid out: annotations
     this.doc = null; this.base = null; this.scale = 1; this.fit = 1; this.fitted = true;
     this.pages = []; this.obs = null; this.current = null; this.pageNo = 1;
     this.links = this._linkService();
@@ -34,7 +42,7 @@ export class PdfPane {
   }
 
   async load(url) {
-    this.doc = await pdfjsLib.getDocument({ url, withCredentials: true }).promise;
+    this.doc = await pdfjsLib.getDocument({ url, withCredentials: true, ...PDF_OPTS }).promise;
     // Pages can differ: Cambridge mark schemes are a portrait cover followed by
     // landscape (rotated) tables. Size every page, fit to the widest.
     const pages = await Promise.all(
@@ -99,8 +107,9 @@ export class PdfPane {
         const chips = document.createElement("div");
         chips.className = "vw-chips";
         chips.style.top = `${q.y * this.scale}px`;
+        chips.dataset.seq = q.seq;
         const tag = q.label ? `<span class="vw-chip-q">${q.label}</span>` : "";
-        chips.innerHTML = `${tag}
+        chips.innerHTML = this.chipHTML ? this.chipHTML(q) : `${tag}
           <button type="button" data-open="explain" data-seq="${q.seq}" class="vw-chip">✦ Explain</button>
           <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Guide me</button>
           <button type="button" data-open="ms" data-seq="${q.seq}" class="vw-chip">✓ Mark scheme</button>`;
@@ -108,6 +117,7 @@ export class PdfPane {
       }
       this.stage.appendChild(pg);
       this.pages.push({ el: pg, rendered: false });
+      this.on.pageEl?.(pg, n);
     }
     this.obs = new IntersectionObserver((entries) => {
       for (const e of entries) if (e.isIntersecting) this._render(+e.target.dataset.n);

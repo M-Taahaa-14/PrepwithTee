@@ -39,6 +39,11 @@
 .ai-opt b { font: 800 1.05rem/1.4 "Archivo", sans-serif; }
 .ai-opt.is-right { background: var(--green); color: var(--green-ink); }
 .ai-opt.is-wrong { background: var(--cream); }
+.ai-opt.is-yours.is-wrong { background: var(--pink); color: var(--pink-ink); box-shadow: inset 0 0 0 1.5px var(--pink-line); }
+.ai-opt.is-yours.is-right { box-shadow: inset 0 0 0 1.5px var(--green-line); }
+.ai-yours { display: inline-block; font: 800 .68rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: .3rem; padding: .2rem .45rem; border-radius: 6px;
+  background: rgba(255, 255, 255, .55); }
 .ai-mistakes ul { margin: 0; padding-left: 1.2rem; }
 .ai-rich p { margin: 0 0 .45rem; }
 .ai-rich p:last-child { margin-bottom: 0; }

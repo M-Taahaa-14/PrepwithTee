@@ -122,6 +122,33 @@ else:
         created_at    TEXT DEFAULT (datetime('now')),
         updated_at    TEXT DEFAULT (datetime('now'))
     );
+    -- MCQ practice sessions + page annotations (migrations/022_mcq_sessions_annotations.sql)
+    CREATE TABLE IF NOT EXISTS mcq_sessions (
+        id            TEXT PRIMARY KEY,
+        user_id       TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        syllabus      TEXT NOT NULL,
+        kind          TEXT NOT NULL,
+        paper_id      INTEGER,
+        title         TEXT,
+        question_ids  TEXT NOT NULL DEFAULT '[]',
+        settings      TEXT NOT NULL DEFAULT '{}',
+        answers       TEXT NOT NULL DEFAULT '{}',
+        status        TEXT NOT NULL DEFAULT 'active',
+        elapsed_s     INTEGER NOT NULL DEFAULT 0,
+        score         INTEGER,
+        total         INTEGER,
+        created_at    TEXT DEFAULT (datetime('now')),
+        updated_at    TEXT DEFAULT (datetime('now')),
+        submitted_at  TEXT
+    );
+    CREATE TABLE IF NOT EXISTS page_annotations (
+        user_id     TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        doc_key     TEXT NOT NULL,
+        page        INTEGER NOT NULL,
+        strokes     TEXT NOT NULL DEFAULT '[]',
+        updated_at  TEXT DEFAULT (datetime('now')),
+        PRIMARY KEY (user_id, doc_key, page)
+    );
     -- subtopic is NOT NULL DEFAULT '' on purpose: a chapter-level row used to
     -- store NULL, and neither SQLite nor Postgres treats two NULLs as equal in
     -- a UNIQUE key, so every chapter save inserted a duplicate instead of
@@ -1428,6 +1455,123 @@ def list_booklets(user_id: str, limit: int = 30) -> list[dict]:
                 f"SELECT {cols} FROM booklets WHERE user_id=? "
                 "ORDER BY created_at DESC LIMIT ?", (user_id, limit)).fetchall()]
     return [_booklet_out(r) for r in rows]
+
+
+# ── MCQ practice sessions ─────────────────────────────────────────────────────
+
+_MCQ_JSON = ("question_ids", "settings", "answers")
+
+
+def _mcq_out(row: dict | None) -> dict | None:
+    if not row:
+        return None
+    row = dict(row)
+    for k in _MCQ_JSON:
+        if isinstance(row.get(k), str):
+            try:
+                row[k] = json.loads(row[k])
+            except ValueError:
+                pass
+    return row
+
+
+def _mcq_local(row: dict) -> dict:
+    return {k: (json.dumps(v) if k in _MCQ_JSON and v is not None else v) for k, v in row.items()}
+
+
+def create_mcq_session(row: dict) -> dict:
+    if _USE_SUPABASE:
+        r = _client().table("mcq_sessions").insert(row).execute()
+        return _mcq_out(r.data[0])
+    local = _mcq_local(row)
+    with _local() as c:
+        c.execute(f"INSERT INTO mcq_sessions ({', '.join(local)}) "
+                  f"VALUES ({', '.join('?' for _ in local)})", list(local.values()))
+        c.commit()
+    return get_mcq_session(row["id"])
+
+
+def update_mcq_session(session_id: str, fields: dict) -> None:
+    fields = {**fields, "updated_at": datetime.now(timezone.utc).isoformat()}
+    if _USE_SUPABASE:
+        _client().table("mcq_sessions").update(fields).eq("id", session_id).execute()
+        return
+    local = _mcq_local(fields)
+    with _local() as c:
+        c.execute(f"UPDATE mcq_sessions SET {', '.join(f'{k}=?' for k in local)} WHERE id=?",
+                  [*local.values(), session_id])
+        c.commit()
+
+
+def get_mcq_session(session_id: str) -> dict | None:
+    if _USE_SUPABASE:
+        r = _client().table("mcq_sessions").select("*").eq("id", session_id).limit(1).execute()
+        return _mcq_out((r.data or [None])[0])
+    with _local() as c:
+        row = c.execute("SELECT * FROM mcq_sessions WHERE id=?", (session_id,)).fetchone()
+        return _mcq_out(dict(row) if row else None)
+
+
+def list_mcq_sessions(user_id: str, syllabus: str | None = None, limit: int = 20) -> list[dict]:
+    cols = ("id,syllabus,kind,paper_id,title,status,score,total,elapsed_s,settings,"
+            "question_ids,answers,created_at,updated_at,submitted_at")
+    if _USE_SUPABASE:
+        q = _client().table("mcq_sessions").select(cols).eq("user_id", user_id)
+        if syllabus:
+            q = q.eq("syllabus", syllabus)
+        rows = q.order("updated_at", desc=True).limit(limit).execute().data or []
+    else:
+        sql = f"SELECT {cols} FROM mcq_sessions WHERE user_id=?"
+        args: list = [user_id]
+        if syllabus:
+            sql += " AND syllabus=?"
+            args.append(syllabus)
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(sql + " ORDER BY updated_at DESC LIMIT ?",
+                                               [*args, limit]).fetchall()]
+    return [_mcq_out(r) for r in rows]
+
+
+# ── Page annotations (pen / highlighter / shapes / text over a page) ─────────
+
+def get_annotations(user_id: str, doc_key: str) -> dict[int, list]:
+    if _USE_SUPABASE:
+        rows = (_client().table("page_annotations").select("page,strokes")
+                .eq("user_id", user_id).eq("doc_key", doc_key).execute().data or [])
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                "SELECT page, strokes FROM page_annotations WHERE user_id=? AND doc_key=?",
+                (user_id, doc_key)).fetchall()]
+    out = {}
+    for r in rows:
+        s = r["strokes"]
+        out[int(r["page"])] = json.loads(s) if isinstance(s, str) else (s or [])
+    return out
+
+
+def set_annotations(user_id: str, doc_key: str, page: int, strokes: list) -> None:
+    now = datetime.now(timezone.utc).isoformat()
+    if _USE_SUPABASE:
+        if strokes:
+            _client().table("page_annotations").upsert(
+                {"user_id": user_id, "doc_key": doc_key, "page": page,
+                 "strokes": strokes, "updated_at": now},
+                on_conflict="user_id,doc_key,page").execute()
+        else:
+            (_client().table("page_annotations").delete().eq("user_id", user_id)
+             .eq("doc_key", doc_key).eq("page", page).execute())
+        return
+    with _local() as c:
+        if strokes:
+            c.execute("INSERT INTO page_annotations (user_id, doc_key, page, strokes, updated_at) "
+                      "VALUES (?,?,?,?,?) ON CONFLICT(user_id, doc_key, page) DO UPDATE SET "
+                      "strokes=excluded.strokes, updated_at=excluded.updated_at",
+                      (user_id, doc_key, page, json.dumps(strokes), now))
+        else:
+            c.execute("DELETE FROM page_annotations WHERE user_id=? AND doc_key=? AND page=?",
+                      (user_id, doc_key, page))
+        c.commit()
 
 
 def restore_enrollment(user_id: str, syllabus: str):

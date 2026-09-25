@@ -48,14 +48,18 @@ export function renderRich(text) {
 // ── Panel ───────────────────────────────────────────────────────────────────
 const TABS = [["explain", "Explain"], ["hint", "Guide me"], ["ms", "Mark scheme"], ["ask", "Ask"]];
 
-export function openAiPanel(el, q, { tab = "explain", onClose } = {}) {
+export function openAiPanel(el, q, { tab = "explain", onClose, tabs } = {}) {
+  // `tabs` limits what is offered - the MCQ solver hides Explain / Mark scheme
+  // until the answer has been revealed, so the panel can't give it away.
+  const shown = tabs ? TABS.filter(([k]) => tabs.includes(k)) : TABS;
+  if (!shown.some(([k]) => k === tab)) tab = shown[0][0];
   const P = { el, q, tab, hints: 0, quote: null, onClose };
   el.innerHTML = `
     <div class="ai-head">
       <div><b>${esc(q.label || `Q${q.seq}`)}</b> <span>${esc(q.ref || "")}</span><em>${esc(q.topic || "")}</em></div>
       <button type="button" class="ai-x" data-ai="close" aria-label="Close panel">✕</button>
     </div>
-    <div class="ai-tabs" role="tablist">${TABS.map(([k, label]) => `
+    <div class="ai-tabs" role="tablist">${shown.map(([k, label]) => `
       <button type="button" role="tab" data-ai-tab="${k}" id="ai-tab-${k}"
               aria-selected="${k === tab}" aria-controls="ai-body">${label}</button>`).join("")}
     </div>
@@ -132,9 +136,12 @@ async function renderExplain(P) {
       ${p.marking ? `<div class="ai-marking"><b>How the marks are given</b><div class="ai-rich">${renderRich(p.marking)}</div></div>` : ""}
     </section>`).join("");
   const mcq = (d.mcq_options || []).length ? `
-    <section class="ai-part"><h4>Why each option</h4>${d.mcq_options.map((o) => `
-      <div class="ai-opt ${o.correct ? "is-right" : "is-wrong"}"><b>${esc(o.letter)}</b>
-        <div class="ai-rich">${renderRich(o.why)}</div></div>`).join("")}</section>` : "";
+    <section class="ai-part"><h4>Why each option</h4>${d.mcq_options.map((o) => {
+      const mine = P.q.your && String(o.letter).toUpperCase() === P.q.your;
+      return `
+      <div class="ai-opt ${o.correct ? "is-right" : "is-wrong"}${mine ? " is-yours" : ""}"><b>${esc(o.letter)}</b>
+        <div class="ai-rich">${mine ? `<span class="ai-yours">${o.correct ? "Your answer ✓" : "Your answer"}</span>` : ""}${renderRich(o.why)}</div></div>`;
+    }).join("")}</section>` : "";
   const mistakes = (d.common_mistakes || []).length ? `
     <section class="ai-part ai-mistakes"><h4>Common mistakes</h4><ul>${
       d.common_mistakes.map((m) => `<li class="ai-rich">${renderRich(m)}</li>`).join("")}</ul></section>` : "";

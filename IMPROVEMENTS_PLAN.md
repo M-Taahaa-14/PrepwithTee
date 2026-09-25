@@ -1,4 +1,4 @@
-# PrepWithTee — Improvements Plan (Sept 2026)
+﻿# PrepWithTee — Improvements Plan (Sept 2026)
 
 Status: **PLAN, nothing built yet.** Covers the 16 requested improvements, ranked,
 with DB / endpoint / frontend / routing changes and a test plan per module.
@@ -337,13 +337,13 @@ Suspected causes found in `pipeline/compose.py`:
 - `/mcq/{board}/{subject}` — own page, no tab switcher.
 - **Tests**: routes 200 + 301s; E2E open a 2016 paper and toggle QP↔MS.
 
-### P1-e · #7 MCQ solver paper view
+### P1-e · #7 MCQ solver paper view — ✅ built locally 2026-09-26 (not deployed)
 - **Exam mode**: real paper pages (PDF.js) on the left, sticky answer-bubble strip (1-40, A-D) on the right; timer (official duration, pause off by default); flag-for-review.
 - **Review mode** after submit: score, grid of ✓/✗, click → jumps to the question and opens the AI panel with "why".
 - Mobile: one question per screen with swipe, bubble bar collapses to a bottom drawer.
 - **Tests**: unit — scoring; E2E — answer 3, submit, review grid shows correct marks against the stored keys (incl. a 2016 paper — proves #5).
 
-### P2-a · #12 Annotation bar
+### P2-a · #12 Annotation bar — ✅ built locally 2026-09-26 with P1-e (ruler/protractor not yet)
 - One floating **horizontal pill** bar (draggable, snaps to top/bottom centre, collapses to a single pen icon). Groups separated by thin dividers: **Pen · Marker · Highlighter · Eraser** | **Ruler · Protractor · Shapes** | **Text** | colour dot + size dot (open small popovers, not inline swatches) | undo/redo | clear.
 - Draws on a canvas layer **per PDF page** (so it scrolls with the page and works in the viewer — the old one skips iframes), saved to `pdf_annotations` per `booklet:<id>`/`paper:<id>` + page.
 - Pressure/smoothing (perfect-freehand-style algorithm, inline), palm rejection for stylus (`pointerType`).

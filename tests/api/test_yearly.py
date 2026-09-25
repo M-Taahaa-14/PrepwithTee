@@ -81,7 +81,9 @@ def test_mcq_pages(client):
 def test_mcq_page_start_button_for_enrolled_student(client, new_student):
     new_student()
     client.post("/api/enrollments", json={"syllabus": "5054"})
-    assert 'href="/mcq-solver.html?syllabus=5054"' in client.get("/mcq/o-level/physics-5054").text
+    html = client.get("/mcq/o-level/physics-5054").text
+    assert 'id="mq-setup" data-syllabus="5054"' in html and "/mcq-setup.js?v=" in html
+    assert "mcq-solver.html" not in html
 
 
 # ── viewer ───────────────────────────────────────────────────────────────────

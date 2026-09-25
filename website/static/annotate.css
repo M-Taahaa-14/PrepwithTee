@@ -1,0 +1,66 @@
+/* annotate.css — the floating annotation pill (annotate.js). styles.css tokens. */
+.an-bar { position: fixed; left: 50%; transform: translateX(-50%); z-index: 70;
+  display: flex; align-items: center; gap: 2px; padding: 5px 8px; max-width: calc(100vw - 24px);
+  background: var(--white); border: 1px solid var(--line); border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(46, 27, 74, .08), 0 12px 32px rgba(46, 27, 74, .16); }
+.an-bar[data-pos="bottom"] { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+.an-bar[data-pos="top"] { top: calc(var(--vw-top, 76px) + 58px); }
+.an-bar[hidden] { display: none; }
+.an-group { display: flex; gap: 2px; }
+.an-bar button { width: 34px; height: 34px; flex: none; border: 0; border-radius: 50%; background: transparent;
+  color: var(--grey); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.an-bar button:hover:not(:disabled) { background: var(--cream); color: var(--ink); }
+.an-bar button:disabled { opacity: .35; cursor: default; }
+.an-bar button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.an-bar button[aria-pressed="true"] { background: var(--lav); color: var(--lav-ink); }
+.an-bar svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; }
+.an-bar .an-grip { width: 22px; cursor: grab; color: var(--grey); opacity: .7; }
+.an-bar .an-grip svg { fill: currentColor; stroke: none; width: 16px; height: 16px; }
+.an-sep { width: 1px; height: 20px; background: var(--line); margin: 0 5px; flex: none; }
+.an-swatch i { width: 18px; height: 18px; border-radius: 50%; display: block;
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--line); }
+.an-size i { width: var(--d, 8px); height: var(--d, 8px); border-radius: 50%; background: var(--ink); display: block; }
+.an-pop-wrap { position: relative; }
+.an-pop { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; padding: 8px;
+  background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(46, 27, 74, .18); }
+.an-bar[data-pos="bottom"] .an-pop { bottom: calc(100% + 10px); }
+.an-bar[data-pos="top"] .an-pop { top: calc(100% + 10px); }
+.an-pop[hidden] { display: none; }
+.an-pop [data-color] { width: 26px; height: 26px; background: var(--c) !important; border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--line); }
+.an-pop [data-color].is-on { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--c); }
+.an-pop [data-size] i { width: var(--d); height: var(--d); border-radius: 50%; background: var(--ink); display: block; }
+.an-pop [data-size].is-on { background: var(--lav); }
+.an-saved { font-size: .72rem; color: var(--green-ink); min-width: 0; max-width: 9rem; white-space: nowrap;
+  overflow: hidden; padding: 0 .2rem; }
+.an-saved:empty { display: none; }
+.an-fab { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 70; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--white);
+  color: var(--purple); display: grid; place-items: center; cursor: pointer;
+  box-shadow: 0 10px 28px rgba(46, 27, 74, .2); }
+.an-fab[hidden] { display: none; }
+.an-fab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the drawing layer over each page */
+.an-layer { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+.an-layer.is-active { pointer-events: auto; touch-action: none; cursor: crosshair; }
+.an-pen .an-layer.is-active { touch-action: pan-x pan-y pinch-zoom; }   /* stylus seen: fingers scroll */
+.an-layer.is-active[data-tool="eraser"] { cursor: cell; }
+.an-layer.is-active[data-tool="text"] { cursor: text; }
+.an-text { position: absolute; z-index: 6; min-width: 8rem; border: 1.5px dashed currentColor; border-radius: 6px;
+  background: rgba(255, 255, 255, .92); font: 600 14px/1.25 "Hanken Grotesk", system-ui, sans-serif;
+  padding: 2px 6px; resize: none; outline: none; }
+/* while drawing, links and form fields on the page must not steal the pen */
+.an-drawing .vw-pg .annotationLayer { pointer-events: none; }
+
+@media (max-width: 640px) {
+  .an-bar { gap: 0; padding: 4px 6px; overflow-x: auto; scrollbar-width: none; }
+  .an-bar button { width: 32px; height: 32px; }
+  .an-sep { margin: 0 3px; }
+  .an-pop { position: fixed; left: 50%; bottom: 70px; }
+}
+@media print { .an-bar, .an-fab { display: none !important; } }
+/* phones: the pen button sits bottom-left, clear of the site's chat / note buttons */
+@media (max-width: 999px) { .an-fab { left: .8rem; transform: none; } }

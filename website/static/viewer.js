@@ -7,8 +7,9 @@
  *   chips    per question: Explain / Guide me / Mark scheme -> ai-panel.js
  */
 import { api } from "/auth.js?v=20260829a";
-import { openAiPanel } from "/ai-panel.js?v=20260926d";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260926d";
+import { openAiPanel } from "/ai-panel.js?v=20260926p";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260926p";
+import { createAnnotator } from "/annotate.js?v=20260926p";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");
@@ -92,8 +93,10 @@ async function open() {
   const meta = await api(`/api/booklets/${S.id}`);
   questions = (meta.page_map_json || { questions: [] }).questions || [];
   shell();
+  const ann = createAnnotator({ mount: document.body });
   pane = new PdfPane(document.getElementById("vw-stage"), {
     questions,
+    onPageEl: (el, n) => ann.attach(el, `booklet:${S.id}`, n),
     onPage: (n) => { document.getElementById("vw-pn").textContent = n; },
     onZoom: (label) => { document.getElementById("vw-z").textContent = label; },
     onQuestion: qbar,

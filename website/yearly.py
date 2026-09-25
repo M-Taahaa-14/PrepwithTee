@@ -27,7 +27,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260926d"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260926p"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -191,6 +191,9 @@ def _sitting_rows(code: str, items: list[dict]) -> str:
         chips = "".join(
             f'<a class="yr-file yr-{k}" href="/yearly/view/{main["id"]}?doc={k}">{lab}</a>'
             for k, lab in (("qp", "QP"), ("ms", "MS"), ("in", "Insert")) if k in files)
+        if mcq and "qp" in files:
+            chips += (f'<a class="yr-file yr-practise" href="{mcq_url(code)}?paper={files["qp"]["id"]}#start"'
+                      f' title="Sit this paper in the MCQ solver">▶ Practise</a>')
         rows.append(f"""
           <li class="yr-row" data-key="{e['year']}|{e['session']}|{e['paper']}|{_e(e['variant'])}">
             <a class="yr-main" href="/yearly/view/{main['id']}">
@@ -336,6 +339,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <link rel="stylesheet" href="/viewer.css?v={VIEWER_V}">
   <link rel="stylesheet" href="/ai-panel.css?v={VIEWER_V}">
+  <link rel="stylesheet" href="/annotate.css?v={VIEWER_V}">
   <link rel="stylesheet" href="/yearly.css?v={VIEWER_V}">
 </head>
 <body class="vw-page">
@@ -498,7 +502,7 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
     state = _catalog._student_state(user)
     can = bool(user) and (code in state["enrolled"] or _staff(user))
     if can:
-        start = (f'<a class="cat-btn" href="/mcq-solver.html?syllabus={code}">⚡ Start practice</a>'
+        start = (f'<a class="cat-btn" href="#start">⚡ Start practice</a>'
                  f'<a class="cat-btn cat-btn-ghost" href="{yearly_url(code)}">Full papers by year</a>')
     elif user:
         start = f'<button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">🔒 Enrol free to practise</button>'
@@ -516,6 +520,7 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
       <p class="cat-lede">{_e(lede)}</p>
       <div class="cat-actions">{start}</div>
     </header>
+    {f'<section class="mqs" id="start"><h2 class="cat-group">Start practice</h2><div id="mq-setup" data-syllabus="{code}"><noscript>Turn on JavaScript to practise.</noscript></div></section>' if can else ''}
     <ul class="yr-feats">
       <li><b>Instant marking</b><span>Every answer checked against the official Cambridge key.</span></li>
       <li><b>Why, not just what</b><span>Each option explained, including the tempting wrong ones.</span></li>
@@ -526,7 +531,7 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
     <p class="cat-note"><a href="{yearly_url(code)}">All {_e(s['plain'])} papers by year →</a></p>"""
     return _page(title=f"{s['plain']} {code} MCQ Practice | Cambridge {BOARD_SHORT[board]} — PrepWithTee",
                  desc=lede[:300], path=mcq_url(code), body=body, user=user,
-                 scripts=(f"/yearly.js?v={VIEWER_V}",),
+                 scripts=(f"/yearly.js?v={VIEWER_V}",) + ((f"/mcq-setup.js?v={VIEWER_V}",) if can else ()),
                  crumbs=[("Home", "/"), ("MCQ practice", "/mcq"),
                          (f"{s['plain']} {code}", mcq_url(code))])
 

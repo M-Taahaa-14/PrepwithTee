@@ -47,7 +47,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260926d"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260926p"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 
@@ -377,6 +377,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
   <link rel="stylesheet" href="/viewer.css?v={VIEWER_V}">
   <link rel="stylesheet" href="/ai-panel.css?v={VIEWER_V}">
+  <link rel="stylesheet" href="/annotate.css?v={VIEWER_V}">
 </head>
 <body class="vw-page">
 {_blog._nav()}

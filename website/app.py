@@ -104,6 +104,9 @@ import booklets as _booklets_mod
 app.include_router(_booklets_mod.router)
 import ai_help as _ai_help_mod
 app.include_router(_ai_help_mod.router)
+import mcq as _mcq_mod
+# mcq before yearly: /mcq/session/{id} must win over /mcq/{board}/{subject}
+app.include_router(_mcq_mod.router)
 import yearly as _yearly_mod
 app.include_router(_yearly_mod.router)
 app.include_router(_catalog_mod.router)
@@ -4076,6 +4079,22 @@ def question_preview(question_id: int):
                         headers={"Cache-Control": "public, max-age=3600"})
     except Exception as exc:
         raise HTTPException(500, f"could not render preview: {exc}")
+
+
+@app.get("/api/question/{question_id}/crop.pdf")
+def question_crop_pdf(question_id: int):
+    """The question's own vector crop, for PDF.js (sharp at any zoom): the MCQ
+    solver's one-at-a-time view and the stacked paper view of topical sets."""
+    files = _question_crop_files(question_id)
+    crop_path = files[1] if files else None
+    if not crop_path or not crop_path.exists():
+        raise HTTPException(404, "crop not available for this question")
+    safe = (ROOT / "data" / "crops").resolve()
+    if not str(crop_path.resolve()).startswith(str(safe)):
+        raise HTTPException(404, "crop not available for this question")
+    return FileResponse(crop_path, media_type="application/pdf",
+                        headers={"Cache-Control": "public, max-age=86400",
+                                 "Content-Disposition": "inline"})
 
 
 @app.get("/api/question/{question_id}/ms-preview")

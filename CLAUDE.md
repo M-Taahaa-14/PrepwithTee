@@ -398,9 +398,32 @@ linked), not agreement with any external file.
       thresholds (default "out of" = threshold max_mark - summing question marks
       overcounts papers with optional sections). PdfPane sizes pages individually:
       mark schemes are a portrait cover + landscape (rotate=90) pages.
+    - **P1-e + P2-a (local, not deployed)**: MCQ solver rebuilt. `website/mcq.py`:
+      `/api/mcq/topics`, `/api/mcq/sessions` (start: full paper `paper_id` or topical
+      `topics`+count, mode paper|single, live_check, timer official|none|custom),
+      `GET/PUT answer/PUT clock/POST submit`, page `/mcq/session/{id}`, old
+      `/mcq-solver.html` 301s to `/mcq/{b}/{s}`. Keys are NEVER sent up front: one is
+      revealed per question by live check (then locked) or all after submit; submit
+      records paper_progress for full papers. Official MCQ times in `EXAM_MINS`
+      (topical = same pace per question). Frontend `static/mcq-session.js/.css`
+      (intro -> paper view [original PDF + gutter markers, or stacked vector crops for
+      topical] / one-by-one / results + review; answer sheet = bottom drawer < 1000px;
+      keys A-D/1-4, arrows, F) and `static/mcq-setup.js` (start card on the MCQ subject
+      page; `?paper=` / `?topics=A|B` preselect). Crop PDFs served by
+      `/api/question/{id}/crop.pdf`. **Annotations**: `static/annotate.js/.css` =
+      floating pill (pen, highlighter, eraser, line, arrow, rect, ellipse, text,
+      colours, sizes, undo/redo, clear, drag to top/bottom, collapses to a pen FAB,
+      palm rejection once a stylus is seen), strokes as page fractions, saved per page
+      to `/api/annotations` (doc keys `paper:<id>`, `booklet:<id>`, `mcq:<sid>:q<qid>`,
+      `mcq:<sid>:q0` for a session's full PDF). Wired into the booklet viewer, the
+      yearly viewer and both MCQ views via `PdfPane({onPageEl})`. PDF.js needs
+      `PDF_OPTS` (standardFontDataUrl) or symbol fonts go missing. NOTE the pane in
+      the desktop app doesn't render while hidden (rAF/IntersectionObserver) - verify
+      rendering with the Playwright e2e tests, not the hidden pane.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
-      `021_ai_help.sql` (done 2026-09-25) on Supabase BEFORE deploying code;
+      `021_ai_help.sql` (done 2026-09-25) and `022_mcq_sessions_annotations.sql`
+      (NOT yet run) on Supabase BEFORE deploying code;
       the server runs **Python 3.10** - no 3.12-only f-string syntax
       (py_compile new files with the server venv).
 
