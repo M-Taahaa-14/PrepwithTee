@@ -379,7 +379,7 @@ async function openPaperMarksModal(year, session, paper, variant = "") {
     // Variant code = paperNumber + variantDigit, e.g. "31"
     const varCode = `${paper}${vStr || "1"}`;
 
-    const paperLink = `/papers.html?tab=yearly&syllabus=${state.syllabus}` +
+    const paperLink = `/yearly/open?syllabus=${state.syllabus}` +
       `&year=${year}&session=${session}&paper=${paper}&variant=${vStr}`;
 
     html += `

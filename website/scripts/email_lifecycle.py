@@ -236,7 +236,7 @@ def _p(text: str) -> str:
 def send_W1(user: dict) -> bool:
     """Welcome — sent day of signup."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     return _send(
         user, "W1",
         subject="You're in, {first} — here's your first move.".format(first=first),
@@ -276,7 +276,7 @@ def send_W1(user: dict) -> bool:
 def send_W2(user: dict) -> bool:
     """Your First Step — 1 day after signup."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     return _send(
         user, "W2",
         subject="The revision habit that actually works (10 min today)",
@@ -359,7 +359,7 @@ def send_W3(user: dict) -> bool:
 def send_R1(user: dict) -> bool:
     """We Miss You — 3 days inactive."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     return _send(
         user, "R1",
         subject="{first}, is everything okay?".format(first=first),
@@ -403,7 +403,7 @@ def send_R1(user: dict) -> bool:
 def send_R2(user: dict) -> bool:
     """Still Procrastinating? — 7 days inactive."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     return _send(
         user, "R2",
         subject="I'll be honest with you.",
@@ -456,7 +456,7 @@ def send_R2(user: dict) -> bool:
 def send_R3(user: dict) -> bool:
     """One Last Nudge — 14 days inactive."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     return _send(
         user, "R3",
         subject="One thing before I leave you alone",
@@ -714,7 +714,7 @@ _WEEKLY_TIPS = [
 def send_F1(user: dict, week_number: int) -> bool:
     """Weekly Study Tip — rotates through _WEEKLY_TIPS by ISO week number."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     subject, plain_tip, html_tip = _WEEKLY_TIPS[week_number % len(_WEEKLY_TIPS)]
 
     return _send(
@@ -748,7 +748,7 @@ def send_F1(user: dict, week_number: int) -> bool:
 def send_M1(user: dict, notify_fn) -> bool:
     """First topic completed. Call from the route handler; pass app._notify."""
     first = (user.get("name") or "there").split()[0]
-    lib = f"{APP_URL}/library.html"
+    lib = f"{APP_URL}/yearly"
     body_html = (
         _p(f"Hi {_esc(first)},")
         + _p(

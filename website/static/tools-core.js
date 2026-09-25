@@ -51,7 +51,7 @@
       href: "pseudocode.html", blurb: "Run it, trace it, fix it" }
   ];
 
-  var VERSION = "20260926a";
+  var VERSION = "20260927b";
 
   // ── Small shared helpers ────────────────────────────────────────────────
   function esc(s) {

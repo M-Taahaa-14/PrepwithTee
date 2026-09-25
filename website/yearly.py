@@ -15,6 +15,7 @@ each paper. The old ?tab=yearly|mcq URLs and library.html 301 here.
 """
 
 import json
+import re
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -27,7 +28,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260926r"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260927c"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -213,19 +214,60 @@ def _sitting_rows(code: str, items: list[dict]) -> str:
     return "".join(rows)
 
 
+def _tile(code: str, e: dict) -> str:
+    """One sitting as a compact tile: variant code, then QP / MS / Insert links and,
+    for a multiple-choice paper, a Practise button that opens the MCQ solver."""
+    files = e["files"]
+    main = files.get("qp") or files.get("ms") or files.get("in")
+    if not main:
+        return ""
+    mcq = is_mcq(code, e["paper"])
+    links = [f'<a class="yr-f yr-f-{k}" href="/yearly/view/{main["id"]}?doc={k}" title="{KINDS[k]}">{lab}</a>'
+             for k, lab in (("qp", "QP"), ("ms", "MS"), ("in", "Insert")) if k in files]
+    if mcq and "qp" in files:
+        links.append(f'<a class="yr-f yr-f-go" href="{mcq_url(code)}?paper={files["qp"]["id"]}#start" '
+                     f'title="Practise in the MCQ solver" aria-label="Practise {code}/{e["code"]} as MCQ">▶ Practise</a>')
+    sess = SESSION_SHORT.get(e["session"], e["session"])
+    return f"""
+          <div class="yr-tile" data-key="{e['year']}|{e['session']}|{e['paper']}|{_e(e['variant'])}"
+               data-find="{code}/{e['code']} {e['code']} {sess} {SESSION_NAMES.get(e['session'], '')} {e['year']} p{e['paper']}">
+            <a class="yr-tile-main" href="/yearly/view/{main['id']}" title="{_e(_sitting_title(code, e))}">
+              <b>{e['code']}</b><span>{code}/{e['code']} · {sess} {e['year']}</span>
+            </a>
+            <div class="yr-tile-files">{''.join(links)}</div>
+            <span class="yr-done" aria-hidden="true"></span>
+          </div>"""
+
+
 def _year_block(code: str, year: int, items: list[dict], open_: bool) -> str:
-    by_session: dict[str, list] = {}
+    """A year as a grid: one row per paper component, one column per session."""
+    sessions = sorted({e["session"] for e in items}, key=lambda x: SESSION_ORDER.get(x, 9))
+    papers = sorted({e["paper"] for e in items})
+    cell: dict[tuple, list] = {}
     for e in items:
-        by_session.setdefault(e["session"], []).append(e)
-    sessions = "".join(
-        f'<div class="yr-session"><h3>{SESSION_NAMES.get(s, s)} {year}</h3>'
-        f'<ul class="yr-list">{_sitting_rows(code, by_session[s])}</ul></div>'
-        for s in sorted(by_session, key=lambda s: SESSION_ORDER.get(s, 9)))
+        cell.setdefault((e["paper"], e["session"]), []).append(e)
+    head = "".join(f'<div class="yr-mh" data-sess="{x}">{SESSION_NAMES.get(x, x)}</div>' for x in sessions)
+    rows = []
+    for pno in papers:
+        c = _catalog.component(code, pno)
+        lvl = f'<i class="yr-level yr-level-{c["level"]}">{c["level"]}</i>' if c["level"] else ""
+        cells = "".join(
+            f'<div class="yr-cell" data-sess="{x}" data-label="{SESSION_NAMES.get(x, x)}">'
+            + ("".join(_tile(code, e) for e in cell.get((pno, x), []))
+               or '<span class="yr-nil" aria-label="No paper">—</span>')
+            + "</div>" for x in sessions)
+        rows.append(f'<div class="yr-mrow" data-comp="{pno}"><div class="yr-comp">'
+                    f'<b>Paper {pno}</b><span>{_e(c["title"])}</span>{lvl}</div>{cells}</div>')
+    n = sum(1 for e in items if e["files"])
     return f"""
     <details class="yr-year" id="y{year}"{' open' if open_ else ''}>
-      <summary><h2>{year}</h2><span>{len(items)} papers</span>
+      <summary><h2>{year}</h2><span class="yr-year-n">{n} papers</span>
+        <span class="yr-year-done" hidden></span>
         <a class="yr-yearlink" href="{yearly_url(code, year)}">Only {year} →</a></summary>
-      <div class="yr-sessions">{sessions}</div>
+      <div class="yr-matrix" style="--sessions:{len(sessions)}">
+        <div class="yr-mhead"><div class="yr-mh yr-mh-comp">Paper</div>{head}</div>
+        {''.join(rows)}
+      </div>
     </details>"""
 
 
@@ -286,6 +328,38 @@ def yearly_hub(user: dict | None = Depends(_auth.maybe_user)):
                       "with mark schemes and inserts.",
                  path="/yearly", body=body, user=user,
                  crumbs=[("Home", "/"), ("Yearly papers", "/yearly")])
+
+
+_KEY_RE = re.compile(r"^(\d{4})_([msw])(\d{2})_(?:qp_|ms_)?(\d)(\d?)$")
+
+
+def find_paper(syllabus: str, year: int, session: str, paper: int, variant: str = "") -> int | None:
+    """The question paper's id for one sitting (falls back to its mark scheme)."""
+    con = _db.plain_connect()
+    try:
+        rows = con.execute(
+            "SELECT id, kind FROM papers WHERE syllabus = ? AND year = ? AND session = ? "
+            "AND paper = ? AND COALESCE(variant, '') = ?",
+            [syllabus, year, session, paper, variant or ""]).fetchall()
+    finally:
+        con.close()
+    by_kind = {r["kind"]: r["id"] for r in rows}
+    return by_kind.get("qp") or by_kind.get("ms")
+
+
+@router.get("/yearly/open", include_in_schema=False)
+def yearly_open(syllabus: str = "", year: int = 0, session: str = "", paper: int = 0,
+                variant: str = "", key: str = ""):
+    """Resolve a sitting (fields, or a paper key like 5054_s23_22) to its viewer.
+    Used by the progress pages and by old /papers.html deep links."""
+    m = _KEY_RE.match(key.strip())
+    if m:
+        syllabus, session = m.group(1), m.group(2)
+        year, paper, variant = 2000 + int(m.group(3)), int(m.group(4)), m.group(5)
+    if syllabus not in SUBJECTS:
+        return RedirectResponse("/yearly", 302)
+    pid = find_paper(syllabus, year, session, paper, variant) if year and paper else None
+    return RedirectResponse(f"/yearly/view/{pid}" if pid else yearly_url(syllabus, year or None), 302)
 
 
 @router.get("/yearly/view/{paper_id}", response_class=HTMLResponse)
@@ -360,7 +434,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260924a"></script>
-<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="/auth.js?v=20260927b"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
@@ -396,7 +470,7 @@ def _subject_page(board: str, subject: str, year: int | None, user: dict | None)
     by_year: dict[int, list] = {}
     for e in items:
         by_year.setdefault(e["year"], []).append(e)
-    blocks = "".join(_year_block(code, y, by_year[y], open_=(year is not None or i < 2))
+    blocks = "".join(_year_block(code, y, by_year[y], open_=(year is not None or i < 3))
                      for i, y in enumerate(sorted(by_year, reverse=True)))
     base = yearly_url(code)
     span = f"{years[-1][0]}–{years[0][0]}" if years else ""
@@ -437,20 +511,47 @@ def _subject_page(board: str, subject: str, year: int | None, user: dict | None)
     elif code not in st["enrolled"] and not _staff(user):
         enrol = (f'<p class="cat-note">🔒 <button class="cat-btn cat-btn-gold" type="button" '
                  f'data-enrol="{code}">Enrol free</button> to open these papers.</p>')
+    comps = sorted({e["paper"] for e in items})
+    sessions = sorted({e["session"] for e in items}, key=lambda x: SESSION_ORDER.get(x, 9))
+    comp_chips = "".join(
+        f'<button type="button" class="yr-chip" data-comp="{pno}" aria-pressed="false" title="{_e(c["title"])}">'
+        f'P{pno} <span>{_e(c["short"])}</span>'
+        + (f'<i class="yr-level yr-level-{c["level"]}">{c["level"]}</i>' if c["level"] else "") + "</button>"
+        for pno in comps for c in [_catalog.component(code, pno)]) if len(comps) > 1 else ""
+    sess_chips = "".join(
+        f'<button type="button" class="yr-chip" data-sess="{x}" aria-pressed="false">{SESSION_NAMES.get(x, x)}</button>'
+        for x in sessions) if len(sessions) > 1 else ""
+    rail = "" if year else (
+        '<nav class="yr-rail" aria-label="Years"><p>Years</p>'
+        + "".join(f'<a href="#y{y}"><b>{y}</b><span data-rail="{y}">{n}</span></a>' for y, n in years)
+        + "</nav>")
+    stats = (f'<dl class="cat-stats"><div><dt>Question papers</dt><dd>{(len(items) if year else nqp):,}</dd></div>'
+             f'<div><dt>{"Year" if year else "Years"}</dt><dd>{year or span}</dd></div>'
+             f'<div><dt>Sessions</dt><dd>{len(sessions)}</dd></div></dl>')
     body = f"""
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
       <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · {code} · Yearly</p>
       <h1>{_e(h1)}</h1>
       <p class="cat-lede">{_e(lede)}</p>
+      {stats}
       <div class="cat-actions">{''.join(actions)}</div>
     </header>
     {enrol}
-    <div class="yr-tools">
-      {jump}
-      <label class="yr-filter"><span class="sr-only">Filter papers</span>
-        <input type="search" placeholder="Filter: 12, M/J, 2019…" data-yr-filter autocomplete="off"></label>
+    {jump if year else ''}
+    <div class="yr-bar" role="toolbar" aria-label="Filter papers">
+      {f'<div class="yr-chips" data-group="comp"><button type="button" class="yr-chip" data-comp="" aria-pressed="true">All papers</button>{comp_chips}</div>' if comp_chips else ''}
+      <div class="yr-bar-end">
+      {f'<div class="yr-chips" data-group="sess"><button type="button" class="yr-chip" data-sess="" aria-pressed="true">All sessions</button>{sess_chips}</div>' if sess_chips else ''}
+      <label class="yr-filter"><span class="sr-only">Search papers</span>
+        <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Search: 42, M/J, 2019…" data-yr-filter autocomplete="off"></label>
+      </div>
     </div>
-    <div class="yr-years" data-syllabus="{code}">{blocks}</div>"""
+    <div class="yr-layout{' has-rail' if rail else ''}">
+      {rail}
+      <div class="yr-years" data-syllabus="{code}">{blocks}</div>
+    </div>
+    <p class="yr-none-found" hidden>No papers match those filters.</p>"""
     crumbs = [("Home", "/"), ("Yearly papers", "/yearly"), (BOARD_SHORT[board], f"/yearly/{board}"),
               (f"{s['plain']} {code}", base)]
     if year:

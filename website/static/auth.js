@@ -423,7 +423,7 @@ export async function initNavbar() {
     </button>
     <div class="account-dropdown" hidden>
       <a href="/dashboard.html">Dashboard</a>
-      <a href="/papers.html">Past papers</a>
+      <a href="/papers">Past papers</a>
       <a href="/formulas.html">Formula sheets</a>
       <a href="/profile.html">Edit profile</a>
       <button type="button" class="account-logout">Sign out</button>

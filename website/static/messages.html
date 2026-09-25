@@ -12,7 +12,7 @@
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260907a">
+  <link rel="stylesheet" href="styles.css?v=20260927c">
   <style>
     :root {
       --msg-accent-bg:   #ede9fe;
@@ -247,7 +247,7 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script type="module">
-import { getUser, api, logout } from "/auth.js?v=20260829a";
+import { getUser, api, logout } from "/auth.js?v=20260927b";
 
 const user = await getUser();
 if (!user) { location.replace("/login.html"); throw 0; }
@@ -431,6 +431,6 @@ async function sendMsg(recipientId) {
 }
 </script>
 
-  <script defer src="chatbot-widget.js?v=20260830a"></script>
+  <script defer src="chatbot-widget.js?v=20260927b"></script>
 </body>
 </html>

@@ -389,13 +389,13 @@
 .pwt-cb-escalate a:hover { text-decoration: underline !important; }
 
 /* Dark mode */
-html[data-theme="dark"] .pwt-chatbot-panel { background: #121224; border-color: #2e2a4a; }
+html[data-theme="dark"] .pwt-chatbot-panel { background: #13161d; border-color: #2b3240; }
 html[data-theme="dark"] .pwt-chatbot-body { background: #0a0a16; }
-html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #2e2a4a; color: #e8e8ff; }
+html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #2b3240; color: #e8e8ff; }
 html[data-theme="dark"] .pwt-chatbot-chips,
-html[data-theme="dark"] .pwt-chatbot-foot { background: #121224; border-color: #2e2a4a; }
+html[data-theme="dark"] .pwt-chatbot-foot { background: #13161d; border-color: #2b3240; }
 html[data-theme="dark"] .pwt-cb-chip { background: #1e1b38; border-color: #38326a; color: #ddd; }
-html[data-theme="dark"] .pwt-chatbot-input { background: #181730; border-color: #383460; color: #fff; }
+html[data-theme="dark"] .pwt-chatbot-input { background: #181730; border-color: #343c4c; color: #fff; }
 html[data-theme="dark"] .pwt-chatbot-tooltip { background: #2E1B4A; }
 html[data-theme="dark"] .pwt-cb-nav-link { background: #1e1b38; border-color: #38326a; color: #c9bfff; }
 html[data-theme="dark"] .pwt-cb-escalate { background: #1e1208; border-color: #5a3a10; color: #f5c070; }
@@ -520,12 +520,12 @@ html[data-theme="dark"] .pwt-cb-escalate { background: #1e1208; border-color: #5
     {
       keys: ['past paper', 'topical', 'paper', 'question', 'library', 'mark scheme', 'ms'],
       answer: '**5,000+ past paper questions** organised by topic, with official mark schemes. Filter by year, session, paper variant and topic to build your own topical practice set.',
-      links: [{ label: '📄 Papers Library', href: 'library.html' }]
+      links: [{ label: '📄 Papers Library', href: '/yearly' }]
     },
     {
       keys: ['mcq', 'multiple choice', 'mock test', 'test', 'quiz', 'practice exam'],
       answer: 'Use the **Quiz** feature to attempt topical MCQs with instant feedback, or generate a full **mock test** from the papers library filtered by topic and year range.',
-      links: [{ label: '🎯 Start a Quiz', href: 'quiz.html' }, { label: '📝 Papers', href: 'papers.html' }]
+      links: [{ label: '🎯 Start a Quiz', href: 'quiz.html' }, { label: '📝 Papers', href: '/papers' }]
     },
     {
       keys: ['tutoring', '1-on-1', 'one on one', 'private tutor', 'book', 'demo', 'lesson', 'teacher'],

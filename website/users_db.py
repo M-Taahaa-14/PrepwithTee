@@ -1444,7 +1444,7 @@ def get_booklet(booklet_id: str) -> dict | None:
 
 
 def list_booklets(user_id: str, limit: int = 30) -> list[dict]:
-    cols = "id,syllabus,title,status,created_at,question_ids"
+    cols = "id,syllabus,title,status,created_at,question_ids,params_json"
     if _USE_SUPABASE:
         r = (_client().table("booklets").select(cols).eq("user_id", user_id)
              .order("created_at", desc=True).limit(limit).execute())

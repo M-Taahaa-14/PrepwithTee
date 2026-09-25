@@ -26,7 +26,7 @@ import json
 import os
 import re
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from typing import Callable
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -39,8 +39,8 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260924c"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260919a"    # the site-wide styles.css pin
+CSS_V = "20260927c"       # bump with catalog.css / catalog.js (immutable caching)
+STYLES_V = "20260927c"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
@@ -78,6 +78,58 @@ BOARD_BLURB = {
     "a-level": "Cambridge International AS & A Level topical past papers, split by "
                "component and chapter, with official mark schemes.",
 }
+# Paper components per syllabus: (short label, full title, level). The short label
+# is what chips and filters show ("P3 · Pure 3"); the title heads a builder
+# section; level is "AS"/"A2" for A Level components, "" otherwise. app.py's
+# PAPER_LABELS and the yearly/builder pages all derive from this one table.
+COMPONENTS: dict[str, dict[int, tuple[str, str, str]]] = {
+    "9709": {1: ("Pure 1", "Pure Mathematics 1", "AS"),
+             3: ("Pure 3", "Pure Mathematics 3", "A2"),
+             4: ("Mechanics", "Mechanics", "AS"),
+             5: ("Statistics", "Probability & Statistics 1", "AS")},
+    "9702": {1: ("MCQ", "Multiple choice", "AS"),
+             2: ("AS Structured", "AS structured questions", "AS"),
+             4: ("A Level", "A Level structured questions", "A2"),
+             5: ("Planning", "Planning, analysis & evaluation", "A2")},
+    "9618": {1: ("Theory", "Theory fundamentals", "AS"),
+             2: ("Problem-solving", "Problem-solving & programming", "AS"),
+             3: ("Advanced Theory", "Advanced theory", "A2"),
+             4: ("Practical", "Practical programming", "A2")},
+    "0580": {2: ("Extended", "Extended · short answer", ""),
+             4: ("Extended", "Extended · structured", "")},
+    "4024": {1: ("Paper 1", "Paper 1", ""), 2: ("Paper 2", "Paper 2", "")},
+    "0625": {1: ("MCQ Core", "Multiple choice (Core)", ""),
+             2: ("MCQ Extended", "Multiple choice (Extended)", ""),
+             4: ("Extended", "Theory (Extended)", "")},
+    "5054": {1: ("MCQ", "Multiple choice", ""), 2: ("Theory", "Theory", "")},
+    "5070": {1: ("MCQ", "Multiple choice", ""), 2: ("Theory", "Theory", "")},
+    "0620": {1: ("MCQ Core", "Multiple choice (Core)", ""),
+             2: ("MCQ Extended", "Multiple choice (Extended)", ""),
+             3: ("Theory Core", "Theory (Core)", ""),
+             4: ("Theory Extended", "Theory (Extended)", "")},
+    "2210": {1: ("Theory", "Computer systems", ""),
+             2: ("Problem-solving", "Algorithms, programming & logic", "")},
+    "0478": {1: ("Theory", "Computer systems", ""),
+             2: ("Problem-solving", "Algorithms, programming & logic", "")},
+    # These two examine different content per component, so the labels are what
+    # the student actually revises from, not just a paper number.
+    "2058": {1: ("Qur'an & the Prophet", "The Qur'an and the life of the Prophet", ""),
+             2: ("Hadith & the Caliphs", "Hadith, history and the Caliphs", "")},
+    "2059": {1: ("History of Pakistan", "History and culture of Pakistan", ""),
+             2: ("Environment of Pakistan", "The environment of Pakistan", "")},
+}
+
+
+def component(code: str, paper: int) -> dict:
+    """{paper, short, label ("P3 · Pure 3"), title, level} for one component."""
+    short, title, level = COMPONENTS.get(code, {}).get(paper, (f"Paper {paper}", f"Paper {paper}", ""))
+    return {"paper": paper, "short": short, "label": f"P{paper} · {short}",
+            "title": title, "level": level}
+
+
+PAPER_LABELS = {code: {p: component(code, p)["label"] for p in comps}
+                for code, comps in COMPONENTS.items()}
+
 # Pastel card pair per subject family (tokens from styles.css).
 _FAMILY = [("math", "lav"), ("physic", "green"), ("chem", "orange"),
            ("computer", "pink"), ("islam", "teal"), ("pakistan", "yellow")]
@@ -161,6 +213,35 @@ def chapters(code: str) -> list[dict]:
                     "papers": t.get("paper_scope"),
                     "subtopics": [{"name": s["name"], "count": s.get("count", 0)}
                                   for s in t.get("subtopics", [])]})
+    return out
+
+
+def paper_groups(code: str) -> list[dict]:
+    """Chapters grouped by the paper(s) that examine them, for subjects whose
+    components cover different content (A Level Maths/Physics/CS, O Level and
+    IGCSE CS, Islamiyat, Pakistan Studies). [] when every chapter is examined on
+    every paper - then one flat list is the right view.
+
+    [{key, papers, title, eyebrow, level, chapters:[name]}], in paper order.
+    Components with an identical chapter set share one group (9702 P1 + P2)."""
+    m = _meta_for(code)
+    if not m or not m.get("split_by_paper"):
+        return []
+    out = []
+    for g in m.get("paper_groups", []):
+        papers = g["papers"]
+        comps = [component(code, p) for p in papers]
+        levels = sorted({c["level"] for c in comps if c["level"]})
+        level = levels[0] if len(levels) == 1 else ""
+        if len(papers) == 1:
+            eyebrow, title = f"Paper {papers[0]}", comps[0]["title"]
+        else:
+            eyebrow = "Papers " + " & ".join(str(p) for p in papers)
+            title = {"AS": "AS Level content", "A2": "A Level (A2) content"}.get(
+                level, " / ".join(c["title"] for c in comps))
+        out.append({"key": "-".join(map(str, papers)), "papers": papers, "title": title,
+                    "eyebrow": eyebrow, "level": level, "chapters": g["topics"],
+                    "components": [c["title"] for c in comps]})
     return out
 
 
@@ -257,7 +338,7 @@ def _e(s) -> str:
 
 def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[str, str]],
            state: dict, noindex: bool = False, ld: list | None = None,
-           scripts: tuple[str, ...] = ()) -> str:
+           scripts: tuple[str, ...] = (), styles: tuple[str, ...] = ()) -> str:
     import blog as _blog                      # shared navbar + footer
     canonical = f"{SITE_ORIGIN}{path}"
     crumb_ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
@@ -297,6 +378,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={STYLES_V}">
   <link rel="stylesheet" href="/catalog.css?v={CSS_V}">
+  {''.join(f'<link rel="stylesheet" href="{href}">' for href in styles)}
 </head>
 <body class="cat-page">
 {_blog._nav()}
@@ -307,9 +389,9 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
 <script src="/main.js?v=20260924a"></script>
-<script src="/tools-core.js?v=20260926a"></script>
+<script src="/tools-core.js?v=20260927b"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="/auth.js?v=20260927b"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>
@@ -327,14 +409,17 @@ def _years(stats: dict) -> str:
     return f"{y0}–{y1}" if y0 and y1 else ""
 
 
-def _subject_card(code: str, state: dict) -> str:
+def _subject_card(code: str, state: dict, test: bool = False) -> str:
     s = SUBJECTS[code]
     st = subject_stats(code)
     enrolled = code in state["enrolled"]
-    url = subject_url(code)
+    url = subject_url(code) + ("?mode=test#builder" if test else "")
     meta = f'{st["chapters"]} chapters · {st["questions"]:,} questions'
     yrs = _years(st)
-    if enrolled:
+    if enrolled and test:
+        actions = f'<a class="cat-btn" href="{url}">Build a mock test</a>'
+        badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
+    elif enrolled:
         actions = (f'<a class="cat-btn" href="{url}">Topical</a>'
                    f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Yearly</a>'
                    + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ</a>'
@@ -353,14 +438,14 @@ def _subject_card(code: str, state: dict) -> str:
     </article>"""
 
 
-def _board_tabs(active: str, state: dict) -> str:
+def _board_tabs(active: str, state: dict, q: str = "") -> str:
     mine = state["boards"] or []
     order = mine + [b for b in BOARD_SHORT if b not in mine] if state["user"] else list(BOARD_SHORT)
     tabs = []
     for b in order:
         cls = "cat-tab" + (" is-active" if b == active else "") + (" is-mine" if b in mine else "")
         current = ' aria-current="page"' if b == active else ""
-        tabs.append(f'<a class="{cls}" href="/papers/{b}"{current}>{BOARD_SHORT[b]}</a>')
+        tabs.append(f'<a class="{cls}" href="/papers/{b}{q}"{current}>{BOARD_SHORT[b]}</a>')
     if state["user"]:
         tabs.append('<button class="cat-tab cat-tab-add" type="button" data-open-boards>'
                     'Edit my boards</button>')
@@ -370,30 +455,39 @@ def _board_tabs(active: str, state: dict) -> str:
 # ── Pages ─────────────────────────────────────────────────────────────────────
 
 @router.get("/papers", response_class=HTMLResponse)
-def page_hub(user: dict | None = Depends(_auth.maybe_user)):
+def page_hub(mode: str = "", user: dict | None = Depends(_auth.maybe_user)):
     state = _student_state(user)
+    q = "?mode=test" if mode == "test" else ""
     if state["user"] and state["boards"] and not state.get("boards_inferred"):
-        return RedirectResponse(f"/papers/{state['primary'] or state['boards'][0]}", 302)
+        return RedirectResponse(f"/papers/{state['primary'] or state['boards'][0]}{q}", 302)
     cards = []
     for board, subs in BOARDS:
         b = BOARD_SLUGS[board]
         names = ", ".join(_plain(n) for _c, n in subs)
         total = sum(subject_stats(c)["questions"] for c, _n in subs)
         cards.append(f"""
-        <a class="cat-board" href="/papers/{b}">
+        <a class="cat-board" href="/papers/{b}{q}">
           <span class="cat-board-eyebrow">Cambridge</span>
           <h2>{BOARD_SHORT[b]}</h2>
           <p>{_e(names)}</p>
           <span class="cat-board-count">{total:,} topical questions →</span>
         </a>""")
-    body = f"""
+    hero = ("""
+    <header class="cat-hero">
+      <p class="cat-eyebrow">Mock tests</p>
+      <h1>Exam-style tests from real Cambridge questions.</h1>
+      <p class="cat-lede">Pick your board and subject, choose up to four chapters, and get a
+        timed test with an exam cover - the mark scheme comes as a separate file you unlock
+        when you finish.</p>
+    </header>""" if q else """
     <header class="cat-hero">
       <p class="cat-eyebrow">Topical past papers</p>
       <h1>Every Cambridge past-paper question, sorted by chapter.</h1>
       <p class="cat-lede">Pick your board, enrol in your subjects for free, then build a
         paper from up to four chapters. Questions are cropped straight from the original
         papers, with the official mark scheme alongside.</p>
-    </header>
+    </header>""")
+    body = f"""{hero}
     <section class="cat-boards">{''.join(cards)}</section>"""
     return _respond(_shell(
         title="Cambridge Topical Past Papers | O Level, IGCSE & A Level — PrepWithTee",
@@ -404,20 +498,21 @@ def page_hub(user: dict | None = Depends(_auth.maybe_user)):
 
 
 @router.get("/papers/{board}", response_class=HTMLResponse)
-def page_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
+def page_board(board: str, mode: str = "", user: dict | None = Depends(_auth.maybe_user)):
     if board not in BOARD_SHORT:
         raise HTTPException(404, "Unknown board")
     state = _student_state(user)
+    test = mode == "test"
     codes = [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
     mine = [c for c in codes if c in state["enrolled"]]
     rest = [c for c in codes if c not in state["enrolled"]]
     sections = []
     if mine:
         sections.append(f'<h2 class="cat-group">Your subjects <span>{len(mine)}</span></h2>'
-                        f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in mine)}</div>')
+                        f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in mine)}</div>')
     label = f"All {BOARD_SHORT[board]} subjects" if mine or not state["user"] else "Choose your subjects"
     sections.append(f'<h2 class="cat-group">{label}</h2>'
-                    f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in rest)}</div>')
+                    f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in rest)}</div>')
     note = ("" if state["user"] else
             '<p class="cat-note">Enrolling is free. <a href="/login.html?signup=1&amp;next=/papers/'
             f'{board}">Create an account</a> to unlock topical papers, yearly papers, MCQ practice '
@@ -427,11 +522,11 @@ def page_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
                 'topical and yearly papers, MCQ practice, AI help and progress tracking.</p>')
     body = f"""
     <header class="cat-hero cat-hero-sm">
-      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]}</p>
-      <h1>{BOARD_SHORT[board]} topical past papers</h1>
+      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]}{' · Mock tests' if test else ''}</p>
+      <h1>{BOARD_SHORT[board]} {'mock tests' if test else 'topical past papers'}</h1>
       <p class="cat-lede">{_e(BOARD_BLURB[board])}</p>
     </header>
-    {_board_tabs(board, state)}
+    {_board_tabs(board, state, "?mode=test" if test else "")}
     {''.join(sections)}
     {note}"""
     ld = [{"@context": "https://schema.org", "@type": "ItemList",
@@ -479,21 +574,30 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
     code, st = s["code"], subject_stats(s["code"])
     chs = chapters(code)
     base = subject_url(code)
-    rows = []
-    for ch in chs:
+    def ch_item(ch):
         subs = "".join(f"<li>{_e(x['name'])}</li>" for x in ch["subtopics"])
-        rows.append(f"""
+        return f"""
         <li class="cat-ch">
           <a class="cat-ch-head" href="{base}/{ch['slug']}">
             <span class="cat-ch-name">{_e(ch['display'])}</span>
             <span class="cat-ch-count">{ch['count']:,} questions</span>
           </a>
           {f'<ul class="cat-subs">{subs}</ul>' if subs else ''}
-        </li>""")
+        </li>"""
+    by_name = {c["name"]: c for c in chs}
+    groups = paper_groups(code)
+    if groups:
+        static_list = "".join(
+            f'<section class="cat-pgroup"><h2 class="cat-group">{_e(g["eyebrow"])} · {_e(g["title"])}'
+            + (f' <span class="cat-level cat-level-{g["level"]}">{"AS Level" if g["level"] == "AS" else "A Level"}</span>'
+               if g["level"] else "")
+            + f'</h2><ol class="cat-chapters">{"".join(ch_item(by_name[n]) for n in g["chapters"] if n in by_name)}</ol></section>'
+            for g in groups)
+    else:
+        static_list = (f'<h2 class="cat-group">Syllabus chapters</h2>'
+                       f'<ol class="cat-chapters">{"".join(ch_item(c) for c in chs)}</ol>')
     can_build = bool(state["user"]) and (
         code in state["enrolled"] or state["user"].get("role") in ("teacher", "admin"))
-    static_list = (f'<h2 class="cat-group">Syllabus chapters</h2>'
-                   f'<ol class="cat-chapters">{"".join(rows)}</ol>')
     builder = (f'<section id="builder" class="bld" data-syllabus="{code}" aria-label="Paper builder">'
                f'<noscript>{static_list}</noscript></section>' if can_build else static_list)
     yrs = _years(st)
@@ -521,6 +625,7 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
         title=f"{s['plain']} {code} Topical Past Papers | Cambridge {BOARD_SHORT[board]} — PrepWithTee",
         desc=lede[:300], path=base, body=body, state=state, ld=ld,
         scripts=(f"/builder.js?v={CSS_V}",) if can_build else (),
+        styles=(f"/builder.css?v={CSS_V}",) if can_build else (),
         crumbs=[("Home", "/"), ("Past papers", "/papers"),
                 (BOARD_SHORT[board], f"/papers/{board}"), (f"{s['plain']} {code}", base)]),
         bool(user))
@@ -560,23 +665,28 @@ def page_chapter(board: str, subject: str, chapter: str,
 
 
 @router.get("/papers.html", include_in_schema=False)
-def legacy_papers(tab: str = "", mode: str = "", syllabus: str = "", topics: str = ""):
-    """The old single-page builder. Topical now lives at /papers/{board}/{subject},
-    yearly at /yearly/..., MCQ at /mcq/... (301 - moved for good). Only the
-    test builder still renders here."""
-    from fastapi.responses import FileResponse
+def legacy_papers(tab: str = "", mode: str = "", syllabus: str = "", s: str = "",
+                  topics: str = "", topic: str = "", key: str = "", year: int = 0,
+                  session: str = "", paper: int = 0, variant: str = ""):
+    """The old single-page builder, retired 2026-09-27. Every old link moves for
+    good (301): topical -> /papers/{board}/{subject} (?pick= the first chapter),
+    the Test Builder -> the same builder with ?mode=test, yearly/library ->
+    /yearly (a specific sitting -> its viewer), MCQ -> /mcq."""
     import yearly as _yearly
+    syllabus = syllabus or s
+    if key or (tab == "yearly" and year and paper):
+        q = {"key": key} if key else {"syllabus": syllabus, "year": year, "session": session,
+                                        "paper": paper, "variant": variant}
+        return RedirectResponse("/yearly/open?" + urlencode(q), 301)
     moved = _yearly.legacy_target(tab, syllabus)
     if moved:
         return RedirectResponse(moved, 301)
-    if mode == "test":
-        return FileResponse(Path(__file__).resolve().parent / "static" / "papers.html",
-                            headers={"Cache-Control": "no-cache"})
+    test = "mode=test" if mode == "test" else ""
     if syllabus in SUBJECTS:
-        first = next((t.strip() for t in re.split(r"[,|]", topics) if t.strip()), "")
-        pick = f"?pick={quote(first)}" if first else ""
-        return RedirectResponse(f"{subject_url(syllabus)}{pick}#builder", 302)
-    return RedirectResponse("/papers", 302)
+        first = next((t.strip() for t in re.split(r"[,|]", topics or topic) if t.strip()), "")
+        query = "&".join(x for x in (f"pick={quote(first)}" if first else "", test) if x)
+        return RedirectResponse(f"{subject_url(syllabus)}{'?' + query if query else ''}#builder", 301)
+    return RedirectResponse("/papers" + (f"?{test}" if test else ""), 301)
 
 
 def sitemap_paths() -> list[str]:

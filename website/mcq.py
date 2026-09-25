@@ -34,7 +34,7 @@ from selection import select_mixed
 
 router = APIRouter()
 
-SESSION_V = "20260926r"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20260927c"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,
@@ -497,7 +497,7 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260924a"></script>
-<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="/auth.js?v=20260927b"></script>
 <script type="module" src="/mcq-session.js?v={SESSION_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

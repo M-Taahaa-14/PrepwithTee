@@ -15,7 +15,7 @@
  * DOMPurify (it is model output). Plan gates come back as 403
  * upgrade_required and render as a "take a plan" card, not an error.
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20260829a";
+import { api, UpgradeRequiredError } from "/auth.js?v=20260927b";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

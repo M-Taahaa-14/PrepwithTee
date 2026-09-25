@@ -1,0 +1,85 @@
+<footer class="site-footer">
+    <div class="footer-wa-strip">
+      <div class="container footer-wa-inner">
+        <div>
+          <p class="footer-wa-head">Got a question before you sign up?</p>
+          <p class="footer-wa-sub">WhatsApp Tee directly &mdash; personal reply, usually within a few hours.</p>
+        </div>
+        <a class="footer-wa-btn" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%20have%20a%20question%20about%20PrepWithTee.">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.176.578 4.215 1.587 5.972L0 24l6.18-1.567A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.923 0-3.716-.528-5.248-1.441l-.376-.221-3.9.99 1.02-3.779-.245-.388A9.797 9.797 0 0 1 2.182 12c0-5.415 4.403-9.818 9.818-9.818 5.415 0 9.818 4.403 9.818 9.818 0 5.415-4.403 9.818-9.818 9.818z"/></svg>
+          WhatsApp Tee
+        </a>
+      </div>
+    </div>
+    <div class="container footer-top footer-5col">
+      <div>
+        <a class="footer-brand" href="/"><img width="40" height="40" src="/logo-nav.webp" alt="PrepWithTee"><span>PrepWithTee</span></a>
+        <p class="footer-tagline">Cambridge O Level, IGCSE &amp; A Level exam prep &mdash; every past paper by year and by topic, an AI tutor, and one-on-one teaching.</p>
+        <div class="footer-socials">
+          <a href="mailto:nexgentutors6@gmail.com" class="footer-social-link"><span class="footer-contact-icon">&#x2709;&#xFE0F;</span>nexgentutors6@gmail.com</a>
+          <a href="https://wa.me/923204884375" class="footer-social-link"><span class="footer-contact-icon">&#x1F4F1;</span>+92 320 488 4375</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Past papers</h4>
+        <a href="/papers">Topical papers</a>
+        <a href="/yearly">Papers by year</a>
+        <a href="/mcq">MCQ practice</a>
+        <a href="/papers?mode=test">Mock tests</a>
+        <a href="/topical-progress.html">Topical progress</a>
+        <a href="/yearly-progress.html">Yearly progress</a>
+      </div>
+      <div class="footer-col">
+        <h4>Boards</h4>
+        <a href="/papers/o-level">Cambridge O Level</a>
+        <a href="/papers/igcse">Cambridge IGCSE</a>
+        <a href="/papers/a-level">Cambridge AS &amp; A Level</a>
+        <a href="/subjects.html" class="footer-link-accent">All subjects &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Study</h4>
+        <a href="/tutor.html">AI Tutor</a>
+        <a href="/notes-view.html">Notes</a>
+        <a href="/flashcards.html">Flashcards</a>
+        <a href="/formulas.html">Formula sheets</a>
+        <a href="/blog">Blog</a>
+        <a href="/tools.html" class="footer-link-accent">All tools &rarr;</a>
+      </div>
+      <div class="footer-col">
+        <h4>Stay updated</h4>
+        <p class="footer-nl-desc">New subjects, study tips, and platform updates &mdash; no spam.</p>
+        <form id="footer-nl-form" class="footer-nl-form">
+          <input type="email" id="footer-nl-email" class="footer-nl-input" placeholder="your@email.com" autocomplete="email" aria-label="Email address">
+          <button type="submit" class="footer-nl-submit">Subscribe</button>
+        </form>
+        <p id="footer-nl-msg" class="footer-nl-msg" role="status"></p>
+        <p class="footer-nl-links"><a href="/pricing.html">Pricing</a> · <a href="/guide.html">Guide</a> · <a href="/teacher-apply.html">Teach with us</a> · <a href="/contact.html">Contact</a></p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; 2026 PrepWithTee &mdash; one student at a time.</span>
+      <span class="footer-bottom-links">
+        <a href="/terms.html">Terms</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/contact.html">Contact</a>
+        <span>Past papers &copy; Cambridge Assessment International Education</span>
+      </span>
+    </div>
+    <script>
+      document.getElementById("footer-nl-form")?.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var input = document.getElementById("footer-nl-email"), msg = document.getElementById("footer-nl-msg");
+        var btn = this.querySelector("button"), email = input.value.trim();
+        if (!email) return;
+        btn.disabled = true; btn.textContent = "…";
+        try {
+          var r = await fetch("/api/newsletter", { method: "POST", headers: { "Content-Type": "application/json" },
+                                                   body: JSON.stringify({ email: email }) });
+          if (!r.ok) throw new Error();
+          msg.textContent = "Subscribed ✓ Thanks!"; msg.style.color = ""; input.value = "";
+        } catch (err) {
+          msg.textContent = "Something went wrong — try again."; msg.style.color = "#f87171";
+        } finally { btn.disabled = false; btn.textContent = "Subscribe"; }
+      });
+    </script>
+  </footer>

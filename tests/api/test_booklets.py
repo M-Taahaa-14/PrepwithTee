@@ -118,3 +118,31 @@ def test_viewer_page_requires_login_and_is_noindex(client, enrolled):
     client.post("/auth/logout")
     r = client.get(f"/papers/view/{bid}", follow_redirects=False)
     assert r.status_code == 302 and "login.html" in r.headers["location"]
+
+
+def test_mock_test_builds_paper_and_separate_mark_scheme(client, enrolled):
+    r = client.post("/api/booklets", json={**PHYS, "max_questions": 3, "kind": "test"})
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["title"].startswith("Mock test: ")
+    st = wait_ready(client, b["id"])
+    assert st["status"] == "ready", st
+    meta = client.get(f"/api/booklets/{b['id']}").json()
+    assert meta["kind"] == "test"
+    paper = client.get(f"/api/booklets/{b['id']}/pdf")
+    ms = client.get(f"/api/booklets/{b['id']}/pdf?part=ms")
+    assert paper.status_code == 200 and ms.status_code == 200
+    assert paper.content != ms.content
+    assert "mark-scheme" in client.get(f"/api/booklets/{b['id']}/pdf?part=ms&download=1").headers[
+        "content-disposition"]
+    listed = next(x for x in client.get("/api/booklets").json()["booklets"] if x["id"] == b["id"])
+    assert listed["kind"] == "test"
+    page = client.get(f"/papers/view/{b['id']}").text
+    assert '"kind": "test"' in page
+
+
+def test_practice_booklet_has_no_separate_mark_scheme(client, enrolled):
+    b = client.post("/api/booklets", json={**PHYS, "max_questions": 2}).json()
+    assert wait_ready(client, b["id"])["status"] == "ready"
+    assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 404
+    assert client.get(f"/api/booklets/{b['id']}").json()["kind"] == "booklet"

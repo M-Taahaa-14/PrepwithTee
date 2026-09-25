@@ -16,6 +16,7 @@ Questions are still original vector crops - never re-typeset.
 
 import argparse
 import json
+import os
 import random
 import re
 from datetime import date
@@ -108,8 +109,9 @@ def cover(doc, args, subject, topics, chosen, *, is_ms):
                   "P R E P W I T H T E E   ·   M A R K   S C H E M E")
     _centre(page, brand_line, y, 12, "hebo", ACCENT)
     y += 15
-    # Detect O Level vs IGCSE by syllabus prefix: 4-digit starting with 0 → IGCSE
+    # Board from the syllabus code: 0xxx IGCSE, 9xxx AS & A Level, else O Level
     level = ("Cambridge IGCSE" if args.syllabus.startswith("0")
+             else "Cambridge International AS & A Level" if args.syllabus.startswith("9")
              else "Cambridge O Level")
     _centre(page, level, y, 9, "helv", (0.35, 0.35, 0.35))
 
@@ -278,6 +280,7 @@ def render_test(con, args, subject, topics, chosen, cache):
     ins_cache: dict = {}
 
     for seq, q in enumerate(chosen, 1):
+        _progress("question", seq, len(chosen))
         syl = args.syllabus
         year, session, paper = q["year"], q["session"], q["paper"]
         sd = config.session_display(session)
@@ -344,6 +347,14 @@ def render_test(con, args, subject, topics, chosen, cache):
         for i in range(len(sheets)):
             b.doc.move_page(base + i, 1 + i)
     return b.doc
+
+
+def _progress(stage: str, done: int | None = None, total: int | None = None) -> None:
+    """PROGRESS lines for the web builder's loader (only with PWT_PROGRESS=1),
+    in the same format compose prints."""
+    if os.environ.get("PWT_PROGRESS"):
+        print(f"PROGRESS {stage} {'' if done is None else done} {'' if total is None else total}".rstrip(),
+              flush=True)
 
 
 def render_ms(con, args, subject, topics, chosen, cache):
@@ -485,7 +496,9 @@ def main():
     cache: dict[str, fitz.Document] = {}
 
     test_doc = render_test(con, args, subject, topics, chosen, cache)
+    _progress("scheme")
     ms_doc, missing = render_ms(con, args, subject, topics, chosen, cache)
+    _progress("saving")
 
     slug = re.sub(r"[^a-z0-9]+", "-", ",".join(topics).lower()).strip("-")
     if getattr(args, "subtopics", None):

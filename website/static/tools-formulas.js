@@ -524,7 +524,7 @@
           (g.component && state.component === "all"
             ? '<span class="fs-comp-tag">' + esc(g.component) + '</span>' : '') +
           (!isGraphTips && !isZTable ?
-            '<a href="papers.html?syllabus=' + encodeURIComponent(state.syllabus) +
+            '<a href="/papers.html?syllabus=' + encodeURIComponent(state.syllabus) +
             "&topics=" + encodeURIComponent(g.topic) + '"' +
             (compact ? ' target="_blank" rel="noopener"' : '') +
             ">Practise this chapter →</a>" : '') +

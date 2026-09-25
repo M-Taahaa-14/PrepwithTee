@@ -32,7 +32,7 @@ const ITEMS = [
     icon:  "📄",
     title: "Topical Past Papers",
     desc:  "Build filtered practice sets from real Cambridge past papers.",
-    href:  "/papers.html",
+    href:  "/papers",
   },
   {
     key:   "ask",

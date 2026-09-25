@@ -39,6 +39,12 @@ os.environ.update({
     "GEMINI_API_KEY": "",
     "OPENROUTER_API_KEY": "",
     "CEREBRAS_API_KEY": "",
+    # every free explanation provider (pipeline/ai_providers.py) - tests never call out
+    "MISTRAL_API_KEY": "",
+    "NVIDIA_API_KEY": "",
+    "CLOUDFLARE_API_TOKEN": "",
+    "CLOUDFLARE_ACCOUNT_ID": "",
+    "OLLAMA_URL": "",
     "SECRET_KEY": "test-secret-not-for-production",
     "APP_BASE_URL": "http://testserver",
     "ADMIN_ACCESS_KEY": "test-admin-key",

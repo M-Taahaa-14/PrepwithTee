@@ -810,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ── Load chatbot widget on all pages that include main.js ─────────────────────
 (function () {
   var s = document.createElement('script');
-  s.src = '/chatbot-widget.js?v=20260830a';   // absolute: pages also live at /papers/..., /blog/...
+  s.src = '/chatbot-widget.js?v=20260927b';   // absolute: pages also live at /papers/..., /blog/...
   s.defer = true;
   document.head.appendChild(s);
 })();

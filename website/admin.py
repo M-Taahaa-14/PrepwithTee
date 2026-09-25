@@ -1766,7 +1766,7 @@ def _build_template(template_id: str, name: str) -> tuple[str, str]:
     """Return (subject, html) for the given template id and recipient name."""
     first = _html_mod.escape((name or "there").split()[0])
     p = _mail_p
-    lib = "https://prepwithtee.com/library.html"
+    lib = "https://prepwithtee.com/yearly"
     ask = "https://prepwithtee.com/ask.html"
 
     if template_id == "W1":

@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260907a"  # keep in sync with styles.css version pin
+_CSS_V = "20260927c"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -183,7 +183,7 @@ _NAV_FALLBACK = """<header class="site-header">
     </a>
     <nav class="header-nav" style="gap:.5rem">
       <a href="/blog" class="nav-link" style="font-weight:600">Blog</a>
-      <a href="/papers.html" class="nav-link">Past Papers</a>
+      <a href="/papers" class="nav-link">Past Papers</a>
       <a href="/resources.html" class="nav-link">Notes</a>
       <a href="/pricing.html" class="nav-link">Pricing</a>
       <a href="/#contact" class="btn btn-dark"
@@ -197,7 +197,7 @@ def _nav() -> str:
     global _NAV_HTML
     if _NAV_HTML is None:
         try:
-            raw = _NAV_PARTIAL.read_text(encoding="utf-8")
+            raw = _NAV_PARTIAL.read_text(encoding="utf-8-sig")
             # href/src that are page-relative (not absolute, protocol, #, mailto,
             # tel or data) → absolute, so they work on /blog and /blog/<slug>.
             _NAV_HTML = re.sub(
@@ -208,28 +208,20 @@ def _nav() -> str:
     return _NAV_HTML
 
 
+_FOOT_PARTIAL = Path(__file__).resolve().parent / "partials" / "footer.html"
+_FOOT_HTML: str | None = None
+
+
 def _foot() -> str:
-    return """<footer class="site-footer" style="margin-top:4rem">
-  <div class="container footer-bottom"
-       style="padding-top:1.25rem;padding-bottom:1.25rem;display:flex;
-              flex-wrap:wrap;gap:.5rem 1.5rem;align-items:center;
-              justify-content:space-between">
-    <a class="footer-brand" href="/" style="text-decoration:none">
-      <img src="/logo.png" alt=""
-           style="height:26px;vertical-align:middle;margin-right:6px">
-      <span style="font-weight:700;color:#fff">PrepWithTee</span>
-    </a>
-    <nav style="display:flex;flex-wrap:wrap;gap:.5rem 1.25rem">
-      <a href="/blog"          style="color:#9ca3af;font-size:.82rem;text-decoration:none">Blog</a>
-      <a href="/papers.html"   style="color:#9ca3af;font-size:.82rem;text-decoration:none">Past Papers</a>
-      <a href="/subjects.html" style="color:#9ca3af;font-size:.82rem;text-decoration:none">Subjects</a>
-      <a href="/pricing.html"  style="color:#9ca3af;font-size:.82rem;text-decoration:none">Pricing</a>
-      <a href="/privacy.html"  style="color:#9ca3af;font-size:.82rem;text-decoration:none">Privacy</a>
-      <a href="/terms.html"    style="color:#9ca3af;font-size:.82rem;text-decoration:none">Terms</a>
-    </nav>
-    <p style="color:#6b7280;font-size:.78rem;margin:0">&copy; 2026 PrepWithTee</p>
-  </div>
-</footer>"""
+    """The shared site footer (partials/footer.html - links are absolute)."""
+    global _FOOT_HTML
+    if _FOOT_HTML is None:
+        try:
+            _FOOT_HTML = _FOOT_PARTIAL.read_text(encoding="utf-8-sig")
+        except OSError:
+            _FOOT_HTML = ('<footer class="site-footer"><div class="container footer-bottom">'
+                          '<span>&copy; 2026 PrepWithTee</span></div></footer>')
+    return _FOOT_HTML
 
 
 _BLOG_CSS = """
@@ -237,7 +229,7 @@ _BLOG_CSS = """
    the site in both light and dark. */
 :root{--bl-head:#1a1a2e;--bl-muted:#6b6b7b;--bl-border:#e7e0d2;--bl-surface:#ffffff;
       --bl-code:#f3f0e8;--bl-shadow:rgba(46,27,74,.12);--bl-goldwash:rgba(232,145,58,.12)}
-html[data-theme="dark"]{--bl-head:#ece7f5;--bl-muted:#a49dba;--bl-border:#2a2340;
+html[data-theme="dark"]{--bl-head:#ece7f5;--bl-muted:#a49dba;--bl-border:#2b3240;
       --bl-surface:#1b1733;--bl-code:#241f38;--bl-shadow:rgba(0,0,0,.45);
       --bl-goldwash:rgba(245,158,11,.14)}
 
@@ -350,9 +342,9 @@ def _page(*, title: str, desc: str, path: str, body: str,
 <main class="{main_class}">{body}</main>
 {_foot()}
 <script src="/main.js?v=20260924a"></script>
-<script src="/tools-core.js?v=20260926a"></script>
+<script src="/tools-core.js?v=20260927b"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="/auth.js?v=20260927b"></script>
 </body>
 </html>"""
 
@@ -406,7 +398,7 @@ def blog_list():
             "<p>We're busy writing study guides, exam tips and topic breakdowns. "
             'In the meantime, dive straight into the good stuff:</p>'
             '<div class="bempty-links">'
-            '<a class="primary" href="/papers.html">Topical Past Papers →</a>'
+            '<a class="primary" href="/papers">Topical Past Papers →</a>'
             '<a href="/resources.html">Revision Notes →</a>'
             '<a href="/#contact">Book a free demo →</a>'
             '</div></div>'

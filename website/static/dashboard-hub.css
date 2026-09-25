@@ -805,58 +805,6 @@ html[data-theme="dark"] .dash-ach-streak-pill { background:linear-gradient(135de
   .hub-action-label { font-size: .58rem; }
 }
 
-/* ── Mega-menu Dashboard dropdown ────────────────────────────── */
-.nav-mega > .nav-group-panel {
-  /* left-align panel to the nav-group edge so a wide panel stays on screen */
-  min-width: 660px;
-  max-width: 720px;
-  left: 0;
-  transform: translateX(0) translateY(-6px);
-  padding: 14px 14px 14px;
-}
-.nav-mega:hover > .nav-group-panel,
-.nav-mega > .nav-group-panel.open {
-  transform: translateX(0) translateY(0);
-}
-/* Overview row at top of mega */
-.nav-mega-overview {
-  border-bottom: 1.5px solid var(--line);
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-radius: 10px 10px 0 0;
-}
-.nav-mega-check {
-  margin-left: auto;
-  color: var(--gold);
-  font-size: 1rem;
-  font-weight: 800;
-  padding-right: 4px;
-}
-/* 3-column grid inside the mega panel */
-.nav-mega-cols {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0 8px;
-}
-.nav-mega-col {}
-.nav-mega-head {
-  font-size: .62rem; font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--grey);
-  padding: 6px 12px 8px;
-}
-/* compact items inside mega */
-.nav-mega-cols .nav-drop-item { padding: 7px 10px; border-radius: 9px; }
-.nav-mega-cols .ndi { font-size: .9rem; width: 26px; height: 26px; border-radius: 7px; }
-
-/* ── Notes dropdown — 2-column variant ──────────────────────── */
-.nav-mega-notes > .nav-group-panel {
-  min-width: 480px;
-  max-width: 540px;
-}
-.nav-mega-notes .nav-mega-cols {
-  grid-template-columns: repeat(2, 1fr);
-}
-
 /* ── Back-to-dashboard bar (on sub-pages) ────────────────────── */
 .page-back-bar {
   background: var(--page);
@@ -874,24 +822,5 @@ html[data-theme="dark"] .dash-ach-streak-pill { background:linear-gradient(135de
 
 /* ── Mobile: mega-menu collapses ─────────────────────────────── */
 @media (max-width: 1200px) {
-  .nav-mega > .nav-group-panel {
-    min-width: unset; max-width: unset; left: 0;
-    position: static; transform: none;
-    box-shadow: none; border: none; padding: 0 0 0 16px;
-    margin-top: 0;
-  }
-  .nav-mega-cols { grid-template-columns: 1fr; gap: 0; }
-  .nav-mega-overview { margin-bottom: 0; border-bottom: none; }
-  .nav-mega-check { display: none; }
-  /* Mega panel expands to ~19 items in a single column (~1000px); the global
-     max-height:500px from styles.css would clip it. Include the :hover variant
-     so sticky-hover on touch doesn't suppress the height via a more-specific rule. */
-  .nav-mega > .nav-group-panel.open,
-  .nav-mega:hover > .nav-group-panel.open {
-    max-height: 1300px;
-  }
-  .nav-mega-notes > .nav-group-panel {
-    min-width: unset; max-width: unset;
-  }
   .page-back-bar { padding: 7px 16px; }
 }

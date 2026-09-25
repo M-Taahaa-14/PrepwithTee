@@ -54,7 +54,7 @@
 .ai-explain ::selection { background: color-mix(in srgb, var(--gold) 40%, transparent); }
 
 .ai-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border: 0; border-radius: 11px;
-  background: var(--purple); color: var(--page); padding: .65rem 1.05rem; font: 700 .92rem/1 "Hanken Grotesk", sans-serif;
+  background: var(--accent); color: var(--on-accent); padding: .65rem 1.05rem; font: 700 .92rem/1 "Hanken Grotesk", sans-serif;
   text-decoration: none; cursor: pointer; }
 .ai-btn-ghost { background: var(--white); color: var(--purple); border: 1px solid var(--line); }
 .ai-guide { display: grid; gap: .8rem; justify-items: start; }
@@ -75,7 +75,7 @@
 
 .ai-chat { display: grid; gap: .6rem; align-content: start; padding-bottom: .6rem; }
 .ai-msg { max-width: 92%; border-radius: 14px; padding: .55rem .8rem; font-size: .97rem; line-height: 1.6; }
-.ai-msg-u { justify-self: end; background: var(--purple); color: var(--page); border-bottom-right-radius: 4px;
+.ai-msg-u { justify-self: end; background: var(--accent); color: var(--on-accent); border-bottom-right-radius: 4px;
   white-space: pre-wrap; }
 .ai-msg-u .ai-quote { color: inherit; opacity: .85; }
 .ai-msg-a { background: var(--white); border: 1px solid var(--line); border-bottom-left-radius: 4px; white-space: pre-wrap; }

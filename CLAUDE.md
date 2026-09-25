@@ -458,6 +458,41 @@ linked), not agreement with any external file.
       the server runs **Python 3.10** - no 3.12-only f-string syntax
       (py_compile new files with the server venv).
 
+26. **UI overhaul (2026-09-27, local, not deployed)** - tutor: "ui isn't that good,
+    dark mode is just dark purple on purple".
+    - **Dark mode** = neutral slate surfaces (`--page #0f1117`, `--white #1c212b` cards),
+      near-white headings, colour kept for accents. New semantic tokens `--accent`,
+      `--on-accent`, `--accent-soft` (filled buttons/selected chips in BOTH themes - never
+      `background: var(--purple)`, which is near-white in dark).
+    - **Components registry**: `catalog.COMPONENTS` (short label, full title, AS/A2 level
+      per paper) is the one table; app.py's `PAPER_LABELS` derives from it.
+      `catalog.paper_groups(code)` groups chapters by the paper that examines them
+      (from taxonomy `papers`; identical chapter sets merge, e.g. 9702 P1+P2 = AS).
+    - **Builder** (`builder.js` + new `builder.css`): chapters grouped by paper with AS/A2
+      badges and a jump bar; **free mixing across papers** (tutor's choice); subtopics shown
+      as chips (tap chips = part of a chapter; the box then shows partly, ticking it = whole
+      chapter); search highlights chips. **Practice booklet / Mock test** switch - the old
+      papers.html Test Builder moved here: `kind:"test"` runs `pipeline.testgen --ids`,
+      writes `{id}.pdf` + `{id}_ms.pdf`, quota `topic_test`; the viewer shows Test / 🔒 Mark
+      scheme tabs, a 1-min-per-mark timer, and "Finish test" unlocks the scheme
+      (localStorage `test-done:{id}`). `?mode=test` flows /papers -> board -> subject.
+    - **Yearly subject page**: each year is a grid (rows = paper components, columns =
+      sessions, tiles = variants with QP/MS/Insert/▶ Practise), sticky filter bar
+      (component + session chips + search), year rail, "n done" per year.
+      `/yearly/open?syllabus&year&session&paper&variant` or `?key=5054_s23_22` resolves a
+      sitting to its viewer (progress page + old deep links use it).
+    - **Header/footer**: `partials/nav.html` + new `partials/footer.html`, all links absolute;
+      `sync_nav.py` stamps BOTH (NAV / FOOT markers); `blog._nav()/_foot()` serve them to the
+      SSR pages. Mega-menu CSS moved from dashboard-hub.css into styles.css (SSR pages never
+      loaded it). Footer newsletter handler lives inside the partial.
+    - **Deleted**: library.html/.js, mcq-solver.html/.js, papers.html, app.js, papers-ui.css,
+      and APIs only they used (`/api/mcq/questions`, `/api/mcq/preview-pdf`,
+      `/api/mcq/explain`, `/api/library/search`, `/api/library/check-quota`). Old URLs 301
+      (`/papers.html?...` maps syllabus/topic/mode=test/key/tab onto the new pages).
+      `/api/library/pdf` + `/api/library/tree` stay (viewer + progress pages use them).
+    - Tests blank every provider key (MISTRAL/NVIDIA/... too) - a real key in .env made
+      test_ai_help call out. 258 unit/API + 13 e2e green.
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

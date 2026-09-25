@@ -22,8 +22,9 @@ def test_open_2016_paper_and_switch_to_mark_scheme(student, shots):
     page = student.new_page()
     page.goto("/yearly/o-level/physics-5054")
     expect(page.locator("h1")).to_have_text("Physics 5054 past papers")
-    page.locator(".yr-jump").get_by_role("link", name="2016").click()     # opens the year
-    page.locator("#y2016 .yr-main", has_text="Paper 21").first.click()
+    page.locator(".yr-rail a[href='#y2016']").click()                     # opens the year
+    page.locator("#y2016 .yr-mrow[data-comp='2'] .yr-cell[data-sess='s'] .yr-tile-main",
+                 has_text="5054/21").first.click()
     expect(page).to_have_url(re.compile(r"/yearly/view/\d+$"))
 
     # 1280 wide: opens side by side; single view for the toggle test
@@ -70,4 +71,25 @@ def test_side_by_side_follows_and_marks_save(student, shots):
 
     # the listing shows it done, with the score
     page.goto("/yearly/o-level/physics-5054/2019")
-    expect(page.locator(".yr-row.is-done .yr-done")).to_have_attribute("data-score", "52/75")
+    expect(page.locator(".yr-tile.is-done .yr-done")).to_have_attribute("data-score", "52/75")
+    expect(page.locator("#y2019 .yr-year-done")).to_contain_text("1 done")
+
+
+def test_filters_narrow_the_grid(student, shots):
+    page = student.new_page()
+    page.goto("/yearly/a-level/mathematics-9709")
+    page.locator(".yr-chip[data-comp='3']").click()
+    y = page.locator("#y2024")
+    expect(y.locator(".yr-mrow:not([hidden])")).to_have_count(1)
+    expect(y.locator(".yr-mrow:not([hidden])")).to_have_attribute("data-comp", "3")
+    page.locator(".yr-chip[data-sess='w']").click()
+    cells = y.locator(".yr-mrow:not([hidden]) .yr-cell:not([hidden])")
+    expect(cells).to_have_count(1)
+    expect(cells).to_have_attribute("data-sess", "w")
+    expect(page.locator("#y2026")).to_be_hidden()           # Feb/March only that year
+    page.locator("[data-yr-filter]").fill("2019")
+    expect(page.locator(".yr-year:not([hidden])")).to_have_count(1)
+    expect(page.locator("#y2019")).to_have_attribute("open", "")
+    page.screenshot(path=str(shots / "yearly_filtered.png"))
+    page.locator("[data-yr-filter]").fill("zzz")
+    expect(page.locator(".yr-none-found")).to_be_visible()

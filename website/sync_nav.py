@@ -1,8 +1,10 @@
-"""Stamp the shared site navbar into every public static page.
+"""Stamp the shared site navbar and footer into every public static page.
 
 Single source of truth: ``website/partials/nav.html`` (the full
-``<header class="site-header"> … </header>`` block). Edit that one file, then
-run this script to propagate it to every page in ``website/static``:
+``<header class="site-header"> … </header>`` block) and
+``website/partials/footer.html`` (``<footer class="site-footer"> … </footer>``).
+Edit those files, then run this script to propagate them to every page in
+``website/static``:
 
     python sync_nav.py            # from the website/ directory
     python sync_nav.py --check    # report drift, change nothing (CI-friendly)
@@ -10,15 +12,18 @@ run this script to propagate it to every page in ``website/static``:
 How it works
 ------------
 On the first run each page still has a bare ``<header class="site-header">``
-block; the script replaces it with the canonical nav wrapped in
-``<!--NAV:START-->`` / ``<!--NAV:END-->`` markers. On later runs it replaces
+(or ``<footer class="site-footer">``) block; the script replaces it with the
+canonical one wrapped in ``<!--NAV:START-->`` / ``<!--NAV:END-->`` (or
+``<!--FOOT:START-->`` / ``<!--FOOT:END-->``) markers. On later runs it replaces
 whatever sits between those markers, so re-running is idempotent.
 
-Only pages that already carry a ``<header class="site-header">`` are touched —
-the sidebar surfaces (admin, messages, teacher dashboard) use a different shell
-and are skipped automatically. Active-link highlighting is applied at runtime by
-main.js (it matches each link's href against the URL), so one identical navbar
-serves every page correctly.
+Only pages that already carry a site header / footer are touched - the sidebar
+surfaces (admin, messages, teacher dashboard) and the full-screen app pages use
+a different shell and are skipped automatically. Links in both partials are
+absolute, so one identical block works at any URL depth. Active-link
+highlighting is applied at runtime by main.js. The server-rendered pages
+(blog, /papers, /yearly, /mcq) read the same partials through blog._nav() and
+blog._foot().
 """
 
 import argparse
@@ -28,44 +33,46 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 STATIC = HERE / "static"
-PARTIAL = HERE / "partials" / "nav.html"
+PARTS = HERE / "partials"
 
-_MARKER_RE = re.compile(r"<!--NAV:START.*?<!--NAV:END-->", re.S)
-_HEADER_RE = re.compile(r'<header class="site-header">.*?</header>', re.S)
-_START = ("<!--NAV:START — shared navbar. Do not edit here; "
-          "edit website/partials/nav.html then run: python sync_nav.py -->")
-_END = "<!--NAV:END-->"
+BLOCKS = [
+    # (partial, marker name, bare-block regex)
+    ("nav.html", "NAV", re.compile(r'<header class="site-header">.*?</header>', re.S)),
+    ("footer.html", "FOOT", re.compile(r'<footer class="site-footer".*?</footer>', re.S)),
+]
 
 
-def _block(nav: str) -> str:
-    return f"{_START}\n{nav.strip()}\n{_END}"
+def _markers(name: str, partial: str):
+    start = (f"<!--{name}:START — shared {'navbar' if name == 'NAV' else 'footer'}. Do not edit here; "
+             f"edit website/partials/{partial} then run: python sync_nav.py -->")
+    return start, f"<!--{name}:END-->", re.compile(rf"<!--{name}:START.*?<!--{name}:END-->", re.S)
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Sync the shared navbar into every static page.")
+    ap = argparse.ArgumentParser(description="Sync the shared navbar + footer into every static page.")
     ap.add_argument("--check", action="store_true",
                     help="report which pages are out of sync; write nothing")
     args = ap.parse_args()
 
-    if not PARTIAL.is_file():
-        print(f"ERROR: canonical nav not found at {PARTIAL}", file=sys.stderr)
-        return 2
+    blocks = []
+    for partial, name, bare in BLOCKS:
+        path = PARTS / partial
+        if not path.is_file():
+            print(f"ERROR: canonical {partial} not found at {path}", file=sys.stderr)
+            return 2
+        start, end, marker_re = _markers(name, partial)
+        blocks.append((f"{start}\n{path.read_text(encoding='utf-8-sig').strip()}\n{end}", marker_re, bare))
 
-    nav = PARTIAL.read_text(encoding="utf-8")
-    block = _block(nav)
-
-    changed, skipped, stale = [], [], []
-    for page in sorted(STATIC.glob("*.html")):
+    changed, stale = [], []
+    pages = sorted(STATIC.glob("*.html"))
+    for page in pages:
         src = page.read_text(encoding="utf-8")
-
-        if _MARKER_RE.search(src):
-            new = _MARKER_RE.sub(lambda _: block, src, count=1)
-        elif _HEADER_RE.search(src):
-            new = _HEADER_RE.sub(lambda _: block, src, count=1)
-        else:
-            skipped.append(page.name)          # no site-header (sidebar shells)
-            continue
-
+        new = src
+        for block, marker_re, bare in blocks:
+            if marker_re.search(new):
+                new = marker_re.sub(lambda _: block, new, count=1)
+            elif bare.search(new):
+                new = bare.sub(lambda _: block, new, count=1)
         if new != src:
             stale.append(page.name)
             if not args.check:
@@ -76,12 +83,9 @@ def main() -> int:
         if stale:
             print(f"{len(stale)} page(s) out of sync: {', '.join(stale)}")
             return 1
-        print(f"All {len(list(STATIC.glob('*.html'))) - len(skipped)} nav pages in sync.")
+        print(f"All {len(pages)} pages in sync.")
         return 0
-
     print(f"Updated {len(changed)} page(s).")
-    if skipped:
-        print(f"Skipped {len(skipped)} page(s) with no .site-header: {', '.join(skipped)}")
     return 0
 
 

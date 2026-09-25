@@ -215,9 +215,9 @@
 }
 
 /* Dark Mode Polishes */
-html[data-theme="dark"] .pwt-chatbot-panel { background: #121224; border-color: #2e2a4a; }
+html[data-theme="dark"] .pwt-chatbot-panel { background: #13161d; border-color: #2b3240; }
 html[data-theme="dark"] .pwt-chatbot-body { background: #0a0a16; scrollbar-color: rgba(255, 255, 255, 0.2) transparent; }
-html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #2e2a4a; color: #fff; }
-html[data-theme="dark"] .pwt-chatbot-chips, html[data-theme="dark"] .pwt-chatbot-foot { background: #121224; border-color: #2e2a4a; }
-html[data-theme="dark"] .pwt-cb-chip { background: #222040; border-color: #383460; color: #eee; }
-html[data-theme="dark"] .pwt-chatbot-input { background: #181730; border-color: #383460; color: #fff; }
+html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #2b3240; color: #fff; }
+html[data-theme="dark"] .pwt-chatbot-chips, html[data-theme="dark"] .pwt-chatbot-foot { background: #13161d; border-color: #2b3240; }
+html[data-theme="dark"] .pwt-cb-chip { background: #222040; border-color: #343c4c; color: #eee; }
+html[data-theme="dark"] .pwt-chatbot-input { background: #181730; border-color: #343c4c; color: #fff; }

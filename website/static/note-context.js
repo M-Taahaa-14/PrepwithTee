@@ -19,10 +19,9 @@ export function resolveLocation(loc) {
 
   switch (loc.type) {
     case 'question':
-      // papers.html?key=5054_s23_22&q=17
+      // /yearly/open?key=5054_s23_22 -> that paper in the viewer
       if (!loc.paperKey) return null;
-      return 'papers.html?key=' + encodeURIComponent(loc.paperKey)
-           + (loc.questionNumber != null ? '&q=' + loc.questionNumber : '');
+      return '/yearly/open?key=' + encodeURIComponent(loc.paperKey);
 
     case 'flashcard':
       // flashcards.html?block=4821
@@ -63,7 +62,7 @@ export function captureContext(overrides = {}) {
   const params = new URLSearchParams(location.search);
   let auto = {};
 
-  if (page === 'papers.html' || page === 'revise.html') {
+  if (page === 'revise.html') {
     const key = params.get('key');
     const q   = params.get('q');
     if (key) auto = { type: 'question', paperKey: key,

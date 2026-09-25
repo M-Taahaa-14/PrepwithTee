@@ -6,12 +6,18 @@
     GET  /api/booklets                    my recent booklets
     GET  /api/booklets/{id}               metadata + page map (for the viewer)
     GET  /api/booklets/{id}/status        {status, progress, stage} (the loader polls this)
-    GET  /api/booklets/{id}/pdf           the PDF, inline (?download=1 to save)
+    GET  /api/booklets/{id}/pdf           the PDF, inline (?download=1 to save;
+                                          ?part=ms = a mock test's separate mark scheme)
     GET  /papers/view/{id}                the viewer page (noindex)
 
 Rules (tutor, 2026-09-24): at most 4 chapters per booklet, any number of
 subtopics inside them; questions from every picked chapter/subtopic, mixed
 rather than grouped (selection.select_mixed); only enrolled students build.
+
+Two kinds (tutor, 2026-09-27 - the old papers.html Test Builder moved here):
+`booklet` = compose, mark scheme after each question (or none); `test` =
+pipeline.testgen, exam-style cover and the mark scheme as a SEPARATE file
+({id}_ms.pdf) that the viewer keeps locked until the student finishes.
 
 The PDF is built by `python -m pipeline.compose --ids ...` in a worker thread,
 exactly as /api/generate shells out: the CLI is the tested interface. Its
@@ -31,6 +37,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from typing import Literal
+
 from pydantic import BaseModel, field_validator
 
 import access as _access
@@ -47,7 +55,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260926r"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260927c"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 
@@ -90,6 +98,7 @@ class BookletReq(Selection):
     max_questions: int = 20
     include_ms: bool = True
     seed: int | None = None
+    kind: Literal["booklet", "test"] = "booklet"
 
     @field_validator("max_questions")
     @classmethod
@@ -191,7 +200,9 @@ def topical_tree(syllabus: str):
     return {
         "syllabus": syllabus, "subject": _catalog.SUBJECTS[syllabus]["plain"],
         "year_min": meta.get("year_min"), "year_max": meta.get("year_max"),
-        "components": meta.get("components", []),
+        "components": [{**c, **_catalog.component(syllabus, c["paper"])}
+                       for c in meta.get("components", [])],
+        "groups": _catalog.paper_groups(syllabus),
         "max_chapters": MAX_CHAPTERS, "max_questions": MAX_QUESTIONS,
         "chapters": [
             {"name": t["name"], "display": t.get("display") or t["name"],
@@ -220,7 +231,7 @@ def booklet_count(sel: Selection, user: dict = Depends(_auth.get_current_user)):
 def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)):
     require_enrolled(user, req.syllabus)
     known = _validate_chapters(req)
-    _access.check_quota_gate(user, "topical_paper")
+    _access.check_quota_gate(user, _event(req.kind))
     pool = question_pool(req)
     if not pool:
         raise HTTPException(400, "No questions match that selection. Widen the year "
@@ -228,12 +239,14 @@ def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)
     seed = req.seed if req.seed is not None else secrets.randbits(31)
     chosen = select_mixed(pool, req.max_questions, seed)
     subj = _catalog.SUBJECTS[req.syllabus]
-    title = (" · ".join(known[p.chapter]["display"] for p in req.picks)
+    title = (("Mock test: " if req.kind == "test" else "")
+             + " · ".join(known[p.chapter]["display"] for p in req.picks)
              + f" — {subj['plain']} {req.syllabus}")
     booklet_id = secrets.token_urlsafe(6)
     _udb.create_booklet({
         "id": booklet_id, "user_id": user["id"], "syllabus": req.syllabus,
-        "title": title, "params_json": req.model_dump(), "seed": seed,
+        "title": title, "seed": seed,
+        "params_json": {**req.model_dump(), "total_marks": sum(q["marks"] or 0 for q in chosen)},
         "question_ids": [q["id"] for q in chosen], "status": "queued",
         "progress": 0, "stage": "Picking questions"})
     _EXEC.submit(_build, booklet_id, user)
@@ -245,7 +258,7 @@ def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)
 def my_booklets(user: dict = Depends(_auth.get_current_user)):
     return {"booklets": [
         {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"],
-         "status": b["status"], "created_at": b["created_at"],
+         "status": b["status"], "created_at": b["created_at"], "kind": _kind(b),
          "questions": len(b.get("question_ids") or []), "url": f"/papers/view/{b['id']}"}
         for b in _udb.list_booklets(user["id"])]}
 
@@ -253,8 +266,9 @@ def my_booklets(user: dict = Depends(_auth.get_current_user)):
 @router.get("/api/booklets/{booklet_id}")
 def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
     b = _owned(booklet_id, user)
-    return {k: b.get(k) for k in ("id", "title", "syllabus", "status", "progress", "stage",
-                                  "error", "params_json", "page_map_json", "created_at")}
+    return {**{k: b.get(k) for k in ("id", "title", "syllabus", "status", "progress", "stage",
+                                     "error", "params_json", "page_map_json", "created_at")},
+            "kind": _kind(b)}
 
 
 @router.get("/api/booklets/{booklet_id}/status")
@@ -265,17 +279,20 @@ def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)
 
 
 @router.get("/api/booklets/{booklet_id}/pdf")
-def booklet_pdf(booklet_id: str, download: bool = False,
+def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
                 user: dict = Depends(_auth.get_current_user)):
     b = _owned(booklet_id, user)
     if b["status"] != "ready":
         raise HTTPException(409, "This booklet is still being built.")
-    pdf = BOOKLET_DIR / f"{booklet_id}.pdf"
+    if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
+        raise HTTPException(404, "No such part")
+    pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
     if not pdf.exists():                       # cleaned up: rebuild from the stored ids
         _build(booklet_id, user, record=False)
     if not pdf.exists():
         raise HTTPException(500, "Could not rebuild this booklet.")
-    name = re.sub(r"[^A-Za-z0-9]+", "-", b["title"] or booklet_id).strip("-")[:80] + ".pdf"
+    name = (re.sub(r"[^A-Za-z0-9]+", "-", b["title"] or booklet_id).strip("-")[:80]
+            + ("-mark-scheme" if part == "ms" else "") + ".pdf")
     return FileResponse(pdf, media_type="application/pdf", filename=name,
                         content_disposition_type="attachment" if download else "inline",
                         headers={"Cache-Control": "private, max-age=3600"})
@@ -284,7 +301,17 @@ def booklet_pdf(booklet_id: str, download: bool = False,
 # ── Build job ─────────────────────────────────────────────────────────────────
 
 _STAGES = {"contents": (90, "Building the clickable contents page"),
-           "saving": (96, "Finishing your booklet")}
+           "scheme": (70, "Writing the separate mark scheme"),
+           "saving": (96, "Finishing your paper")}
+
+
+def _kind(b: dict) -> str:
+    return (b.get("params_json") or {}).get("kind") or "booklet"
+
+
+def _event(kind: str) -> str:
+    """The quota a build counts against (tests keep the old Test Builder's)."""
+    return "topic_test" if kind == "test" else "topical_paper"
 
 
 def _build(booklet_id: str, user: dict, record: bool = True) -> None:
@@ -296,12 +323,18 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
     BOOKLET_DIR.mkdir(parents=True, exist_ok=True)
     pdf = BOOKLET_DIR / f"{booklet_id}.pdf"
     pmap = BOOKLET_DIR / f"{booklet_id}.json"
-    cmd = [sys.executable, "-m", "pipeline.compose", "--syllabus", b["syllabus"],
-           "--topics", "|".join(p["chapter"] for p in params.get("picks", [])),
-           "--ids", ",".join(str(i) for i in b["question_ids"]),
-           "--out", str(pdf), "--page-map", str(pmap)]
-    if not params.get("include_ms", True):
-        cmd.append("--no-ms")
+    test = _kind(b) == "test"
+    topics = "|".join(p["chapter"] for p in params.get("picks", []))
+    ids = ",".join(str(i) for i in b["question_ids"])
+    if test:
+        cmd = [sys.executable, "-m", "pipeline.testgen", "--syllabus", b["syllabus"],
+               "--topics", topics, "--ids", ids, "--out", str(pdf)]
+    else:
+        cmd = [sys.executable, "-m", "pipeline.compose", "--syllabus", b["syllabus"],
+               "--topics", topics, "--ids", ids, "--out", str(pdf), "--page-map", str(pmap)]
+        if not params.get("include_ms", True):
+            cmd.append("--no-ms")
+    span = 60 if test else 84                 # a test still has its mark scheme to write
     last = {"progress": -1, "stage": None}
 
     def push(progress: int, stage: str):
@@ -327,7 +360,7 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
                 parts = line.split()
                 if parts[1] == "question" and len(parts) == 4:
                     done, total = int(parts[2]), max(1, int(parts[3]))
-                    push(4 + int(84 * done / total),
+                    push(4 + int(span * done / total),
                          f"Cropping questions from the original papers · {done}/{total}")
                 elif parts[1] in _STAGES:
                     push(*_STAGES[parts[1]])
@@ -335,13 +368,13 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
         finally:
             timer.cancel()
         if rc != 0 or not pdf.exists():
-            raise RuntimeError(" | ".join(tail[-3:]) or f"compose exited {rc}")
+            raise RuntimeError(" | ".join(tail[-3:]) or f"{cmd[2]} exited {rc}")
         page_map = json.loads(pmap.read_text("utf-8")) if pmap.exists() else None
         _udb.update_booklet(booklet_id, {"status": "ready", "progress": 100,
                                          "stage": "Ready", "page_map_json": page_map,
                                          "error": None})
         if record:
-            _access.record_quota(user, "topical_paper")   # only successful builds count
+            _access.record_quota(user, _event(_kind(b)))   # only successful builds count
     except Exception as exc:                              # surface, never hang the loader
         print(f"[booklet {booklet_id}] build failed: {exc}", flush=True)
         _udb.update_booklet(booklet_id, {"status": "failed", "stage": "Failed",
@@ -359,7 +392,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
     import blog as _blog
     esc = _catalog._e
     subj = _catalog.SUBJECTS.get(b["syllabus"], {})
-    state = {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"],
+    state = {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"], "kind": _kind(b),
+             "totalMarks": (b.get("params_json") or {}).get("total_marks"),
              "subjectUrl": _catalog.subject_url(b["syllabus"]) if subj else "/papers"}
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="en">
@@ -388,7 +422,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260924a"></script>
-<script type="module" src="/auth.js?v=20260829a"></script>
+<script type="module" src="/auth.js?v=20260927b"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

@@ -116,16 +116,49 @@ def test_sitemap_lists_catalogue_pages(client):
 @pytest.mark.parametrize("url,where", [
     ("/papers.html", "/papers"),
     ("/papers.html?syllabus=0625&topics=Motion,Forces", "/papers/igcse/physics-0625?pick=Motion#builder"),
+    ("/papers.html?syllabus=0625&topic=Motion", "/papers/igcse/physics-0625?pick=Motion#builder"),
+    ("/papers.html?s=9618", "/papers/a-level/computer-science-9618#builder"),
     ("/papers.html?syllabus=nope", "/papers"),
+    # the old Test Builder now lives in the same builder, as "Mock test"
+    ("/papers.html?mode=test", "/papers?mode=test"),
+    ("/papers.html?mode=test&syllabus=0625", "/papers/igcse/physics-0625?mode=test#builder"),
+    ("/papers.html?key=5054_s23_22&q=3", "/yearly/open?key=5054_s23_22"),
 ])
 def test_legacy_builder_redirects(client, url, where):
     r = client.get(url, follow_redirects=False)
-    assert r.status_code == 302 and r.headers["location"] == where
+    assert r.status_code == 301 and r.headers["location"] == where
 
 
-def test_legacy_test_builder_still_served(client):
-    r = client.get("/papers.html?mode=test")
-    assert r.status_code == 200 and "<html" in r.text.lower()
+def test_retired_pages_are_gone(client):
+    for page in ("/app.js", "/library.js", "/mcq-solver.js", "/papers-ui.css"):
+        assert client.get(page).status_code == 404, page
+    for api in ("/api/mcq/questions", "/api/mcq/preview-pdf", "/api/mcq/explain"):
+        assert client.post(api, json={}).status_code in (404, 405), api
+    assert client.get("/api/library/search?q=x").status_code == 404
+
+
+def test_mock_test_mode_carries_through_board_pages(client, new_student):
+    new_student()
+    client.post("/api/enrollments", json={"syllabus": "5054"})
+    html = client.get("/papers/o-level?mode=test").text
+    assert "mock tests" in html.lower()
+    assert 'href="/papers/o-level/physics-5054?mode=test#builder"' in html
+    assert 'href="/papers/igcse?mode=test"' in html
+
+
+def test_builder_tree_groups_chapters_by_paper(client):
+    t = client.get("/api/topical/9709/tree").json()
+    assert [(g["papers"], g["level"]) for g in t["groups"]] == [([1], "AS"), ([3], "A2"), ([4], "AS"), ([5], "AS")]
+    assert t["groups"][0]["title"] == "Pure Mathematics 1"
+    as_ = client.get("/api/topical/9702/tree").json()["groups"][0]
+    assert as_["papers"] == [1, 2] and as_["title"] == "AS Level content"
+    assert client.get("/api/topical/0625/tree").json()["groups"] == []     # one shared syllabus
+    assert {c["level"] for c in t["components"]} == {"AS", "A2"}
+
+
+def test_public_subject_page_lists_chapters_per_paper(client):
+    html = client.get("/papers/a-level/mathematics-9709").text
+    assert "Paper 3 · Pure Mathematics 3" in html and "cat-level-A2" in html
 
 
 def test_subject_cards_link_to_the_new_yearly_and_mcq_pages(client, new_student):

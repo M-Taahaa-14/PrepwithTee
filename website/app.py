@@ -66,26 +66,7 @@ YEAR_MIN, YEAR_MAX = 2010, 2026
 # syllabus missing from this map still works - it just gets plain "P1"/"P2"
 # labels. Each component carries its own topic list: 9709 P5 (Statistics) and
 # P1 (Pure 1) share almost nothing, so the topic grid is filtered per paper.
-PAPER_LABELS = {
-    "9709": {1: "P1 · Pure 1", 3: "P3 · Pure 3",
-             4: "P4 · Mechanics", 5: "P5 · Statistics"},
-    "9702": {1: "P1 · MCQ", 2: "P2 · AS Structured",
-             4: "P4 · A Level", 5: "P5 · Planning"},
-    "9618": {1: "P1 · Theory", 2: "P2 · Problem-solving",
-             3: "P3 · Advanced Theory", 4: "P4 · Practical"},
-    "0580": {2: "P2 · Extended", 4: "P4 · Extended"},
-    "0625": {1: "P1 · MCQ Core", 2: "P2 · MCQ Extended", 4: "P4 · Extended"},
-    "5054": {1: "P1 · MCQ", 2: "P2 · Theory"},
-    "5070": {1: "P1 · MCQ", 2: "P2 · Theory"},
-    "0620": {1: "P1 · MCQ Core", 2: "P2 · MCQ Extended",
-             3: "P3 · Theory Core", 4: "P4 · Theory Extended"},
-    "2210": {1: "P1 · Theory", 2: "P2 · Problem-solving"},
-    "0478": {1: "P1 · Theory", 2: "P2 · Problem-solving"},
-    # These two examine different content per component, so the labels are what
-    # the student actually revises from, not just a paper number.
-    "2058": {1: "P1 · Qur'an & the Prophet", 2: "P2 · Hadith & the Caliphs"},
-    "2059": {1: "P1 · History of Pakistan", 2: "P2 · Environment of Pakistan"},
-}
+from catalog import PAPER_LABELS  # noqa: E402  (one table: catalog.COMPONENTS)
 
 app = FastAPI(title="PrepWithTee")
 
@@ -344,28 +325,6 @@ def mcq_answer(question_id: int):
     }
 
 
-class MCQSessionReq(BaseModel):
-    """Filters for the MCQ solver — topic mode or full-paper mode."""
-    syllabus: str
-    topics: list[str] = []
-    subtopics: list[str] | None = None
-    year_from: int = YEAR_MIN
-    year_to: int = YEAR_MAX
-    papers: list[int] | None = None
-    count: int | None = None
-    seed: int | None = None
-    sessions: list[str] | None = None
-    variants: list[str] | None = None
-    paper_id: int | None = None       # full-paper mode: DB id of the QP paper
-
-    @field_validator("syllabus")
-    @classmethod
-    def _check_syllabus(cls, v: str) -> str:
-        if not re.match(r"^[0-9A-Za-z]{4,6}$", v):
-            raise ValueError("invalid syllabus code")
-        return v
-
-
 @app.get("/api/mcq/papers")
 def mcq_papers_list(syllabus: str = Query(...)):
     """Return all QP papers for a syllabus that have questions segmented.
@@ -399,350 +358,6 @@ def mcq_papers_list(syllabus: str = Query(...)):
         for p in rows if p["q_count"] > 0
     ]
     return {"papers": papers}
-
-
-@app.post("/api/mcq/questions")
-def mcq_questions(req: MCQSessionReq):
-    """Return MCQ questions with their stored answer letters.
-
-    Topic mode: random selection from topic pool (default 40 questions).
-    Full-paper mode: all questions from a specific QP in order (req.paper_id set).
-    Attaches `answer` (A/B/C/D or null) and `has_answer` to each row.
-    """
-    # ── Full-paper mode ────────────────────────────────────────────────────────
-    if req.paper_id is not None:
-        con = _con()
-        con.row_factory = sqlite3.Row
-        try:
-            rows = con.execute(
-                """SELECT q.id, q.number, q.sub_part, q.marks, q.text,
-                          c.topic, c.subtopic,
-                          p.syllabus, p.year, p.session, p.paper, p.variant
-                   FROM questions q
-                   JOIN papers p ON p.id = q.paper_id
-                   LEFT JOIN classifications c ON c.question_id = q.id
-                   WHERE p.id = ? AND p.kind = 'qp'
-                     AND q.status IS NOT 'excluded'
-                   ORDER BY q.number""",
-                (req.paper_id,)).fetchall()
-            if not rows:
-                raise HTTPException(404, "No questions found for this paper.")
-            qids = [r["id"] for r in rows]
-            ph = ",".join("?" for _ in qids)
-            answer_rows = con.execute(
-                f"""SELECT q.id AS qid, m.answer
-                    FROM questions q
-                    JOIN papers p ON p.id = q.paper_id
-                    LEFT JOIN ms_entries m ON (
-                        m.paper_id = (
-                            SELECT p2.id FROM papers p2
-                            WHERE p2.syllabus = p.syllabus AND p2.year = p.year
-                              AND p2.session = p.session AND p2.paper = p.paper
-                              AND p2.variant = p.variant AND p2.kind = 'ms'
-                        )
-                        AND m.question_number = q.number
-                        AND m.sub_part = q.sub_part
-                    )
-                    WHERE q.id IN ({ph})""",
-                qids).fetchall()
-            answer_map = {r["qid"]: r["answer"] for r in answer_rows}
-        finally:
-            con.close()
-        abbr = _SESSION_ABBR
-        questions = []
-        for q in rows:
-            sa = abbr.get(q["session"], q["session"].upper())
-            ref = (f"{q['syllabus']}/P{q['paper']} {sa} {q['year']} "
-                   f"Q{q['number']}{('(' + q['sub_part'] + ')') if q['sub_part'] else ''}")
-            answer = answer_map.get(q["id"])
-            questions.append({
-                "id": q["id"], "ref": ref,
-                "year": q["year"], "session": q["session"],
-                "paper": q["paper"], "variant": q["variant"],
-                "number": q["number"], "sub_part": q["sub_part"],
-                "topic": q["topic"] or "MCQ", "subtopic": q["subtopic"],
-                "marks": q["marks"] or 1,
-                "text_snippet": (q["text"] or "")[:160].strip(),
-                "answer": answer, "has_answer": answer is not None,
-            })
-        return {
-            "questions": questions,
-            "total_marks": len(questions),
-            "pool_size": len(questions),
-            "seed": None,
-            "has_answers": any(q["has_answer"] for q in questions),
-        }
-
-    # ── Topic mode ─────────────────────────────────────────────────────────────
-    if not req.topics:
-        raise HTTPException(400, "pick at least one topic")
-
-    # Reuse the shared question pool logic via a compatible object
-    class _Compat:
-        syllabus = req.syllabus
-        topics = req.topics
-        subtopics = req.subtopics
-        year_from = req.year_from
-        year_to = req.year_max if hasattr(req, 'year_max') else req.year_to
-        papers = req.papers or []
-        sessions = req.sessions or []
-        variants = req.variants or []
-        contains = None
-
-    compat = _Compat()
-    compat.year_to = req.year_to
-
-    con = _con()
-    con.row_factory = sqlite3.Row
-    try:
-        pool = _question_pool(compat, con)
-
-        # Apply random selection (default 40 for MCQ, otherwise user's count)
-        k = req.count or 40
-        seed = req.seed
-        chosen = _apply_random_selection(pool, k, None, seed)
-
-        # Attach the stored MCQ answer letter from ms_entries
-        # Build a lookup: (paper_id → ms_paper_id) so one query covers all
-        if chosen:
-            qids = [q["id"] for q in chosen]
-            ph = ",".join("?" for _ in qids)
-            answer_rows = con.execute(
-                f"""SELECT q.id AS qid, m.answer
-                    FROM questions q
-                    JOIN papers p ON p.id = q.paper_id
-                    LEFT JOIN ms_entries m ON (
-                        m.paper_id = (
-                            SELECT p2.id FROM papers p2
-                            WHERE p2.syllabus = p.syllabus AND p2.year = p.year
-                              AND p2.session = p.session AND p2.paper = p.paper
-                              AND p2.variant = p.variant AND p2.kind = 'ms'
-                        )
-                        AND m.question_number = q.number
-                        AND m.sub_part = q.sub_part
-                    )
-                    WHERE q.id IN ({ph})""",
-                qids).fetchall()
-            answer_map = {r["qid"]: r["answer"] for r in answer_rows}
-        else:
-            answer_map = {}
-
-    finally:
-        con.close()
-
-    sess_abbr = _SESSION_ABBR
-    questions = []
-    for q in chosen:
-        sa = sess_abbr.get(q["session"], q["session"].upper())
-        ref = (f"{q['syllabus']}/P{q['paper']} {sa} {q['year']} "
-               f"Q{q['number']}{('(' + q['sub_part'] + ')') if q['sub_part'] else ''}")
-        snippet = (q["text"] or "")[:160].strip()
-        answer = answer_map.get(q["id"])
-        questions.append({
-            "id": q["id"],
-            "ref": ref,
-            "year": q["year"],
-            "session": q["session"],
-            "paper": q["paper"],
-            "variant": q["variant"],
-            "number": q["number"],
-            "sub_part": q["sub_part"],
-            "topic": q["topic"],
-            "subtopic": q["subtopic"],
-            "marks": q["marks"],
-            "text_snippet": snippet,
-            "answer": answer,            # "A"|"B"|"C"|"D"|null
-            "has_answer": answer is not None,
-        })
-
-    return {
-        "questions": questions,
-        "total_marks": len(questions),   # MCQ: 1 mark each
-        "pool_size": len(pool),
-        "seed": seed,
-        "has_answers": any(q["has_answer"] for q in questions),
-    }
-
-
-# ── MCQ PDF stitch ─────────────────────────────────────────────────────────────
-
-class MCQPreviewPdfReq(BaseModel):
-    question_ids: list[int]
-
-    @field_validator("question_ids")
-    @classmethod
-    def _check_ids(cls, v: list[int]) -> list[int]:
-        if not v:
-            raise ValueError("at least one question id required")
-        if len(v) > 200:
-            raise ValueError("max 200 questions")
-        return v
-
-
-@app.post("/api/mcq/preview-pdf")
-def mcq_preview_pdf(req: MCQPreviewPdfReq):
-    """Build an A4-layout exam-style PDF with branding, watermark, and headers.
-
-    Uses the same Booklet-style layout as compose.py: each question gets a
-    Q1/Q2/... header, pages carry the PrepWithTee watermark, and a footer
-    with page number and brand name.
-    """
-    import fitz
-
-    PAGE_W, PAGE_H = 595.28, 841.89
-    MARGIN_X = 24.0
-    TOP_Y = 40.0
-    BOTTOM_Y = PAGE_H - 40.0
-    CONTENT_W = PAGE_W - 2 * MARGIN_X
-    Q_HEADER_H = 18.0
-    DIVIDER_GAP = 14.0
-    ACCENT = (0.161, 0.208, 0.329)
-    GREY = (0.35, 0.35, 0.35)
-    GOLD = (0.957, 0.651, 0.196)
-    BRAND = "PrepWithTee"
-    WM_STRENGTH = 0.12
-    WM_TEXT_GREY = 0.92
-    LOGO_PATH = ROOT / "website" / "static" / "prepwithtee-logo.png"
-    LOGO_OWL_CLIP = (414, 252, 786, 834)
-
-    _wm_cache = getattr(mcq_preview_pdf, "_wm_cache", {})
-    mcq_preview_pdf._wm_cache = _wm_cache
-
-    def _watermark(pg):
-        if LOGO_PATH.exists():
-            if "owl" not in _wm_cache:
-                clip = fitz.IRect(*LOGO_OWL_CLIP)
-                src = fitz.Pixmap(str(LOGO_PATH))
-                rgb = fitz.Pixmap(fitz.csRGB, clip, False)
-                rgb.copy(src, clip)
-                gray = fitz.Pixmap(fitz.csGRAY, rgb)
-                faint = bytes(
-                    255 if s >= 200 else 255 - int(WM_STRENGTH * (255 - s))
-                    for s in gray.samples)
-                _wm_cache["owl"] = fitz.Pixmap(fitz.csGRAY, gray.w, gray.h, faint, 0)
-            pix = _wm_cache["owl"]
-            h = 300.0
-            w = h * pix.width / pix.height
-            r = fitz.Rect((PAGE_W - w) / 2, (PAGE_H - h) / 2 - 26,
-                          (PAGE_W + w) / 2, (PAGE_H + h) / 2 - 26)
-            pg.insert_image(r, pixmap=pix)
-            ty = r.y1 + 40
-        else:
-            ty = PAGE_H / 2
-        fs = 30
-        tw = fitz.get_text_length(BRAND, fontname="hebo", fontsize=fs)
-        pg.insert_text(((PAGE_W - tw) / 2, ty), BRAND, fontsize=fs,
-                       fontname="hebo",
-                       color=(WM_TEXT_GREY, WM_TEXT_GREY, WM_TEXT_GREY))
-
-    keys = _question_keys(req.question_ids)
-    pdf_out = fitz.open()
-    missing = 0
-    q_num = 0
-    page = None
-    y = TOP_Y
-    body_pages = 0
-
-    def new_page():
-        nonlocal page, y, body_pages
-        page = pdf_out.new_page(width=PAGE_W, height=PAGE_H)
-        body_pages += 1
-        _watermark(page)
-        page.insert_text(
-            (MARGIN_X, PAGE_H - 22), BRAND,
-            fontsize=7.5, fontname="hebo", color=ACCENT)
-        num = f"Page {body_pages}"
-        w = fitz.get_text_length(num, fontname="helv", fontsize=7)
-        page.insert_text(
-            ((PAGE_W - w) / 2, PAGE_H - 22), num,
-            fontsize=7, fontname="helv", color=GREY)
-        y = TOP_Y
-
-    def ensure(height):
-        nonlocal page, y
-        if page is None or y + height > BOTTOM_Y:
-            new_page()
-
-    for qid in req.question_ids:
-        q_key = keys.get(qid)
-        files = _crop_files_for_key(q_key) if q_key else None
-        if not files:
-            missing += 1
-            q_num += 1
-            continue
-        _, crop_path = files
-        if crop_path is None or not crop_path.exists():
-            missing += 1
-            q_num += 1
-            continue
-        try:
-            with fitz.open(str(crop_path)) as crop_doc:
-                crop_pages = crop_doc.page_count
-                if crop_pages == 0:
-                    missing += 1
-                    q_num += 1
-                    continue
-                q_num += 1
-
-                first_crop = crop_doc[0]
-                first_h = first_crop.rect.height * (CONTENT_W / first_crop.rect.width)
-
-                if q_num > 1 and page is not None and y + DIVIDER_GAP < BOTTOM_Y:
-                    mid = y + DIVIDER_GAP / 2
-                    page.draw_line(
-                        fitz.Point(MARGIN_X, mid),
-                        fitz.Point(PAGE_W - MARGIN_X, mid),
-                        color=(0.75, 0.75, 0.75), width=0.5)
-                    y += DIVIDER_GAP
-
-                max_keep = BOTTOM_Y - TOP_Y - Q_HEADER_H
-                ensure(Q_HEADER_H + min(first_h, max_keep))
-
-                label = f"Q{q_num}"
-                bar_w = 4.0
-                page.draw_rect(
-                    fitz.Rect(MARGIN_X, y + 2, MARGIN_X + bar_w, y + Q_HEADER_H - 2),
-                    color=None, fill=ACCENT)
-                lx = MARGIN_X + bar_w + 6
-                page.insert_text((lx, y + 11), label,
-                                 fontsize=12, fontname="hebo", color=ACCENT)
-                x = lx + fitz.get_text_length(label, fontname="hebo", fontsize=12)
-                ref_str = (q_key or "").replace("_", "/") if q_key else ""
-                if ref_str:
-                    page.insert_text((x + 8, y + 10), ref_str,
-                                     fontsize=8.5, fontname="helv", color=GREY)
-                rule_y = y + Q_HEADER_H - 1
-                page.draw_line(
-                    fitz.Point(MARGIN_X, rule_y),
-                    fitz.Point(PAGE_W - MARGIN_X, rule_y),
-                    color=GOLD, width=0.6)
-                y += Q_HEADER_H
-
-                for pg_idx in range(crop_pages):
-                    cp = crop_doc[pg_idx]
-                    scale = CONTENT_W / cp.rect.width
-                    h = cp.rect.height * scale
-                    ensure(h)
-                    target = fitz.Rect(MARGIN_X, y, MARGIN_X + CONTENT_W, y + h)
-                    page.show_pdf_page(target, crop_doc, pg_idx)
-                    y += h + 4
-
-        except Exception:
-            missing += 1
-            q_num += 1
-
-    if pdf_out.page_count == 0:
-        pdf_out.close()
-        raise HTTPException(404, "no crop PDFs found for these questions")
-
-    pdf_bytes = pdf_out.tobytes(garbage=3, deflate=True)
-    pdf_out.close()
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"X-Missing-Crops": str(missing)},
-    )
 
 
 # ── MCQ AI explanation ─────────────────────────────────────────────────────────
@@ -797,15 +412,6 @@ Hard rules:
   A Level).
 - If the image is missing or unreadable, say exactly that in one <p> and stop.
   Never guess at an equation you cannot see."""
-
-
-class MCQExplainReq(BaseModel):
-    question_id: int
-    your_answer: str | None = None
-    correct_answer: str | None = None
-    syllabus: str | None = None
-    topic: str | None = None
-    refresh: bool = False        # ignore the stored copy and re-generate
 
 
 # ── Durable explanation store ──────────────────────────────────────────────
@@ -1066,20 +672,6 @@ def _explanation_for(question_id: int, correct_answer: str | None,
         _explanation_put(question_id, out["html"], out.get("provider"))
     out["cached"] = False
     return out
-
-
-@app.post("/api/mcq/explain")
-def mcq_explain(req: MCQExplainReq, request: Request):
-    """AI explanation for an MCQ question: why the correct answer is right."""
-    # A cache hit costs no API budget, so it must not burn the caller's quota
-    # either — only a real generation is rate limited.
-    if req.refresh or _explanation_get(req.question_id) is None:
-        wait = _tutor_rate_limited(_client_ip(request))
-        if wait is not None:
-            raise HTTPException(
-                429, f"Rate limit — try again in {wait // 60 + 1} minutes.")
-    return _explanation_for(req.question_id, req.correct_answer,
-                            req.syllabus, req.topic, refresh=req.refresh)
 
 
 # ── MCQ session review PDF ─────────────────────────────────────────────────
@@ -1445,7 +1037,6 @@ def mcq_report_pdf(job_id: str):
     st = _report_status_read(job_dir) or {}
     return FileResponse(pdf, media_type="application/pdf",
                         filename=st.get("filename") or "mcq-review.pdf")
-
 
 
 @app.post("/api/questions")
@@ -2258,51 +1849,6 @@ def _library_index() -> list[dict]:
         return out
 
 
-@app.get("/api/library/search")
-def library_search(q: str = Query(..., max_length=120), limit: int = 40):
-    """Free-text search over the whole archive.
-
-    Every whitespace-separated token must match somewhere in the sitting, so
-    tokens narrow rather than widen — "0625 2021 p2" finds exactly the paper a
-    student means, in any order.
-    """
-    # Split the query exactly the way the index splits its words, so pasting a
-    # whole filename ("0625_s21_qp_22.pdf") becomes the tokens 0625/s21/qp/22
-    # and matches. Splitting only on whitespace left it as one token that
-    # matched nothing.
-    tokens = [t for t in re.split(r"[^a-z0-9']+", q.lower().strip()) if t][:8]
-    if not tokens:
-        return {"results": [], "total": 0}
-    limit = max(1, min(int(limit or 40), 100))
-
-    hits = []
-    for e in _library_index():
-        words = e["_words"]
-        # Prefix match, so "chem" finds Chemistry but "cs" does not find IGCSE.
-        if all(any(w.startswith(t) for w in words) for t in tokens):
-            hits.append(e)
-
-    total = len(hits)
-    return {
-        "total": total,
-        "truncated": total > limit,
-        "results": [{k: v for k, v in e.items() if k != "_words"}
-                    for e in hits[:limit]],
-    }
-
-
-@app.get("/api/library/check-quota")
-def library_check_quota(user: dict = _Depends(_get_current_user)):
-    """Check if user has remaining quota for viewing past paper PDFs."""
-    try:
-        _access_mod.check_quota(user, "yearly_paper")
-        return {"ok": True}
-    except HTTPException as exc:
-        if exc.status_code in (403, 429):
-            return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
-        raise exc
-
-
 @app.get("/api/library/pdf/{paper_id}")
 def library_pdf(paper_id: int,
                 user: dict | None = _Depends(_auth_mod.maybe_user)):
@@ -2441,7 +1987,9 @@ Coverage: 2020–2025 papers, all sessions and variants.
 - Flashcards (/flashcards.html): Spaced-repetition card decks for key facts
 - Study Hub (/study-hub.html): Personalised revision plans tracking topic coverage
 - Dashboard (/dashboard.html): Progress analytics, streaks, achievements, yearly & topical performance charts
-- Papers Library (/library.html): Full past-paper PDFs with topic filtering
+- Topical papers (/papers): pick board, subject, chapters and subtopics; build a practice booklet or a mock test
+- Past papers by year (/yearly): every sitting's question paper, mark scheme and insert, side by side
+- MCQ practice (/mcq): full papers or topical sets, marked instantly against the official key
 
 == PRICING ==
 - Free: Monthly capped topical access + all free tools (no card required)
@@ -4151,7 +3699,7 @@ _PUBLIC_PATHS = [
     "/pricing.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/blog",
     # Study tools — each has a distinct meta description and real student value
-    "/mcq-solver.html", "/formulas.html", "/definitions.html",
+    "/formulas.html", "/definitions.html",
     "/command-words.html", "/calculator.html", "/periodic-table.html",
     "/bases-logic.html", "/pseudocode.html", "/graph.html",
     "/grade-calculator.html", "/grade-trends.html", "/graphs-guide.html",
@@ -4168,7 +3716,7 @@ _NOINDEX_PATHS = {
     "/achievements.html", "/notes.html", "/notes-view.html",
     "/analytics.html", "/calendar.html",
     # Redirect stubs — no content, should never be indexed
-    "/library.html", "/revise.html", "/ask.html", "/walkthrough.html",
+    "/revise.html", "/ask.html", "/walkthrough.html",
 }
 
 
@@ -4189,10 +3737,11 @@ def sitemap_xml():
     # Priority hints: homepage highest, topical papers second, then by traffic value
     _priority = {
         "/": "1.0",
-        "/papers.html": "0.95",
+        "/papers": "0.95",
+        "/yearly": "0.92",
+        "/mcq": "0.88",
         "/subjects.html": "0.90",
         "/resources.html": "0.85",
-        "/mcq-solver.html": "0.85",
         "/pricing.html": "0.80",
         "/tools.html": "0.80",
         "/formulas.html": "0.80",
@@ -4205,7 +3754,7 @@ def sitemap_xml():
     entries = []
     for p in _PUBLIC_PATHS:
         pri = _priority.get(p, "0.60")
-        freq = "weekly" if p in ("/", "/papers.html", "/blog", "/resources.html") else "monthly"
+        freq = "weekly" if p in ("/", "/blog", "/resources.html") else "monthly"
         entries.append(
             f"  <url><loc>{origin}{p}</loc>"
             f"<changefreq>{freq}</changefreq>"

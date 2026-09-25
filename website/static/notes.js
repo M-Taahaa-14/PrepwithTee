@@ -337,7 +337,7 @@ function buildJumpUrl(n) {
     if (url) return url;
   }
   const MAP = {
-    paper:           n.linked_id ? `papers.html?key=${encodeURIComponent(n.linked_id)}` : null,
+    paper:           n.linked_id ? `/yearly/open?key=${encodeURIComponent(n.linked_id)}` : null,
     flashcard_block: n.linked_id ? `flashcards.html?block=${n.linked_id}` : null,
     chapter:         'topical-progress.html',
     tutor_message:   'tutor.html',

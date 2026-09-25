@@ -1,24 +1,36 @@
 /* builder.js — the topical paper builder on /papers/{board}/{subject}.
  *
- * Pick up to 4 chapters (whole, or any of their subtopics), filter by years
- * and paper, choose how many questions, Build -> the booklet opens in a new
- * tab at /papers/view/{id}, where a loader shows the real build stages.
- * The exact pool size comes from POST /api/booklets/count (debounced); chapter
- * counts under the filters are computed here from the tree's per-year data.
+ * Chapters are grouped by the paper that examines them when a subject's papers
+ * cover different content (A Level Maths P1/P3/P4/P5, Physics AS vs A2, 9618
+ * P1-P4, O Level/IGCSE CS P1 vs P2 ...); chapters from any group can be mixed.
+ * Every chapter shows its subtopics as chips: tick the chapter for all of it, or
+ * tap chips for just those subtopics (the box then shows "partly"; ticking it
+ * takes the whole chapter). Up to 4 chapters per paper.
+ *
+ * Two kinds of paper: a practice booklet (mark scheme after each question) or a
+ * mock test (exam cover, random questions, mark scheme as a separate file that
+ * unlocks when the student finishes). Build -> /papers/view/{id} in a new tab.
+ * The exact pool size comes from POST /api/booklets/count (debounced).
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20260829a";
+import { api, UpgradeRequiredError } from "/auth.js?v=20260927b";
 
 const root = document.getElementById("builder");
 const SYL = root?.dataset.syllabus;
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
+};
 
 const st = {
-  tree: null,
+  tree: null, byName: new Map(),
   picks: new Map(),          // chapter name -> null (whole chapter) | Set(subtopics)
-  open: new Set(),           // expanded chapters
+  closed: new Set(),         // collapsed group sections
+  showSubs: store.get("bld.showSubs", true),
   y0: null, y1: null,
-  papers: new Set(),         // empty = all components
+  papers: new Set(),         // empty = every component
+  kind: "booklet",           // booklet | test
   maxQ: 20, includeMs: true,
   pool: null, poolMarks: 0, counting: false, filter: "", msg: "",
 };
@@ -26,21 +38,21 @@ const st = {
 if (root && SYL) init();
 
 async function init() {
-  root.innerHTML = `<div class="bld-loading" role="status">Loading chapters…</div>`;
+  root.innerHTML = `<div class="bld-loading" role="status"><span class="bld-spin"></span>Loading chapters…</div>`;
   try {
     st.tree = await api(`/api/topical/${SYL}/tree`);
   } catch (e) {
     root.innerHTML = `<p class="bld-error" role="alert">Couldn't load the chapters: ${esc(e.message)}</p>`;
     return;
   }
+  st.tree.chapters.forEach((c) => st.byName.set(c.name, c));
   st.y0 = st.tree.year_min; st.y1 = st.tree.year_max;
-  const want = new URLSearchParams(location.search).get("pick");
-  if (want && st.tree.chapters.some((c) => c.name === want)) {
-    st.picks.set(want, null);
-    st.open.add(want);
-  }
+  const q = new URLSearchParams(location.search);
+  const want = q.get("pick");
+  if (want && st.byName.has(want)) st.picks.set(want, null);
+  if (q.get("mode") === "test") st.kind = "test";
   render();
-  if (want) requestAnimationFrame(() => root.scrollIntoView({ block: "start" }));
+  if (want || q.get("mode")) requestAnimationFrame(() => root.scrollIntoView({ block: "start" }));
   recount();
   loadRecent();
 }
@@ -51,100 +63,146 @@ function inYears(byYear) {
   for (const [y, c] of Object.entries(byYear || {})) if (+y >= st.y0 && +y <= st.y1) n += c;
   return n;
 }
-function chapterCount(ch) {
-  if (!st.papers.size) return inYears(ch.counts_by_year);
-  let n = 0;
-  for (const p of st.papers) n += inYears((ch.paper_year || {})[p]);
-  return n;
+/** Questions in a chapter under the year range and paper filter; limited to
+ *  `papers` (a group's components) when given. */
+function chapterCount(ch, papers = null) {
+  let use = papers ? papers.map(String) : null;
+  if (st.papers.size) use = (use || [...st.papers]).filter((p) => st.papers.has(p));
+  if (!use) return inYears(ch.counts_by_year);
+  return use.reduce((n, p) => n + inYears((ch.paper_year || {})[p]), 0);
+}
+function groups() {
+  const t = st.tree;
+  if (t.groups?.length) return t.groups;
+  return [{ key: "all", papers: null, title: "", chapters: t.chapters.map((c) => c.name) }];
 }
 
 // ── Render ──────────────────────────────────────────────────────────────────
+const LEVEL_NAME = { AS: "AS Level", A2: "A Level" };
+
+function chapterHTML(ch, g, gi, i) {
+  const t = st.tree, max = t.max_chapters;
+  const picked = st.picks.has(ch.name);
+  const sel = st.picks.get(ch.name);
+  const partial = picked && sel instanceof Set;
+  const disabled = !picked && st.picks.size >= max;
+  const n = chapterCount(ch, g.papers);
+  const q = st.filter.trim().toLowerCase();
+  const nameHit = !q || ch.display.toLowerCase().includes(q);
+  const subHits = q ? ch.subtopics.filter((s) => s.name.toLowerCase().includes(q)) : [];
+  const hidden = q && !nameHit && !subHits.length;
+  const id = `c${gi}-${i}`;
+  const chips = ch.subtopics.map((s) => {
+    const on = picked && (!partial || sel.has(s.name));
+    const hit = q && s.name.toLowerCase().includes(q);
+    const c = inYears(s.counts_by_year);
+    return `<button type="button" class="bld-subchip${on ? " is-on" : ""}${hit ? " is-hit" : ""}${c ? "" : " is-zero"}"
+        data-sub="${esc(s.name)}" data-ch="${esc(ch.name)}" aria-pressed="${on}">
+        <span>${esc(s.name)}</span><em>${c}</em></button>`;
+  }).join("");
+  const showChips = ch.subtopics.length && (st.showSubs || picked || subHits.length);
+  return `<li class="bld-ch${picked ? " is-picked" : ""}${disabled ? " is-disabled" : ""}${n ? "" : " is-empty"}"
+        ${hidden ? "hidden" : ""}>
+      <div class="bld-ch-row">
+        <input type="checkbox" id="${id}" data-ch="${esc(ch.name)}" ${picked && !partial ? "checked" : ""}
+               ${partial ? 'data-partial="1"' : ""} ${disabled ? 'aria-disabled="true"' : ""}>
+        <label for="${id}" class="bld-ch-name">${esc(ch.display)}</label>
+        ${partial ? `<span class="bld-partial">${sel.size}/${ch.subtopics.length} subtopics</span>` : ""}
+        <span class="bld-count" title="Questions under your filters">${n.toLocaleString()}<small> Q</small></span>
+      </div>
+      ${showChips ? `<div class="bld-subchips" role="group" aria-label="Subtopics of ${esc(ch.display)}">${chips}</div>` : ""}
+    </li>`;
+}
+
 function render() {
   const t = st.tree, max = t.max_chapters;
-  const full = st.picks.size >= max;
-  const q = st.filter.trim().toLowerCase();
-  const chapters = t.chapters.map((ch, i) => {
-    const picked = st.picks.has(ch.name);
-    const subsSel = st.picks.get(ch.name);
-    const partial = picked && subsSel instanceof Set;
-    const hidden = q && !ch.display.toLowerCase().includes(q) &&
-                   !ch.subtopics.some((s) => s.name.toLowerCase().includes(q));
-    const disabled = !picked && full;
-    const n = chapterCount(ch);
-    const isOpen = st.open.has(ch.name);
-    const subs = ch.subtopics.map((s, j) => {
-      const on = picked && (!partial || subsSel.has(s.name));
-      return `<li><label class="bld-sub${disabled ? " is-disabled" : ""}">
-          <input type="checkbox" data-sub="${esc(s.name)}" data-ch="${esc(ch.name)}"
-                 id="sub-${i}-${j}" ${on ? "checked" : ""} ${disabled ? "disabled" : ""}>
-          <span>${esc(s.name)}</span><em>${inYears(s.counts_by_year)}</em></label></li>`;
-    }).join("");
-    return `<li class="bld-ch${picked ? " is-picked" : ""}${disabled ? " is-disabled" : ""}"
-                ${hidden ? "hidden" : ""} ${n === 0 ? 'data-empty="1"' : ""}>
-      <div class="bld-ch-row">
-        <input type="checkbox" id="ch-${i}" data-ch="${esc(ch.name)}"
-               ${picked ? "checked" : ""} ${disabled ? "disabled" : ""}
-               ${partial ? 'data-partial="1"' : ""} aria-describedby="chn-${i}">
-        <label for="ch-${i}" class="bld-ch-name">${esc(ch.display)}</label>
-        <span class="bld-count" id="chn-${i}">${n.toLocaleString()} Q</span>
-        ${ch.subtopics.length ? `<button type="button" class="bld-expand" data-toggle="${esc(ch.name)}"
-            aria-expanded="${isOpen}" aria-controls="subs-${i}"
-            aria-label="${isOpen ? "Hide" : "Show"} subtopics of ${esc(ch.display)}">
-            ${partial ? `<span class="bld-partial">${subsSel.size}/${ch.subtopics.length}</span>` : ""}
-            <svg viewBox="0 0 10 6" width="10" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </button>` : ""}
-      </div>
-      ${ch.subtopics.length ? `<ul class="bld-subs" id="subs-${i}" ${isOpen ? "" : "hidden"}>${subs}</ul>` : ""}
-    </li>`;
+  const gs = groups();
+  const grouped = gs.length > 1 || gs[0].key !== "all";
+
+  const sections = gs.map((g, gi) => {
+    const chs = g.chapters.map((name) => st.byName.get(name)).filter(Boolean);
+    const total = chs.reduce((n, ch) => n + chapterCount(ch, g.papers), 0);
+    const pickedHere = chs.filter((ch) => st.picks.has(ch.name)).length;
+    const closed = st.closed.has(g.key) && !st.filter;
+    const list = `<ol class="bld-list">${chs.map((ch, i) => chapterHTML(ch, g, gi, i)).join("")}</ol>`;
+    if (!grouped) return list;
+    return `<section class="bld-sec" id="bld-g-${esc(g.key)}" data-level="${esc(g.level || "")}">
+      <button type="button" class="bld-sec-head" data-sec="${esc(g.key)}" aria-expanded="${!closed}">
+        <span class="bld-sec-eyebrow">${esc(g.eyebrow)}${g.level ? ` <i class="bld-level bld-level-${g.level}">${LEVEL_NAME[g.level]}</i>` : ""}</span>
+        <span class="bld-sec-title">${esc(g.title)}</span>
+        <span class="bld-sec-meta">${chs.length} chapters · ${total.toLocaleString()} Q${pickedHere ? ` · <b>${pickedHere} picked</b>` : ""}</span>
+        <svg viewBox="0 0 10 6" width="12" height="8" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <div class="bld-sec-body" ${closed ? "hidden" : ""}>${list}</div>
+    </section>`;
   }).join("");
+
+  const jump = grouped ? `<nav class="bld-jump" aria-label="Jump to a paper">${gs.map((g) =>
+    `<a href="#bld-g-${esc(g.key)}">${esc(g.eyebrow.replace("Papers ", "P").replace("Paper ", "P").replace(" & ", "&"))}
+      <span>${esc(g.title)}</span>${g.level ? `<i class="bld-level bld-level-${g.level}">${g.level}</i>` : ""}</a>`).join("")}</nav>` : "";
 
   const slots = Array.from({ length: max }, (_, k) => {
     const name = [...st.picks.keys()][k];
-    if (!name) return `<li class="bld-slot is-empty">Chapter ${k + 1}</li>`;
-    const ch = t.chapters.find((c) => c.name === name);
+    if (!name) return `<li class="bld-slot is-empty"><span>Chapter ${k + 1}</span></li>`;
+    const ch = st.byName.get(name);
     const sel = st.picks.get(name);
     return `<li class="bld-slot"><span>${esc(ch.display)}${sel instanceof Set ?
-      ` <small>· ${sel.size} subtopic${sel.size === 1 ? "" : "s"}</small>` : ""}</span>
+      `<small>${[...sel].map(esc).join(" · ")}</small>` : "<small>Whole chapter</small>"}</span>
       <button type="button" data-unpick="${esc(name)}" aria-label="Remove ${esc(ch.display)}">×</button></li>`;
   }).join("");
 
   const years = [];
   for (let y = t.year_max; y >= t.year_min; y--) years.push(y);
   const yOpts = (sel) => years.map((y) => `<option ${y === sel ? "selected" : ""}>${y}</option>`).join("");
-  const comps = (t.components || []).map((c) => `
-    <button type="button" class="bld-chip${st.papers.has(String(c.paper)) ? " is-on" : ""}"
-            data-paper="${c.paper}" aria-pressed="${st.papers.has(String(c.paper))}">${esc(c.label)}</button>`).join("");
+  const comps = (t.components || []).map((c) => {
+    const on = st.papers.has(String(c.paper));
+    return `<button type="button" class="bld-chip${on ? " is-on" : ""}" data-paper="${c.paper}"
+      aria-pressed="${on}" title="${esc(c.title || c.label)}">${esc(c.label)}${c.level ? ` <i>${c.level}</i>` : ""}</button>`;
+  }).join("");
 
   const pool = st.pool;
   const maxAllowed = Math.max(1, Math.min(t.max_questions, pool ?? t.max_questions));
   if (st.maxQ > maxAllowed) st.maxQ = maxAllowed;
   const avgMarks = pool ? st.poolMarks / pool : 0;
   const canBuild = st.picks.size > 0 && pool > 0;
+  const test = st.kind === "test";
 
-  const scrollY = root.querySelector(".bld-list")?.scrollTop || 0;
   const focusId = document.activeElement?.id;   // keep keyboard users in place
   root.innerHTML = `
   <div class="bld-grid">
     <div class="bld-main">
       <div class="bld-head">
         <div>
-          <h2>Build a topical paper</h2>
-          <p>Tick up to ${max} chapters — whole, or just the subtopics you need.
-             Questions from every pick are mixed together.</p>
+          <p class="bld-eyebrow">Topical paper builder</p>
+          <h2>Pick your chapters</h2>
+          <p>Tick up to ${max} chapters for all of them, or tap the subtopics you want.
+             ${grouped ? "Chapters are grouped by the paper that examines them — you can mix papers." : ""}</p>
         </div>
-        <label class="bld-search"><span class="sr-only">Filter chapters</span>
-          <input type="search" id="bld-filter" placeholder="Filter chapters or subtopics"
-                 value="${esc(st.filter)}" autocomplete="off"></label>
       </div>
-      <ol class="bld-list">${chapters}</ol>
+      <div class="bld-tools">
+        <label class="bld-search"><span class="sr-only">Search chapters and subtopics</span>
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input type="search" id="bld-filter" placeholder="Search chapters or subtopics"
+                 value="${esc(st.filter)}" autocomplete="off"></label>
+        <label class="bld-switch"><input type="checkbox" id="bld-showsubs" ${st.showSubs ? "checked" : ""}>
+          <span>Show all subtopics</span></label>
+      </div>
+      ${jump}
+      ${sections}
     </div>
-    <aside class="bld-side" aria-label="Paper options">
+    <aside class="bld-side" id="bld-side" aria-label="Paper options">
+      <div class="bld-kind" role="radiogroup" aria-label="Kind of paper">
+        <button type="button" role="radio" data-kind="booklet" aria-checked="${!test}">
+          <b>Practice booklet</b><span>Mark scheme after each question</span></button>
+        <button type="button" role="radio" data-kind="test" aria-checked="${test}">
+          <b>Mock test</b><span>Exam cover · separate mark scheme</span></button>
+      </div>
       <div class="bld-block">
         <div class="bld-label">Your chapters <b>${st.picks.size}/${max}</b></div>
         <ol class="bld-slots">${slots}</ol>
         <p class="bld-msg${st.msg ? " is-on" : ""}" role="status" id="bld-msg">${esc(st.msg)}</p>
       </div>
-      <div class="bld-block bld-row">
+      <div class="bld-block">
         <label class="bld-label" for="bld-y0">Years</label>
         <div class="bld-years">
           <select id="bld-y0" aria-label="From year">${yOpts(st.y0)}</select>
@@ -152,7 +210,7 @@ function render() {
           <select id="bld-y1" aria-label="To year">${yOpts(st.y1)}</select>
         </div>
       </div>
-      ${comps ? `<div class="bld-block"><div class="bld-label">Paper</div>
+      ${comps ? `<div class="bld-block"><div class="bld-label">Papers <span class="bld-dim">${st.papers.size ? `${st.papers.size} picked` : "all"}</span></div>
         <div class="bld-chips">${comps}</div></div>` : ""}
       <div class="bld-block">
         <label class="bld-label" for="bld-n">Questions
@@ -163,109 +221,133 @@ function render() {
                  ${pool ? "" : "disabled"}>
           <output for="bld-n" class="bld-big">${pool ? st.maxQ : "–"}</output>
         </div>
-        <p class="bld-hint">${pool ? `≈ ${Math.round(avgMarks * st.maxQ)} marks · about
-          ${Math.max(5, Math.round(avgMarks * st.maxQ * 1.2 / 5) * 5)} minutes` :
-          st.picks.size ? "No questions match — widen the years or paper." : "Pick a chapter to begin."}</p>
+        <p class="bld-hint" id="bld-est">${estimate(avgMarks)}</p>
       </div>
-      <label class="bld-block bld-toggle">
-        <input type="checkbox" id="bld-ms" ${st.includeMs ? "checked" : ""}>
-        <span>Mark scheme after each question</span>
-      </label>
+      ${test ? `<p class="bld-note">Questions are picked at random from your chapters. The mark
+          scheme is a separate file that unlocks when you finish.</p>` :
+        `<label class="bld-toggle"><input type="checkbox" id="bld-ms" ${st.includeMs ? "checked" : ""}>
+          <span>Mark scheme after each question</span></label>`}
       <button type="button" class="cat-btn bld-go" id="bld-go" ${canBuild ? "" : "disabled"}>
-        Build paper <span aria-hidden="true">↗</span></button>
+        ${test ? "Build mock test" : "Build booklet"} <span aria-hidden="true">↗</span></button>
       <p class="bld-hint bld-center">Opens in a new tab</p>
       <div class="bld-recent" id="bld-recent"></div>
     </aside>
   </div>
   <div class="bld-mbar" ${st.picks.size ? "" : "hidden"}>
     <span><b>${st.picks.size}/${max}</b> chapters · ${pool ? `${st.maxQ} of ${pool.toLocaleString()} Q` : "…"}</span>
-    <a href="#bld-n" class="bld-mbar-opt">Options</a>
+    <a href="#bld-side" class="bld-mbar-opt">Options</a>
     <button type="button" class="cat-btn" data-build ${canBuild ? "" : "disabled"}>Build ↗</button>
   </div>`;
-  root.querySelector(".bld-list").scrollTop = scrollY;
   if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
   document.body.classList.toggle("has-dock", st.picks.size > 0);
   root.querySelectorAll("input[data-partial]").forEach((i) => (i.indeterminate = true));
   renderRecent();
 }
 
+function estimate(avgMarks) {
+  if (!st.pool) return st.picks.size ? "No questions match — widen the years or papers."
+                                     : "Pick a chapter to begin.";
+  const marks = Math.round(avgMarks * st.maxQ);
+  // a mock test allows the cover's 1 minute per mark; practice gets a little slack
+  const mins = st.kind === "test" ? Math.max(5, marks) : Math.max(5, Math.round(marks * 1.2 / 5) * 5);
+  return `≈ ${marks} marks · ${st.kind === "test" ? "time allowed" : "about"} ${mins} minutes`;
+}
+
 function flash(msg) {
   st.msg = msg;
   const el = document.getElementById("bld-msg");
-  if (el) { el.textContent = msg; el.classList.add("is-on"); }
+  if (el) { el.textContent = msg; el.classList.toggle("is-on", !!msg); }
+}
+
+// ── Picking ─────────────────────────────────────────────────────────────────
+function full(ch) {
+  if (st.picks.has(ch) || st.picks.size < st.tree.max_chapters) return false;
+  flash(`You can combine up to ${st.tree.max_chapters} chapters. Remove one to add another.`);
+  return true;
+}
+function toggleChapter(ch, on) {
+  if (on) { if (full(ch)) return render(); st.picks.set(ch, null); }
+  else st.picks.delete(ch);
+  changed();
+}
+function toggleSub(ch, sub) {
+  if (full(ch)) return;
+  const all = st.byName.get(ch).subtopics.map((s) => s.name);
+  let sel = st.picks.has(ch) ? st.picks.get(ch) : new Set();
+  if (sel === null) sel = new Set(all);
+  sel.has(sub) ? sel.delete(sub) : sel.add(sub);
+  if (!sel.size) st.picks.delete(ch);
+  else st.picks.set(ch, sel.size === all.length ? null : sel);
+  changed();
 }
 
 // ── Events ──────────────────────────────────────────────────────────────────
 root?.addEventListener("change", (e) => {
   const t = e.target;
-  const ch = t.dataset.ch;
-  if (t.dataset.sub !== undefined) {
-    const all = st.tree.chapters.find((c) => c.name === ch).subtopics.map((s) => s.name);
-    let sel = st.picks.has(ch) ? st.picks.get(ch) : new Set();
-    if (sel === null) sel = new Set(all);
-    t.checked ? sel.add(t.dataset.sub) : sel.delete(t.dataset.sub);
-    if (!sel.size) st.picks.delete(ch);
-    else st.picks.set(ch, sel.size === all.length ? null : sel);
-    st.open.add(ch);
-    changed();
-  } else if (ch !== undefined) {
-    if (t.checked) st.picks.set(ch, null); else st.picks.delete(ch);
-    changed();
+  if (t.dataset.ch !== undefined && t.type === "checkbox") {
+    toggleChapter(t.dataset.ch, t.checked);
   } else if (t.id === "bld-y0" || t.id === "bld-y1") {
     st[t.id === "bld-y0" ? "y0" : "y1"] = +t.value;
     if (st.y0 > st.y1) [st.y0, st.y1] = [st.y1, st.y0];
     changed();
   } else if (t.id === "bld-ms") {
     st.includeMs = t.checked;
+  } else if (t.id === "bld-showsubs") {
+    st.showSubs = t.checked;
+    store.set("bld.showSubs", st.showSubs);
+    render();
   }
 });
 
+let filterTimer = null;
 root?.addEventListener("input", (e) => {
   if (e.target.id === "bld-n") {
     st.maxQ = +e.target.value;
-    const out = root.querySelector(".bld-big");
-    if (out) out.textContent = st.maxQ;
-    const hint = out?.closest(".bld-block").querySelector(".bld-hint");
-    if (hint && st.pool) {
-      const avg = st.poolMarks / st.pool;
-      hint.textContent = `≈ ${Math.round(avg * st.maxQ)} marks · about ${
-        Math.max(5, Math.round(avg * st.maxQ * 1.2 / 5) * 5)} minutes`;
-    }
+    root.querySelector(".bld-big").textContent = st.maxQ;
+    document.getElementById("bld-est").textContent = estimate(st.pool ? st.poolMarks / st.pool : 0);
+    const bar = root.querySelector(".bld-mbar span");
+    if (bar && st.pool) bar.innerHTML = `<b>${st.picks.size}/${st.tree.max_chapters}</b> chapters · ${st.maxQ} of ${st.pool.toLocaleString()} Q`;
   } else if (e.target.id === "bld-filter") {
     st.filter = e.target.value;
-    const q = st.filter.trim().toLowerCase();
-    root.querySelectorAll(".bld-ch").forEach((li, i) => {
-      const ch = st.tree.chapters[i];
-      li.hidden = !!q && !ch.display.toLowerCase().includes(q) &&
-                  !ch.subtopics.some((s) => s.name.toLowerCase().includes(q));
-    });
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(render, 120);
   }
 });
 
 root?.addEventListener("click", (e) => {
-  const tog = e.target.closest("[data-toggle]");
-  if (tog) {
-    const ch = tog.dataset.toggle;
-    st.open.has(ch) ? st.open.delete(ch) : st.open.add(ch);
-    const list = document.getElementById(tog.getAttribute("aria-controls"));
-    list.hidden = !st.open.has(ch);
-    tog.setAttribute("aria-expanded", st.open.has(ch));
+  const chip = e.target.closest("[data-sub]");
+  if (chip) { toggleSub(chip.dataset.ch, chip.dataset.sub); return; }
+  const sec = e.target.closest("[data-sec]");
+  if (sec) {
+    const k = sec.dataset.sec;
+    st.closed.has(k) ? st.closed.delete(k) : st.closed.add(k);
+    render();
     return;
   }
+  const kind = e.target.closest("[data-kind]");
+  if (kind) { st.kind = kind.dataset.kind; render(); return; }
   const un = e.target.closest("[data-unpick]");
   if (un) { st.picks.delete(un.dataset.unpick); changed(); return; }
-  const chip = e.target.closest("[data-paper]");
-  if (chip) {
-    const p = chip.dataset.paper;
+  const paper = e.target.closest("[data-paper]");
+  if (paper) {
+    const p = paper.dataset.paper;
     st.papers.has(p) ? st.papers.delete(p) : st.papers.add(p);
     changed();
     return;
   }
-  // A click on a disabled chapter explains why instead of doing nothing.
-  const dis = e.target.closest(".bld-ch.is-disabled");
-  if (dis) flash(`You can combine up to ${st.tree.max_chapters} chapters. Remove one to add another.`);
+  const jump = e.target.closest(".bld-jump a");
+  if (jump) {
+    const key = jump.getAttribute("href").slice("#bld-g-".length);
+    if (st.closed.delete(key)) render();
+  }
   if (e.target.closest("#bld-go, [data-build]")) build();
 });
+
+// A disabled chapter's checkbox still toggles natively; explain instead.
+root?.addEventListener("click", (e) => {
+  const box = e.target.closest('input[aria-disabled="true"]');
+  if (box) { e.preventDefault(); full(box.dataset.ch); }
+}, true);
 
 let countTimer = null;
 function changed() {
@@ -295,7 +377,7 @@ async function recount() {
     st.pool = r.pool; st.poolMarks = r.marks;
     if (st.maxQ > r.pool) st.maxQ = Math.max(1, r.pool);
   } catch (e) {
-    if (seq === countSeq) { st.pool = 0; flash(e.message); }
+    if (seq === countSeq) { st.pool = 0; st.msg = e.message; }
   } finally {
     if (seq === countSeq) { st.counting = false; render(); }
   }
@@ -305,30 +387,29 @@ async function recount() {
 async function build() {
   const btn = document.getElementById("bld-go");
   if (!btn || !st.picks.size || !st.pool) return;
+  const test = st.kind === "test";
   // Open the tab synchronously inside the click, or popup blockers eat it.
   const win = window.open("", "_blank");
   if (win) {
+    const dark = document.documentElement.dataset.theme === "dark";
     win.document.write(`<title>Setting up your paper…</title><body style="font:16px system-ui;
-      display:grid;place-items:center;height:100vh;margin:0;color:#4C2E72;background:#FDF9F3">
-      Setting up your paper…</body>`);
+      display:grid;place-items:center;height:100vh;margin:0;color:${dark ? "#e8ebf1" : "#4C2E72"};
+      background:${dark ? "#0f1117" : "#FDF9F3"}">Setting up your ${test ? "mock test" : "paper"}…</body>`);
   }
   btn.disabled = true;
   btn.textContent = "Building…";
   try {
     const r = await api("/api/booklets", { method: "POST",
-      body: { ...selection(), max_questions: st.maxQ, include_ms: st.includeMs } });
+      body: { ...selection(), max_questions: st.maxQ, include_ms: st.includeMs, kind: st.kind } });
     if (win) win.location.href = r.url; else location.href = r.url;
     loadRecent();
   } catch (e) {
     win?.close();
-    if (e instanceof UpgradeRequiredError) {
-      flash(`${e.message} — see plans on the pricing page.`);
-    } else {
-      flash(e.message || "Couldn't start the build. Try again.");
-    }
+    flash(e instanceof UpgradeRequiredError ? `${e.message} — see plans on the pricing page.`
+                                             : e.message || "Couldn't start the build. Try again.");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = 'Build paper <span aria-hidden="true">↗</span>';
+    btn.innerHTML = `${test ? "Build mock test" : "Build booklet"} <span aria-hidden="true">↗</span>`;
   }
 }
 
@@ -345,5 +426,5 @@ function renderRecent() {
   if (!box) return;
   box.innerHTML = recent.length ? `<div class="bld-label">Your recent papers</div><ul>${
     recent.map((b) => `<li><a href="${b.url}" target="_blank" rel="noopener">${
-      esc(b.title.split(" — ")[0])}</a><span>${b.questions} Q</span></li>`).join("")}</ul>` : "";
+      esc(b.title.split(" — ")[0])}</a><span>${b.kind === "test" ? '<i class="bld-tag">Test</i>' : ""}${b.questions} Q</span></li>`).join("")}</ul>` : "";
 }

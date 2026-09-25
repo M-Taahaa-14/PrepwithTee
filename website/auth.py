@@ -316,7 +316,7 @@ def send_welcome_email(user: dict) -> bool:
         f"      Build long-term memory with smart review scheduling.\n\n"
         f"── Your first three steps ──────────────────────────────────────────\n"
         f"  1. Enrol in your subjects  →  {base}/dashboard.html\n"
-        f"  2. Browse topical papers    →  {base}/papers.html\n"
+        f"  2. Browse topical papers    →  {base}/papers\n"
         f"  3. Try the AI Tutor         →  {base}/tutor.html\n\n"
         f"Want unlimited papers, AI queries and 1-on-1 tutoring? Upgrade at any time:\n"
         f"  {base}/pricing.html\n\n"
@@ -363,7 +363,7 @@ def send_welcome_email(user: dict) -> bool:
 
     steps = [
         ("1", "Enrol in your subjects", f"{base}/dashboard.html"),
-        ("2", "Browse topical past papers", f"{base}/papers.html"),
+        ("2", "Browse topical past papers", f"{base}/papers"),
         ("3", "Try the AI Tutor", f"{base}/tutor.html"),
     ]
     steps_html = ""

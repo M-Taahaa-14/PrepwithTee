@@ -47,7 +47,7 @@
 .vw-tbtn:hover { border-color: var(--purple); color: var(--purple); }
 .vw-tbtn:focus-visible, .vw-chip:focus-visible, .vw-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .vw-btn { display: inline-flex; align-items: center; gap: .35rem; border: 0; border-radius: 10px;
-  background: var(--purple); color: var(--page); padding: .5rem .85rem; font: 700 .85rem/1 "Hanken Grotesk", sans-serif;
+  background: var(--accent); color: var(--on-accent); padding: .5rem .85rem; font: 700 .85rem/1 "Hanken Grotesk", sans-serif;
   text-decoration: none; cursor: pointer; white-space: nowrap; }
 
 /* ── body: contents | pages | panel ───────────────────────────────── */
@@ -121,3 +121,21 @@
   body.has-dock .pwt-chatbot-fab,
   body.has-dock #global-note-fab { bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px)) !important; }
 }
+
+/* mock tests: Test / Mark scheme tabs, countdown, finish */
+.vw-seg { display: flex; flex: none; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.vw-seg button { border: 0; background: var(--white); color: var(--grey); cursor: pointer;
+  font: 700 .82rem/1 "Hanken Grotesk", sans-serif; padding: .5rem .75rem; white-space: nowrap; }
+.vw-seg button + button { border-left: 1px solid var(--line); }
+.vw-seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+.vw-seg button[disabled] { cursor: not-allowed; opacity: .7; }
+.vw-seg button:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.vw-timer { font-variant-numeric: tabular-nums; display: inline-flex; gap: .35rem; align-items: center; }
+.vw-timer b { font: 800 .92rem/1 "Archivo", sans-serif; }
+.vw-timer span { font-size: .72rem; color: var(--grey); }
+.vw-timer[aria-pressed="true"] { border-color: var(--accent); }
+.vw-timer.is-low b { color: var(--orange-ink); }
+.vw-timer.is-over b { color: var(--pink-ink); }
+.vw-finish { background: var(--green-ink); color: var(--page); }
+html[data-theme="dark"] .vw-finish { color: #0f1117; }
+@media (max-width: 640px) { .vw-seg button { padding: .5rem .55rem; font-size: .76rem; } }

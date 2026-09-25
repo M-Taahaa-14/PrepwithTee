@@ -47,13 +47,36 @@ def test_subject_page_lists_every_sitting_as_text(client):
     assert "<title>Physics 5054 Past Papers by Year" in html
     assert 'rel="canonical" href="https://prepwithtee.com/yearly/o-level/physics-5054"' in html
     text = _text(html)
-    assert "May/June 2016" in text and "Oct/Nov 2016" in text
+    assert "M/J 2016" in text and "O/N 2016" in text
     p = _paper()
     assert f'href="/yearly/view/{p["id"]}"' in html
     assert f'href="/yearly/view/{p["id"]}?doc=ms"' in html
     # newest year first
     years = [int(y) for y in re.findall(r'<details class="yr-year" id="y(\d{4})"', html)]
     assert years == sorted(years, reverse=True) and 2016 in years
+
+
+def test_year_grid_has_a_row_per_paper_and_a_column_per_session(client):
+    html = client.get("/yearly/a-level/mathematics-9709/2024").text
+    rows = re.findall(r'<div class="yr-mrow" data-comp="(\d)">', html)
+    assert rows == ["1", "3", "4", "5"]
+    assert "Pure Mathematics 3" in html and "yr-level-A2" in html
+    assert re.findall(r'<div class="yr-mh" data-sess="(\w)">', html) == ["m", "s", "w"]
+    # filter chips for every component and session
+    assert 'data-comp="5" aria-pressed="false"' in html and 'data-sess="w" aria-pressed="false"' in html
+
+
+def test_open_resolves_a_sitting_to_its_viewer(client):
+    p = _paper()
+    q = (f"syllabus=5054&year=2016&session={p['session']}&paper=2&variant={p['variant'] or ''}")
+    r = client.get(f"/yearly/open?{q}", follow_redirects=False)
+    assert r.status_code == 302 and r.headers["location"] == f"/yearly/view/{p['id']}"
+    key = f"5054_{p['session']}16_2{p['variant'] or ''}"
+    r = client.get(f"/yearly/open?key={key}", follow_redirects=False)
+    assert r.headers["location"] == f"/yearly/view/{p['id']}"
+    r = client.get("/yearly/open?syllabus=5054&year=2016", follow_redirects=False)
+    assert r.headers["location"] == "/yearly/o-level/physics-5054/2016"
+    assert client.get("/yearly/open?key=junk", follow_redirects=False).headers["location"] == "/yearly"
 
 
 def test_year_page_only_that_year(client):
@@ -152,6 +175,8 @@ def test_approved_teachers_do_not_need_to_enrol(client, new_student):
     ("/papers.html?tab=mcq&syllabus=4024", "/mcq"),
     ("/library.html", "/yearly"),
     ("/library.html?syllabus=5070", "/yearly/o-level/chemistry-5070"),
+    ("/papers.html?tab=yearly&syllabus=0625&year=2023&session=s&paper=4&variant=2",
+     "/yearly/open?syllabus=0625&year=2023&session=s&paper=4&variant=2"),
 ])
 def test_old_urls_301(client, url, where):
     r = client.get(url, follow_redirects=False)

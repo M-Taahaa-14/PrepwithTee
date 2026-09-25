@@ -148,7 +148,7 @@
 .calc-keys button:active { transform: scale(.95); }
 .calc-keys .k-fn   { background: var(--lav); border-color: var(--lav-line); color: var(--lav-ink); font-size: .85rem; }
 .calc-keys .k-op   { background: var(--cream); font-weight: 700; }
-.calc-keys .k-eq   { background: var(--purple); border-color: var(--purple); color: #fff; font-weight: 800; }
+.calc-keys .k-eq   { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 800; }
 .calc-keys .k-eq:hover { background: var(--purple-bright); }
 .calc-keys .k-clear{ background: var(--pink); border-color: var(--pink-line); color: var(--pink-ink); }
 .calc-keys .k-mode.on { background: var(--gold); border-color: var(--gold); color: #fff; }
@@ -221,7 +221,7 @@
 }
 .fs-subtab-btn:hover { border-color: var(--lav-line); color: var(--purple); }
 .fs-subtab-btn.on {
-  background: var(--purple); border-color: var(--purple); color: #fff;
+  background: var(--accent); border-color: var(--accent); color: #fff;
 }
 .fs-code-badge {
   font-size: .66rem; opacity: .75; font-weight: 700;
@@ -400,7 +400,7 @@
   transition: background .12s, border-color .12s;
   outline: none;
 }
-.fs-deriv-toggle:hover { background: var(--purple); border-color: var(--purple); color: #fff; }
+.fs-deriv-toggle:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* Tips row */
 .fs-tip {
@@ -458,7 +458,7 @@ body.fs-modal-open { overflow: hidden; }
   margin-bottom: 18px; padding-right: 36px;
 }
 .fs-modal-expr {
-  background: var(--navy-deep); color: #fff; border-radius: 14px;
+  background: var(--accent); color: #fff; border-radius: 14px;
   padding: 20px 24px; margin-bottom: 24px; text-align: center;
   font-size: 1.5rem; overflow-x: auto;
 }
@@ -479,13 +479,13 @@ body.fs-modal-open { overflow: hidden; }
 .fs-step-num {
   display: inline-block;
   font-size: .67rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
   padding: 2px 9px; border-radius: 99px;
 }
 .fs-deriv-desc { font-size: .88rem; color: var(--ink); margin-bottom: 10px; line-height: 1.6; }
 .fs-deriv-desc:only-child { margin-bottom: 0; }
 .fs-deriv-math {
-  background: var(--navy-deep);
+  background: var(--accent);
   border-radius: 10px;
   padding: 12px 16px;
   text-align: center;
@@ -540,7 +540,7 @@ body.fs-modal-open { overflow: hidden; }
 .fs-ztable { border-collapse: collapse; font-size: .78rem; width: 100%;
   font-variant-numeric: tabular-nums; }
 .fs-ztable th, .fs-ztable td { padding: 5px 8px; border: 1px solid var(--line); text-align: right; }
-.fs-ztable thead tr { background: var(--navy); color: #fff; }
+.fs-ztable thead tr { background: var(--accent); color: #fff; }
 .fs-ztable thead th { color: #fff; border-color: rgba(255,255,255,.15); }
 .fs-ztable tbody tr:nth-child(even) { background: var(--cream); }
 .fs-ztable .fs-ztable-z { font-weight: 700; color: var(--purple); background: var(--lav); }
@@ -599,7 +599,7 @@ body.fs-modal-open { overflow: hidden; }
   cursor: pointer;
   transition: background .15s, color .15s;
 }
-.fs-ai-btn:hover:not(:disabled) { background: var(--purple); color: #fff; }
+.fs-ai-btn:hover:not(:disabled) { background: var(--accent); color: #fff; }
 .fs-ai-btn:disabled { opacity: .6; cursor: default; }
 .fs-ai-panel {
   margin-top: 14px;
@@ -825,7 +825,7 @@ body.fs-modal-open { overflow: hidden; }
 
 /* Buttons */
 .gp2-add-btn { border: 1.5px dashed var(--line); background: var(--white); border-radius: 10px; padding: 10px; width: 100%; cursor: pointer; font-size: .92rem; color: var(--purple); font-weight: 700; transition: all 0.2s; }
-.gp2-add-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+.gp2-add-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .gp2-kb-bar { display: flex; gap: 10px; }
 .gp2-kb-toggle {
   border: 1.5px solid var(--line);
@@ -843,17 +843,17 @@ body.fs-modal-open { overflow: hidden; }
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .gp2-kb-toggle:hover {
-  background: var(--purple);
+  background: var(--accent);
   color: #fff;
-  border-color: var(--purple);
+  border-color: var(--accent);
 }
 
 /* Math keyboard */
 .gp2-kb { display: flex; flex-direction: column; gap: 6px; background: var(--white); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; }
 .gp2-kb-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .gp2-kb-btn { border: 1.5px solid var(--line); background: var(--cream); border-radius: 8px; padding: 8px 4px; font-size: .95rem; font-family: 'Courier New', monospace; cursor: pointer; font-weight: 700; transition: all 0.15s; }
-.gp2-kb-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
-.gp2-kb-btn[data-ins="ENTER"] { background: var(--purple); color: #fff; border-color: var(--purple); font-weight: 800; }
+.gp2-kb-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.gp2-kb-btn[data-ins="ENTER"] { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 800; }
 .gp2-kb-btn[data-ins="ENTER"]:hover { background: #232e58; border-color: #232e58; }
 
 /* Presets */
@@ -891,7 +891,7 @@ body.fs-modal-open { overflow: hidden; }
 .gp2-canvas-wrap canvas { display: block; width: 100%; cursor: crosshair; }
 .gp2-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
 .gp2-controls button { width: 30px; height: 30px; border: 1.5px solid var(--line); background: rgba(255,255,255,.9); border-radius: 7px; cursor: pointer; font-size: 1rem; font-weight: 700; backdrop-filter: blur(4px); }
-.gp2-controls button:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+.gp2-controls button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .gp2-coord { position: absolute; bottom: 28px; right: 10px; font-size: .75rem; color: var(--grey); font-family: monospace; background: rgba(255,255,255,.82); padding: 2px 7px; border-radius: 4px; pointer-events: none; }
 .gp2-hint { font-size: .72rem; color: var(--grey); opacity: .7; margin: 4px 0 0; text-align: center; }
 
@@ -1246,7 +1246,7 @@ body.tool-page > main.container { max-width: 1280px; }
   display: flex; flex-direction: column; align-items: center; gap: 7px;
   padding: 15px 9px;
   border: none; border-radius: 12px 0 0 12px;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
   font: 700 .78rem/1 "Hanken Grotesk", -apple-system, sans-serif;
   letter-spacing: .06em; cursor: pointer;
   box-shadow: -2px 0 14px rgba(0, 0, 0, .16);
@@ -1500,7 +1500,7 @@ body.tool-page > main.container { max-width: 1280px; }
 }
 .gs-toggle:hover { border-color: var(--lav-line); color: var(--purple); }
 .gs-toggle.on {
-  background: var(--purple); border-color: var(--purple); color: #fff;
+  background: var(--accent); border-color: var(--accent); color: #fff;
 }
 .gs-toggle span { opacity: .75; margin-left: 4px; }
 
@@ -1518,7 +1518,7 @@ body.tool-page > main.container { max-width: 1280px; }
 .ps-run {
   font: inherit; font-size: .85rem; font-weight: 800; cursor: pointer;
   padding: 9px 18px; border-radius: 10px; border: none;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
 }
 .ps-run:hover { background: var(--purple-bright); }
 
@@ -1586,7 +1586,7 @@ body.tool-page > main.container { max-width: 1280px; }
 .ps-diag-line {
   font: inherit; font-size: .7rem; font-weight: 800; cursor: pointer;
   padding: 2px 8px; border-radius: 20px; border: none;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
 }
 .ps-diag-line:hover { background: var(--purple-bright); }
 .ps-diag-kind {
@@ -1616,7 +1616,7 @@ body.tool-page > main.container { max-width: 1280px; }
   border: 1.5px solid var(--line); background: var(--white); color: var(--grey);
 }
 .fs-comps button:hover { border-color: var(--lav-line); color: var(--purple); }
-.fs-comps button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+.fs-comps button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .fs-comp-tag {
   font-size: .64rem; font-weight: 800; letter-spacing: .05em;
   padding: 2px 8px; border-radius: 20px;
@@ -1664,7 +1664,7 @@ body.tool-page > main.container { max-width: 1280px; }
 /* Question Guide formatting */
 .ps-qtoggle-hint {
   font-size: .72rem; font-weight: 700;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
   padding: 2px 8px; border-radius: 20px;
   margin-left: 10px; opacity: 0.9;
 }
@@ -1751,7 +1751,7 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
   display: inline-flex; align-items: center; justify-content: center;
   margin-left: 6px; padding: 1px 7px;
   border-radius: 99px; font-size: .66rem; font-weight: 800;
-  background: var(--purple); color: #fff;
+  background: var(--accent); color: #fff;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1785,7 +1785,7 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
 }
 .pr-mode-tabs button:hover { border-color: var(--lav-line); color: var(--purple); }
 .pr-mode-tabs button.on {
-  background: var(--purple); border-color: var(--purple); color: #fff;
+  background: var(--accent); border-color: var(--accent); color: #fff;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1855,7 +1855,7 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
 }
 .ar-mission-prog-bar {
   height: 100%; border-radius: 99px;
-  background: var(--purple);
+  background: var(--accent);
   transition: width .4s ease;
 }
 .ar-mission-prog-label {
@@ -1918,7 +1918,7 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
 }
 .ar-session-prog-bar {
   height: 100%; width: 0; border-radius: 99px;
-  background: var(--purple);
+  background: var(--accent);
   transition: width .35s ease;
 }
 .ar-close-btn {

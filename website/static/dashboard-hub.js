@@ -48,8 +48,8 @@ const MISSION_POOL = [
   { text: "Open AI Tutor and ask one concept", sub: "Get it explained clearly", xp: 15, href: "tutor.html" },
   { text: "Complete a 25-minute focus session", sub: "Use the Focus Timer right here", xp: 40, href: null },
   { text: "Revise one chapter in progress tracker", sub: "Track your understanding", xp: 20, href: "topical-progress.html" },
-  { text: "Build a topical past paper", sub: "Real Cambridge questions by chapter", xp: 35, href: "papers.html" },
-  { text: "Practice 10 MCQs timed", sub: "A/B/C/D with instant feedback", xp: 25, href: "mcq-solver.html" },
+  { text: "Build a topical past paper", sub: "Real Cambridge questions by chapter", xp: 35, href: "/papers" },
+  { text: "Practice 10 MCQs timed", sub: "A/B/C/D with instant feedback", xp: 25, href: "/mcq" },
   { text: "Read one set of study notes", sub: "Take your time with it", xp: 15, href: "resources.html" },
   { text: "Check your homework list", sub: "Clear whatever's pending", xp: 10, href: "homework.html" },
   { text: "Message your tutor a progress update", sub: "Stay connected", xp: 15, href: "messages.html" },
@@ -591,11 +591,11 @@ function renderInsights() {
 
 const QUICK_ACTIONS = [
   { ico: "🗂️", label: "Flashcards",      href: "flashcards.html",  tint: "#7c4dff" },
-  { ico: "⚡",  label: "Practice Quiz",   href: "mcq-solver.html",  tint: "#e74c3c" },
+  { ico: "⚡",  label: "Practice Quiz",   href: "/mcq",  tint: "#e74c3c" },
   { ico: "🤖", label: "AI Tutor",         href: "tutor.html",       tint: "#E8913A" },
   { ico: "📚", label: "Study Notes",      href: "resources.html",   tint: "#00b8a9" },
   { ico: "📖", label: "Progress",         href: "topical-progress.html", tint: "#43a047" },
-  { ico: "📑", label: "Past Papers",      href: "papers.html",      tint: "#2196f3" },
+  { ico: "📑", label: "Past Papers",      href: "/papers",      tint: "#2196f3" },
   { ico: "📝", label: "Homework",         href: "homework.html",    tint: "#f39c12" },
   { ico: "💬", label: "Messages",         href: "messages.html",    tint: "#3cb87a", id: "dash-messages-link" },
 ];
