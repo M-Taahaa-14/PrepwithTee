@@ -454,11 +454,12 @@ linked), not agreement with any external file.
     - **DEPLOY PREREQUISITES**: run `website/migrations/019_student_boards.sql`
       (done 2026-09-24), `020_booklets.sql` (done 2026-09-25) and
       `021_ai_help.sql` (done 2026-09-25) and `022_mcq_sessions_annotations.sql`
-      (NOT yet run) on Supabase BEFORE deploying code;
+      (done - verified present) on Supabase BEFORE deploying code. **Branch deployed 2026-09-27**
+      (code-only tar of website/ + pipeline/ via /tmp/stage; backup /srv/backup-code-20260925-1550.tgz);
       the server runs **Python 3.10** - no 3.12-only f-string syntax
       (py_compile new files with the server venv).
 
-26. **UI overhaul (2026-09-27, local, not deployed)** - tutor: "ui isn't that good,
+26. **UI overhaul (2026-09-27) - DEPLOYED with the whole improvements branch (commit 5ccef91)** - tutor: "ui isn't that good,
     dark mode is just dark purple on purple".
     - **Dark mode** = neutral slate surfaces (`--page #0f1117`, `--white #1c212b` cards),
       near-white headings, colour kept for accents. New semantic tokens `--accent`,
