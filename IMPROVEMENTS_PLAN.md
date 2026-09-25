@@ -469,15 +469,15 @@ def test_build_and_explain(page, logged_in_as):
 .venv/Scripts/python -m pytest tests/unit tests/api tests/pdf -q
 ```
 ```bash
-.venv/Scripts/python -m pytest tests/e2e --headed --base-url http://localhost:8019
+.venv/Scripts/python -m pytest tests/e2e --headed --base-url http://localhost:8017
 ```
 (`--headed` lets you watch the browser; drop it for speed. `-m live` runs the real-Claude checks.)
 
 ### 7.4 Testing the frontend yourself locally
 1. Start the site against **staging**: in this app I start the `prepwithtee-staging`
    config from `.claude/launch.json` (it loads `.env.test`); from a terminal it's
-   `.venv/Scripts/python -m uvicorn website.app:app --port 8019 --env-file .env.test`.
-2. Open `http://localhost:8019`, log in as a seeded test user (credentials in
+   `.venv/Scripts/python -m uvicorn website.app:app --port 8017 --env-file .env.test`.
+2. Open `http://localhost:8017`, log in as a seeded test user (credentials in
    `.env.test`, never real students).
 3. Walk the module's checklist (each module PR includes one, e.g. "Build a
    4-chapter paper → 5th chapter disabled → loader shows stages → contents link

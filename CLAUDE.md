@@ -309,7 +309,10 @@ linked), not agreement with any external file.
       refuse any DB setting that points at the production Supabase project.
       Local dev = `--env-file .env.local` (SQLite: data/index.db + data/users.db,
       no email). `.claude/launch.json`: `prepwithtee-local` (safe default),
-      `prepwithtee-staging`, `prepwithtee-PROD-DATA` (explicit).
+      `prepwithtee-staging` (8021), `prepwithtee-PROD-DATA` (8018, explicit).
+      **Local dev runs on http://localhost:8017 - always** (tutor, 2026-09-27): Google
+      sign-in only accepts that redirect (`APP_BASE_URL=http://localhost:8017` in
+      .env.local), and the e2e tests default to it (`E2E_BASE_URL` overrides).
     - **Tests**: `pytest` (unit/api/pdf; LLM + email keys blanked, throwaway
       users DB). `-m e2e` / `-m live` are opt-in. Nothing ships until green.
     - **Old mark schemes**: production lacked 16,173 of the 2010-19 `ms_entries`

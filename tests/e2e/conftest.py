@@ -1,7 +1,7 @@
 """End-to-end tests: a real browser against a running local server.
 
 Start the site first (it must be the SQLite/local config, never production):
-    .venv\\Scripts\\python -m uvicorn website.app:app --port 8019 --env-file .env.local
+    .venv\\Scripts\\python -m uvicorn website.app:app --port 8017 --env-file .env.local
 then:
     .venv\\Scripts\\python -m pytest -m e2e tests/e2e --headed      (watch it)
     .venv\\Scripts\\python -m pytest -m e2e tests/e2e               (headless)
@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import requests
 
-BASE = os.environ.get("E2E_BASE_URL", "http://localhost:8019").rstrip("/")
+BASE = os.environ.get("E2E_BASE_URL", "http://localhost:8017").rstrip("/")
 SHOTS = Path(__file__).resolve().parents[2] / "e2e-shots"   # pytest-playwright wipes test-results/
 
 
