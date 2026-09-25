@@ -51,6 +51,16 @@ WM_STRENGTH = 0.12     # max ink of the owl watermark (0..1); lower = fainter
 WM_TEXT_GREY = 0.92    # wordmark grey (on white, this reads ~8% ink)
 
 
+def save_small(doc: fitz.Document, path) -> None:
+    """Save a generated PDF, merging duplicate objects (the same source paper's
+    fonts are pulled in by every crop taken from it). Lossless.
+
+    NOT subset_fonts(): MuPDF's subsetter drops the space glyph from some
+    Cambridge fonts ("downward pointing arrow" came out "downwardpointingarrow")
+    - crops must reproduce the original exactly (checked 2026-09-27)."""
+    doc.save(path, garbage=4, deflate=True, deflate_fonts=True, deflate_images=True)
+
+
 def _watermark_owl():
     """Faint grayscale owl for the body-page watermark (cached).
 
@@ -1574,7 +1584,7 @@ def main(argv=None):
                          f"{args.year_from}-{args.year_to}.pdf")
     out.parent.mkdir(parents=True, exist_ok=True)
     report("saving")
-    booklet.doc.save(out, deflate=True, garbage=3)
+    save_small(booklet.doc, out)
     n_q = sum(len(qs) for _, qs in sections)
     log.info("wrote %s: %d questions in %d sections, %d pages%s",
              out, n_q, len(sections), booklet.doc.page_count,

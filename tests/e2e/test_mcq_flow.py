@@ -84,9 +84,13 @@ def test_topical_live_check_and_annotations(student, shots):
         "live_check": True, "timer": "none", "seed": 11}).json()
     page = student.new_page()
     page.goto(s["url"])
-    page.get_by_role("button", name=re.compile(r"^Start")).click()
+    # every question is fetched before Start is allowed - the clock never runs on "Loading…"
+    expect(page.locator("#mq-prep")).to_contain_text("Paper ready", timeout=30_000)
+    start = page.get_by_role("button", name=re.compile(r"^Start"))
+    expect(start).to_be_enabled()
+    start.click()
     expect(page.locator(".mq-q")).to_have_count(5)
-    expect(page.locator(".mq-q").first.locator("canvas.mq-crop-canvas")).to_be_visible(timeout=20_000)
+    expect(page.locator(".mq-q").first.locator("canvas.mq-crop-canvas")).to_be_visible(timeout=3_000)
 
     # live check: marked at once, then locked, "Why" appears
     page.locator('#mq-sheet [data-pick="1|A"]').click()

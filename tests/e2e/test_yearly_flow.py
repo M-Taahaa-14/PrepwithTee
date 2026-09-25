@@ -65,7 +65,9 @@ def test_side_by_side_follows_and_marks_save(student, shots):
     expect(panel.get_by_label("Out of")).to_have_value("75")      # official maximum, not the sum
     panel.get_by_label("Your mark").fill("52")
     panel.get_by_role("button", name="Save").click()
-    expect(panel.locator("#pv-grade")).to_contain_text("52/75 = grade A")
+    expect(panel.locator("#pv-grade")).to_contain_text("52 / 75")
+    expect(panel.locator(".pv-result-card")).to_have_attribute("data-g", "A")
+    expect(panel.locator(".pv-saved")).to_contain_text("Saved")
     expect(page.get_by_role("button", name=re.compile("Done"))).to_have_attribute("aria-pressed", "true")
     page.screenshot(path=str(shots / "yearly_marks.png"))
 

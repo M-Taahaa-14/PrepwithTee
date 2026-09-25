@@ -11,7 +11,7 @@
  */
 import { api } from "/auth.js?v=20260927b";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260927b";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
 import { createAnnotator } from "/annotate.js?v=20260927b";
 
 let ann = null;                  // the annotation bar, created with the shell
@@ -79,7 +79,7 @@ async function pane(kind) {
   if (V.panes[kind]) return V.panes[kind];
   const stage = document.getElementById(`pv-${kind}`);
   const p = new PdfPane(stage, {
-    questions: kind === "qp" ? S.questions : [],
+    questions: kind === "qp" ? S.questions : [], ranged: true,
     onPage: (n) => { if (kind === primary()) document.getElementById("vw-pn").textContent = n; },
     onZoom: (label) => { if (kind === primary()) document.getElementById("vw-z").textContent = label; },
     onQuestion: kind === "qp" ? onQuestion : null,
@@ -225,16 +225,38 @@ async function toggleDone() {
 
 const GRADES = [["astar", "A*"], ["a", "A"], ["b", "B"], ["c", "C"], ["d", "D"], ["e", "E"], ["f", "F"], ["g", "G"]];
 
-function chips(t) {
+function chips(t, mine = null) {
   if (!t) return `<p class="ai-muted">Not published for this component.</p>`;
   return `<div class="pv-th">${GRADES.filter(([k]) => t[`grade_${k}`] != null).map(([k, g]) =>
-    `<span class="pv-th-g" data-g="${g}"><b>${g}</b>${t[`grade_${k}`]}</span>`).join("")}</div>`;
+    `<span class="pv-th-g${g === mine ? " is-mine" : ""}" data-g="${g}"><b>${g}</b>${t[`grade_${k}`]}</span>`).join("")}</div>`;
 }
 
 function gradeFor(t, score) {
   if (!t || score == null) return null;
   for (const [k, g] of GRADES) if (t[`grade_${k}`] != null && score >= t[`grade_${k}`]) return g;
   return "U";
+}
+
+/** Marks still needed for the next grade up (null at the top grade). */
+function toNext(t, score) {
+  const up = GRADES.filter(([k]) => t[`grade_${k}`] != null && t[`grade_${k}`] > score)
+    .map(([k, g]) => [g, t[`grade_${k}`]]);
+  return up.length ? { g: up[up.length - 1][0], need: up[up.length - 1][1] - score } : null;
+}
+
+/** The mark range 0..max as coloured grade bands, with the student's mark on it. */
+function ladder(t, score) {
+  if (!t || !t.max_mark) return "";
+  const cuts = GRADES.filter(([k]) => t[`grade_${k}`] != null)
+    .map(([k, g]) => [g, t[`grade_${k}`]]).sort((x, y) => x[1] - y[1]);
+  const bands = [["U", 0, cuts[0]?.[1] ?? t.max_mark]];
+  cuts.forEach(([g, from], i) => bands.push([g, from, cuts[i + 1]?.[1] ?? t.max_mark]));
+  const pct = (v) => Math.max(0, Math.min(100, (v / t.max_mark) * 100));
+  return `<div class="pv-ladder" aria-hidden="true">
+    ${bands.filter(([, a, b]) => b > a).map(([g, a, b]) =>
+      `<span data-g="${g}" style="width:${pct(b - a)}%" title="${g}: ${a}–${b}"><i>${g}</i></span>`).join("")}
+    ${score != null ? `<em class="pv-ladder-me" style="left:${pct(score)}%"></em>` : ""}
+  </div>`;
 }
 
 let TH = null;
@@ -261,15 +283,18 @@ function renderMarks(panel) {
     <div class="ai-head"><div><b>Marks &amp; grades</b> <span>${esc(S.short)}</span></div>
       <button type="button" class="ai-x" data-act="close" aria-label="Close panel">✕</button></div>
     <div class="ai-body pv-marks">
-      <form class="pv-score" data-marks>
-        <label>Your mark<input type="number" min="0" inputmode="numeric" name="score"
-               value="${p.score ?? ""}" placeholder="e.g. 52"></label>
-        <span aria-hidden="true">/</span>
-        <label>Out of<input type="number" min="1" inputmode="numeric" name="max"
-               value="${p.max_score ?? ""}"></label>
-        <button type="submit" class="ai-btn">Save</button>
-      </form>
-      <p class="pv-grade" id="pv-grade" aria-live="polite"></p>
+      <section class="pv-card pv-entry">
+        <h4 class="pv-h">Your score</h4>
+        <form class="pv-score" data-marks>
+          <label>Your mark<input type="number" min="0" inputmode="numeric" name="score"
+                 value="${p.score ?? ""}" placeholder="e.g. 52"></label>
+          <span aria-hidden="true">/</span>
+          <label>Out of<input type="number" min="1" inputmode="numeric" name="max"
+                 value="${p.max_score ?? ""}"></label>
+          <button type="submit" class="ai-btn pv-save">Save</button>
+        </form>
+        <div class="pv-result" id="pv-grade" aria-live="polite"></div>
+      </section>
       <div id="pv-th"><p class="ai-muted">Loading the official grade thresholds…</p></div>
     </div>`;
   const form = panel.querySelector("[data-marks]");
@@ -286,32 +311,64 @@ function renderMarks(panel) {
       paintGrade(panel);
     } catch (err) { toast(`Couldn't save: ${err.message}`); }
   };
-  thresholds().then(({ comp, opts }) => {
-    const box = panel.querySelector("#pv-th");
-    if (!box) return;
-    box.innerHTML = `
-      <h4 class="pv-h">This paper · official Cambridge thresholds${comp ? ` · out of ${comp.max_mark}` : ""}</h4>
-      ${chips(comp)}
-      ${opts.length ? `<h4 class="pv-h">Overall grade (weighted total)</h4>${opts.map((o) => `
-        <div class="pv-opt"><span><b>${esc(o.option_code)}</b> ${esc(o.components)} · out of ${o.max_mark}</span>
-        ${chips(o)}</div>`).join("")}
-        <p class="ai-muted">Cambridge scales each paper before comparing with the overall
-          boundaries — the <a href="/grade-calculator.html">Grade Calculator</a> does that for you.</p>` : ""}`;
-    // The official maximum first: adding up the questions overcounts papers
-    // with optional questions (e.g. "answer two of Section B").
-    if (!form.max.value) form.max.value = comp?.max_mark || S.totalMarks || "";
+  form.oninput = () => paintGrade(panel);          // live preview while typing
+  thresholds().then(() => {
+    if (!form.max.value) form.max.value = TH.comp?.max_mark || S.totalMarks || "";
     paintGrade(panel);
   });
 }
 
+/** The typed (or saved) mark scaled onto the component's official maximum. */
+function current(panel) {
+  const form = panel.querySelector("[data-marks]");
+  const score = parseInt(form?.score.value, 10), max = parseInt(form?.max.value, 10);
+  if (Number.isNaN(score) || Number.isNaN(max) || max <= 0 || score < 0 || score > max) return null;
+  const off = TH?.comp?.max_mark;
+  return { score, max, scaled: off ? Math.round(score * off / max) : score,
+           saved: V.progress?.score === score && V.progress?.max_score === max };
+}
+
 function paintGrade(panel) {
   const out = panel.querySelector("#pv-grade");
-  const p = V.progress;
-  if (!out || !p || p.score == null || !TH?.comp) { if (out) out.textContent = ""; return; }
-  // Thresholds are on the component's own maximum: scale if the student used another total.
-  const scaled = p.max_score && TH.comp.max_mark ? Math.round(p.score * TH.comp.max_mark / p.max_score) : p.score;
-  const g = gradeFor(TH.comp, scaled);
-  out.innerHTML = `${p.score}/${p.max_score} = grade <b>${g}</b> on this paper's ${S.sessionName} ${S.year} thresholds.`;
+  const box = panel.querySelector("#pv-th");
+  if (!out || !TH) return;
+  const c = current(panel);
+  const comp = TH.comp;
+  const g = c && comp ? gradeFor(comp, c.scaled) : null;
+  if (!c) {
+    out.innerHTML = `<p class="pv-result-empty">Type your mark to see your grade on this paper's
+      ${esc(S.sessionName)} ${S.year} thresholds.</p>`;
+  } else {
+    const next = comp && g !== "A*" ? toNext(comp, c.scaled) : null;
+    out.innerHTML = `
+      <div class="pv-result-card" data-g="${g || ""}">
+        <span class="pv-result-grade">${g || "–"}</span>
+        <div class="pv-result-text">
+          <b>${c.score} / ${c.max} <small>· ${Math.round((c.score / c.max) * 100)}%</small></b>
+          <span>${comp ? `Grade ${g} on the ${esc(S.sessionName)} ${S.year} thresholds`
+                       : "No official thresholds for this paper"}</span>
+          ${next ? `<span class="pv-next">${next.need} more mark${next.need === 1 ? "" : "s"} for ${next.g}</span>` : ""}
+        </div>
+        <span class="pv-saved ${c.saved ? "is-saved" : ""}">${c.saved ? "✓ Saved" : "Not saved"}</span>
+      </div>`;
+  }
+  if (box) {
+    box.innerHTML = `
+      <section class="pv-card">
+        <h4 class="pv-h">This paper · official thresholds${comp ? ` <span>out of ${comp.max_mark}</span>` : ""}</h4>
+        ${ladder(comp, c ? c.scaled : null)}
+        ${chips(comp, g)}
+      </section>
+      ${TH.opts.length ? `<section class="pv-card">
+        <h4 class="pv-h">Overall grade · weighted total</h4>
+        ${TH.opts.map((o) => `
+          <div class="pv-opt"><div class="pv-opt-head"><span class="pv-opt-code">${esc(o.option_code)}</span>
+            <span>Papers ${esc(o.components)} · out of ${o.max_mark}</span></div>
+          ${chips(o)}</div>`).join("")}
+        <p class="pv-foot">Cambridge scales each paper before comparing with the overall boundaries.</p>
+        <a class="pv-calc" href="/grade-calculator.html?syllabus=${encodeURIComponent(S.syllabus)}">🧮 Predict my overall grade →</a>
+      </section>` : ""}`;
+  }
 }
 
 // ── Events ──────────────────────────────────────────────────────────────────

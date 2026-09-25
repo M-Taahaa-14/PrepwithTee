@@ -39,8 +39,8 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260927c"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260927c"    # the site-wide styles.css pin
+CSS_V = "20260927d"       # bump with catalog.css / catalog.js (immutable caching)
+STYLES_V = "20260927d"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's

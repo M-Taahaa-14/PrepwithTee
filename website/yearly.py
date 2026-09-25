@@ -28,7 +28,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260927c"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260927d"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year

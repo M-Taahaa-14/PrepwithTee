@@ -10,7 +10,7 @@
  */
 import { api } from "/auth.js?v=20260927b";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260927b";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
 import { createAnnotator } from "/annotate.js?v=20260927b";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
@@ -108,7 +108,7 @@ async function open() {
   shell();
   const ann = createAnnotator({ mount: document.body });
   pane = new PdfPane(document.getElementById("vw-stage"), {
-    questions,
+    questions, ranged: true, uniform: true,      // first page long before the whole file
     onPageEl: (el, n) => ann.attach(el, `booklet:${S.id}`, n),
     onPage: (n) => { document.getElementById("vw-pn").textContent = n; },
     onZoom: (label) => { document.getElementById("vw-z").textContent = label; },
@@ -141,7 +141,7 @@ async function showPart(which) {
   pane = panes[which] || pane;
   if (which === "ms" && !panes.ms) {
     panes.ms = new PdfPane(ms, {
-      questions: [],
+      questions: [], ranged: true, uniform: true,
       onPageEl: (el, n) => annotator.attach(el, `booklet:${S.id}:ms`, n),
       onPage: (n) => { if (part === "ms") document.getElementById("vw-pn").textContent = n; },
       onZoom: (label) => { document.getElementById("vw-z").textContent = label; },

@@ -304,3 +304,14 @@
 
 /* the pen bar steps aside while the answer drawer is open */
 .mq.sheet-open ~ .an-bar, .mq.sheet-open ~ .an-fab { display: none; }
+
+/* intro: the paper downloads before Start is allowed (the clock never runs on "Loading…") */
+.mq-prep { display: grid; gap: .4rem; margin: .2rem 0 .4rem; }
+.mq-prep-bar { height: 8px; border-radius: 999px; background: var(--cream); border: 1px solid var(--line); overflow: hidden; }
+.mq-prep-bar i { display: block; height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--gold)); transition: width .25s ease; }
+.mq-prep span { font-size: .8rem; color: var(--grey); font-variant-numeric: tabular-nums; }
+.mq-prep.is-ready .mq-prep-bar i { background: var(--green-ink); }
+.mq-prep.is-ready span { color: var(--green-ink); font-weight: 700; }
+.mq-go[disabled] { opacity: .6; cursor: progress; }
+.mq-muted { margin: 0; color: var(--grey); }

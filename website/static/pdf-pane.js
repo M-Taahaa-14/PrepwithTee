@@ -26,6 +26,11 @@ export class PdfPane {
    *   chips      draw chips beside pages (default true when questions exist)
    *   gutter     px kept free beside the page on wide screens (chips column)
    *   onPage(n) / onQuestion(q) / onZoom(label)   callbacks
+   *   ranged     fetch only the byte ranges the visible pages need (the server
+   *              answers Range requests), so page 1 shows long before a 5-10 MB
+   *              booklet has finished downloading; later pages load as you scroll
+   *   uniform    every page has page 1's size (generated booklets are all A4) -
+   *              skips reading every page before the first can be drawn
    */
   constructor(stage, opts = {}) {
     this.stage = stage;
@@ -33,6 +38,8 @@ export class PdfPane {
     this.chips = opts.chips ?? this.questions.length > 0;
     this.gutter = opts.gutter;
     this.chipHTML = opts.chipHTML;             // (q) => html, replaces the default chips
+    this.ranged = !!opts.ranged;
+    this.uniform = !!opts.uniform;
     this.on = { page: opts.onPage, question: opts.onQuestion, zoom: opts.onZoom,
                 pageEl: opts.onPageEl };       // (el, n) for every page laid out: annotations
     this.doc = null; this.base = null; this.scale = 1; this.fit = 1; this.fitted = true;
@@ -41,12 +48,16 @@ export class PdfPane {
     stage.addEventListener("scroll", debounce(() => this._onScroll(), 60));
   }
 
-  async load(url) {
-    this.doc = await pdfjsLib.getDocument({ url, withCredentials: true, ...PDF_OPTS }).promise;
+  /** `src` is a URL, or a document (promise) the caller already started loading. */
+  async load(src) {
+    const lazy = this.ranged ? { disableAutoFetch: true, disableStream: true, rangeChunkSize: 262144 } : {};
+    this.doc = await (typeof src === "string"
+      ? pdfjsLib.getDocument({ url: src, withCredentials: true, ...PDF_OPTS, ...lazy }).promise : src);
     // Pages can differ: Cambridge mark schemes are a portrait cover followed by
     // landscape (rotated) tables. Size every page, fit to the widest.
-    const pages = await Promise.all(
-      Array.from({ length: this.doc.numPages }, (_, i) => this.doc.getPage(i + 1)));
+    const pages = this.uniform
+      ? Array(this.doc.numPages).fill(await this.doc.getPage(1))
+      : await Promise.all(Array.from({ length: this.doc.numPages }, (_, i) => this.doc.getPage(i + 1)));
     this.sizes = pages.map((p) => {
       const v = p.getViewport({ scale: 1 });
       return { w: v.width, h: v.height };

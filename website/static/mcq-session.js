@@ -16,7 +16,7 @@
  */
 import { api } from "/auth.js?v=20260927b";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
-import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260927b";
+import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260927d";
 import { createAnnotator } from "/annotate.js?v=20260927b";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -42,7 +42,7 @@ const S = {
   filter: "all",
   elapsed: 0, running: false, paused: false, tick: null, lastBeat: 0,
   qtime: {},             // qid -> seconds spent (sent with the answer)
-  pane: null, ann: null, queue: Promise.resolve(), drawer: false,
+  pane: null, ann: null, queue: Promise.resolve(), drawer: false, ready: false,
 };
 const Q = () => S.d.questions;
 const cur = () => Q()[S.i];
@@ -69,8 +69,62 @@ async function boot() {
   shell();
   S.ann = createAnnotator({ mount: document.body });
   S.ann.setVisible(false);                     // appears with the paper, not on intro/results
-  if (!submitted() && S.elapsed === 0) intro();
-  else { render(); if (!submitted()) startClock(); }
+  if (submitted()) { render(); return; }
+  if (S.elapsed === 0) intro();
+  else preparing();                            // resuming: the paper loads before the clock runs
+  await preload((done, total) => paintPrep(done, total));
+  S.ready = true;
+  if (S.elapsed === 0) paintPrep(1, 1);
+  else { render(); startClock(); }
+}
+
+// ── Preload: every question (or the whole paper) is fetched BEFORE the clock
+// starts, so no time is spent looking at "Loading question…". ────────────────
+let paperDoc = null;
+async function preload(progress) {
+  if (S.d.pdf_url) {
+    paperDoc = pdfjsLib.getDocument({ url: S.d.pdf_url, withCredentials: true, ...PDF_OPTS }).promise;
+    progress(0, 1);
+    try { const d = await paperDoc; await d.getPage(1); } catch { paperDoc = null; }
+    progress(1, 1);
+    return;
+  }
+  const qs = Q();
+  let next = 0, done = 0;
+  progress(0, qs.length);
+  const worker = async () => {
+    while (next < qs.length) {
+      const q = qs[next++];
+      try { await (await cropDoc(q.qid)).getPage(1); } catch { /* the PNG fallback covers it */ }
+      progress(++done, qs.length);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(6, qs.length) }, worker));
+}
+
+function paintPrep(done, total) {
+  const box = document.getElementById("mq-prep");
+  if (!box) return;
+  const ready = S.ready;
+  const pct = total ? Math.round((done / total) * 100) : 100;
+  box.querySelector("i").style.width = `${ready ? 100 : pct}%`;
+  box.querySelector("span").textContent = ready ? "Paper ready ✓"
+    : S.d.pdf_url ? "Loading the question paper…" : `Loading questions… ${done}/${total}`;
+  box.classList.toggle("is-ready", !!ready);
+  const go = document.querySelector("[data-act=begin]");
+  if (go) {
+    go.disabled = !ready;
+    go.textContent = ready ? go.dataset.label : "Preparing your paper…";
+  }
+}
+
+function preparing() {
+  document.getElementById("mq-main").innerHTML = `
+    <div class="mq-intro"><div class="mq-intro-card">
+      <p class="vw-eyebrow">Welcome back</p><h1>${esc(S.d.title)}</h1>
+      <p class="mq-muted">Your clock is paused while the paper loads.</p>
+      <div class="mq-prep" id="mq-prep"><div class="mq-prep-bar"><i></i></div><span>Loading…</span></div>
+    </div></div>`;
 }
 
 // ── Shell ───────────────────────────────────────────────────────────────────
@@ -173,7 +227,9 @@ function intro() {
           <li>Flag questions to come back to. Switch between Paper and One-by-one whenever you like.</li>
           <li>Draw on the paper with the pen bar at the bottom. Keys: <kbd>A</kbd>–<kbd>D</kbd> answer, <kbd>←</kbd><kbd>→</kbd> move, <kbd>F</kbd> flag.</li>
         </ul>
-        <button type="button" class="vw-btn mq-go" data-act="begin">Start ${mins ? `· ${mins}:00` : ""}</button>
+        <div class="mq-prep" id="mq-prep"><div class="mq-prep-bar"><i></i></div><span>Loading questions…</span></div>
+        <button type="button" class="vw-btn mq-go" data-act="begin" disabled
+          data-label="Start ${mins ? `· ${mins}:00` : ""}">Preparing your paper…</button>
       </div>
     </div>`;
   renderSheet();
@@ -199,7 +255,7 @@ function renderPaper(main) {
       onQuestion: (q) => { if (q) setCurrent(q.n - 1, false); },
       onPageEl: (el, n) => S.ann.attach(el, `mcq:${S.d.id}:q0`, n),
     });
-    S.pane.load(S.d.pdf_url).then(() => S.pane.scrollToQuestion(S.i + 1)).catch((e) => {
+    S.pane.load(paperDoc || S.d.pdf_url).then(() => S.pane.scrollToQuestion(S.i + 1)).catch((e) => {
       stage.innerHTML = `<p class="mq-empty">Couldn't load the paper: ${esc(e.message)}</p>`;
     });
   } else {
@@ -248,14 +304,16 @@ function scrollToQ(i, smooth = true) {
 
 // Vector crop of one question, fitted to its box (PDF.js; sharp at any zoom).
 const cropDocs = new Map();
+function cropDoc(qid) {
+  if (!cropDocs.has(qid)) {
+    cropDocs.set(qid, pdfjsLib.getDocument({ url: `/api/question/${qid}/crop.pdf`, ...PDF_OPTS }).promise);
+  }
+  return cropDocs.get(qid);
+}
 async function drawCrop(box, qid) {
   const w = box.clientWidth;
   if (!w) return;
-  let doc = cropDocs.get(qid);
-  if (!doc) {
-    doc = pdfjsLib.getDocument({ url: `/api/question/${qid}/crop.pdf`, ...PDF_OPTS }).promise;
-    cropDocs.set(qid, doc);
-  }
+  const doc = cropDoc(qid);
   try {
     const page = await (await doc).getPage(1);
     const base = page.getViewport({ scale: 1 });
@@ -796,7 +854,10 @@ root.addEventListener("click", (e) => {
   const op = t.closest("[data-open]");
   if (op) return openPanelFor(+op.dataset.n, op.dataset.open);
   const act = t.closest("[data-act]")?.dataset.act;
-  if (act === "begin") { root.classList.remove("is-intro"); beat(true); render(); startClock(); }
+  if (act === "begin") {
+    if (!S.ready) return;                       // the clock never runs on an unloaded paper
+    root.classList.remove("is-intro"); beat(true); render(); startClock();
+  }
   else if (act === "pause") togglePause();
   else if (act === "submit") submit();
   else if (act === "prev") setCurrent(S.i - 1, true);

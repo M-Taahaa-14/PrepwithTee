@@ -24,7 +24,7 @@ from datetime import date
 import fitz
 
 from . import config, db, heuristics, setup_logging
-from .compose import (Booklet, brand_backdrop, footer_band, fetch_sections,
+from .compose import (Booklet, save_small, brand_backdrop, footer_band, fetch_sections,
                       answer_key, bubble_sheet,
                       _centre, _wrap, PAGE_W, PAGE_H, MARGIN_X, CONTENT_W,
                       ACCENT, GOLD, GREY, CREAM,
@@ -509,8 +509,8 @@ def main():
     ms_path = base.with_name(base.stem + "_ms.pdf")
     base.parent.mkdir(parents=True, exist_ok=True)
 
-    test_doc.save(base, deflate=True, garbage=3)
-    ms_doc.save(ms_path, deflate=True, garbage=3)
+    save_small(test_doc, base)
+    save_small(ms_doc, ms_path)
     total_m = sum(q["marks"] or 0 for q in chosen)
     log.info("test: %s  (%d questions, %d marks, %d pages)",
              base, len(chosen), total_m, test_doc.page_count)
