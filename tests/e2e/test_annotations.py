@@ -94,12 +94,25 @@ def test_pen_select_text_and_partial_eraser(student, shots):
     page.locator('.an-bar [data-tool="line"]').click()
     lx, ly = box["x"] + 100, box["y"] + 600
     page.mouse.move(lx, ly); page.mouse.down(); page.mouse.move(lx + 300, ly, steps=8); page.mouse.up()
-    eraser = page.locator('.an-bar [data-tool="eraser"]')
-    eraser.click()
-    eraser.click()                                         # second tap: options
-    page.locator('.an-bar [data-erase="partial"]').click()
+    page.locator('.an-bar [data-tool="eraser"]').click()
+    # the eraser's own options replace colour/thickness while it is on
+    opts = page.locator(".an-eraseopts")
+    expect(opts).to_be_visible()
+    expect(page.locator(".an-bar .an-swatch")).to_be_hidden()
+    opts.get_by_role("radio", name="Partial").click()
+    opts.get_by_role("radio", name="Large eraser").click()
+    expect(opts.get_by_role("radio", name="Large eraser")).to_have_attribute("aria-checked", "true")
     _stroke(cdp, [(lx + 150, ly - 25), (lx + 150, ly), (lx + 150, ly + 25)])
     page.wait_for_timeout(1200)
     lines = [x for x in _strokes(student, pid) if x["t"] != "text"]
     assert len(lines) == 2 and all(x.get("pts") for x in lines), lines
     page.screenshot(path=str(shots / "annotations.png"))
+
+    # 5. whole-object mode removes a touched stroke entirely
+    opts.get_by_role("radio", name="Whole object").click()
+    _stroke(cdp, [(lx + 40, ly - 20), (lx + 40, ly), (lx + 40, ly + 20)])
+    page.wait_for_timeout(1200)
+    assert len([x for x in _strokes(student, pid) if x["t"] != "text"]) == 1
+    page.locator('.an-bar [data-tool="pen"]').click()
+    expect(opts).to_be_hidden()
+    expect(page.locator(".an-bar .an-swatch")).to_be_visible()

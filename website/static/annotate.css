@@ -33,14 +33,18 @@
 .an-pop [data-color].is-on { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--c); }
 .an-pop [data-size] i { width: var(--d); height: var(--d); border-radius: 50%; background: var(--ink); display: block; }
 .an-pop [data-size].is-on { background: var(--lav); }
-.an-bar [data-tool="eraser"] { position: relative; }
-.an-mode { position: absolute; right: 4px; bottom: 3px; font-size: 14px; line-height: 0; color: var(--lav-ink); }
-.an-pop-list { flex-direction: column; gap: 4px; min-width: 15rem; }
-.an-bar .an-pop-list button { width: 100%; height: auto; border-radius: 10px; display: grid; gap: 2px; justify-items: start;
-  text-align: left; padding: .5rem .65rem; color: var(--ink); }
-.an-pop-list b { font: 700 .84rem/1.2 "Hanken Grotesk", sans-serif; }
-.an-pop-list span { font-size: .72rem; color: var(--grey); }
-.an-bar .an-pop-list button.is-on { background: var(--lav); }
+/* eraser options: shown in place of colour/thickness while the eraser is on */
+.an-eraseopts { display: flex; align-items: center; gap: 6px; }
+.an-eraseopts[hidden], .an-inkopt[hidden] { display: none; }
+.an-seg { display: flex; background: var(--cream); border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.an-bar .an-seg button { width: auto; height: 28px; border-radius: 999px; padding: 0 .7rem; white-space: nowrap;
+  font: 700 .74rem/1 "Hanken Grotesk", sans-serif; color: var(--grey); }
+.an-bar .an-seg button[aria-checked="true"] { background: var(--accent); color: var(--on-accent); }
+.an-esizes { display: flex; gap: 1px; }
+.an-bar .an-esizes button { width: 30px; }
+.an-esizes i { display: block; width: var(--d); height: var(--d); border-radius: 50%; border: 1.5px solid var(--grey); }
+.an-bar .an-esizes button[aria-checked="true"] { background: var(--lav); }
+.an-bar .an-esizes button[aria-checked="true"] i { border-color: var(--lav-ink); background: var(--white); }
 .an-bar .an-del { color: var(--pink-ink); }
 .an-bar .an-del[hidden] { display: none; }
 .an-saved { font-size: .72rem; color: var(--green-ink); min-width: 0; max-width: 9rem; white-space: nowrap;

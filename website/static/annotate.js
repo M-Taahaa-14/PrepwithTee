@@ -4,8 +4,10 @@
  *   ann.attach(pageEl, "paper:123", 4);   // any positioned element = one "page"
  *
  * Tools: pointer (scroll/click), select (move · edit text · delete · recolour),
- * pen, highlighter, eraser (partial - cuts through strokes and shapes - or
- * whole objects), line, arrow, rectangle, ellipse, text; 6 colours, 3 sizes;
+ * pen, highlighter, eraser, line, arrow, rectangle, ellipse, text; 6 colours,
+ * 3 sizes. While the eraser is on, the bar shows its own options in place of
+ * colour/thickness: Partial (cuts through strokes and shapes) | Whole object,
+ * and three eraser sizes;
  * undo/redo; clear page. Strokes are stored as fractions of the page (so zoom
  * never matters) and saved per page to /api/annotations, debounced.
  *
@@ -41,7 +43,7 @@ const ICON = {
 };
 const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
 const TOOLS = [["pointer", "Pointer — scroll and click (V)"], ["select", "Select — move, edit, delete (S)"],
-  ["pen", "Pen (P)"], ["marker", "Highlighter (H)"], ["eraser", "Eraser (E) — tap again for options"]];
+  ["pen", "Pen (P)"], ["marker", "Highlighter (H)"], ["eraser", "Eraser (E)"]];
 const SHAPES = [["line", "Line"], ["arrow", "Arrow"], ["rect", "Rectangle"],
   ["ellipse", "Ellipse"], ["text", "Text (T)"]];
 const DRAWS = new Set(["select", "pen", "marker", "eraser", "line", "arrow", "rect", "ellipse", "text"]);
@@ -57,7 +59,7 @@ async function req(method, url, body) {
 
 export function createAnnotator({ mount = document.body, position = "bottom" } = {}) {
   const A = {
-    tool: "pointer", color: COLORS[0], size: 1, collapsed: false, eraseMode: "partial",
+    tool: "pointer", color: COLORS[0], size: 1, collapsed: false, eraseMode: "partial", eraseSize: 1,
     docs: new Map(),      // doc -> Promise<{page: strokes[]}>
     pages: new Map(),     // `${doc}|${page}` -> { el, canvas, strokes, doc, page }
     undo: [], redo: [], saveTimers: new Map(), penSeen: false, listeners: new Set(),
@@ -69,6 +71,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     if (s.size >= 0 && s.size < SIZES.length) A.size = s.size;
     if (s.pos === "top" || s.pos === "bottom") position = s.pos;
     if (s.erase === "stroke" || s.erase === "partial") A.eraseMode = s.erase;
+    if (s.esize >= 0 && s.esize < ERASER_R.length) A.eraseSize = s.esize;
   } catch { /* storage may be blocked */ }
 
   // ── toolbar ────────────────────────────────────────────────────────────────
@@ -80,14 +83,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
   bar.innerHTML = `
     <button type="button" class="an-grip" data-an="grip" title="Drag to move · double-click to flip top/bottom"
             aria-label="Move toolbar">${svg("grip")}</button>
-    <div class="an-group">${TOOLS.map(([k, t]) => k === "eraser" ? `
-      <div class="an-pop-wrap">
-        <button type="button" data-tool="eraser" title="${t}" aria-label="${t}" aria-pressed="false">${svg("eraser")}<b class="an-mode"></b></button>
-        <div class="an-pop an-pop-list" data-pop="eraser" hidden>
-          <button type="button" data-erase="partial"><b>Partial eraser</b><span>Rub out just the part you touch</span></button>
-          <button type="button" data-erase="stroke"><b>Object eraser</b><span>Remove a whole stroke or shape</span></button>
-        </div>
-      </div>` : `
+    <div class="an-group">${TOOLS.map(([k, t]) => `
       <button type="button" data-tool="${k}" title="${t}" aria-label="${t}" aria-pressed="false">${svg(k)}</button>`).join("")}
     </div>
     <span class="an-sep" aria-hidden="true"></span>
@@ -95,13 +91,25 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
       <button type="button" data-tool="${k}" title="${t}" aria-label="${t}" aria-pressed="false">${svg(k)}</button>`).join("")}
     </div>
     <span class="an-sep" aria-hidden="true"></span>
-    <div class="an-pop-wrap">
+    <div class="an-eraseopts" role="group" aria-label="Eraser options" hidden>
+      <div class="an-seg" role="radiogroup" aria-label="Eraser type">
+        <button type="button" role="radio" data-erase="partial" aria-checked="true"
+                title="Rub out just the part you touch">Partial</button>
+        <button type="button" role="radio" data-erase="stroke" aria-checked="false"
+                title="Remove a whole stroke, shape or text box">Whole object</button>
+      </div>
+      <div class="an-esizes" role="radiogroup" aria-label="Eraser size">${ERASER_R.map((_, i) => `
+        <button type="button" role="radio" data-esize="${i}" aria-checked="false"
+                title="${["Small", "Medium", "Large"][i]} eraser" aria-label="${["Small", "Medium", "Large"][i]} eraser"><i style="--d:${6 + i * 5}px"></i></button>`).join("")}
+      </div>
+    </div>
+    <div class="an-pop-wrap an-inkopt">
       <button type="button" class="an-swatch" data-an="colors" title="Colour" aria-label="Colour"
               aria-haspopup="true" aria-expanded="false"><i></i></button>
       <div class="an-pop" data-pop="colors" hidden>${COLORS.map((c) => `
         <button type="button" data-color="${c}" style="--c:${c}" aria-label="Colour ${c}"></button>`).join("")}</div>
     </div>
-    <div class="an-pop-wrap">
+    <div class="an-pop-wrap an-inkopt">
       <button type="button" class="an-size" data-an="sizes" title="Thickness" aria-label="Thickness"
               aria-haspopup="true" aria-expanded="false"><i></i></button>
       <div class="an-pop" data-pop="sizes" hidden>${SIZES.map((_, i) => `
@@ -131,7 +139,8 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     try {
       const s = JSON.parse(localStorage.getItem("pwt-annot") || "{}");
       localStorage.setItem("pwt-annot", JSON.stringify({ ...s, color: A.color, size: A.size,
-                                                         pos: bar.dataset.pos, erase: A.eraseMode }));
+                                                         pos: bar.dataset.pos, erase: A.eraseMode,
+                                                         esize: A.eraseSize }));
     } catch { /* ignore */ }
   }
 
@@ -142,10 +151,11 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     bar.querySelector(".an-size i").style.setProperty("--d", `${4 + A.size * 4}px`);
     bar.querySelectorAll("[data-color]").forEach((b) => b.classList.toggle("is-on", b.dataset.color === A.color));
     bar.querySelectorAll("[data-size]").forEach((b) => b.classList.toggle("is-on", +b.dataset.size === A.size));
-    bar.querySelectorAll("[data-erase]").forEach((b) => b.classList.toggle("is-on", b.dataset.erase === A.eraseMode));
-    bar.querySelector(".an-mode").textContent = A.eraseMode === "partial" ? "" : "•";
-    bar.querySelector('[data-tool="eraser"]').title =
-      `${A.eraseMode === "partial" ? "Partial" : "Object"} eraser (E) — tap again for options`;
+    bar.querySelectorAll("[data-erase]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.erase === A.eraseMode)));
+    bar.querySelectorAll("[data-esize]").forEach((b) => b.setAttribute("aria-checked", String(+b.dataset.esize === A.eraseSize)));
+    const erasing = A.tool === "eraser";                     // eraser options replace colour/thickness
+    bar.querySelector(".an-eraseopts").hidden = !erasing;
+    bar.querySelectorAll(".an-inkopt").forEach((el) => { el.hidden = erasing; });
     bar.querySelector('[data-an="undo"]').disabled = !A.undo.length;
     bar.querySelector('[data-an="redo"]').disabled = !A.redo.length;
     bar.querySelector('[data-an="delete"]').hidden = !A.sel;
@@ -181,17 +191,12 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
 
   bar.addEventListener("click", (e) => {
     const er = e.target.closest("[data-erase]");
-    if (er) { A.eraseMode = er.dataset.erase; persist(); closePops(); A.tool = "eraser"; return paintBar(); }
+    if (er) { A.eraseMode = er.dataset.erase; persist(); return paintBar(); }
+    const es = e.target.closest("[data-esize]");
+    if (es) { A.eraseSize = +es.dataset.esize; persist(); return paintBar(); }
     const t = e.target.closest("[data-tool]");
     if (t) {
       const k = t.dataset.tool;
-      if (k === "eraser" && A.tool === "eraser") {            // second tap: eraser options
-        const pop = bar.querySelector('[data-pop="eraser"]');
-        const open = pop.hidden;
-        closePops();
-        pop.hidden = !open;
-        return;
-      }
       return setTool(A.tool === k && k !== "pointer" ? "pointer" : k);
     }
     const c = e.target.closest("[data-color]");
@@ -336,7 +341,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
     if (A.sel?.key === p.key && p.strokes[A.sel.i]) drawSelection(ctx, p.strokes[A.sel.i], w, h);
     if (p.eraserAt && A.tool === "eraser") {
       ctx.beginPath();
-      ctx.arc(p.eraserAt[0] * w, p.eraserAt[1] * h, ERASER_R[A.size] * w, 0, Math.PI * 2);
+      ctx.arc(p.eraserAt[0] * w, p.eraserAt[1] * h, ERASER_R[A.eraseSize] * w, 0, Math.PI * 2);
       ctx.strokeStyle = "rgba(120,120,140,.8)";
       ctx.lineWidth = 1;
       ctx.stroke();
@@ -671,7 +676,7 @@ export function createAnnotator({ mount = document.body, position = "bottom" } =
 
   // ── eraser ─────────────────────────────────────────────────────────────────
   function eraseAt(p, q, w, h) {
-    const r = ERASER_R[A.size];
+    const r = ERASER_R[A.eraseSize];
     const k = h / w;
     let changed = false;
     const out = [];

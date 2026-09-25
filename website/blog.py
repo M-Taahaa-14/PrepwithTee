@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260927e"  # keep in sync with styles.css version pin
+_CSS_V = "20260927f"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
