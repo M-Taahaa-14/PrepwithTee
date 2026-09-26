@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260927l"  # keep in sync with styles.css version pin
+_CSS_V = "20260928a"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -331,7 +331,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
   <meta property="og:url"         content="{_html.escape(canonical)}">
   <meta name="twitter:card"       content="summary_large_image">
   {ld}
-  <link rel="icon" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={_CSS_V}">
@@ -341,7 +341,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
 {_nav()}
 <main class="{main_class}">{body}</main>
 {_foot()}
-<script src="/main.js?v=20260927k"></script>
+<script src="/main.js?v=20260928a"></script>
 <script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260927k"></script>

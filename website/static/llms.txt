@@ -1,0 +1,29 @@
+# PrepWithTee
+
+> Cambridge O Level, IGCSE and A Level exam prep from Lahore: topical past papers with official mark schemes, papers by year, instantly marked MCQ practice, revision notes, study tools and one-on-one tutoring.
+
+Every past-paper question is a crop of the original Cambridge PDF, classified by syllabus chapter. Pages behind sign-in (dashboards, paper viewers, the AI tutor) are for enrolled students.
+
+## Past papers
+
+- [Topical past papers](https://prepwithtee.com/papers): pick a board and subject, then build a booklet by chapter and subtopic
+- [O Level](https://prepwithtee.com/papers/o-level): Maths 4024, Physics 5054, Chemistry 5070, Computer Science 2210
+- [IGCSE](https://prepwithtee.com/papers/igcse): Maths 0580, Physics 0625, Chemistry 0620, Computer Science 0478
+- [AS & A Level](https://prepwithtee.com/papers/a-level): Maths 9709, Physics 9702, Computer Science 9618
+- [Papers by year](https://prepwithtee.com/yearly): every sitting with its mark scheme
+- [MCQ practice](https://prepwithtee.com/mcq): timed multiple-choice papers, marked instantly
+
+## Study resources
+
+- [Revision notes](https://prepwithtee.com/notes): chapter-by-chapter notes on the current syllabus
+- [Formula sheets](https://prepwithtee.com/formulas.html)
+- [Command words](https://prepwithtee.com/command-words.html)
+- [Study tools](https://prepwithtee.com/tools.html): calculator, graph plotter, grade calculator, pseudocode runner, periodic table
+- [Photo Solver](https://prepwithtee.com/solver): photograph a question for a worked solution, or check your own working
+- [Blog](https://prepwithtee.com/blog)
+
+## Tutoring
+
+- [Pricing](https://prepwithtee.com/pricing.html)
+- [Our teachers](https://prepwithtee.com/teachers.html)
+- [Contact / book a free demo lesson](https://prepwithtee.com/contact.html)

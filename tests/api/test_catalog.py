@@ -68,7 +68,7 @@ def test_subject_page_is_readable_without_js(client):
     assert '"@type": "BreadcrumbList"' in html
     # chapter names are in the HTML itself (the SEO value), no question images
     assert "Motion" in _text(html)
-    assert "/api/question/" not in html and ".png" not in html.replace("logo.png", "")
+    assert "/api/question/" not in html and ".png" not in html.replace("logo.png", "").replace("favicon-32.png", "").replace("apple-touch-icon.png", "")
     assert r.headers["cache-control"].startswith("public")
 
 

@@ -674,7 +674,7 @@ select, input[type="number"] { border: 1.5px solid var(--line); border-radius: 1
 .footer-wa-head { font-weight: 700; color: #fff; font-size: .92rem; margin-bottom: 3px; }
 .footer-wa-sub { color: #6e7d9b; font-size: .81rem; }
 .footer-wa-btn { display: inline-flex; align-items: center; gap: 8px;
-  background: #25D366; color: #fff; text-decoration: none;
+  background: #25D366; color: #053b22;  /* dark text: white on this green is 2:1 */ text-decoration: none;
   padding: 10px 20px; border-radius: 8px; font-weight: 700;
   font-size: .86rem; white-space: nowrap; flex-shrink: 0;
   transition: background .15s, transform .15s; }

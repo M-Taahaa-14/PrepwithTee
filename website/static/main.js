@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Choice modal HTML ----
   const choiceHTML = `
-<div class="bk-choice" id="bkChoice" aria-hidden="true">
+<div class="bk-choice" id="bkChoice" aria-hidden="true" inert>
   <div class="bkc-backdrop" id="bkChoiceBackdrop"></div>
   <div class="bkc-inner" role="dialog" aria-labelledby="bkcTitle">
     <button class="bkc-close" id="bkChoiceClose" aria-label="Close">&times;</button>
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- Booking form panel HTML ----
   const panelHTML = `
-<div class="bk-panel" id="bkPanel" aria-hidden="true">
+<div class="bk-panel" id="bkPanel" aria-hidden="true" inert>
   <div id="bkBody">
     <div class="fb-panel-head">
       <div>
@@ -257,20 +257,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openChoice() {
     choice.classList.add("open");
-    choice.setAttribute("aria-hidden", "false");
+    choice.setAttribute("aria-hidden", "false"); choice.inert = false;
   }
   function closeChoice() {
     choice.classList.remove("open");
-    choice.setAttribute("aria-hidden", "true");
+    choice.setAttribute("aria-hidden", "true"); choice.inert = true;
   }
   function openPanel() {
     closeChoice();
     bkPanel.classList.add("open");
-    bkPanel.setAttribute("aria-hidden", "false");
+    bkPanel.setAttribute("aria-hidden", "false"); bkPanel.inert = false;
   }
   function closePanel() {
     bkPanel.classList.remove("open");
-    bkPanel.setAttribute("aria-hidden", "true");
+    bkPanel.setAttribute("aria-hidden", "true"); bkPanel.inert = true;
     document.getElementById("bkBody").hidden = false;
     document.getElementById("bkThanks").hidden = true;
     document.getElementById("bkForm").reset();
@@ -416,7 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </button>`;
 
     const panelHTML = `
-<div class="fb-panel" id="fbPanel" aria-hidden="true">
+<div class="fb-panel" id="fbPanel" aria-hidden="true" inert>
   <div id="fbBody">
     <div class="fb-type-tabs">
       <button class="fb-type-tab active" data-type="feedback">Feedback</button>
@@ -515,11 +515,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openPanel() {
       panel.classList.add("open");
-      panel.setAttribute("aria-hidden", "false");
+      panel.setAttribute("aria-hidden", "false"); panel.inert = false;
     }
     function closePanel() {
       panel.classList.remove("open");
-      panel.setAttribute("aria-hidden", "true");
+      panel.setAttribute("aria-hidden", "true"); panel.inert = true;
     }
 
     tabBtn.addEventListener("click", () =>

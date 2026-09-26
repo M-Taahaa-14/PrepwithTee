@@ -40,7 +40,7 @@ router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
 CSS_V = "20260927l"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260927i"    # the site-wide styles.css pin
+STYLES_V = "20260928a"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
@@ -373,7 +373,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
   <meta property="og:url" content="{_e(canonical)}">
   <meta property="og:image" content="{SITE_ORIGIN}/logo.png">
   {ld_html}
-  <link rel="icon" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={STYLES_V}">
@@ -388,7 +388,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 </main>
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
-<script src="/main.js?v=20260927k"></script>
+<script src="/main.js?v=20260928a"></script>
 <script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260927k"></script>

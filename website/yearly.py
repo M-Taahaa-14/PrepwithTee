@@ -411,7 +411,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
   <meta name="robots" content="noindex">
   <script>try{{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
   <title>{_e(title)} — PrepWithTee</title>
-  <link rel="icon" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css?v={_catalog.STYLES_V}">
@@ -433,7 +433,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260927k"></script>
+<script src="/main.js?v=20260928a"></script>
 <script type="module" src="/auth.js?v=20260927k"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 </body>
