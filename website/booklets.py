@@ -354,8 +354,13 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
     if not pdf.exists():                       # swept: rebuild in the background
         _ensure_files(b, user)
         raise HTTPException(409, "This paper is being rebuilt - it will open in a moment.")
+    # "Last opened" - what retention counts from. At most once a day: touching the
+    # file changes its ETag / Last-Modified, and PDF.js loads it in byte ranges, so
+    # a touch mid-session made the browser stitch ranges of two "versions"
+    # ("Bad end offset"). A day's granularity is plenty for a 30-day rule.
     try:
-        os.utime(pdf)                          # "last opened" - what retention counts from
+        if time.time() - pdf.stat().st_mtime > 86400:
+            os.utime(pdf)
     except OSError:
         pass
     name = (re.sub(r"[^A-Za-z0-9]+", "-", b["title"] or booklet_id).strip("-")[:80]
