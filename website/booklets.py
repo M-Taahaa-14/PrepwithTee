@@ -19,6 +19,14 @@ Two kinds (tutor, 2026-09-27 - the old papers.html Test Builder moved here):
 pipeline.testgen, exam-style cover and the mark scheme as a SEPARATE file
 ({id}_ms.pdf) that the viewer keeps locked until the student finishes.
 
+Retention (tutor's call, 2026-09-26): a built PDF is kept for 30 days after it
+was LAST OPENED (every open refreshes the file's mtime), then sweep() deletes
+the file only. The booklet row keeps its question ids, so opening an old link
+rebuilds the same paper in the same order - the status endpoint notices the
+missing file and queues the rebuild, and the viewer shows its normal loader.
+Builds write to a temporary name and are swapped in atomically, so two workers
+rebuilding at once can never serve a half-written file.
+
 The PDF is built by `python -m pipeline.compose --ids ...` in a worker thread,
 exactly as /api/generate shells out: the CLI is the tested interface. Its
 PROGRESS lines drive the loader. Status lives in the database, not in memory,
@@ -32,6 +40,7 @@ import secrets
 import subprocess
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -57,7 +66,62 @@ MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
 VIEWER_V = "20260927k"          # bump with viewer.css / viewer.js / builder.js
 
+RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
+SWEEP_EVERY_S = 6 * 3600
+
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
+
+
+# ── Retention ─────────────────────────────────────────────────────────────────
+
+def _pdf_paths(b: dict) -> list[Path]:
+    paths = [BOOKLET_DIR / f"{b['id']}.pdf"]
+    if (b.get("params_json") or {}).get("kind") == "test":
+        paths.append(BOOKLET_DIR / f"{b['id']}_ms.pdf")
+    return paths
+
+
+def sweep(now: float | None = None, days: int | None = None) -> int:
+    """Delete built PDFs (and page maps) not opened for `days`; returns how many."""
+    cutoff = (now or time.time()) - (days if days is not None else RETENTION_DAYS) * 86400
+    n = 0
+    if not BOOKLET_DIR.exists():
+        return 0
+    for f in BOOKLET_DIR.iterdir():
+        if f.suffix not in (".pdf", ".json") or ".tmp-" in f.name:
+            continue
+        try:
+            if f.stat().st_mtime < cutoff:
+                f.unlink()
+                n += 1
+        except OSError:
+            pass                                   # already gone / in use: next sweep
+    return n
+
+
+def _sweeper() -> None:
+    while True:
+        time.sleep(SWEEP_EVERY_S)
+        try:
+            n = sweep()
+            if n:
+                print(f"[booklets] retention sweep removed {n} file(s)", flush=True)
+        except Exception as exc:                   # never let the loop die
+            print(f"[booklets] retention sweep failed: {exc}", flush=True)
+
+
+if os.environ.get("APP_ENV") != "test":
+    threading.Thread(target=_sweeper, name="booklet-sweep", daemon=True).start()
+
+
+def _ensure_files(b: dict, user: dict) -> dict:
+    """A ready booklet whose PDF was swept: queue the rebuild (same ids, same order)."""
+    if b["status"] == "ready" and not all(p.exists() for p in _pdf_paths(b)):
+        _udb.update_booklet(b["id"], {"status": "queued", "progress": 0,
+                                      "stage": "Rebuilding your paper"})
+        _EXEC.submit(_build, b["id"], user, False)
+        b = {**b, "status": "queued", "progress": 0, "stage": "Rebuilding your paper"}
+    return b
 
 
 # ── Request models ────────────────────────────────────────────────────────────
@@ -273,7 +337,7 @@ def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)
 
 @router.get("/api/booklets/{booklet_id}/status")
 def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
-    b = _owned(booklet_id, user)
+    b = _ensure_files(_owned(booklet_id, user), user)
     return {"status": b["status"], "progress": b["progress"], "stage": b.get("stage"),
             "error": b.get("error")}
 
@@ -287,10 +351,13 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
     if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
         raise HTTPException(404, "No such part")
     pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
-    if not pdf.exists():                       # cleaned up: rebuild from the stored ids
-        _build(booklet_id, user, record=False)
-    if not pdf.exists():
-        raise HTTPException(500, "Could not rebuild this booklet.")
+    if not pdf.exists():                       # swept: rebuild in the background
+        _ensure_files(b, user)
+        raise HTTPException(409, "This paper is being rebuilt - it will open in a moment.")
+    try:
+        os.utime(pdf)                          # "last opened" - what retention counts from
+    except OSError:
+        pass
     name = (re.sub(r"[^A-Za-z0-9]+", "-", b["title"] or booklet_id).strip("-")[:80]
             + ("-mark-scheme" if part == "ms" else "") + ".pdf")
     return FileResponse(pdf, media_type="application/pdf", filename=name,
@@ -321,8 +388,12 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
         return
     params = b["params_json"] or {}
     BOOKLET_DIR.mkdir(parents=True, exist_ok=True)
-    pdf = BOOKLET_DIR / f"{booklet_id}.pdf"
-    pmap = BOOKLET_DIR / f"{booklet_id}.json"
+    final = BOOKLET_DIR / f"{booklet_id}.pdf"
+    final_ms = BOOKLET_DIR / f"{booklet_id}_ms.pdf"
+    final_map = BOOKLET_DIR / f"{booklet_id}.json"
+    tag = f".tmp-{os.getpid()}-{threading.get_ident()}"
+    pdf = BOOKLET_DIR / f"{booklet_id}{tag}.pdf"            # written here, then swapped in
+    pmap = BOOKLET_DIR / f"{booklet_id}{tag}.json"
     test = _kind(b) == "test"
     topics = "|".join(p["chapter"] for p in params.get("picks", []))
     ids = ",".join(str(i) for i in b["question_ids"])
@@ -370,6 +441,12 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
         if rc != 0 or not pdf.exists():
             raise RuntimeError(" | ".join(tail[-3:]) or f"{cmd[2]} exited {rc}")
         page_map = json.loads(pmap.read_text("utf-8")) if pmap.exists() else None
+        tmp_ms = pdf.with_name(pdf.stem + "_ms.pdf")          # testgen's companion file
+        if test:
+            os.replace(tmp_ms, final_ms)
+        os.replace(pdf, final)
+        if pmap.exists():
+            os.replace(pmap, final_map)
         _udb.update_booklet(booklet_id, {"status": "ready", "progress": 100,
                                          "stage": "Ready", "page_map_json": page_map,
                                          "error": None})
@@ -377,6 +454,8 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
             _access.record_quota(user, _event(_kind(b)))   # only successful builds count
     except Exception as exc:                              # surface, never hang the loader
         print(f"[booklet {booklet_id}] build failed: {exc}", flush=True)
+        for leftover in BOOKLET_DIR.glob(f"{booklet_id}{tag}*"):
+            leftover.unlink(missing_ok=True)
         _udb.update_booklet(booklet_id, {"status": "failed", "stage": "Failed",
                                          "error": "We couldn't build this paper. "
                                                   "Please try again."})

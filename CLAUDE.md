@@ -509,6 +509,11 @@ linked), not agreement with any external file.
     (**migration 023 must be run on Supabase before deploying it**) - memory M+/M−/MR/MC,
     Ans, variables A-F (STO), DEG/RAD, last 200 calculations per account; guests keep
     the same in localStorage `pwt-calc`, merged in on sign-in.
+    **Booklet retention**: built PDFs are deleted 30 days after they were last OPENED
+    (`booklets.sweep()`, every 6 h in each worker; opening = `os.utime`); the row keeps
+    the ids, so an old link's status call queues a rebuild of the same paper. Builds
+    write `{id}.tmp-<pid>-<thread>.pdf` and `os.replace` it in (two workers can rebuild
+    at once). `BOOKLET_RETENTION_DAYS` overrides.
 
 ## Ground rules for future sessions
 

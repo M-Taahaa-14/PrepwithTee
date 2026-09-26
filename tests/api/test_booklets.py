@@ -146,3 +146,49 @@ def test_practice_booklet_has_no_separate_mark_scheme(client, enrolled):
     assert wait_ready(client, b["id"])["status"] == "ready"
     assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 404
     assert client.get(f"/api/booklets/{b['id']}").json()["kind"] == "booklet"
+
+
+def test_retention_sweeps_unopened_pdfs_and_reopening_rebuilds(client, enrolled):
+    import os
+    import booklets as bk
+    b = client.post("/api/booklets", json={**PHYS, "max_questions": 3}).json()
+    assert wait_ready(client, b["id"])["status"] == "ready"
+    ids = client.get(f"/api/booklets/{b['id']}").json()
+    pdf = bk.BOOKLET_DIR / f"{b['id']}.pdf"
+    assert pdf.exists() and not list(bk.BOOKLET_DIR.glob(f"{b['id']}.tmp-*"))
+
+    # opening it refreshes "last opened"
+    old = pdf.stat().st_mtime - 40 * 86400
+    os.utime(pdf, (old, old))
+    assert client.get(f"/api/booklets/{b['id']}/pdf").status_code == 200
+    assert pdf.stat().st_mtime > old + 39 * 86400
+
+    # not opened for 40 days: swept (a fresh file is left alone)
+    os.utime(pdf, (old, old))
+    assert bk.sweep() >= 1 and not pdf.exists()
+    assert bk.sweep() == 0
+
+    # the old link still works: status notices, rebuilds the same paper in the same order
+    st = client.get(f"/api/booklets/{b['id']}/status").json()
+    assert st["status"] in ("queued", "building", "ready")
+    assert wait_ready(client, b["id"])["status"] == "ready"
+    assert pdf.exists()
+    again = client.get(f"/api/booklets/{b['id']}").json()
+    assert again["params_json"] == ids["params_json"]
+    assert client.get(f"/api/booklets/{b['id']}/pdf").status_code == 200
+
+
+def test_swept_mock_test_rebuilds_both_files(client, enrolled):
+    import os
+    import booklets as bk
+    b = client.post("/api/booklets", json={**PHYS, "max_questions": 2, "kind": "test"}).json()
+    assert wait_ready(client, b["id"])["status"] == "ready"
+    ms = bk.BOOKLET_DIR / f"{b['id']}_ms.pdf"
+    old = ms.stat().st_mtime - 40 * 86400
+    for f in (ms, bk.BOOKLET_DIR / f"{b['id']}.pdf"):
+        os.utime(f, (old, old))
+    bk.sweep()
+    assert not ms.exists()
+    assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 409   # being rebuilt
+    assert wait_ready(client, b["id"])["status"] == "ready"
+    assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 200
