@@ -539,6 +539,14 @@ linked), not agreement with any external file.
     message and all later - they used to stay in the DB); chat search; "which AI help"
     card; drifting maths-symbol background. **tests/conftest.py now deletes its temp dir
     at exit** - 120 leftover 90 MB copies had filled C: (2026-09-26).
+    **P3 landing demo**: "See it in action" section on index.html (after the numbers
+    band) = `static/demo-player.js/.css` playing `static/demos/how-it-works/timeline.json`
+    (9 real screenshots in a tablet frame; crossfade, zoom about the cursor, click
+    ripple, captions, 5 chapter buttons; plays only on screen, pauses on hover/focus/
+    hidden tab, reduced motion = manual frames; poster <img> without JS). **Re-capture
+    after UI changes**: `.venv\Scripts\python scripts\capture_demo_shots.py` against the
+    local server (demo student "Ayesha Khan", paper 37 for stored explanations); it
+    asserts every cursor target is on screen. Viewer stages scroll, not the window.
 
 ## Ground rules for future sessions
 

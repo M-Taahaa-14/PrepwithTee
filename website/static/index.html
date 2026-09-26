@@ -92,6 +92,7 @@
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b">
   <link rel="stylesheet" href="tools.css?v=20260927j">
 
+  <link rel="stylesheet" href="demo-player.css?v=20260927l" media="print" onload="this.media='all'">
 </head>
 
 <body>
@@ -166,6 +167,17 @@
     </div>
   </section>
 
+
+  <!-- ============ SEE IT IN ACTION (demo-player.js; shots from scripts/capture_demo_shots.py) ============ -->
+  <section class="section demo-section" id="see-it">
+    <div class="container">
+      <p class="eyebrow reveal centered">See it in action</p>
+      <h2 class="section-title reveal centered">From a blank page to a<br>marked paper in <em>a minute.</em></h2>
+      <div class="dp" data-demo="/demos/how-it-works/timeline.json" role="region" aria-label="How PrepWithTee works - a short demo">
+        <img src="/demos/how-it-works/04-booklet.jpg" alt="A topical booklet built on PrepWithTee" loading="lazy" width="1280" height="800" style="width:100%;height:auto;border-radius:18px">
+      </div>
+    </div>
+  </section>
 
   <!-- ============ JOURNEY LADDER ============ -->
   <section class="section journey-section">
@@ -1126,6 +1138,7 @@ if (window.innerWidth >= 768) {
       startAuto();
     })();
   </script>
+  <script type="module" src="demo-player.js?v=20260927l"></script>
 </body>
 
 </html>

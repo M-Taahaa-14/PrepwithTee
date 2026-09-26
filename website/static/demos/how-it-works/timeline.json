@@ -1,0 +1,133 @@
+{
+  "title": "How PrepWithTee works",
+  "w": 1280,
+  "h": 800,
+  "steps": [
+    {
+      "shot": "01-board.jpg",
+      "caption": "Pick your board and enrol in your subjects \u2014 free.",
+      "chapter": "Choose",
+      "cursor": [
+        0.1176,
+        0.7124
+      ],
+      "click": true,
+      "zoom": null,
+      "dur": 3200
+    },
+    {
+      "shot": "02-chapters.jpg",
+      "caption": "Tick the chapters you need \u2014 or just a few subtopics.",
+      "chapter": "Build",
+      "cursor": [
+        0.0967,
+        0.9036
+      ],
+      "click": true,
+      "zoom": null,
+      "dur": 3200
+    },
+    {
+      "shot": "03-picked.jpg",
+      "caption": "Mix up to four chapters. Every question is a real Cambridge one.",
+      "chapter": "Build",
+      "cursor": [
+        0.7891,
+        0.9296
+      ],
+      "click": true,
+      "zoom": {
+        "x": 0.7891,
+        "y": 0.9296,
+        "s": 1.35
+      },
+      "dur": 3200
+    },
+    {
+      "shot": "04-booklet.jpg",
+      "caption": "Your paper is built in seconds - a proper booklet with a cover and contents.",
+      "chapter": "Practise",
+      "cursor": null,
+      "click": false,
+      "zoom": null,
+      "dur": 2600
+    },
+    {
+      "shot": "05-question.jpg",
+      "caption": "Real Cambridge questions, with the official mark scheme after each one.",
+      "chapter": "Practise",
+      "cursor": [
+        0.8711,
+        0.268
+      ],
+      "click": false,
+      "zoom": {
+        "x": 0.8711,
+        "y": 0.268,
+        "s": 1.12
+      },
+      "dur": 3200
+    },
+    {
+      "shot": "06-explain-chip.jpg",
+      "caption": "Stuck? Ask for a step-by-step explanation.",
+      "chapter": "Understand",
+      "cursor": [
+        0.8711,
+        0.3703
+      ],
+      "click": true,
+      "zoom": {
+        "x": 0.8711,
+        "y": 0.3703,
+        "s": 1.15
+      },
+      "dur": 3200
+    },
+    {
+      "shot": "07-explain.jpg",
+      "caption": "Every explanation is checked against the official mark scheme.",
+      "chapter": "Understand",
+      "cursor": null,
+      "click": false,
+      "zoom": {
+        "x": 0.78,
+        "y": 0.5,
+        "s": 1.2
+      },
+      "dur": 4200
+    },
+    {
+      "shot": "08-marks.jpg",
+      "caption": "Log your mark \u2014 see your grade on Cambridge's own thresholds.",
+      "chapter": "Track",
+      "cursor": [
+        0.8285,
+        0.4398
+      ],
+      "click": false,
+      "zoom": {
+        "x": 0.8285,
+        "y": 0.4398,
+        "s": 1.25
+      },
+      "dur": 3200
+    },
+    {
+      "shot": "09-progress.jpg",
+      "caption": "Every paper you finish is ticked off, with your score.",
+      "chapter": "Track",
+      "cursor": [
+        0.748,
+        0.9334
+      ],
+      "click": false,
+      "zoom": {
+        "x": 0.748,
+        "y": 0.9334,
+        "s": 1.15
+      },
+      "dur": 3800
+    }
+  ]
+}
