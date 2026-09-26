@@ -88,3 +88,30 @@
 /* scratch layer over a whole web page (every non-PDF page; never saved) */
 .an-viewport { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
 .an-viewport .an-layer:not(.is-active) { pointer-events: none; }
+
+/* instruments: ruler + protractor (annotate.js) - see-through, draggable, rotatable */
+.an-inst { position: absolute; z-index: 7; pointer-events: auto; touch-action: none; cursor: grab;
+  user-select: none; -webkit-user-select: none; filter: drop-shadow(0 4px 10px rgba(20, 20, 40, .18)); }
+.an-inst:active { cursor: grabbing; }
+.an-inst-svg { display: block; overflow: visible; }
+.an-inst-body { fill: rgba(255, 252, 236, .72); stroke: rgba(60, 60, 90, .55); stroke-width: 1; }
+.an-inst-ticks line { stroke: #2b2b40; stroke-width: .8; }
+.an-inst-ticks text { fill: #2b2b40; text-anchor: middle; font-family: "Hanken Grotesk", system-ui, sans-serif; font-weight: 600; }
+.an-inst-ticks .an-inst-inner { fill: #b0326e; font-weight: 500; }
+.an-inst-unit { fill: #5a5a72; font: 600 9px "Hanken Grotesk", sans-serif; }
+.an-inst-base { stroke: #2b2b40; stroke-width: 1; }
+.an-inst-centre { fill: #dc2626; }
+.an-inst-rot { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #7c5cf0;
+  background: #fff; cursor: alias; padding: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, .25); }
+.an-inst-ruler .an-inst-rot { right: -26px; top: 50%; margin-top: -10px; }
+.an-inst-protractor .an-inst-rot { right: -24px; bottom: -6px; }
+.an-inst-deg { position: absolute; left: 50%; transform: translateX(-50%); font: 700 11px/1 "Hanken Grotesk", sans-serif;
+  color: #fff; background: #7c5cf0; border-radius: 999px; padding: 3px 7px; pointer-events: none; white-space: nowrap; }
+.an-inst-ruler .an-inst-deg { bottom: -22px; }
+.an-inst-protractor .an-inst-deg { top: 34%; }
+.an-inst-x { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 0; background: #2b2b40;
+  color: #fff; font: 700 13px/1 system-ui; cursor: pointer; padding: 0; }
+.an-inst-ruler .an-inst-x { left: -26px; top: 50%; margin-top: -10px; }
+.an-inst-protractor .an-inst-x { left: -24px; bottom: -6px; }
+.an-viewport .an-inst { pointer-events: auto; }
+.an-insts { display: flex; gap: 2px; }

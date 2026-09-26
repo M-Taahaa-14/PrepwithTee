@@ -20,6 +20,10 @@
  * Scratch mode (createAnnotator({ persist: false }) + attachViewport()): one
  * layer over the whole web page, ink moving with the content as you scroll,
  * NEVER saved - main.js puts it on every page that isn't a PDF viewer.
+ * Instruments (not saved): a 15 cm ruler and a 180° protractor, drawn to the
+ * paper's real scale (A4, or A4 landscape for mark schemes; CSS cm on web pages).
+ * Drag to move, drag the round handle to rotate (1° steps, Shift = 15°). A pen or
+ * highlighter stroke that starts on a ruler edge snaps to a straight line along it.
  * Keys: V pointer · S select · P pen · H highlighter · E eraser · T text ·
  *       Delete remove selection · Ctrl+Z / Ctrl+Y.
  */
@@ -42,6 +46,8 @@ const ICON = {
   clear: '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>',
   trash: '<path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
   collapse: '<path d="M6 9l6 6 6-6"/>',
+  ruler: '<rect x="2.5" y="8" width="19" height="8" rx="1.2" transform="rotate(-30 12 12)"/><path d="M8.6 7.4l1 1.7M11.2 5.9l1.5 2.6M13.8 4.4l1 1.7" transform="translate(-1.2 4.6)"/>',
+  protractor: '<path d="M3 17a9 9 0 0118 0z"/><path d="M12 17l4.5-6.5"/><path d="M7 17a5 5 0 0110 0"/>',
   grip: '<circle cx="9" cy="7" r="1.2"/><circle cx="15" cy="7" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="17" r="1.2"/><circle cx="15" cy="17" r="1.2"/>',
 };
 const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
@@ -93,6 +99,11 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     <span class="an-sep" aria-hidden="true"></span>
     <div class="an-group an-shapes">${SHAPES.map(([k, t]) => `
       <button type="button" data-tool="${k}" title="${t}" aria-label="${t}" aria-pressed="false">${svg(k)}</button>`).join("")}
+    </div>
+    <span class="an-sep" aria-hidden="true"></span>
+    <div class="an-group an-insts">
+      <button type="button" data-inst="ruler" title="Ruler — drag, rotate; draw along its edge" aria-label="Ruler" aria-pressed="false">${svg("ruler")}</button>
+      <button type="button" data-inst="protractor" title="Protractor — drag, rotate to measure angles" aria-label="Protractor" aria-pressed="false">${svg("protractor")}</button>
     </div>
     <span class="an-sep" aria-hidden="true"></span>
     <div class="an-eraseopts" role="group" aria-label="Eraser options" hidden>
@@ -198,6 +209,8 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     if (er) { A.eraseMode = er.dataset.erase; persist(); return paintBar(); }
     const es = e.target.closest("[data-esize]");
     if (es) { A.eraseSize = +es.dataset.esize; persist(); return paintBar(); }
+    const inst = e.target.closest("[data-inst]");
+    if (inst) return toggleInstrument(inst.dataset.inst);
     const t = e.target.closest("[data-tool]");
     if (t) {
       const k = t.dataset.tool;
@@ -574,7 +587,11 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       if (A.tool === "select") return startSelect(p, q, w, h, e);
       const sw = SIZES[A.size];
       if (A.tool === "eraser") { p.erasing = { before: null }; p.eraserAt = q; eraseAt(p, q, w, h); }
-      else if (A.tool === "pen" || A.tool === "marker") p.live = { t: A.tool, c: A.color, w: sw, pts: [q] };
+      else if (A.tool === "pen" || A.tool === "marker") {
+        const snap = rulerSnap(p, e);
+        p.live = { t: A.tool, c: A.color, w: sw, pts: [snap ? snap.project(q) : q] };
+        p.snap = snap;
+      }
       else p.live = { t: A.tool, c: A.color, w: sw, a: q.slice(0, 2), b: q.slice(0, 2) };
       schedule(p);
     });
@@ -600,7 +617,8 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
         else if (p.drag) moveSelect(p, q);
         else if (p.live.pts) {
           const last = p.live.pts[p.live.pts.length - 1];
-          if (Math.hypot(q[0] - last[0], q[1] - last[1]) > 0.0008) p.live.pts.push(q);
+          const qq = p.snap ? p.snap.project(q) : q;
+          if (Math.hypot(qq[0] - last[0], qq[1] - last[1]) > 0.0008) p.live.pts.push(qq);
         } else p.live.b = q.slice(0, 2);
       }
       schedule(p, !!(p.erasing || p.drag));
@@ -617,6 +635,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       } else if (p.live) {
         const s = p.live;
         p.live = null;
+        p.snap = null;
         const tiny = s.a && Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) < 0.004;
         if (!tiny) {
           const before = p.strokes.slice();
@@ -897,6 +916,176 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     window.addEventListener("scroll", () => schedule(p, true), { passive: true });
     paintLayer(p);
     return p;
+  }
+
+  // ── instruments: ruler + protractor (on screen only, never saved) ──────────
+  const INST = { ruler: null, protractor: null };           // kind -> { p, el, x, y, deg }
+
+  /** Pixels per millimetre on this page, at the paper's real size. */
+  function pxPerMm(p) {
+    if (p.view) return 96 / 25.4;                               // a web page: CSS millimetres
+    const w = p.el.clientWidth, h = p.el.clientHeight;
+    return w / (w > h ? 297 : 210);                             // A4, or A4 landscape
+  }
+
+  function nearestPage() {
+    let best = null, bestD = Infinity;
+    for (const p of A.pages.values()) {
+      if (!p.el.isConnected) continue;
+      const r = p.el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) continue;
+      const d = Math.abs((Math.max(r.top, 0) + Math.min(r.bottom, window.innerHeight)) / 2 - window.innerHeight / 2);
+      if (d < bestD) { best = p; bestD = d; }
+    }
+    return best;
+  }
+
+  function toggleInstrument(kind) {
+    if (INST[kind]) { INST[kind].el.remove(); INST[kind] = null; paintInstButtons(); return; }
+    const p = nearestPage();
+    if (!p) return flash("Open a page first");
+    const r = p.el.getBoundingClientRect();
+    const vis = { top: Math.max(r.top, 0), bottom: Math.min(r.bottom, window.innerHeight) };
+    const it = { kind, p, deg: 0, x: p.el.clientWidth / 2,
+                 y: (vis.top + vis.bottom) / 2 - r.top + (kind === "protractor" ? 60 : 0) };
+    it.el = document.createElement("div");
+    it.el.className = `an-inst an-inst-${kind}`;
+    it.el.innerHTML = instrumentSVG(kind, pxPerMm(p)) +
+      `<button type="button" class="an-inst-rot" aria-label="Rotate the ${kind}" title="Drag to rotate (Shift: 15° steps)"></button>
+       <span class="an-inst-deg">0°</span>
+       <button type="button" class="an-inst-x" aria-label="Put the ${kind} away" title="Put away">×</button>`;
+    p.el.appendChild(it.el);
+    INST[kind] = it;
+    placeInstrument(it);
+    bindInstrument(it);
+    paintInstButtons();
+  }
+
+  function paintInstButtons() {
+    bar.querySelectorAll("[data-inst]").forEach((b) =>
+      b.setAttribute("aria-pressed", String(!!INST[b.dataset.inst])));
+  }
+
+  function instrumentSVG(kind, k) {
+    if (kind === "ruler") {
+      const L = 150 * k, H = 16 * k, t = [];
+      for (let mm = 0; mm <= 150; mm++) {
+        const x = 6 + mm * k, len = mm % 10 === 0 ? 5 * k : mm % 5 === 0 ? 3.4 * k : 2 * k;
+        t.push(`<line x1="${x}" y1="0" x2="${x}" y2="${len}"/>`);
+        if (mm % 10 === 0) t.push(`<text x="${x}" y="${len + 3.2 * k}">${mm / 10}</text>`);
+      }
+      return `<svg class="an-inst-svg" width="${L + 12}" height="${H}" viewBox="0 0 ${L + 12} ${H}">
+        <rect class="an-inst-body" x="0" y="0" width="${L + 12}" height="${H}" rx="4"/>
+        <g class="an-inst-ticks" style="font-size:${Math.max(8, 2.6 * k)}px">${t.join("")}</g>
+        <text class="an-inst-unit" x="${L + 6}" y="${H - 4}" text-anchor="end">cm</text></svg>`;
+    }
+    const R = 60 * k, pad = 6, t = [];
+    for (let d = 0; d <= 180; d++) {
+      const a = Math.PI - (d * Math.PI) / 180, len = d % 10 === 0 ? 7 * k : d % 5 === 0 ? 4.5 * k : 2.6 * k;
+      const x1 = pad + R + R * Math.cos(a), y1 = pad + R - R * Math.sin(a);
+      const x2 = pad + R + (R - len) * Math.cos(a), y2 = pad + R - (R - len) * Math.sin(a);
+      t.push(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`);
+      if (d % 10 === 0) {
+        const ro = R - 10.5 * k, ri = R - 15.5 * k;
+        const lx = pad + R + ro * Math.cos(a), ly = pad + R - ro * Math.sin(a);
+        const ix = pad + R + ri * Math.cos(a), iy = pad + R - ri * Math.sin(a);
+        t.push(`<text x="${lx.toFixed(1)}" y="${(ly + 1.2 * k).toFixed(1)}">${d}</text>`);
+        t.push(`<text class="an-inst-inner" x="${ix.toFixed(1)}" y="${(iy + 1.2 * k).toFixed(1)}">${180 - d}</text>`);
+      }
+    }
+    return `<svg class="an-inst-svg" width="${2 * R + 2 * pad}" height="${R + pad + 4}" viewBox="0 0 ${2 * R + 2 * pad} ${R + pad + 4}">
+      <path class="an-inst-body" d="M${pad} ${pad + R} A${R} ${R} 0 0 1 ${pad + 2 * R} ${pad + R} Z"/>
+      <g class="an-inst-ticks" style="font-size:${Math.max(7, 2.3 * k)}px">${t.join("")}</g>
+      <line class="an-inst-base" x1="${pad}" y1="${pad + R}" x2="${pad + 2 * R}" y2="${pad + R}"/>
+      <circle class="an-inst-centre" cx="${pad + R}" cy="${pad + R}" r="3"/></svg>`;
+  }
+
+  /** Where the instrument's origin sits inside its SVG (ruler: centre; protractor: centre of the arc). */
+  function origin(it) {
+    const svgEl = it.el.querySelector("svg");
+    const w = +svgEl.getAttribute("width"), h = +svgEl.getAttribute("height");
+    return it.kind === "ruler" ? { ox: w / 2, oy: h / 2, w, h } : { ox: w / 2, oy: h - 4, w, h };
+  }
+
+  function placeInstrument(it) {
+    const { ox, oy } = origin(it);
+    Object.assign(it.el.style, { left: `${it.x - ox}px`, top: `${it.y - oy}px`,
+                                 transformOrigin: `${ox}px ${oy}px`, transform: `rotate(${-it.deg}deg)` });
+    const d = ((Math.round(it.deg) % 360) + 360) % 360;
+    it.el.querySelector(".an-inst-deg").textContent = `${d > 180 ? d - 360 : d}°`;
+  }
+
+  function bindInstrument(it) {
+    const el = it.el;
+    el.querySelector(".an-inst-x").addEventListener("click", () => toggleInstrument(it.kind));
+    el.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".an-inst-x")) return;
+      // Pen/highlighter pressed on a ruler EDGE draws along it (hand the press to
+      // the page underneath); the middle strip still drags the ruler.
+      if (it.kind === "ruler" && (A.tool === "pen" || A.tool === "marker") &&
+          !e.target.closest(".an-inst-rot") && rulerSnap(it.p, e)) {
+        e.preventDefault();
+        it.p.canvas.dispatchEvent(new PointerEvent("pointerdown", {
+          bubbles: true, cancelable: true, clientX: e.clientX, clientY: e.clientY,
+          pointerId: e.pointerId, pointerType: e.pointerType, pressure: e.pressure,
+          button: e.button, buttons: e.buttons, isPrimary: e.isPrimary }));
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      el.setPointerCapture(e.pointerId);
+      const rot = !!e.target.closest(".an-inst-rot");
+      const host = it.p.el.getBoundingClientRect();
+      const start = { x: e.clientX, y: e.clientY, ix: it.x, iy: it.y };
+      const move = (ev) => {
+        if (rot) {
+          const cx = host.left + it.x, cy = host.top + it.y;
+          let deg = -Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180 / Math.PI;
+          deg = ev.shiftKey ? Math.round(deg / 15) * 15 : Math.round(deg);
+          it.deg = deg;
+        } else {
+          it.x = start.ix + ev.clientX - start.x;
+          it.y = start.iy + ev.clientY - start.y;
+        }
+        placeInstrument(it);
+      };
+      const up = () => {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", up);
+        el.removeEventListener("pointercancel", up);
+      };
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
+    });
+  }
+
+  /** If a stroke starts on (or just off) a long edge of the ruler on this page,
+   *  a projector that pins every point onto that edge line. */
+  function rulerSnap(p, e) {
+    const it = INST.ruler;
+    if (!it || it.p !== p) return null;
+    const host = p.el.getBoundingClientRect();
+    const x = e.clientX - host.left, y = e.clientY - host.top;
+    const a = (-it.deg * Math.PI) / 180, ux = Math.cos(a), uy = Math.sin(a);   // along the ruler
+    const nx = -uy, ny = ux;                                                      // across it
+    const half = (16 * pxPerMm(p)) / 2, len = (150 * pxPerMm(p)) / 2 + 6;
+    const dx = x - it.x, dy = y - it.y;
+    const along = dx * ux + dy * uy, across = dx * nx + dy * ny;
+    if (Math.abs(along) > len + 10) return null;
+    const edge = Math.abs(across - half) < Math.abs(across + half) ? half : -half;
+    if (Math.abs(across - edge) > 14) return null;
+    const { w, h } = size(p);
+    const ex = it.x + nx * edge, ey = it.y + ny * edge;          // a point on the edge line
+    return {
+      project(q) {
+        // page fractions -> element px (the whole-page layer is scrolled)
+        const px = q[0] * w - (p.view ? window.scrollX : 0), py = q[1] * h - (p.view ? window.scrollY : 0);
+        const t = (px - ex) * ux + (py - ey) * uy;
+        const sx = ex + t * ux, sy = ey + t * uy;
+        return [(sx + (p.view ? window.scrollX : 0)) / w, (sy + (p.view ? window.scrollY : 0)) / h, q[2]];
+      },
+    };
   }
 
   return {

@@ -11,7 +11,7 @@
 import { api } from "/auth.js?v=20260927k";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
-import { createAnnotator } from "/annotate.js?v=20260927i";
+import { createAnnotator } from "/annotate.js?v=20260927l";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");

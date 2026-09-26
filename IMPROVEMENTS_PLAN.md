@@ -343,7 +343,7 @@ Suspected causes found in `pipeline/compose.py`:
 - Mobile: one question per screen with swipe, bubble bar collapses to a bottom drawer.
 - **Tests**: unit — scoring; E2E — answer 3, submit, review grid shows correct marks against the stored keys (incl. a 2016 paper — proves #5).
 
-### P2-a · #12 Annotation bar — ✅ built locally 2026-09-26 with P1-e (ruler/protractor not yet)
+### P2-a · #12 Annotation bar — ✅ built locally 2026-09-26 with P1-e; ruler + protractor 2026-09-26
 - One floating **horizontal pill** bar (draggable, snaps to top/bottom centre, collapses to a single pen icon). Groups separated by thin dividers: **Pen · Marker · Highlighter · Eraser** | **Ruler · Protractor · Shapes** | **Text** | colour dot + size dot (open small popovers, not inline swatches) | undo/redo | clear.
 - Draws on a canvas layer **per PDF page** (so it scrolls with the page and works in the viewer — the old one skips iframes), saved to `pdf_annotations` per `booklet:<id>`/`paper:<id>` + page.
 - Pressure/smoothing (perfect-freehand-style algorithm, inline), palm rejection for stylus (`pointerType`).

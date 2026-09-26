@@ -150,3 +150,69 @@ def test_scratch_pen_on_every_other_page_is_never_saved(student, shots):
     page.goto(f"/yearly/view/{_paper_id()}")
     expect(page.locator("#pv-qp .vw-pg canvas").first).to_be_visible(timeout=30_000)
     assert page.locator(".an-bar").count() == 1 and page.locator(".an-viewport").count() == 0
+
+
+def test_ruler_snaps_strokes_and_protractor_measures(student, shots):
+    student.request.post("/api/enrollments", data={"syllabus": "5054"})
+    pid = _paper_id()
+    page = student.new_page()
+    page.goto(f"/yearly/view/{pid}")
+    split = page.get_by_role("button", name=re.compile("Side by side"))
+    if split.get_attribute("aria-pressed") == "true":
+        split.click()
+    stage = page.locator("#pv-qp")
+    expect(stage.locator(".vw-pg canvas").first).to_be_visible(timeout=30_000)
+    page.wait_for_timeout(600)
+
+    # ruler: on the page, at the paper's real scale (15 cm of an A4 width)
+    page.locator('.an-bar [data-inst="ruler"]').click()
+    ruler = page.locator(".an-inst-ruler")
+    expect(ruler).to_be_visible()
+    pg_w = stage.locator(".vw-pg").first.bounding_box()["width"]
+    svg_w = float(ruler.locator("svg").get_attribute("width"))
+    assert abs((svg_w - 12) - pg_w * 150 / 210) < 2
+
+    # rotate it with the handle to about -30° (handle dragged down-right)
+    rb = ruler.bounding_box()
+    cx, cy = rb["x"] + rb["width"] / 2, rb["y"] + rb["height"] / 2
+    h = ruler.locator(".an-inst-rot").bounding_box()
+    page.mouse.move(h["x"] + 10, h["y"] + 10); page.mouse.down()
+    import math
+    r = 200
+    page.mouse.move(cx + r * math.cos(math.radians(30)), cy + r * math.sin(math.radians(30)), steps=8)
+    page.mouse.up()
+    expect(ruler.locator(".an-inst-deg")).to_have_text("-30°")
+
+    # a wobbly pen stroke started on the ruler's edge comes out perfectly straight
+    page.locator('.an-bar [data-tool="pen"]').click()
+    cdp = page.context.new_cdp_session(page)
+    ux, uy = math.cos(math.radians(30)), math.sin(math.radians(30))     # along the ruler (screen)
+    nx, ny = -uy, ux                                                      # across it
+    half = ruler.locator("svg").evaluate("s => s.getAttribute('height')")
+    edge = float(half) / 2 + 3
+    pts = [(cx + nx * edge + ux * t + (4 if i % 2 else -4) * nx,
+            cy + ny * edge + uy * t + (4 if i % 2 else -4) * ny) for i, t in enumerate(range(-120, 121, 12))]
+    _stroke(cdp, pts)
+    page.wait_for_timeout(1200)
+    s = [x for x in _strokes(student, pid, page=str(stage.evaluate(
+        "s => [...s.querySelectorAll('.vw-pg')].findIndex(p => p.querySelector('.an-inst')) + 1")))
+         if x["t"] == "pen"][-1]
+    box = stage.locator(".vw-pg").first.bounding_box()
+    xy = [(p[0] * box["width"], p[1] * box["height"]) for p in s["pts"]]
+    (x0, y0), (x1, y1) = xy[0], xy[-1]
+    L = math.hypot(x1 - x0, y1 - y0)
+    dev = max(abs((x - x0) * (y1 - y0) - (y - y0) * (x1 - x0)) / L for x, y in xy)
+    assert L > 200 and dev < 1.0, (L, dev)                     # straight to within a pixel
+    assert abs(math.degrees(math.atan2(y1 - y0, x1 - x0)) - 30) < 1.5
+
+    # protractor: 0-180 both ways; the × puts instruments away
+    page.locator('.an-bar [data-inst="protractor"]').click()
+    prot = page.locator(".an-inst-protractor")
+    expect(prot).to_be_visible()
+    labels = prot.locator("text").evaluate_all("ts => ts.map(t => t.textContent)")
+    assert "0" in labels and "90" in labels and "180" in labels
+    page.screenshot(path=str(shots / "instruments.png"))
+    prot.locator(".an-inst-x").click()
+    ruler.locator(".an-inst-x").click()
+    expect(page.locator(".an-inst")).to_have_count(0)
+    expect(page.locator('.an-bar [data-inst="ruler"]')).to_have_attribute("aria-pressed", "false")

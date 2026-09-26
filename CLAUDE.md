@@ -514,6 +514,10 @@ linked), not agreement with any external file.
     the ids, so an old link's status call queues a rebuild of the same paper. Builds
     write `{id}.tmp-<pid>-<thread>.pdf` and `os.replace` it in (two workers can rebuild
     at once). `BOOKLET_RETENTION_DAYS` overrides.
+    **Ruler + protractor** (annotation bar, never saved): real scale from the page width
+    (A4 210 mm, landscape 297 mm; CSS mm on web pages); drag / rotate handle (1°, Shift 15°);
+    a pen/highlighter press within 14 px of a ruler edge is handed to the page canvas and
+    snaps to the edge line (`rulerSnap`), the ruler's middle strip still drags it.
 
 ## Ground rules for future sessions
 
