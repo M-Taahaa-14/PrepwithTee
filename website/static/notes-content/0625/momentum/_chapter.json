@@ -1,0 +1,18 @@
+{
+  "syllabus_ref": "1.6",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~6–8 marks",
+  "tier_split": "Extended only",
+  "learning_outcomes": [
+    "Define momentum as the product of mass and velocity: p = mv",
+    "Recall and use the equation p = mv, rearranging to find mass or velocity",
+    "State that momentum is a vector quantity with the same direction as velocity",
+    "State the principle of conservation of momentum: total momentum is conserved in the absence of external forces",
+    "Apply conservation of momentum to collisions and explosions in a straight line",
+    "Distinguish between elastic collisions (KE conserved) and inelastic collisions (KE not conserved)",
+    "Define impulse as the product of force and time: impulse = FΔt = Δp",
+    "Use F = Δp/Δt to calculate force, change in momentum or time of contact",
+    "Find the impulse from the area under a force–time graph",
+    "Explain how increasing the time of a collision reduces the force, with examples from crash safety"
+  ]
+}

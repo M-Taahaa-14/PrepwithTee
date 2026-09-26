@@ -1,0 +1,35 @@
+{
+  "description": "Cambridge O Level Islamiat (2058) covers the Holy Quran, Hadith and Sunnah, Islamic beliefs, worship (Ibadat), and the history of early Islam — from the life of the Prophet ﷺ through the first four caliphs.",
+  "study_guide": [
+    "Learn Quranic verses with their surah name and approximate verse number — examiners award marks for citing references correctly.",
+    "For Hadith, always state the narrator or collection (e.g. Bukhari, Muslim, Tirmidhi) when you quote it in an answer.",
+    "For essay questions, structure every point: Reference → Explanation → Relevance to the question.",
+    "Paper 2 history questions ask you to 'evaluate' or 'assess the importance of' — give multiple reasons, then a supported conclusion."
+  ],
+  "papers": {
+    "extended_label": "Paper 1 — Quran, Hadith, Beliefs & Practice",
+    "core_label": "Paper 2 — History of Early Islam",
+    "extended": [
+      {
+        "code": "P1",
+        "name": "Written Paper",
+        "duration": "1 hr 45 min",
+        "marks": 75,
+        "pct": 75,
+        "questions": "5 questions (answer all); Quran, Hadith, Belief, Worship"
+      }
+    ],
+    "core": [
+      {
+        "code": "P2",
+        "name": "Written Paper",
+        "duration": "1 hr 30 min",
+        "marks": 50,
+        "pct": 25,
+        "questions": "5 questions (answer 3); Seerah, early caliphs, spread of Islam"
+      }
+    ]
+  },
+  "color": "#1A6B4A",
+  "emoji": "☪️"
+}

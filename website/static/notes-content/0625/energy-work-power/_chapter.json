@@ -1,0 +1,22 @@
+{
+  "syllabus_ref": "1.7",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~10–14 marks",
+  "tier_split": "Core + Extended",
+  "learning_outcomes": [
+    "Identify and describe different energy stores: gravitational PE, kinetic, chemical, thermal, elastic, nuclear, electromagnetic",
+    "State the principle of conservation of energy: energy cannot be created or destroyed",
+    "Describe energy transfer chains for common situations (falling object, burning fuel, pendulum)",
+    "Draw and interpret Sankey diagrams with arrow widths proportional to energy amounts",
+    "Recall and use W = Fd to calculate work done, force, or distance",
+    "State that work done equals energy transferred and understand the conditions for work to be done",
+    "Find work done from the area under a force–distance graph",
+    "Recall and use P = W/t = E/t to calculate power, energy, or time",
+    "Use P = Fv for an object moving at constant velocity under a constant force (Extended)",
+    "Recall and use ΔE_p = mgΔh for gravitational potential energy",
+    "Recall and use E_k = ½mv² for kinetic energy",
+    "Apply conservation of energy to convert between GPE and KE (with and without energy losses)",
+    "Calculate efficiency as useful energy output ÷ total energy input; use as a fraction or percentage",
+    "Use efficiency = useful power output ÷ total power input (Extended)"
+  ]
+}

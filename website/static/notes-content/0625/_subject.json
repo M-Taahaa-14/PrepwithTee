@@ -1,0 +1,67 @@
+{
+  "description": "Cambridge IGCSE Physics (0625) covers the fundamental principles of physics: mechanics, thermal physics, waves, electricity, magnetism, and nuclear and space physics. The Extended tier adds mathematical depth to every topic.",
+  "study_guide": [
+    "Read each subtopic note, then practise the matching past-paper questions under timed conditions.",
+    "Tick each syllabus learning outcome on the chapter checklist once you can answer it from memory.",
+    "Focus on command words: State = one fact; Describe = several sentences; Explain = give reasons; Calculate = show all working.",
+    "Extended tier students must also master the Supplement subtopics (marked with a blue badge)."
+  ],
+  "papers": {
+    "extended_label": "Extended tier (Papers 2, 4, 6)",
+    "core_label": "Core tier (Papers 1, 3, 5)",
+    "extended": [
+      {
+        "code": "P2",
+        "name": "Multiple Choice (Extended)",
+        "duration": "45 min",
+        "marks": 40,
+        "pct": 30,
+        "questions": "40 MCQ questions"
+      },
+      {
+        "code": "P4",
+        "name": "Theory (Extended)",
+        "duration": "1 h 15 min",
+        "marks": 80,
+        "pct": 50,
+        "questions": "Structured and free-response"
+      },
+      {
+        "code": "P6",
+        "name": "Alternative to Practical (Extended)",
+        "duration": "1 h",
+        "marks": 40,
+        "pct": 20,
+        "questions": "Practical skills and data analysis"
+      }
+    ],
+    "core": [
+      {
+        "code": "P1",
+        "name": "Multiple Choice (Core)",
+        "duration": "45 min",
+        "marks": 30,
+        "pct": 30,
+        "questions": "30 MCQ questions"
+      },
+      {
+        "code": "P3",
+        "name": "Theory (Core)",
+        "duration": "1 h 15 min",
+        "marks": 80,
+        "pct": 50,
+        "questions": "Structured questions"
+      },
+      {
+        "code": "P5",
+        "name": "Alternative to Practical (Core)",
+        "duration": "1 h",
+        "marks": 40,
+        "pct": 20,
+        "questions": "Practical skills"
+      }
+    ]
+  },
+  "color": "#1d4ed8",
+  "emoji": "⚛️"
+}

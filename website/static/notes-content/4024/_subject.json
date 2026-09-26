@@ -1,0 +1,35 @@
+{
+  "description": "Cambridge O Level Mathematics D (4024) develops algebraic, geometric and statistical reasoning across two papers. Paper 1 is non-calculator; Paper 2 allows a scientific calculator and demands structured written working.",
+  "study_guide": [
+    "Sketch graphs freehand first — a correctly shaped curve with key points labelled earns method marks even if the plot is imperfect.",
+    "Show every step of working in Paper 2; method marks are available independently of the final answer.",
+    "After solving an equation algebraically, substitute your answer back in to verify it is correct.",
+    "Memorise key graph shapes, their equations and features (intercepts, asymptotes, turning points) — they appear across every series."
+  ],
+  "papers": {
+    "extended_label": "Paper 1 — Non-calculator (Short Answer)",
+    "core_label": "Paper 2 — Calculator (Structured & Free-response)",
+    "extended": [
+      {
+        "code": "P1",
+        "name": "Paper 1",
+        "duration": "2 hours",
+        "marks": 80,
+        "pct": 44,
+        "questions": "~26 short-answer questions; no calculator"
+      }
+    ],
+    "core": [
+      {
+        "code": "P2",
+        "name": "Paper 2",
+        "duration": "2 hr 30 min",
+        "marks": 100,
+        "pct": 56,
+        "questions": "~12 structured questions; scientific calculator allowed"
+      }
+    ]
+  },
+  "color": "#7C3AED",
+  "emoji": "🔢"
+}

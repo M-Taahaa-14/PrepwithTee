@@ -359,7 +359,7 @@ Suspected causes found in `pipeline/compose.py`:
 - Save every `=` to `calc_history`; M, M+, M−, MR, MC, Ans and variables A-F to `calc_state`. History panel: unlimited scroll (last 200), tap to reuse, clear. Works as a guest via localStorage and merges when the guest logs in.
 - **Tests**: API round-trip; E2E — compute, reload, history and memory still there; second device (new browser context, same user) sees it.
 
-### P2-d · #13 Notes
+### P2-d · #13 Notes — ✅ built locally 2026-09-26 (notes attach to taxonomy CHAPTERS; each note names its subtopic)
 - `/notes` → board → **subject cards** → subject page = chapter/subtopic tree (from the same taxonomy as topical) with "Notes ✓" / "Coming soon" per subtopic → note page `/notes/o-level/physics-5054/forces/hookes-law`.
 - Notes pages server-rendered (full text in HTML → indexable), breadcrumb JSON-LD, "Practise this topic" button → pre-filled topical builder, prev/next subtopic.
 - Adding a note = drop an HTML/MD file in `notes-content/{syllabus}/{chapter}/{subtopic}.html`; the tree picks it up automatically.

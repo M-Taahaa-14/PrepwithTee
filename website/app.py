@@ -92,6 +92,8 @@ import yearly as _yearly_mod
 app.include_router(_yearly_mod.router)
 import calc as _calc_mod
 app.include_router(_calc_mod.router)
+import notes as _notes_mod
+app.include_router(_notes_mod.router)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
@@ -3777,6 +3779,14 @@ def sitemap_xml():
             pri = "0.80" if p.count("/") <= 3 else "0.70"
             entries.append(f"  <url><loc>{origin}{p}</loc>"
                            f"<changefreq>monthly</changefreq><priority>{pri}</priority></url>")
+    except Exception:
+        pass
+    # Revision notes (only pages with real notes)
+    try:
+        for p in _notes_mod.sitemap_paths():
+            pri = "0.80" if p.count("/") <= 3 else "0.75"
+            entries.append(f"  <url><loc>{origin}{p}</loc>"
+                           f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
     except Exception:
         pass
     try:

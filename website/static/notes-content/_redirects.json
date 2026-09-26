@@ -1,0 +1,86 @@
+{
+  "0625": {
+    "chapters": {
+      "physical-quantities": "physical-quantities-measurement",
+      "motion": "motion",
+      "mass-weight": "mass-weight",
+      "density": "density",
+      "forces": "forces",
+      "momentum": "momentum",
+      "energy-work-power": "energy-work-power",
+      "pressure": "pressure",
+      "kinetic-particle-model": "kinetic-particle-model-of-matter",
+      "thermal-properties": "thermal-properties-temperature",
+      "thermal-energy-transfer": "transfer-of-thermal-energy",
+      "wave-properties": "general-wave-properties",
+      "light": "light",
+      "electromagnetic-spectrum": "electromagnetic-spectrum",
+      "sound": "sound",
+      "magnetism": "simple-phenomena-of-magnetism",
+      "electrical-quantities": "electrical-quantities",
+      "electric-circuits": "electric-circuits",
+      "electrical-safety": "electrical-safety",
+      "electromagnetic-effects": "electromagnetic-effects",
+      "nuclear-model": "nuclear-model-of-the-atom",
+      "radioactivity": "radioactivity"
+    },
+    "notes": {
+      "physical-quantities/measuring-length-volume": "physical-quantities-measurement/measuring-length-volume",
+      "physical-quantities/measuring-time": "physical-quantities-measurement/measuring-time",
+      "physical-quantities/measuring-multiples": "physical-quantities-measurement/measuring-multiples",
+      "physical-quantities/scalars-and-vectors": "physical-quantities-measurement/scalars-and-vectors",
+      "physical-quantities/resultant-vectors": "physical-quantities-measurement/resultant-vectors",
+      "motion/speed-distance-time": "motion/speed-distance-time",
+      "motion/velocity-acceleration": "motion/velocity-acceleration",
+      "motion/equations-of-motion": "motion/equations-of-motion",
+      "motion/free-fall-terminal": "motion/free-fall-terminal",
+      "mass-weight/mass-and-weight": "mass-weight/mass-and-weight",
+      "mass-weight/gravitational-field-strength": "mass-weight/gravitational-field-strength",
+      "density/density-formula": "density/density-formula",
+      "density/measuring-density": "density/measuring-density",
+      "forces/effects-of-forces": "forces/effects-of-forces",
+      "forces/newtons-laws": "forces/newtons-laws",
+      "forces/hookes-law": "forces/hookes-law",
+      "forces/turning-effects": "forces/turning-effects",
+      "momentum/momentum-definition": "momentum/momentum-definition",
+      "momentum/conservation-of-momentum": "momentum/conservation-of-momentum",
+      "momentum/impulse": "momentum/impulse",
+      "energy-work-power/energy-stores-transfers": "energy-work-power/energy-stores-transfers",
+      "energy-work-power/work-done": "energy-work-power/work-done",
+      "energy-work-power/power": "energy-work-power/power",
+      "energy-work-power/efficiency-energy-calculations": "energy-work-power/efficiency-energy-calculations",
+      "pressure/pressure-definition": "pressure/pressure-definition",
+      "pressure/pressure-in-liquids": "pressure/pressure-in-liquids",
+      "pressure/atmospheric-pressure": "pressure/atmospheric-pressure"
+    }
+  },
+  "2058": {
+    "chapters": {
+      "battles-of-islam": "the-life-of-the-prophet-muhammad-pbuh"
+    },
+    "notes": {
+      "quranic-references/important-verses": "the-qur-an-themes-and-teachings/important-verses",
+      "quranic-references/key-hadith": "teachings-of-the-hadiths/key-hadith",
+      "battles-of-islam/battle-of-badr": "the-life-of-the-prophet-muhammad-pbuh/battle-of-badr",
+      "battles-of-islam/battle-of-uhud": "the-life-of-the-prophet-muhammad-pbuh/battle-of-uhud",
+      "battles-of-islam/battle-of-khandaq": "the-life-of-the-prophet-muhammad-pbuh/battle-of-khandaq",
+      "battles-of-islam/conquest-of-makkah": "the-life-of-the-prophet-muhammad-pbuh/conquest-of-makkah"
+    }
+  },
+  "4024": {
+    "chapters": {
+      "graphs-of-functions": "graphs-of-functions",
+      "algebra": "algebra",
+      "functions": "functions",
+      "trigonometry-2d": "2d-trigonometry",
+      "trigonometry-3d": "3d-trigonometry",
+      "statistics": "statistics",
+      "probability": "probability"
+    },
+    "notes": {
+      "graphs-of-functions/graph-sketching-guide": "graphs-of-functions/graph-sketching-guide",
+      "graphs-of-functions/quadratic-cubic-graphs": "graphs-of-functions/quadratic-cubic-graphs",
+      "graphs-of-functions/reciprocal-exponential": "graphs-of-functions/reciprocal-exponential"
+    }
+  }
+}

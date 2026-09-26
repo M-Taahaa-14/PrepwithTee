@@ -1,0 +1,21 @@
+{
+  "syllabus_ref": "1.5",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~10–14 marks",
+  "tier_split": "Core + Extended",
+  "learning_outcomes": [
+    "State the effects a force can have on an object: change shape, speed or direction",
+    "Distinguish between contact forces (friction, normal reaction, tension) and non-contact forces (gravity, magnetic, electrostatic)",
+    "Calculate the resultant of forces acting along the same straight line",
+    "Draw and interpret free body diagrams with labelled force arrows",
+    "State Newton's First Law: an object remains at rest or moves at constant velocity unless a resultant force acts on it",
+    "Recall and use F = ma to calculate resultant force, mass or acceleration",
+    "State Newton's Third Law and identify Newton's Third Law pairs",
+    "State that extension is directly proportional to force, within the limit of proportionality (Hooke's Law)",
+    "Recall and use F = ke, where k is the spring constant",
+    "Describe and interpret a force–extension graph including the limit of proportionality and elastic limit",
+    "Define the moment of a force as M = F × d and use the principle of moments for equilibrium",
+    "Define centre of gravity and describe how to find it for a flat lamina by suspension",
+    "Explain the conditions that affect stability in terms of centre of gravity and base area"
+  ]
+}

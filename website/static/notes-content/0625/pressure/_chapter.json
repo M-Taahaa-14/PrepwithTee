@@ -1,0 +1,18 @@
+{
+  "syllabus_ref": "1.8",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~4–6 marks",
+  "tier_split": "Core + Extended",
+  "learning_outcomes": [
+    "Define pressure as force per unit area: P = F/A",
+    "Recall and use P = F/A; convert area units between cm² and m²",
+    "Explain everyday examples of high and low pressure in terms of force and contact area",
+    "State that pressure in a liquid increases with depth and depends on the density of the liquid",
+    "State that pressure at a given depth in a liquid acts equally in all directions",
+    "Recall and use P = hρg to calculate pressure, depth, or density in a liquid",
+    "Describe how atmospheric pressure arises from the weight of air above, and decreases with altitude",
+    "Describe how a mercury barometer works and how the height of mercury indicates atmospheric pressure",
+    "Use h = P/(ρg) to relate atmospheric pressure to the height of a mercury column",
+    "Describe and use a U-tube manometer to compare or measure gas pressure"
+  ]
+}

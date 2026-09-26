@@ -1,0 +1,100 @@
+<!--note {"title": "Measuring time intervals", "order": 2, "subtopic": "Measuring time intervals", "tier": "Core"} -->
+<h2 id="time-units">Units of time</h2>
+
+<div class="note-def">
+  <strong>Time</strong> is a fundamental physical quantity. Its SI unit is the <strong>second (s)</strong>.
+  <table class="note-table" style="margin-top:.6rem">
+    <thead><tr><th>Unit</th><th>Symbol</th><th>Conversion</th></tr></thead>
+    <tbody>
+      <tr><td>millisecond</td><td>ms</td><td>1 ms = 0.001 s</td></tr>
+      <tr><td>second</td><td>s</td><td>base unit</td></tr>
+      <tr><td>minute</td><td>min</td><td>1 min = 60 s</td></tr>
+      <tr><td>hour</td><td>h</td><td>1 h = 3600 s</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 id="instruments">Instruments for measuring time</h2>
+
+<p>Different instruments are chosen based on the duration and precision required.</p>
+
+<div class="note-table-wrap">
+  <table class="note-table">
+    <thead>
+      <tr><th>Instrument</th><th>Typical precision</th><th>Best for</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Stopwatch (analogue)</td><td>±0.1 s (reaction time dominates)</td><td>Durations of seconds to minutes</td></tr>
+      <tr><td>Stopwatch (digital)</td><td>±0.01 s</td><td>Durations of seconds to minutes</td></tr>
+      <tr><td>Light gate + datalogger</td><td>±0.001 s or better</td><td>Very short intervals (e.g. a card passing through a sensor)</td></tr>
+      <tr><td>Ticker timer</td><td>±0.02 s (50 Hz tape)</td><td>Recording motion on a tape</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-tip">
+  When <em>describing</em> a timing method in an exam, always state (1) the instrument, (2) when you start it, and (3) when you stop it. Each step earns a mark.
+</div>
+
+<h2 id="reaction-time">Human reaction time and how to reduce error</h2>
+
+<p>The main source of error when using a stopwatch is <strong>reaction time</strong> — the delay between the event occurring and the experimenter pressing the button. Typical human reaction time is 0.1–0.4 s.</p>
+
+<div class="note-warn">
+  Reaction time cannot be eliminated, but it can be <strong>reduced</strong>:
+  <ul style="margin:.4rem 0 0 1.2rem">
+    <li>Use a digital stopwatch rather than a mechanical one (reduces reading error).</li>
+    <li>Measure <em>many</em> oscillations and divide (see the next subtopic on multiples).</li>
+    <li>Use electronic timing (light gates) where possible — no human reaction involved.</li>
+  </ul>
+</div>
+
+<h2 id="period">The period of an oscillation</h2>
+
+<div class="note-def">
+  The <strong>period</strong> \( T \) of an oscillation is the time for <em>one complete</em> oscillation. Unit: seconds (s).
+</div>
+
+<p>A <strong>simple pendulum</strong> is a small mass (the bob) suspended from a fixed point by a light, inextensible string. When displaced and released, it swings back and forth.</p>
+
+<div class="note-fig note-fig-ph" data-label="Fig. 1 — A simple pendulum showing one complete oscillation">
+  <div style="display:flex;align-items:center;justify-content:center;height:160px;flex-direction:column;gap:.4rem;font-size:.82rem;color:var(--grey)">
+    <div style="position:relative;width:100px;height:120px">
+      <div style="position:absolute;top:0;left:50%;width:2px;height:80px;background:var(--navy);transform:translateX(-50%)"></div>
+      <div style="position:absolute;top:77px;left:50%;width:16px;height:16px;border-radius:50%;background:var(--navy);transform:translateX(-50%)"></div>
+      <div style="position:absolute;top:80px;left:4px;font-size:.7rem;color:var(--grey)">A</div>
+      <div style="position:absolute;top:80px;right:4px;font-size:.7rem;color:var(--grey)">C</div>
+    </div>
+    <span>A → B → C → B → A = one complete oscillation</span>
+    <span>B = equilibrium (centre)</span>
+  </div>
+</div>
+
+<div class="note-key">
+  <strong>How to measure the period of a pendulum</strong>
+  <ol style="margin:.4rem 0 0 1.2rem">
+    <li>Set the pendulum swinging with a small amplitude (&lt;10° from the vertical).</li>
+    <li>Start the stopwatch as the bob passes through the <em>equilibrium position</em> (centre).</li>
+    <li>Count <strong>20 complete oscillations</strong> (bob returns to the same position moving in the same direction).</li>
+    <li>Stop the stopwatch after 20 oscillations. Record the total time \( t \).</li>
+    <li>Calculate the period: \( T = \dfrac{t}{20} \)</li>
+  </ol>
+</div>
+
+<div class="note-warn">
+  A common mistake is starting the timer at the end of the swing (at maximum displacement). It is better to start at the centre because the bob is moving fastest there, making the moment easier to judge precisely.
+</div>
+
+<details class="note-example">
+  <summary>Worked example — calculating period and frequency</summary>
+  <div>
+    <p>A student counts 20 complete oscillations of a pendulum in 34.0 s. Calculate (a) the period and (b) the frequency of the pendulum.</p>
+    <p><strong>(a)</strong> \( T = \dfrac{t}{n} = \dfrac{34.0}{20} = 1.70 \text{ s} \)</p>
+    <p><strong>(b)</strong> Frequency \( f = \dfrac{1}{T} = \dfrac{1}{1.70} \approx 0.588 \text{ Hz} \)</p>
+    <p>Note: frequency (Hz) is not on the syllabus for this section, but may appear in Section 3 (Waves).</p>
+  </div>
+</details>
+
+<div class="note-tip">
+  A "Describe how you would measure the period" question typically awards marks for: (1) using a stopwatch, (2) timing a large number of oscillations (20 or more), (3) dividing by the number of oscillations. Write these three steps explicitly.
+</div>

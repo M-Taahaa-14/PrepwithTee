@@ -1,0 +1,13 @@
+{
+  "syllabus_ref": "2.5",
+  "section": "Section 2 — Algebra and Graphs",
+  "weighting": "~8–12 marks on P2",
+  "tier_split": "All students",
+  "learning_outcomes": [
+    "Recognise and sketch y = ax^n for n = −2, −1, 0, 1, 2, 3 and simple sums of these",
+    "Identify and state the coordinates of turning points, intercepts and asymptotes",
+    "Sketch and interpret graphs of the form y = ab^x (exponential growth and decay)",
+    "Use a graph to solve an equation by reading off intersection points",
+    "Sketch the graph of a function after a given transformation (translation, stretch)"
+  ]
+}

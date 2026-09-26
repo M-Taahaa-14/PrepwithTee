@@ -1,0 +1,16 @@
+{
+  "syllabus_ref": "1.2",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~8–12 marks",
+  "tier_split": "Core + Extended",
+  "learning_outcomes": [
+    "Define and calculate average speed using speed = distance / time",
+    "Sketch and interpret distance-time graphs: gradient = speed",
+    "Define velocity as speed in a given direction",
+    "Define acceleration as change in velocity divided by time; calculate using a = (v – u) / t",
+    "Sketch and interpret speed-time graphs: gradient = acceleration, area under graph = distance",
+    "Apply the equations of uniformly accelerated motion to solve problems (Supplement)",
+    "State that the acceleration of free fall near the Earth's surface is approximately 10 m/s²",
+    "Describe terminal velocity and explain the forces acting on a falling object"
+  ]
+}

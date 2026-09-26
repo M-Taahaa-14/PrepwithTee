@@ -1,0 +1,15 @@
+{
+  "syllabus_ref": "1.4",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~4–6 marks",
+  "tier_split": "Core + Extended",
+  "learning_outcomes": [
+    "Define density as mass per unit volume: ρ = m/V",
+    "Recall and use the equation ρ = m/V to calculate density, mass or volume",
+    "State the SI unit of density (kg/m³) and the alternative unit g/cm³; convert between them",
+    "Describe how to determine the density of a regular solid using a ruler and balance",
+    "Describe how to determine the density of an irregular solid using the displacement method (measuring cylinder or eureka can)",
+    "Describe how to determine the density of a liquid using a measuring cylinder and balance",
+    "Predict whether an object will float or sink based on its density relative to the liquid"
+  ]
+}

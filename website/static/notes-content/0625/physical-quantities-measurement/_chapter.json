@@ -1,0 +1,15 @@
+{
+  "syllabus_ref": "1.1",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~4–6 marks",
+  "tier_split": "Core (measurement) + Extended (vectors)",
+  "learning_outcomes": [
+    "Describe the use of rulers and measuring cylinders to find a length or a volume",
+    "Describe how to measure a variety of time intervals using clocks and digital timers",
+    "Determine an average value for a small distance or time interval by measuring multiples (including the period of a pendulum)",
+    "Understand that a scalar quantity has magnitude only and a vector quantity has magnitude and direction",
+    "Know the scalar quantities: distance, speed, time, mass, energy and temperature",
+    "Know the vector quantities: force, weight, velocity, acceleration, momentum, electric field strength and gravitational field strength",
+    "Determine, by calculation or graphically, the resultant of two vectors at right angles (forces or velocities only)"
+  ]
+}

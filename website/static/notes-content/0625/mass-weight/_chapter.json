@@ -1,0 +1,15 @@
+{
+  "syllabus_ref": "1.3",
+  "section": "Section 1 — Motion, Forces and Energy",
+  "weighting": "~3–5 marks",
+  "tier_split": "Core",
+  "learning_outcomes": [
+    "State that mass is a measure of the quantity of matter in an object",
+    "State that weight is a gravitational force on an object due to a gravitational field",
+    "Calculate weight using W = mg",
+    "Know that g ≈ 10 N/kg at the Earth's surface",
+    "Distinguish between mass and weight: mass is constant everywhere; weight depends on g",
+    "Describe the use of a spring balance to measure weight and a beam balance to measure mass",
+    "Know that g varies on different planets and moons"
+  ]
+}

@@ -518,6 +518,16 @@ linked), not agreement with any external file.
     (A4 210 mm, landscape 297 mm; CSS mm on web pages); drag / rotate handle (1°, Shift 15°);
     a pen/highlighter press within 14 px of a ruler edge is handed to the page canvas and
     snaps to the edge line (`rulerSnap`), the ruler's middle strip still drags it.
+    **P2-d Notes** (`website/notes.py`, SSR): `/notes` -> board -> subject (chapters grouped
+    by paper like the builder) -> chapter (learning outcomes, notes, subtopic checklist) ->
+    note (full text in the HTML, KaTeX, TOC, sidebar, prev/next, "Practise this chapter" =
+    builder `?pick=`). Notes attach to TAXONOMY chapters: `static/notes-content/{syl}/
+    {chapter-slug}/{note}.html` with a `<!--note {"title","order","subtopic","tier"} -->`
+    header; `_chapter.json` / `_subject.json` optional; new files appear by themselves.
+    `manifest.json` is gone (archived to data/notes-manifest.old.json by
+    scripts/migrate_notes_to_taxonomy.py); note.html / chapter.html / subject.html deleted,
+    301 via `notes-content/_redirects.json`. Chapters/subjects without notes are noindex and
+    out of the sitemap. Nav "Notes" -> /notes.
 
 ## Ground rules for future sessions
 

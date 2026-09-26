@@ -1,0 +1,116 @@
+/* notes.css — /notes pages (notes.py). styles.css tokens; the note content blocks
+   (.note-def, .note-key, .note-warn, .note-fig, .note-table) live in styles.css. */
+
+.nt-badge { font: 700 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--green-ink); background: var(--green); border-radius: 999px; padding: .28rem .5rem; white-space: nowrap; }
+.nt-soon { font: 700 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--grey); background: var(--cream); border: 1px dashed var(--line); border-radius: 999px;
+  padding: .26rem .5rem; white-space: nowrap; }
+a.nt-card { text-decoration: none; color: var(--ink); transition: transform .12s ease, box-shadow .15s ease, border-color .15s; }
+a.nt-card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(46, 27, 74, .1); border-color: var(--accent); }
+a.nt-card h3 { color: var(--purple); margin: .1rem 0 0; }
+a.nt-card.is-soon { opacity: .75; }
+
+.nt-guide { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: .8rem 1rem;
+  margin: 0 0 1.2rem; }
+.nt-guide summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+.nt-guide ul { margin: .6rem 0 0 1.1rem; color: var(--grey); font-size: .92rem; line-height: 1.6; }
+
+/* subject page: chapter cards */
+.nt-group + .nt-group { margin-top: 1.4rem; }
+.nt-chs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .8rem; }
+.nt-ch { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: .95rem 1rem;
+  display: grid; gap: .55rem; align-content: start; }
+.nt-ch.has-notes { border-top: 3px solid var(--green-ink); }
+.nt-ch header { display: flex; align-items: flex-start; justify-content: space-between; gap: .6rem; }
+.nt-ch-name { font: 800 1.02rem/1.25 "Archivo", sans-serif; color: var(--ink); text-decoration: none; }
+.nt-ch-name:hover { color: var(--navy); text-decoration: underline; }
+.nt-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.nt-notes li { display: flex; justify-content: space-between; gap: .6rem; font-size: .9rem; }
+.nt-notes a { color: var(--navy); text-decoration: none; font-weight: 600; }
+.nt-notes a::before { content: "📄 "; }
+.nt-notes a:hover { text-decoration: underline; }
+.nt-notes span { color: var(--grey); font-size: .76rem; white-space: nowrap; }
+.nt-subs summary { cursor: pointer; font-size: .8rem; color: var(--grey); }
+.nt-subs ul, .nt-sublist { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .2rem; font-size: .84rem; color: var(--grey); }
+.nt-subs li::before, .nt-sublist li::before { content: "○"; margin-right: .45rem; color: var(--line); }
+.nt-subs li.is-on, .nt-sublist li.is-on { color: var(--ink); }
+.nt-subs li.is-on::before, .nt-sublist li.is-on::before { content: "✓"; color: var(--green-ink); font-weight: 800; }
+.nt-practise { justify-self: start; font-size: .82rem; font-weight: 700; color: var(--orange-ink); text-decoration: none; }
+.nt-practise:hover { text-decoration: underline; }
+
+/* chapter page */
+.nt-note-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .7rem; }
+.nt-note-card { display: grid; gap: .3rem; text-decoration: none; background: var(--white); border: 1px solid var(--line);
+  border-left: 4px solid var(--accent); border-radius: 14px; padding: .9rem 1rem; color: var(--ink);
+  transition: transform .12s, box-shadow .15s; }
+.nt-note-card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(46, 27, 74, .1); }
+.nt-note-card b { font: 800 1rem/1.25 "Archivo", sans-serif; }
+.nt-note-card span { color: var(--grey); font-size: .8rem; }
+.nt-outcomes { margin: 0; padding: .9rem 1rem .9rem 2.2rem; background: var(--white); border: 1px solid var(--line);
+  border-radius: 14px; display: grid; gap: .35rem; font-size: .93rem; line-height: 1.5; }
+.nt-sublist { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: .8rem 1rem; }
+.nt-empty { background: var(--white); border: 1px dashed var(--line); border-radius: 14px; padding: 1rem; color: var(--grey); }
+.nt-pn { display: flex; justify-content: space-between; gap: .8rem; margin-top: 2rem; }
+.nt-pn a { display: grid; gap: .15rem; text-decoration: none; color: var(--navy); font-weight: 700; background: var(--white);
+  border: 1px solid var(--line); border-radius: 12px; padding: .6rem .9rem; max-width: 48%; }
+.nt-pn a small { font: 700 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--grey); }
+.nt-pn a.nt-next { text-align: right; margin-left: auto; }
+.nt-pn a:hover { border-color: var(--accent); }
+
+/* note page */
+.nt-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 2rem; align-items: start; }
+.nt-side { position: sticky; top: 84px; max-height: calc(100vh - 100px); overflow: auto; background: var(--white);
+  border: 1px solid var(--line); border-radius: 16px; padding: .9rem; font-size: .88rem; }
+.nt-side-head { margin: 0 0 .6rem; font: 700 .7rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--grey); }
+.nt-side-list, .nt-side-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .15rem; }
+.nt-side-list > li > a { display: block; padding: .35rem .5rem; border-radius: 8px; color: var(--ink); text-decoration: none; font-weight: 600; }
+.nt-side-list > li > a:hover { background: var(--cream); }
+.nt-side-list > li.is-here > a { color: var(--navy); }
+.nt-side-list ul { margin: .15rem 0 .4rem .6rem; border-left: 2px solid var(--line); }
+.nt-side-list ul a { display: block; padding: .28rem .55rem; color: var(--grey); text-decoration: none; border-radius: 0 8px 8px 0;
+  margin-left: -2px; border-left: 2px solid transparent; }
+.nt-side-list ul a:hover { color: var(--ink); }
+.nt-side-list ul a.is-here { color: var(--navy); border-left-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+.nt-side-list ul a.is-read::after { content: " ✓"; color: var(--green-ink); }
+
+.nt-article { min-width: 0; max-width: 780px; }
+.nt-head h1 { font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.1; color: var(--purple); margin: .2rem 0 .6rem; }
+.nt-meta { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; color: var(--grey); font-size: .84rem; margin: 0 0 1rem; }
+.nt-chip { background: var(--lav); color: var(--lav-ink); border-radius: 999px; padding: .22rem .6rem; font-weight: 600; font-size: .78rem; }
+.nt-tier { background: var(--blue); color: var(--blue-ink); }
+.nt-toc { background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: .7rem .9rem; margin: 0 0 1.4rem;
+  font-size: .88rem; }
+.nt-toc b { font: 700 .7rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--grey); }
+.nt-toc ol { margin: .45rem 0 0 1.1rem; display: grid; gap: .2rem; }
+.nt-toc a { color: var(--navy); text-decoration: none; }
+.nt-toc a:hover { text-decoration: underline; }
+.nt-body { font-size: 1.02rem; line-height: 1.7; }
+.nt-body h2 { font: 800 1.35rem/1.25 "Archivo", sans-serif; color: var(--purple); margin: 2rem 0 .7rem; scroll-margin-top: 90px; }
+.nt-body h3 { font: 800 1.08rem/1.3 "Archivo", sans-serif; margin: 1.4rem 0 .5rem; }
+.nt-body p, .nt-body ul, .nt-body ol { margin: 0 0 .9rem; }
+.nt-body ul, .nt-body ol { padding-left: 1.3rem; }
+.nt-body svg { max-width: 100%; height: auto; }
+html[data-theme="dark"] .nt-body svg text { fill: var(--grey); }
+.nt-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem;
+  margin: 2.2rem 0 0; padding: 1rem 1.1rem; border-radius: 16px; background: var(--orange); border: 1px solid var(--orange-line); }
+.nt-cta div { display: grid; gap: .2rem; }
+.nt-cta b { color: var(--ink); }
+.nt-cta span { color: var(--grey); font-size: .88rem; }
+.nt-progress { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 300; pointer-events: none; }
+.nt-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--gold)); }
+.nt-side-btn { display: none; }
+
+@media (max-width: 900px) {
+  .nt-layout { grid-template-columns: 1fr; }
+  .nt-side { position: fixed; top: 0; bottom: 0; left: 0; width: min(300px, 85vw); max-height: none; z-index: 400;
+    border-radius: 0 16px 16px 0; transform: translateX(-105%); transition: transform .2s ease; }
+  .nt-side.is-open { transform: none; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .35); }
+  .nt-side-btn { display: inline-flex; position: fixed; left: .8rem; bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px));
+    z-index: 60; border: 1px solid var(--line); background: var(--white); color: var(--ink); border-radius: 999px;
+    padding: .5rem .85rem; font: 700 .82rem/1 "Hanken Grotesk", sans-serif; box-shadow: 0 8px 22px rgba(0, 0, 0, .15); }
+  .nt-pn a { max-width: none; flex: 1; }
+}
+@media print { .nt-side, .nt-side-btn, .nt-progress, .nt-cta, .nt-pn { display: none !important; } }
