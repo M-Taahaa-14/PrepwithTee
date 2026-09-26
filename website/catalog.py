@@ -39,7 +39,7 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260927i"       # bump with catalog.css / catalog.js (immutable caching)
+CSS_V = "20260927k"       # bump with catalog.css / catalog.js (immutable caching)
 STYLES_V = "20260927i"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
@@ -388,10 +388,10 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 </main>
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
-<script src="/main.js?v=20260927i"></script>
-<script src="/tools-core.js?v=20260927b"></script>
+<script src="/main.js?v=20260927k"></script>
+<script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260927i"></script>
+<script type="module" src="/auth.js?v=20260927k"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>

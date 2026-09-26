@@ -55,7 +55,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260927i"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260927k"          # bump with viewer.css / viewer.js / builder.js
 
 _EXEC = ThreadPoolExecutor(max_workers=2, thread_name_prefix="booklet")
 
@@ -421,8 +421,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260927i"></script>
-<script type="module" src="/auth.js?v=20260927i"></script>
+<script src="/main.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260927k"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

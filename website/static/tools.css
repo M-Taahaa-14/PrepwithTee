@@ -164,22 +164,46 @@
   background: var(--white);
   border: 1.5px solid var(--line);
   border-radius: var(--radius);
-  padding: 16px 16px 12px;
+  padding: 14px 14px 10px;
+  display: flex; flex-direction: column; min-height: 0; max-height: 560px;
 }
+.calc-side-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .calc-side h3 {
   font-size: .76rem; text-transform: uppercase; letter-spacing: .06em;
-  color: var(--grey); margin: 0 0 10px;
+  color: var(--grey); margin: 0;
 }
-.calc-hist-row {
-  display: flex; flex-direction: column; gap: 2px; width: 100%;
-  padding: 9px 10px; margin-bottom: 5px;
-  background: var(--page); border: 1px solid var(--line); border-radius: 9px;
-  cursor: pointer; text-align: right; font: inherit;
+.calc-sync { flex: 1; font-size: .7rem; color: var(--green-ink); }
+.calc-clear { border: 1px solid var(--line); background: var(--page); color: var(--grey); border-radius: 8px;
+  font: 600 .74rem/1 inherit; padding: 5px 9px; cursor: pointer; }
+.calc-clear:hover { color: var(--pink-ink); border-color: var(--pink-line); }
+.calc-clear[hidden] { display: none; }
+.calc-hist { overflow-y: auto; min-height: 0; flex: 1; padding-right: 2px; }
+.calc-hist-row { display: flex; gap: 5px; margin-bottom: 5px; }
+.calc-hist-use {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;
+  padding: 8px 10px; background: var(--page); border: 1px solid var(--line); border-radius: 9px;
+  cursor: pointer; text-align: right; font: inherit; color: inherit;
 }
-.calc-hist-row:hover { background: var(--cream); }
+.calc-hist-use:hover { background: var(--cream); border-color: var(--accent); }
+.calc-hist-edit { flex: none; width: 30px; border: 1px solid var(--line); background: var(--page); color: var(--grey);
+  border-radius: 9px; cursor: pointer; font-size: .95rem; }
+.calc-hist-edit:hover { color: var(--ink); border-color: var(--accent); }
 .calc-hist-q { font-size: .76rem; color: var(--grey); word-break: break-all; }
-.calc-hist-a { font-size: .95rem; font-weight: 700; color: var(--purple); }
-.calc-hist-empty { font-size: .82rem; color: var(--grey); opacity: .7; }
+.calc-hist-a { font-size: .95rem; font-weight: 700; color: var(--purple); word-break: break-all; }
+.calc-hist-empty { font-size: .82rem; color: var(--grey); opacity: .8; line-height: 1.5; }
+
+/* variables A-F + STO, under the screen */
+.calc-vars { display: grid; grid-template-columns: auto repeat(6, minmax(0, 1fr)); gap: 5px; margin: 8px 0 10px; }
+.calc-vars button { border: 1px solid var(--line); background: var(--white); color: var(--ink); border-radius: 9px;
+  cursor: pointer; padding: 5px 4px; display: grid; gap: 1px; justify-items: center; min-width: 0; font: inherit; }
+.calc-vars button b { font-size: .8rem; }
+.calc-vars button span { font-size: .64rem; color: var(--grey); max-width: 100%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.calc-var.has { border-color: var(--lav-line); background: var(--lav); }
+.calc-var.has span { color: var(--lav-ink); }
+.calc-sto { padding: 5px 10px !important; font-weight: 800 !important; font-size: .74rem !important; color: var(--grey) !important; }
+.calc-sto.on { background: var(--accent) !important; color: var(--on-accent) !important; border-color: var(--accent) !important; }
+.calc-sto.on ~ .calc-var { border-color: var(--accent); border-style: dashed; }
 
 /* ── Formula sheet ─────────────────────────────────────────────────────── */
 .fs-controls-wrap {

@@ -550,4 +550,4 @@ if (typeof window !== "undefined") {
 }
 
 // The pen button on every non-PDF page (scratch ink, never saved).
-import("/scratch-pen.js?v=20260927i").catch(() => {});
+import("/scratch-pen.js?v=20260927k").catch(() => {});

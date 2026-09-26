@@ -355,7 +355,7 @@ Suspected causes found in `pipeline/compose.py`:
 - Equation type icons (𝑦=, 𝑥=, parametric, inequality later) on each row, colour swatch, show/hide eye.
 - **Tests**: unit table of ~60 expressions → expected value at x=2 (runs in the browser via Playwright `page.evaluate`, no Node). Includes every bug listed in Section 1.
 
-### P2-c · #15 Calculator memory/history per account
+### P2-c · #15 Calculator memory/history per account — ✅ built locally 2026-09-26
 - Save every `=` to `calc_history`; M, M+, M−, MR, MC, Ans and variables A-F to `calc_state`. History panel: unlimited scroll (last 200), tap to reuse, clear. Works as a guest via localStorage and merges when the guest logs in.
 - **Tests**: API round-trip; E2E — compute, reload, history and memory still there; second device (new browser context, same user) sees it.
 

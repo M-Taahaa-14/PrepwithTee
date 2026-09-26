@@ -497,6 +497,19 @@ linked), not agreement with any external file.
     - Tests blank every provider key (MISTRAL/NVIDIA/... too) - a real key in .env made
       test_ai_help call out. 258 unit/API + 13 e2e green.
 
+27. **Since the deploy (2026-09-27/28, committed, staged on the server via /tmp/stage):**
+    booklet viewer range-loads PDFs (`PdfPane({ranged, uniform})` - page 1 in ~1 s
+    instead of downloading 5-10 MB); compose/testgen `save_small()` = lossless dedup only
+    (**never `subset_fonts()`** - MuPDF drops the space glyph from Cambridge fonts); MCQ
+    sessions preload every question before Start; colourful Marks & grades panel;
+    annotations rewritten (touch-action none for pens - Wacom strokes used to turn into
+    scrolls; Select tool; partial / whole-object eraser with sizes on the bar; editable
+    text); scratch pen on every non-PDF page (`scratch-pen.js`, never saved); Tools nav
+    two-column; **P2-c calculator**: `website/calc.py` + `calc_state` table
+    (**migration 023 must be run on Supabase before deploying it**) - memory M+/M−/MR/MC,
+    Ans, variables A-F (STO), DEG/RAD, last 200 calculations per account; guests keep
+    the same in localStorage `pwt-calc`, merged in on sign-in.
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

@@ -28,7 +28,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260927i"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260927k"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -433,8 +433,8 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260927i"></script>
-<script type="module" src="/auth.js?v=20260927i"></script>
+<script src="/main.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260927k"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

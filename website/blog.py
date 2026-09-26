@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260927i"  # keep in sync with styles.css version pin
+_CSS_V = "20260927k"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -341,10 +341,10 @@ def _page(*, title: str, desc: str, path: str, body: str,
 {_nav()}
 <main class="{main_class}">{body}</main>
 {_foot()}
-<script src="/main.js?v=20260927i"></script>
-<script src="/tools-core.js?v=20260927b"></script>
+<script src="/main.js?v=20260927k"></script>
+<script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260927i"></script>
+<script type="module" src="/auth.js?v=20260927k"></script>
 </body>
 </html>"""
 

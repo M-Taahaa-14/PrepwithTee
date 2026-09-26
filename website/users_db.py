@@ -149,6 +149,15 @@ else:
         updated_at  TEXT DEFAULT (datetime('now')),
         PRIMARY KEY (user_id, doc_key, page)
     );
+    CREATE TABLE IF NOT EXISTS calc_state (
+        user_id     TEXT PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+        mem         REAL NOT NULL DEFAULT 0,
+        ans         REAL NOT NULL DEFAULT 0,
+        vars        TEXT NOT NULL DEFAULT '{}',
+        deg         INTEGER NOT NULL DEFAULT 1,
+        history     TEXT NOT NULL DEFAULT '[]',
+        updated_at  TEXT DEFAULT (datetime('now'))
+    );
     -- subtopic is NOT NULL DEFAULT '' on purpose: a chapter-level row used to
     -- store NULL, and neither SQLite nor Postgres treats two NULLs as equal in
     -- a UNIQUE key, so every chapter save inserted a duplicate instead of
@@ -1572,6 +1581,49 @@ def set_annotations(user_id: str, doc_key: str, page: int, strokes: list) -> Non
             c.execute("DELETE FROM page_annotations WHERE user_id=? AND doc_key=? AND page=?",
                       (user_id, doc_key, page))
         c.commit()
+
+
+# ── Calculator memory + history (P2-c) ───────────────────────────────────────
+
+CALC_HISTORY_MAX = 200
+_CALC_DEFAULT = {"mem": 0.0, "ans": 0.0, "vars": {}, "deg": True, "history": []}
+
+
+def get_calc(user_id: str) -> dict:
+    if _USE_SUPABASE:
+        rows = (_client().table("calc_state").select("mem,ans,vars,deg,history")
+                .eq("user_id", user_id).execute().data or [])
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                "SELECT mem, ans, vars, deg, history FROM calc_state WHERE user_id=?",
+                (user_id,)).fetchall()]
+    if not rows:
+        return {**_CALC_DEFAULT, "vars": {}, "history": []}
+    r = rows[0]
+    load = lambda v, d: (json.loads(v) if isinstance(v, str) else v) or d   # noqa: E731
+    return {"mem": float(r["mem"] or 0), "ans": float(r["ans"] or 0), "vars": load(r["vars"], {}),
+            "deg": bool(r["deg"]), "history": load(r["history"], [])[:CALC_HISTORY_MAX]}
+
+
+def set_calc(user_id: str, state: dict) -> dict:
+    """Write the whole calculator state (history already trimmed by the caller)."""
+    now = datetime.now(timezone.utc).isoformat()
+    row = {"mem": float(state["mem"]), "ans": float(state["ans"]), "vars": state["vars"],
+           "deg": bool(state["deg"]), "history": state["history"][:CALC_HISTORY_MAX]}
+    if _USE_SUPABASE:
+        _client().table("calc_state").upsert({"user_id": user_id, **row, "updated_at": now},
+                                             on_conflict="user_id").execute()
+    else:
+        with _local() as c:
+            c.execute("INSERT INTO calc_state (user_id, mem, ans, vars, deg, history, updated_at) "
+                      "VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET mem=excluded.mem, "
+                      "ans=excluded.ans, vars=excluded.vars, deg=excluded.deg, "
+                      "history=excluded.history, updated_at=excluded.updated_at",
+                      (user_id, row["mem"], row["ans"], json.dumps(row["vars"]), int(row["deg"]),
+                       json.dumps(row["history"]), now))
+            c.commit()
+    return row
 
 
 def restore_enrollment(user_id: str, syllabus: str):

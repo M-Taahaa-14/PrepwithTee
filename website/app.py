@@ -90,6 +90,8 @@ import mcq as _mcq_mod
 app.include_router(_mcq_mod.router)
 import yearly as _yearly_mod
 app.include_router(_yearly_mod.router)
+import calc as _calc_mod
+app.include_router(_calc_mod.router)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────

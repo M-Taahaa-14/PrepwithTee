@@ -5,7 +5,7 @@
  * Also lists sessions to resume and recent results. ?paper=<id> or
  * ?topics=A|B pre-selects (links from the yearly pages and the results screen).
  */
-import { api } from "/auth.js?v=20260927i";
+import { api } from "/auth.js?v=20260927k";
 
 const box = document.getElementById("mq-setup");
 const code = box?.dataset.syllabus;

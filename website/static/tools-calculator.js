@@ -6,6 +6,9 @@
  *      it says so and offers to lock itself rather than teach a bad habit.
  *   2. It renders itself into any container, so the same code is the
  *      calculator page and the calculator inside the practice dock.
+ *   3. Memory (M+ / M− / MR / MC), Ans, variables A–F, DEG/RAD and the last
+ *      200 calculations are kept per account (/api/calc) - the same on every
+ *      device - or in localStorage for a guest, merged in when they sign in.
  *
  * Expressions go through tokenise -> shunting-yard -> RPN. eval() is never
  * used: input arrives from the URL as well as the keypad, and a parser this
@@ -46,7 +49,7 @@
               "×": { prec: 2, assoc: "L" }, "÷": { prec: 2, assoc: "L" },
               "^": { prec: 4, assoc: "R" } };
 
-  function tokenize(src) {
+  function tokenize(src, vars) {
     var out = [], i = 0;
     var s = String(src).replace(/\*/g, "×").replace(/\//g, "÷")
       .replace(/-/g, "−").replace(/\s+/g, "");
@@ -61,6 +64,7 @@
       }
       if (c === "π") { out.push({ t: "num", v: Math.PI }); i++; continue; }
       if (c === "e") { out.push({ t: "num", v: Math.E }); i++; continue; }
+      if (/[A-F]/.test(c)) { out.push({ t: "num", v: (vars && vars[c]) || 0 }); i++; continue; }
       var matched = null;
       for (var f = 0; f < FUNC_NAMES.length; f++) {
         if (s.startsWith(FUNC_NAMES[f], i)) { matched = FUNC_NAMES[f]; break; }
@@ -191,8 +195,8 @@
     return st[0];
   }
 
-  function calculate(src, deg) {
-    var v = evalRPN(toRPN(tokenize(src)), deg);
+  function calculate(src, deg, vars) {
+    var v = evalRPN(toRPN(tokenize(src, vars)), deg);
     if (!isFinite(v)) throw new Error("Result is not a finite number");
     return v;
   }
@@ -210,8 +214,8 @@
 
   // ── Markup ──────────────────────────────────────────────────────────────
   var KEYPAD = [
-    [["shift", "SHIFT", "k-fn"], ["mode", "DRG", "k-fn k-mode"], ["M+", "M+", "k-fn"],
-     ["MR", "MR", "k-fn"], ["MC", "MC", "k-fn"]],
+    [["shift", "SHIFT", "k-fn"], ["mode", "DRG", "k-fn k-mode"], ["M+", "M+", "k-fn", "M−", "M−"],
+     ["MR", "MR", "k-fn", "STO", "STO"], ["MC", "MC", "k-fn"]],
     [["sin(", "sin", "k-fn", "sin⁻¹(", "sin⁻¹"], ["cos(", "cos", "k-fn", "cos⁻¹(", "cos⁻¹"],
      ["tan(", "tan", "k-fn", "tan⁻¹(", "tan⁻¹"], ["(", "(", "k-op"], [")", ")", "k-op"]],
     [["^2", "x²", "k-fn", "^3", "x³"], ["^", "x^y", "k-fn"], ["√(", "√", "k-fn"],
@@ -258,6 +262,68 @@
     return BOARD_GROUPS[0].level;
   }
 
+  // ── Persistence: the account (/api/calc) or, for a guest, localStorage ────
+  var GUEST_KEY = "pwt-calc";
+  function readGuest() {
+    try { return JSON.parse(localStorage.getItem(GUEST_KEY) || "null"); } catch (e) { return null; }
+  }
+  function writeGuest(d) {
+    try { localStorage.setItem(GUEST_KEY, JSON.stringify(d)); } catch (e) { /* private mode */ }
+  }
+  function req(method, url, body) {
+    return fetch(url, { method: method, credentials: "same-origin",
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined });
+  }
+  function Store() {
+    var self = { signedIn: false }, timer = null, history = [];
+    function snapshot(st) {
+      return { mem: st.mem, ans: st.ans, deg: st.deg, vars: st.vars, history: history };
+    }
+    self.load = function (apply) {
+      var guest = readGuest();
+      if (guest) { history = guest.history || []; apply(guest); }
+      req("GET", "/api/calc").then(function (r) {
+        if (!r.ok) throw new Error("guest");
+        self.signedIn = true;
+        // A guest who has just signed in: fold their calculator into the account once.
+        if (guest && ((guest.history && guest.history.length) || guest.mem ||
+                      Object.keys(guest.vars || {}).length)) {
+          return req("POST", "/api/calc/merge", guest).then(function (m) {
+            if (m.ok) { try { localStorage.removeItem(GUEST_KEY); } catch (e) { /* ignore */ } }
+            return m.ok ? m.json() : r.json();
+          });
+        }
+        return r.json();
+      }).then(function (acc) {
+        history = acc.history || [];
+        apply(acc);
+      }).catch(function () { apply(guest || {}); });
+    };
+    self.add = function (entry, st) {
+      history = [entry].concat(history).slice(0, 200);
+      if (self.signedIn) {
+        req("POST", "/api/calc/history", { q: entry.q, a: entry.a, t: entry.t }).catch(function () {});
+        self.save(st);
+      } else writeGuest(snapshot(st));
+    };
+    self.save = function (st) {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        if (self.signedIn) {
+          req("PUT", "/api/calc/state", { mem: st.mem, ans: st.ans, deg: st.deg, vars: st.vars })
+            .catch(function () {});
+        } else writeGuest(snapshot(st));
+      }, 300);
+    };
+    self.clear = function (st) {
+      history = [];
+      if (self.signedIn) req("DELETE", "/api/calc/history").catch(function () {});
+      else writeGuest(snapshot(st));
+    };
+    return self;
+  }
+
   // ── Widget ──────────────────────────────────────────────────────────────
   function mount(root, opts) {
     var PWTx = window.PWT;
@@ -281,20 +347,34 @@
             '<div class="calc-expr" data-expr>0</div>' +
             '<div class="calc-result" data-result></div>' +
           "</div>" +
+          '<div class="calc-vars" data-vars></div>' +
           '<div class="calc-keys" data-keys>' + keypadHTML() + "</div>" +
         "</div>" +
         (compact ? "" :
-        '<aside class="calc-side"><h3>Working</h3><div data-history></div></aside>') +
+        '<aside class="calc-side"><div class="calc-side-head"><h3>History</h3>' +
+        '<span class="calc-sync" data-sync></span>' +
+        '<button type="button" class="calc-clear" data-clear hidden>Clear</button></div>' +
+        '<div class="calc-hist" data-history></div></aside>') +
       "</div>";
 
     var $ = function (sel) { return root.querySelector(sel); };
     var expr = $("[data-expr]"), resultEl = $("[data-result]"), keys = $("[data-keys]");
     var histEl = $("[data-history]"), banner = $("[data-banner]");
     var modeEl = $("[data-mode]"), memEl = $("[data-mem]");
+    var varsEl = $("[data-vars]"), clearBtn = $("[data-clear]"), syncEl = $("[data-sync]");
 
-    var state = { input: "", ans: 0, mem: 0, deg: true, shift: false,
-                  locked: false, justEqualled: false };
+    var state = { input: "", ans: 0, mem: 0, deg: true, shift: false, sto: false,
+                  locked: false, justEqualled: false, vars: {} };
     var history = [];
+    var store = Store();
+    store.load(function (saved) {          // called with local data, then the account's
+      state.mem = saved.mem || 0; state.ans = saved.ans || 0;
+      state.deg = saved.deg !== false; state.vars = saved.vars || {};
+      history = saved.history || [];
+      drawHistory(); render();
+      if (syncEl) syncEl.textContent = store.signedIn ? "Saved to your account" : "Saved on this device";
+    });
+    var calc = function (src) { return calculate(src, state.deg, state.vars); };
 
     function esc(s) { return PWTx ? PWTx.esc(s) : String(s); }
 
@@ -303,6 +383,16 @@
       expr.scrollLeft = expr.scrollWidth;
       modeEl.textContent = state.deg ? "DEG" : "RAD";
       memEl.hidden = state.mem === 0;
+      if (varsEl) {
+        varsEl.innerHTML = '<button type="button" class="calc-sto' + (state.sto ? " on" : "") +
+          '" data-sto title="Store the current value in a variable">STO</button>' +
+          ["A", "B", "C", "D", "E", "F"].map(function (n) {
+            var has = state.vars[n] != null;
+            return '<button type="button" class="calc-var' + (has ? " has" : "") + '" data-var="' + n +
+              '" title="' + (state.sto ? "Store in " + n : has ? n + " = " + fmt(state.vars[n]) : n + " (empty)") +
+              '"><b>' + n + "</b><span>" + (has ? esc(fmt(state.vars[n], 6)) : "–") + "</span></button>";
+          }).join("");
+      }
       keys.classList.toggle("shifted", state.shift);
       keys.classList.toggle("locked", state.locked);
     }
@@ -310,31 +400,38 @@
     function preview() {
       if (!state.input.trim()) { resultEl.textContent = ""; resultEl.className = "calc-result"; return; }
       try {
-        resultEl.textContent = "= " + fmt(calculate(state.input, state.deg));
+        resultEl.textContent = "= " + fmt(calc(state.input));
         resultEl.className = "calc-result";
       } catch (e) { resultEl.textContent = ""; resultEl.className = "calc-result"; }
     }
 
     function drawHistory() {
       if (!histEl) return;
+      if (clearBtn) clearBtn.hidden = !history.length;
       if (!history.length) {
-        histEl.innerHTML = '<p class="calc-hist-empty">Your working shows up here.</p>';
+        histEl.innerHTML = '<p class="calc-hist-empty">Every = you press is kept here, newest first. ' +
+          "Tap an answer to use it again.</p>";
         return;
       }
       histEl.innerHTML = history.map(function (h, i) {
-        return '<button class="calc-hist-row" data-hist="' + i + '">' +
+        return '<div class="calc-hist-row">' +
+          '<button type="button" class="calc-hist-use" data-hist="' + i + '" title="Use this answer">' +
           '<span class="calc-hist-q">' + esc(h.q) + "</span>" +
-          '<span class="calc-hist-a">= ' + esc(h.a) + "</span></button>";
+          '<span class="calc-hist-a">= ' + esc(h.a) + "</span></button>" +
+          '<button type="button" class="calc-hist-edit" data-hist-q="' + i + '" title="Edit this calculation" ' +
+          'aria-label="Edit this calculation">↺</button></div>';
       }).join("");
     }
 
     function commit() {
       if (!state.input.trim()) return;
       try {
-        var v = calculate(state.input, state.deg);
+        var v = calc(state.input);
         state.ans = v;
-        history.unshift({ q: state.input, a: fmt(v) });
-        if (history.length > 12) history.pop();
+        var entry = { q: state.input, a: fmt(v), t: Date.now() };
+        history.unshift(entry);
+        if (history.length > 200) history.length = 200;
+        store.add(entry, state);
         drawHistory();
         resultEl.textContent = "= " + fmt(v);
         resultEl.className = "calc-result ok";
@@ -353,7 +450,7 @@
       if (state.justEqualled) {
         state.justEqualled = false;
         var fresh = /^[0-9.]$/.test(k) || k === "(" || k === "π" ||
-                    /\($/.test(k) || k === "Ans" || k === "MR";
+                    /\($/.test(k) || k === "Ans" || k === "MR" || /^[A-F]$/.test(k);
         if (fresh) { state.input = ""; resultEl.textContent = ""; }
       }
       switch (k) {
@@ -361,11 +458,13 @@
         case "DEL": state.input = state.input.slice(0, -1); break;
         case "=": commit(); render(); return;
         case "shift": state.shift = !state.shift; render(); return;
-        case "mode": state.deg = !state.deg; preview(); render(); return;
+        case "mode": state.deg = !state.deg; store.save(state); preview(); render(); return;
         case "Ans": state.input += fmt(state.ans); break;
-        case "M+": try { state.mem += calculate(state.input || "0", state.deg); } catch (e) {} break;
+        case "M+": try { state.mem += current(); store.save(state); } catch (e) {} break;
+        case "M−": try { state.mem -= current(); store.save(state); } catch (e) {} break;
         case "MR": state.input += fmt(state.mem); break;
-        case "MC": state.mem = 0; break;
+        case "MC": state.mem = 0; store.save(state); break;
+        case "STO": state.sto = !state.sto; break;
         default: state.input += k;
       }
       if (state.shift && k !== "shift") state.shift = false;
@@ -379,13 +478,51 @@
     }
     keys.addEventListener("click", onKeys);
 
+    // The value M+/M−/STO act on: the entry line, or the last answer when it's empty.
+    function current() { return state.input.trim() ? calc(state.input) : state.ans; }
+
     function onHist(ev) {
+      var edit = ev.target.closest("[data-hist-q]");
+      if (edit) {
+        state.input = history[+edit.dataset.histQ].q;
+        state.justEqualled = false;
+        preview(); render();
+        return;
+      }
       var row = ev.target.closest("[data-hist]");
       if (!row) return;
+      if (state.justEqualled) { state.input = ""; state.justEqualled = false; }
       state.input += history[+row.dataset.hist].a;
       preview(); render();
     }
     if (histEl) histEl.addEventListener("click", onHist);
+    function onClear() {
+      if (!history.length || !confirm("Clear your calculator history?")) return;
+      history = [];
+      store.clear(state);
+      drawHistory();
+    }
+    if (clearBtn) clearBtn.addEventListener("click", onClear);
+
+    function onVars(ev) {
+      if (ev.target.closest("[data-sto]")) { state.sto = !state.sto; render(); return; }
+      var b = ev.target.closest("[data-var]");
+      if (!b || state.locked) return;
+      var n = b.dataset.var;
+      if (state.sto) {
+        try {
+          state.vars[n] = current();
+          state.sto = false;
+          resultEl.textContent = n + " = " + fmt(state.vars[n]);
+          resultEl.className = "calc-result ok";
+          store.save(state);
+        } catch (e) { resultEl.textContent = e.message; resultEl.className = "calc-result err"; }
+        render();
+        return;
+      }
+      press(n);
+    }
+    if (varsEl) varsEl.addEventListener("click", onVars);
 
     // Physical keyboard. Scoped so a calculator inside the dock does not eat
     // keystrokes meant for the page behind it.
@@ -499,6 +636,8 @@
       document.removeEventListener("keydown", onKeydown);
       keys.removeEventListener("click", onKeys);
       if (histEl) histEl.removeEventListener("click", onHist);
+      if (clearBtn) clearBtn.removeEventListener("click", onClear);
+      if (varsEl) varsEl.removeEventListener("click", onVars);
       off();
       root.innerHTML = "";
     };

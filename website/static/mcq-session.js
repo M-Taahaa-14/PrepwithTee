@@ -14,7 +14,7 @@
  *   Annotations  pen/highlighter/shapes on every page and question (annotate.js)
  * Keys: A–D or 1–4 answer · ← → move · F flag · Esc close panel.
  */
-import { api } from "/auth.js?v=20260927i";
+import { api } from "/auth.js?v=20260927k";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
 import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260927d";
 import { createAnnotator } from "/annotate.js?v=20260927i";

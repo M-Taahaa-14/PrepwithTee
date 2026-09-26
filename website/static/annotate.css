@@ -50,7 +50,8 @@
 .an-saved { font-size: .72rem; color: var(--green-ink); min-width: 0; max-width: 9rem; white-space: nowrap;
   overflow: hidden; padding: 0 .2rem; }
 .an-saved:empty { display: none; }
-.an-fab { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+/* bottom-left corner: clear of page content and of the chat / note buttons on the right */
+.an-fab { position: fixed; left: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   z-index: 70; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--white);
   color: var(--purple); display: grid; place-items: center; cursor: pointer;
   box-shadow: 0 10px 28px rgba(46, 27, 74, .2); }
@@ -82,7 +83,7 @@
 }
 @media print { .an-bar, .an-fab { display: none !important; } }
 /* phones: the pen button sits bottom-left, clear of the site's chat / note buttons */
-@media (max-width: 999px) { .an-fab { left: .8rem; transform: none; } }
+@media (max-width: 999px) { .an-fab { left: .8rem; } }
 
 /* scratch layer over a whole web page (every non-PDF page; never saved) */
 .an-viewport { position: fixed; inset: 0; z-index: 65; pointer-events: none; }
