@@ -528,6 +528,17 @@ linked), not agreement with any external file.
     scripts/migrate_notes_to_taxonomy.py); note.html / chapter.html / subject.html deleted,
     301 via `notes-content/_redirects.json`. Chapters/subjects without notes are noindex and
     out of the sitemap. Nav "Notes" -> /notes.
+    **P2-e**: `/solver` (static solver.html/js/css) = Photo Solver with two modes -
+    "Solve a question" (SOLVER_SYSTEM) and "Check my working" (CHECK_SYSTEM: question photo
+    + working photo or typed text -> estimated mark, per-step ✓/✗); drop / paste / camera,
+    crop box, JPEG <=1600 px client-side; `/api/solve` takes `mode`, `working`,
+    `working_text`, `syllabus` (vision helper takes extra images); `/api/solve/followup`
+    (text-only, answer as context). ask.html + tutor.html?tab=solver -> /solver. Tutor:
+    server message ids adopted from the stream's done event; regenerate + new ✏️
+    edit-and-resend call `DELETE /api/tutor/sessions/{sid}/messages/{mid}` (drops that
+    message and all later - they used to stay in the DB); chat search; "which AI help"
+    card; drifting maths-symbol background. **tests/conftest.py now deletes its temp dir
+    at exit** - 120 leftover 90 MB copies had filled C: (2026-09-26).
 
 ## Ground rules for future sessions
 

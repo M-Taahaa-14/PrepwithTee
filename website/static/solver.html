@@ -4,46 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cambridge Subjects | O Level, IGCSE & A Level Maths, Physics, Computer Science — PrepWithTee</title>
-  <meta name="description"
-    content="Cambridge O Level (4024 Maths, 5054 Physics, 2210 CS), IGCSE (0580 Maths, 0625 Physics, 0478 CS) and A Level exam prep — topical past papers, notes, MCQ practice and tutoring for every subject.">
-  <link rel="canonical" href="https://prepwithtee.com/subjects.html">
-  <meta property="og:type"        content="website">
-  <meta property="og:title"       content="Cambridge Subjects | O Level, IGCSE & A Level — PrepWithTee">
-  <meta property="og:description" content="Past papers, notes and MCQ practice for Cambridge O Level (4024, 5054, 2210), IGCSE (0580, 0625, 0478) and A Level Maths, Physics and Computer Science.">
-  <meta property="og:image"       content="https://prepwithtee.com/logo.png">
-  <meta property="og:url"         content="https://prepwithtee.com/subjects.html">
-  <meta name="twitter:card"       content="summary_large_image">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Cambridge Subjects at PrepWithTee",
-    "itemListElement": [
-      {"@type":"ListItem","position":1,"name":"Mathematics O Level (4024)","url":"https://prepwithtee.com/subjects.html"},
-      {"@type":"ListItem","position":2,"name":"Mathematics IGCSE (0580)","url":"https://prepwithtee.com/subjects.html"},
-      {"@type":"ListItem","position":3,"name":"Physics O Level (5054)","url":"https://prepwithtee.com/subjects.html"},
-      {"@type":"ListItem","position":4,"name":"Physics IGCSE (0625)","url":"https://prepwithtee.com/subjects.html"},
-      {"@type":"ListItem","position":5,"name":"Computer Science O Level (2210)","url":"https://prepwithtee.com/subjects.html"},
-      {"@type":"ListItem","position":6,"name":"Computer Science IGCSE (0478)","url":"https://prepwithtee.com/subjects.html"}
-    ]
-  }
-  </script>
-  <link rel="icon" href="logo.png">
+  <link rel="canonical" href="https://prepwithtee.com/solver">
+  <title>Photo Solver — solve or check a Cambridge question | PrepWithTee</title>
+  <meta name="description" content="Photograph a Cambridge O Level, IGCSE or A Level question for a step-by-step worked solution, or photograph your own working to have it marked like an examiner would.">
+  <link rel="icon" href="/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap"
     rel="preload" as="style" onload="this.rel='stylesheet'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260927g">
-  <link rel="stylesheet" href="tools.css?v=20260927j">
-
+  <link rel="stylesheet" href="/styles.css?v=20260927g">
+  <link rel="stylesheet" href="/dashboard-hub.css?v=20260927b">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="/solver.css?v=20260926a">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
 
-<body>
+<body class="sv-page">
 
-  <!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
+<!--NAV:START — shared navbar. Do not edit here; edit website/partials/nav.html then run: python sync_nav.py -->
 <header class="site-header">
     <div class="container header-row">
       <a class="brand" href="/">
@@ -64,265 +44,102 @@
   </header>
 <!--NAV:END-->
 
-      <section class="hero hero-slim">
-    <div class="container">
-      <p class="eyebrow">O Level &middot; IGCSE &middot; A Level</p>
-      <h1>Every subject we teach,<br><em>yours to pick.</em></h1>
-      <p class="sub">From Maths to Physics, O Level to A Level &mdash; every course is taught 1-on-1 with full past-paper coverage. Find your subject below and see what&rsquo;s live.</p>
+<main class="sv" id="sv">
+  <header class="sv-hero">
+    <p class="sv-eyebrow">AI Photo Solver</p>
+    <h1>Stuck on a question? Take a photo.</h1>
+    <p class="sv-lede">Get a step-by-step worked solution the way a Cambridge examiner would set it out —
+      or photograph your own working and have it marked, step by step.</p>
+    <div class="sv-modes" role="radiogroup" aria-label="What do you need?">
+      <button type="button" role="radio" class="sv-mode" data-mode="solve" aria-checked="true">
+        <span class="sv-mode-ico">📷</span><b>Solve a question</b>
+        <span>Photo of the question → full worked solution</span></button>
+      <button type="button" role="radio" class="sv-mode" data-mode="check" aria-checked="false">
+        <span class="sv-mode-ico">✅</span><b>Check my working</b>
+        <span>Question + your working → marked like an examiner</span></button>
     </div>
-  </section>
+  </header>
 
-  <main class="container">
+  <div class="sv-grid">
+    <section class="sv-card sv-inputs" aria-label="Your question">
+      <div class="sv-step">
+        <h2><span class="sv-num">1</span> The question</h2>
+        <div class="sv-drop" id="sv-q" data-slot="question">
+          <div class="sv-drop-empty">
+            <p><b>Drop a photo here</b>, paste it (Ctrl+V), or</p>
+            <div class="sv-drop-btns">
+              <label class="sv-btn">📷 Take photo<input type="file" accept="image/*" capture="environment" hidden data-pick></label>
+              <label class="sv-btn sv-btn-ghost">Choose file<input type="file" accept="image/png,image/jpeg,image/webp" hidden data-pick></label>
+            </div>
+            <small>Crop to one question for the best answer.</small>
+          </div>
+        </div>
+      </div>
 
-    <!-- ============ O LEVEL ============ -->
-    <section class="board-section" id="olevel">
-      <div class="board-head reveal">
-        <div class="board-head-left">
-          <h2>Cambridge O Level</h2>
-          <p>The classic route — Pakistan's most-sat Cambridge qualification.</p>
+      <div class="sv-step" id="sv-working" hidden>
+        <h2><span class="sv-num">2</span> Your working</h2>
+        <div class="sv-tabs" role="tablist">
+          <button type="button" role="tab" data-wtab="photo" aria-selected="true">Photo</button>
+          <button type="button" role="tab" data-wtab="type" aria-selected="false">Type it</button>
         </div>
-        <div class="scroll-controls">
-          <button class="scroll-btn prev" aria-label="Scroll left">‹</button>
-          <button class="scroll-btn next" aria-label="Scroll right">›</button>
-        </div>
-      </div>
-      <div class="subject-grid reveal-stagger">
-        <div class="subject-card math reveal-scale">
-          <div class="code">4024</div>
-          <h3>Mathematics (Syllabus D)</h3>
-          <p>Paper 1 &amp; Paper 2 · full topical coverage 2020–2025, classified
-            into 35 chapters from Algebra to Vectors.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/mathematics-4024">Topicals live →</a>
-            <a class="chip res" href="resources.html#/O%20Level%20Mathematics%204024">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card physics reveal-scale">
-          <div class="code">5054</div>
-          <h3>Physics</h3>
-          <p>Theory Papers 1 &amp; 2 · every question 2020–2025 sorted across
-            all 25 syllabus topics, mark schemes linked.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/physics-5054">Topicals live →</a>
-            <a class="chip res" href="resources.html#/O%20Level%20Physics%205054">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card chem reveal-scale">
-          <div class="code">5070</div>
-          <h3>Chemistry</h3>
-          <p>Paper 1 &amp; Paper 2 · 12 syllabus topics from States of Matter
-            to Organic Chemistry — every question 2020–2025 classified.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/chemistry-5070">Topicals live →</a>
-            <a class="chip res" href="resources.html#/O%20Level%20Chemistry%205070">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card cs reveal-scale">
-          <div class="code">2210</div>
-          <h3>Computer Science</h3>
-          <p>Paper 1 &amp; Paper 2 · 10 topics from Data Representation to
-            Boolean Logic — every question 2020–2025 classified.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/computer-science-2210">Topicals live →</a>
-            <a class="chip res" href="resources.html">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card islam reveal-scale">
-          <div class="code">2058</div>
-          <h3>Islamiyat</h3>
-          <p>Paper 1 (Quran &amp; Hadith) · Paper 2 (History &amp; Civilisation) ·
-            every question 2015–2025 classified by topic.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/islamiyat-2058">Topicals live →</a>
-            <a class="chip res" href="resources.html">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card pak reveal-scale">
-          <div class="code">2059</div>
-          <h3>Pakistan Studies</h3>
-          <p>Paper 1 (History &amp; Culture) · Paper 2 (Geography) ·
-            every question 2018–2025 classified by topic.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/o-level/pakistan-studies-2059">Topicals live →</a>
-            <a class="chip res" href="resources.html">Resources →</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ IGCSE ============ -->
-    <section class="board-section" id="igcse">
-      <div class="board-head reveal">
-        <div class="board-head-left">
-          <h2>Cambridge IGCSE</h2>
-          <p>The international twin — extended papers, same one-on-one depth.</p>
-        </div>
-        <div class="scroll-controls">
-          <button class="scroll-btn prev" aria-label="Scroll left">‹</button>
-          <button class="scroll-btn next" aria-label="Scroll right">›</button>
-        </div>
-      </div>
-      <div class="subject-grid reveal-stagger">
-        <div class="subject-card math reveal-scale">
-          <div class="code">0580</div>
-          <h3>Mathematics</h3>
-          <p>Extended Papers 2 &amp; 4 · 1,500+ questions classified into 37
-            chapters including Differentiation and Trigonometric Graphs.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/igcse/mathematics-0580">Topicals live →</a>
-            <a class="chip res" href="resources.html#/IGCSE%20Mathematics%200580">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card physics reveal-scale">
-          <div class="code">0625</div>
-          <h3>Physics</h3>
-          <p>Papers 1, 2 &amp; 4 · questions across all 24 topics, from Motion
-            to Stars &amp; the Universe.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/igcse/physics-0625">Topicals live →</a>
-            <a class="chip res" href="resources.html#/IGCSE%20Physics%200625">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card chem reveal-scale">
-          <div class="code">0620</div>
-          <h3>Chemistry</h3>
-          <p>Papers 2 &amp; 4 · 12 core topics from Atomic Structure to
-            Organic Chemistry — every question 2020–2025 classified.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/igcse/chemistry-0620">Topicals live →</a>
-            <a class="chip res" href="resources.html#/IGCSE%20Chemistry%200620">Resources →</a>
-          </div>
-        </div>
-        <div class="subject-card cs reveal-scale">
-          <div class="code">0478</div>
-          <h3>Computer Science</h3>
-          <p>Paper 1 &amp; Paper 2 · 10 topics from Data Representation to
-            Boolean Logic — every question 2020–2025 classified.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/igcse/computer-science-0478">Topicals live →</a>
-            <a class="chip res" href="resources.html#/IGCSE%20Computer%20Science%200478">Resources →</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ A LEVEL ============ -->
-    <section class="board-section" id="alevel">
-      <div class="board-head reveal">
-        <div class="board-head-left">
-          <h2>Cambridge A Level</h2>
-          <p>AS &amp; A2 — full topical coverage now live for Mathematics and Physics.</p>
-        </div>
-        <div class="scroll-controls">
-          <button class="scroll-btn prev" aria-label="Scroll left">‹</button>
-          <button class="scroll-btn next" aria-label="Scroll right">›</button>
-        </div>
-      </div>
-      <div class="subject-grid reveal-stagger">
-        <div class="subject-card math reveal-scale">
-          <div class="code">9709</div>
-          <h3>Mathematics</h3>
-          <p>Papers P1 Pure 1, P3 Pure 3, P4 Mechanics &amp; P5 Statistics — every question 2020–2025 classified against
-            all 27 official syllabus topics.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/a-level/mathematics-9709">Topicals live →</a>
-            <a class="chip res" href="resources.html#/A%20Level%20Mathematics%209709">Resources →</a>
-            <div class="comp-chips">
-              <span class="chip-comp">P1</span>
-              <span class="chip-comp">P3</span>
-              <span class="chip-comp">P4</span>
-              <span class="chip-comp">P5</span>
+        <div class="sv-drop" id="sv-w" data-slot="working">
+          <div class="sv-drop-empty">
+            <p><b>Drop a photo of your working</b>, paste it, or</p>
+            <div class="sv-drop-btns">
+              <label class="sv-btn">📷 Take photo<input type="file" accept="image/*" capture="environment" hidden data-pick></label>
+              <label class="sv-btn sv-btn-ghost">Choose file<input type="file" accept="image/png,image/jpeg,image/webp" hidden data-pick></label>
             </div>
           </div>
         </div>
-        <div class="subject-card physics reveal-scale">
-          <div class="code">9702</div>
-          <h3>Physics</h3>
-          <p>Papers P1 MCQ, P2 AS structured, P4 A Level &amp; P5 Planning — every question 2020–2025 classified against
-            all 25 official syllabus topics.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/a-level/physics-9702">Topicals live →</a>
-            <a class="chip res" href="resources.html#/A%20Level%20Physics%209702">Resources →</a>
-            <div class="comp-chips">
-              <span class="chip-comp">P1</span>
-              <span class="chip-comp">P2</span>
-              <span class="chip-comp">P4</span>
-              <span class="chip-comp">P5</span>
-            </div>
-          </div>
-        </div>
-        <div class="subject-card cs reveal-scale">
-          <div class="code">9618</div>
-          <h3>Computer Science</h3>
-          <p>Papers P1–P4 · AS &amp; A2 · 20 topics from Data Representation
-            to Artificial Intelligence — full topical coverage live.</p>
-          <div class="subject-links">
-            <a class="chip live" href="/papers/a-level/computer-science-9618">Topicals live →</a>
-            <a class="chip res" href="resources.html#/A%20Level%20Computer%20Science%209618">Resources →</a>
-            <div class="comp-chips">
-              <span class="chip-comp">P1</span>
-              <span class="chip-comp">P2</span>
-              <span class="chip-comp">P3</span>
-              <span class="chip-comp">P4</span>
-            </div>
-          </div>
-        </div>
+        <textarea id="sv-wtext" class="sv-text" rows="6" hidden
+          placeholder="e.g.&#10;v = s / t&#10;= 120 / 8&#10;= 15 m/s"></textarea>
       </div>
-    </section>
-  </main>
 
-  <div class="container">
-    <div class="subject-request">
-      <h2>Can't find your subject?</h2>
-      <p>Let us know what you're looking for — we add new courses based on demand and will reach out when it's live.</p>
-      <form class="subject-request-form" id="subjectRequestForm">
-        <input type="text" id="srSubject" placeholder="e.g. O Level Biology 5090" required maxlength="120">
-        <button type="submit" class="btn btn-dark">Let us know →</button>
+      <div class="sv-step sv-extras">
+        <label>Subject <small>(optional)</small>
+          <select id="sv-subject"><option value="">Any subject</option></select></label>
+        <label>Anything to add? <small>(optional)</small>
+          <input id="sv-note" type="text" maxlength="600" placeholder="e.g. I'm stuck on part (b)"></label>
+      </div>
+
+      <button type="button" class="sv-go" id="sv-go" disabled>Solve it</button>
+      <p class="sv-status" id="sv-status" role="status"></p>
+    </section>
+
+    <section class="sv-card sv-out" id="sv-out" aria-live="polite" aria-label="Solution">
+      <div class="sv-placeholder" id="sv-placeholder">
+        <div class="sv-ph-ico">🦉</div>
+        <p>Your worked solution will appear here.</p>
+        <ul class="sv-howto">
+          <li><b>Crop tight.</b> One question per photo, straight on, in good light.</li>
+          <li><b>Include diagrams and tables</b> the question refers to.</li>
+          <li><b>Tell it where you're stuck</b> — "part (b)", "why is it 2π?".</li>
+        </ul>
+      </div>
+      <div class="sv-result" id="sv-result" hidden></div>
+      <form class="sv-follow" id="sv-follow" hidden>
+        <label for="sv-fq">Ask a follow-up about this</label>
+        <div class="sv-follow-row">
+          <input id="sv-fq" type="text" maxlength="800" placeholder="e.g. Why do we square the velocity?" autocomplete="off">
+          <button type="submit" class="sv-btn">Ask</button>
+        </div>
+        <div class="sv-thread" id="sv-thread"></div>
+        <p class="sv-more">Want to go deeper? <a href="/tutor.html">Open the AI Tutor →</a></p>
       </form>
-      <p class="subject-request-status" id="srStatus"></p>
-    </div>
-  </div>
-
-  <!-- ============ REVISE NOW STRIP ============ -->
-  <div class="container">
-    <div class="revise-strip reveal">
-      <div class="revise-strip-copy">
-        <h2>Done with a topic? Test yourself on it.</h2>
-        <p>Mark your confidence chapter by chapter, then let the examiner quiz you — instant results, no waiting. The fastest way to find out what actually stuck.</p>
-      </div>
-      <div class="revise-strip-actions">
-        <a class="btn btn-dark" href="topical-progress.html">Start progress tracker →</a>
-        <a class="btn btn-outline" href="/papers">Build a topical paper</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <section class="confused tint-lav">
-      <div>
-        <h2 class="tint-ink">Not sure which board you're on?</h2>
-        <p>Send us your school's course list and we'll tell you exactly which papers you sit.</p>
-      </div>
-      <a class="btn btn-tint" href="https://wa.me/923204884375?text=Hi%20Tee%2C%20I%20need%20help%20figuring%20out%20my%20Cambridge%20board%20and%20course%20code.">Check my course on WhatsApp</a>
     </section>
   </div>
 
-  <section class="cta-band">
-    <div class="container cta-row">
-      <div>
-        <h2>Not sure which board fits?</h2>
-        <p>Bring the school's course list to a free demo lesson — we'll map it out.</p>
-      </div>
-      <div class="cta-actions">
-        <a class="btn btn-gold" href="" onclick="openBooking();return false;">Book a Demo</a>
-        <a class="btn btn-white" href="mailto:nexgentutors6@gmail.com">Email PrepWithTee</a>
-      </div>
+  <section class="sv-which" aria-label="Which tool to use">
+    <h2>Which AI help should I use?</h2>
+    <div class="sv-which-grid">
+      <div><b>📷 Photo Solver</b><span>A question from a book, worksheet or class test: photo in, worked solution out — or your working marked.</span></div>
+      <div><b>🦉 AI Tutor</b><span>A conversation: explain a concept, quiz you, give practice questions, go back and forth until it clicks.</span><a href="/tutor.html">Open the Tutor →</a></div>
+      <div><b>✦ Explain (in papers)</b><span>A Cambridge past-paper question: tap Explain beside it — checked against the official mark scheme.</span><a href="/papers">Past papers →</a></div>
     </div>
   </section>
+</main>
 
-
-  <!-- ============ FOOTER ============ -->
-    <!--FOOT:START — shared footer. Do not edit here; edit website/partials/footer.html then run: python sync_nav.py -->
+<!--FOOT:START — shared footer. Do not edit here; edit website/partials/footer.html then run: python sync_nav.py -->
 <footer class="site-footer">
     <div class="footer-wa-strip">
       <div class="container footer-wa-inner">
@@ -410,45 +227,8 @@
   </footer>
 <!--FOOT:END-->
 
-  <script src="main.js?v=20260927k"></script>
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("subjectRequestForm");
-    const status = document.getElementById("srStatus");
-    if (!form) return;
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const subject = document.getElementById("srSubject").value.trim();
-      if (!subject) return;
-      const btn = form.querySelector("button");
-      btn.disabled = true;
-      status.className = "subject-request-status";
-      status.textContent = "Sending…";
-      try {
-        const r = await fetch("/api/subject-request", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ subject }),
-        });
-        if (r.ok) {
-          status.className = "subject-request-status ok";
-          status.textContent = "✓ Received! We'll let you know when it's added.";
-          form.reset();
-        } else {
-          throw new Error();
-        }
-      } catch (_) {
-        btn.disabled = false;
-        status.className = "subject-request-status err";
-        status.textContent = "Something went wrong — try WhatsApp instead.";
-      }
-    });
-  });
-  </script>
-  <script type="module" src="/auth.js?v=20260927k"></script>
-
-  <script src="tools-core.js?v=20260927j"></script>
-  <script src="tools-nav.js?v=20260811d"></script>
+<script src="/main.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/solver.js?v=20260926a"></script>
 </body>
-
 </html>

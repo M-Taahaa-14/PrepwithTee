@@ -3488,6 +3488,30 @@ def delete_tutor_session(session_id: str, user_id: str) -> bool:
         c.commit()
         return True
 
+def truncate_tutor_messages(session_id: str, user_id: str, message_id: str) -> int | None:
+    """Delete one message and every later message in the session (regenerate /
+    edit-and-resend). None if the session or message is not the user's."""
+    if get_tutor_session(session_id, user_id) is None:
+        return None
+    if _USE_SUPABASE:
+        m = (_client().table("tutor_messages").select("created_at").eq("id", message_id)
+             .eq("session_id", session_id).execute().data or [])
+        if not m:
+            return None
+        r = (_client().table("tutor_messages").delete().eq("session_id", session_id)
+             .gte("created_at", m[0]["created_at"]).execute())
+        return len(r.data or [])
+    with _local() as c:
+        row = c.execute("SELECT created_at FROM tutor_messages WHERE id=? AND session_id=?",
+                        (message_id, session_id)).fetchone()
+        if row is None:
+            return None
+        cur = c.execute("DELETE FROM tutor_messages WHERE session_id=? AND created_at >= ?",
+                        (session_id, row[0]))
+        c.commit()
+        return cur.rowcount
+
+
 def update_session_summary(session_id: str, summary: str) -> None:
     if _USE_SUPABASE:
         _client().table("tutor_sessions").update({"summary": summary}).eq("id", session_id).execute()

@@ -419,6 +419,24 @@ import { getUser } from "./auth.js?v=20260927k";
     } catch (_) {}
   }
 
+  function filterSessions() {
+    const q = (document.getElementById('tc-search')?.value || '').trim().toLowerCase();
+    let shown = 0;
+    sessionScroll.querySelectorAll('.tc-date-group, .tc-pinned-group').forEach(grp => {
+      let any = false;
+      grp.querySelectorAll('.tc-session-item').forEach(it => {
+        const ok = !q || it.textContent.toLowerCase().includes(q);
+        it.hidden = !ok;
+        any ||= ok;
+      });
+      grp.hidden = !any;
+      shown += any ? 1 : 0;
+    });
+    const none = document.getElementById('tc-search-none');
+    if (none) none.hidden = !q || shown > 0;
+  }
+  document.getElementById('tc-search')?.addEventListener('input', filterSessions);
+
   function renderSessions(sessions) {
     [...sessionScroll.querySelectorAll('.tc-date-group, .tc-pinned-group')].forEach(el => el.remove());
     sessionsEmpty.style.display = sessions.length ? 'none' : 'block';
@@ -446,6 +464,7 @@ import { getUser } from "./auth.js?v=20260927k";
       items.forEach(sess => grp.appendChild(makeSessionItem(sess)));
       sessionScroll.appendChild(grp);
     });
+    filterSessions();
   }
 
   function makeSessionItem(sess) {
@@ -651,10 +670,13 @@ import { getUser } from "./auth.js?v=20260927k";
         <div class="tc-bubble-wrap" style="min-width:0;flex:1;max-width:min(80ch,90%)">
           <div class="tc-bubble"></div>
           ${!isUser && msgId ? `<div class="tc-msg-acts"></div>` : ''}
+          ${isUser ? `<div class="tc-user-acts"><button type="button" class="tc-act-btn tc-edit-btn" title="Edit and resend">✏️ Edit</button></div>` : ''}
         </div>
       `;
       messages.appendChild(row);
+      if (isUser) row.querySelector('.tc-edit-btn').addEventListener('click', () => editMessage(row));
     }
+    if (msgId) row.dataset.msg = msgId;
 
     const bubble = row.querySelector('.tc-bubble');
     bubble.innerHTML = contentHtml;
@@ -738,7 +760,7 @@ import { getUser } from "./auth.js?v=20260927k";
     let userHtml = '';
     images.forEach(img => { userHtml += `<img src="${img.dataUri}" alt="attached image">`; });
     if (text.trim()) userHtml += `<p>${esc(text).replace(/\n/g, '<br>')}</p>`;
-    renderBubble('user', userHtml);
+    const userRow = renderBubble('user', userHtml);
 
     session.messages.push({ role: 'user', content: text || '(photo attached)', attachments: images.map(i => ({ type: 'image', url: i.dataUri })) });
 
@@ -813,7 +835,19 @@ import { getUser } from "./auth.js?v=20260927k";
 
               session.id      = data.session_id;
               session.summary = data.summary;
-              session.messages.push({ id: botId, role: 'assistant', content: data.html, provider: data.provider });
+              // Adopt the ids the server saved the messages under, so feedback,
+              // regenerate and edit act on the saved conversation.
+              const userMsg = session.messages[session.messages.length - 1];
+              if (data.user_message_id && userMsg) {
+                userMsg.id = data.user_message_id;
+                if (userRow) userRow.dataset.msg = data.user_message_id;
+              }
+              const finalId = data.bot_message_id || botId;
+              if (finalId !== botId) {
+                botRow.remove();
+                renderBubble('bot', data.html, finalId);
+              }
+              session.messages.push({ id: finalId, role: 'assistant', content: data.html, provider: data.provider });
 
               // Append suggestion chips
               appendSuggestions(defaultSuggestions());
@@ -858,26 +892,60 @@ import { getUser } from "./auth.js?v=20260927k";
     }).catch(() => {});
   }
 
+  /** Drop a message and everything after it - on screen, in memory and (signed
+   *  in) in the saved conversation - so the next send carries on from there. */
+  async function cutFrom(msgIndex) {
+    const m = session.messages[msgIndex];
+    if (!m) return;
+    if (currentUser && session.id && m.id) {
+      try { await apiFetch(`/api/tutor/sessions/${session.id}/messages/${m.id}`, 'DELETE'); } catch (_) { /* keep going */ }
+    }
+    session.messages = session.messages.slice(0, msgIndex);
+    const row = m.id ? messages.querySelector(`.tc-msg[data-msg="${CSS.escape(m.id)}"]`) : null;
+    if (row) { while (row.nextSibling) row.nextSibling.remove(); row.remove(); }
+    messages.querySelectorAll('.tc-suggestions').forEach(el => el.remove());
+  }
+
   async function regenerate(msgId) {
     if (busy) return;
     const idx = session.messages.findIndex(m => m.id === msgId);
     if (idx === -1) return;
-    const prevUser = session.messages.slice(0, idx).reverse().find(m => m.role === 'user');
-    if (!prevUser) return;
-
-    session.messages = session.messages.slice(0, idx);
-    const botEl = $(`tc-msg-${msgId}`);
-    if (botEl) { while (botEl.nextSibling) botEl.nextSibling.remove(); botEl.remove(); }
-    // Remove suggestions row if present
-    const sug = messages.querySelector('.tc-suggestions:last-child');
-    if (sug) sug.remove();
-
-    session.messages.pop();
-    const lastUserEl = messages.querySelector('.tc-msg.user:last-child');
-    if (lastUserEl) lastUserEl.remove();
-
+    let u = idx - 1;
+    while (u >= 0 && session.messages[u].role !== 'user') u--;
+    if (u < 0) return;
+    const prevUser = session.messages[u];
+    await cutFrom(u);
     const imgs = (prevUser.attachments || []).map(a => ({ dataUri: a.url }));
     await send(prevUser.content, imgs);
+  }
+
+  /** ✏️ on your own message: edit it in place, then the conversation restarts from it. */
+  function editMessage(row) {
+    if (busy || row.querySelector('.tc-edit-box')) return;
+    const idx = session.messages.findIndex(m => m.id && m.id === row.dataset.msg);
+    if (idx === -1) { toastError('Wait for the reply to finish, then edit.'); return; }
+    const m = session.messages[idx];
+    const bubble = row.querySelector('.tc-bubble');
+    const before = bubble.innerHTML;
+    bubble.innerHTML = `<div class="tc-edit-box"><textarea rows="3"></textarea>
+      <div class="tc-edit-acts"><button type="button" class="tc-act-btn" data-cancel>Cancel</button>
+      <button type="button" class="tc-act-btn tc-edit-send" data-send>Send</button></div></div>`;
+    const ta = bubble.querySelector('textarea');
+    ta.value = m.content === '(photo attached)' ? '' : (m.content || '');
+    ta.focus();
+    bubble.querySelector('[data-cancel]').onclick = () => { bubble.innerHTML = before; renderMath(bubble); };
+    const go = async () => {
+      const text = ta.value.trim();
+      const imgs = (m.attachments || []).map(a => ({ dataUri: a.url }));
+      if (!text && !imgs.length) return;
+      await cutFrom(idx);
+      await send(text, imgs);
+    };
+    bubble.querySelector('[data-send]').onclick = go;
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); }
+      if (e.key === 'Escape') bubble.querySelector('[data-cancel]').click();
+    });
   }
 
   // ── Textarea auto-height ───────────────────────────────────────────────────
@@ -895,6 +963,7 @@ import { getUser } from "./auth.js?v=20260927k";
   // ── Deep-link (e.g. from past papers) ────────────────────────────────────
   function checkDeepLink() {
     const p = new URLSearchParams(location.search);
+    if (p.get('tab') === 'solver') { location.replace('/solver'); return; }
     const syllabus = p.get('syllabus');
     const topic    = p.get('topic');
     const q        = p.get('q');   // prefilled question

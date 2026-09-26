@@ -94,6 +94,18 @@ import calc as _calc_mod
 app.include_router(_calc_mod.router)
 import notes as _notes_mod
 app.include_router(_notes_mod.router)
+
+
+@app.get("/solver", include_in_schema=False)
+def solver_page():
+    """The Photo Solver (static page; clean URL)."""
+    return FileResponse(Path(__file__).parent / "static" / "solver.html",
+                        headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/ask.html", include_in_schema=False)
+def legacy_ask():
+    return RedirectResponse("/solver", 301)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
@@ -1895,8 +1907,44 @@ never guess at what it might have said."""
 
 
 class SolveReq(BaseModel):
-    image: str                      # data URL from the browser
+    image: str                      # data URL from the browser: the question
     note: str | None = None         # optional "I got stuck at part (b)"
+    mode: str = "solve"             # solve | check (mark the student's own working)
+    working: str | None = None      # check mode: a photo of the student's working
+    working_text: str | None = None # ...or their working typed out
+    syllabus: str | None = None     # e.g. "0625" - names the board's marking style
+
+
+CHECK_SYSTEM = """You are a Cambridge examiner marking a student's working for \
+PrepWithTee. You get a photo of the QUESTION and the student's WORKING (a second
+photo, or typed text). Mark it the way a Cambridge examiner would.
+
+Reply in this shape, using clean HTML (no markdown, no code fences):
+  <h3>Verdict</h3>
+  <p><b>Estimated mark: X / Y</b> - one sentence on how it went.</p>
+  <h3>Step by step</h3>
+  one <div class="mark ok">...</div> for each correct step (say what earned the mark),
+  and one <div class="mark bad">...</div> for each step that is wrong or missing,
+  saying exactly what is wrong and what the correct step is.
+  <h3>Correct final answer</h3>
+  <p>The right answer with unit and sensible significant figures.</p>
+  <h3>Next time</h3>
+  <p>One specific habit that would have saved the lost marks.</p>
+
+Rules: judge THEIR working - do not just solve it again. Credit correct method
+even after an arithmetic slip (error carried forward). If a photo is unreadable,
+say so plainly and ask for a clearer picture - never guess."""
+
+SOLVE_FOLLOW_SYSTEM = """You are a Cambridge tutor for PrepWithTee continuing a \
+conversation about a question the student photographed. The worked solution you
+already gave is below. Answer their follow-up briefly and clearly (at most about
+150 words), in clean HTML (<p>, <ul>, <b>; maths as \\( ... \\)). If they ask for
+something unrelated, steer them to the AI Tutor."""
+
+
+class SolveFollowReq(BaseModel):
+    solution: str                   # the HTML answer they are asking about
+    message: str
 
 
 def _client_ip(request: Request) -> str:
@@ -1952,22 +2000,60 @@ def solve(req: SolveReq, request: Request):
                  f"try again in {wait // 60 + 1} minutes, or message us on "
                  f"WhatsApp for help.")
 
-    m = re.match(r"data:(image/(?:png|jpe?g|webp|gif));base64,(.+)$",
-                 req.image or "", re.S)
-    if not m:
-        raise HTTPException(400, "Send a PNG, JPEG or WebP photo.")
-    media_type, b64 = m.group(1), m.group(2)
-    if len(b64) > 8_000_000:
-        raise HTTPException(413, "That image is too large - try a photo under 5 MB.")
+    def image(data: str | None, what: str):
+        m = re.match(r"data:(image/(?:png|jpe?g|webp|gif));base64,(.+)$", data or "", re.S)
+        if not m:
+            raise HTTPException(400, f"Send the {what} as a PNG, JPEG or WebP photo.")
+        if len(m.group(2)) > 8_000_000:
+            raise HTTPException(413, f"The {what} photo is too large - try one under 5 MB.")
+        return m.group(1), m.group(2)
 
-    prompt = ("Here is my question. " + (req.note.strip() if req.note else "")).strip()
-    html, provider = _solve_vision_complete(SOLVER_SYSTEM, prompt, media_type, b64)
+    media_type, b64 = image(req.image, "question")
+    extra = []
+    note = (req.note or "").strip()[:600]
+    where = f" (Cambridge syllabus {req.syllabus})" if req.syllabus and re.fullmatch(r"\d{4}", req.syllabus) else ""
+    if req.mode == "check":
+        working_text = (req.working_text or "").strip()[:4000]
+        if req.working:
+            extra.append(image(req.working, "working"))
+        elif not working_text:
+            raise HTTPException(400, "Add a photo of your working, or type it out, to have it checked.")
+        prompt = (f"The first photo is the question{where}. "
+                  + ("The second photo is my working. " if req.working else "")
+                  + (f"My working:\n{working_text}\n" if working_text else "")
+                  + (f"Note: {note}" if note else "")).strip()
+        system = CHECK_SYSTEM
+    elif req.mode == "solve":
+        prompt = (f"Here is my question{where}. " + note).strip()
+        system = SOLVER_SYSTEM
+    else:
+        raise HTTPException(400, "mode must be 'solve' or 'check'")
+    html, provider = _solve_vision_complete(system, prompt, media_type, b64, extra)
     if html is None:
         print(f"[solve] no vision provider answered: {provider}", flush=True)
         raise HTTPException(
             503, "The photo solver is unavailable right now — try again shortly, "
                  "or send the photo to us on WhatsApp.")
-    return {"html": _clean_html(html), "provider": provider}
+    return {"html": _clean_html(html), "provider": provider, "mode": req.mode}
+
+
+@app.post("/api/solve/followup")
+def solve_followup(req: SolveFollowReq, request: Request):
+    """A short follow-up about a solution the Solver just gave (text only)."""
+    wait = _rate_limited(_client_ip(request))
+    if wait is not None:
+        raise HTTPException(429, f"That's {SOLVE_LIMIT} questions in an hour - try again in "
+                                 f"{wait // 60 + 1} minutes.")
+    msg = (req.message or "").strip()
+    if not msg:
+        raise HTTPException(400, "Type your question.")
+    context = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", req.solution or ""))[:6000]
+    text, provider = _chat_complete([
+        {"role": "system", "content": SOLVE_FOLLOW_SYSTEM + "\n\nThe solution so far:\n" + context},
+        {"role": "user", "content": msg[:800]}], max_tokens=700)
+    if text is None:
+        raise HTTPException(503, "The tutor is busy right now - try again in a moment.")
+    return {"html": _clean_html(text), "provider": provider}
 
 
 # ── Live Help Chatbot Widget Endpoint (Task 17) ────────────────────────────────
@@ -2078,10 +2164,13 @@ SOLVE_VISION_PROVIDERS = [
 ]
 
 
-def _solve_vision_complete(system: str, prompt: str, media_type: str, b64: str):
-    """Photo Solver: image + prompt -> text via Anthropic or OpenAI-compat providers."""
+def _solve_vision_complete(system: str, prompt: str, media_type: str, b64: str,
+                           extra: list | None = None):
+    """Photo Solver: image(s) + prompt -> text via Anthropic or OpenAI-compat providers.
+    `extra` = more (media_type, b64) images after the first (Check my working)."""
     import requests
     errors = []
+    images = [(media_type, b64)] + list(extra or [])
 
     key = os.environ.get("ANTHROPIC_API_KEY")
     if key:
@@ -2090,8 +2179,8 @@ def _solve_vision_complete(system: str, prompt: str, media_type: str, b64: str):
             msg = anthropic.Anthropic(api_key=key).messages.create(
                 model="claude-sonnet-4-6", max_tokens=2000, system=system,
                 messages=[{"role": "user", "content": [
-                    {"type": "image", "source": {"type": "base64",
-                                                 "media_type": media_type, "data": b64}},
+                    *[{"type": "image", "source": {"type": "base64", "media_type": mt, "data": d}}
+                      for mt, d in images],
                     {"type": "text", "text": prompt},
                 ]}])
             text = "".join(b.text for b in msg.content
@@ -2101,8 +2190,7 @@ def _solve_vision_complete(system: str, prompt: str, media_type: str, b64: str):
         except Exception as exc:
             errors.append(f"anthropic: {exc}")
 
-    # OpenAI-compatible providers take the image as a data URL.
-    data_url = f"data:{media_type};base64,{b64}"
+    # OpenAI-compatible providers take the images as data URLs.
     for p in SOLVE_VISION_PROVIDERS:
         pkey = os.environ.get(p["env"])
         if not pkey:
@@ -2113,8 +2201,8 @@ def _solve_vision_complete(system: str, prompt: str, media_type: str, b64: str):
                           {"role": "system", "content": system},
                           {"role": "user", "content": [
                               {"type": "text", "text": prompt},
-                              {"type": "image_url",
-                               "image_url": {"url": data_url}},
+                              *[{"type": "image_url", "image_url": {"url": f"data:{mt};base64,{d}"}}
+                                for mt, d in images],
                           ]},
                       ]}
             payload.update(p.get("extra") or {})
@@ -2709,6 +2797,17 @@ def delete_tutor_session(session_id: str, user: dict = _Depends(_get_current_use
     if not ok:
         raise _HTTPException(404, "Session not found")
     return {"ok": True}
+
+
+@app.delete("/api/tutor/sessions/{session_id}/messages/{message_id}")
+def truncate_tutor_session(session_id: str, message_id: str, user: dict = _Depends(_get_current_user)):
+    """Regenerate / edit-and-resend: drop this message and everything after it,
+    so the saved conversation matches what the student sees."""
+    import users_db as _udb
+    n = _udb.truncate_tutor_messages(session_id, user["id"], message_id)
+    if n is None:
+        raise _HTTPException(404, "Message not found")
+    return {"ok": True, "deleted": n}
 
 
 @app.post("/api/tutor/messages/{message_id}/feedback")

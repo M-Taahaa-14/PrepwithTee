@@ -365,7 +365,7 @@ Suspected causes found in `pipeline/compose.py`:
 - Adding a note = drop an HTML/MD file in `notes-content/{syllabus}/{chapter}/{subtopic}.html`; the tree picks it up automatically.
 - **Tests**: every manifest entry resolves; every taxonomy subtopic produces a page (coming-soon allowed); sitemap includes only notes that exist.
 
-### P2-e · #10 + #11 AI Tutor & Solver
+### P2-e · #10 + #11 AI Tutor & Solver — ✅ built locally 2026-09-26
 - **Tutor** (`/tutor`): ChatGPT/Claude-like — left sidebar with searchable, date-grouped chats ("Today / Previous 7 days"), auto titles from content, rename/pin/archive/delete, new chat; centred message column, streaming markdown + KaTeX + code, copy / regenerate / edit-and-resend / thumbs; subject selector chip; attach image; voice note (Groq Whisper exists). Background: subtle animated **maths-symbol pattern** (∑ π √ ∫ drawn faintly, CSS only, respects reduced-motion).
 - **Solver** (`/solver`): two big modes — **📷 Solve a question** and **✅ Check my working** — drag/paste/camera upload, crop box, then a structured worked solution / marking report; short follow-up allowed.
 - On both pages an "How to get the best out of this" card (when to use Tutor vs Solver vs the in-paper Explain).

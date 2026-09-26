@@ -12,7 +12,9 @@ Layout
   tests/e2e   Playwright against a running local server (see tests/e2e/conftest.py)
 """
 
+import atexit
 import os
+import shutil
 import sys
 import tempfile
 import uuid
@@ -22,6 +24,9 @@ import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 _TMP = Path(tempfile.mkdtemp(prefix="pwt_tests_"))
+# Each run copies the ~90 MB archive DB in here; without this, 120 runs left
+# 9.5 GB behind and filled the disk (2026-09-26).
+atexit.register(shutil.rmtree, _TMP, ignore_errors=True)
 
 os.environ.update({
     "APP_ENV": "test",
