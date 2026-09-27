@@ -597,6 +597,61 @@ linked), not agreement with any external file.
       CRUMB markers, BreadcrumbList JSON-LD) under the header. New static page = add it to
       CRUMBS, run `python sync_nav.py`.
 
+29. **UI + speed pass (2026-09-27, local, not yet deployed).**
+    - **Speed**: `website/db.py` keeps a pool of open Postgres connections (own idle
+      list, NOT psycopg2.pool - it closes everything above minconn); every query used
+      to pay a fresh TLS connect to the Supabase pooler (~1-2 s). `yearly._all_years()`
+      = one cached query for every subject's year/paper counts (was one per subject:
+      /yearly took 14 s on production). `_student_state` reads run via `udb.gather`.
+    - **One picker** (`ui.picker` + `ui.tile`, CSS `.pk-*` in catalog.css, behaviour
+      in catalog.js): board tabs + search + a coloured band per board + equal tiles
+      (icon, flag, name, code/years, 2 stats, "Also" links, max 2 buttons). Used by
+      topical, mock tests, board pages, yearly, MCQ, notes, resources.
+    - **Site search**: header button + Ctrl K / "/" (inline hook in partials/nav.html,
+      palette = static/site-search.js) over `GET /api/search/index` (website/search.py:
+      pages, subject sections, every chapter, every note; cached 10 min).
+    - Dark mode lifted to a "dimmed" slate (page #1c2130, cards #293043); colour pass
+      (tinted heroes, tone-cycled steps, centred FAQ/"which one"). Profile redesigned
+      (hero + stats, section nav, subject tiles from /api/boards `links`; Board field
+      pre-fills from student_boards).
+    - Booklets/mock tests print **newest paper first** (`selection.order_recent_first`),
+      still covering every picked chapter.
+
+30. **Round 2 UI + streak fix (2026-09-28, local, not yet deployed).**
+    - **Streaks were broken for everyone**: `/api/dashboard` called
+      `users_db.get_time_spent_range`, which did not exist (AttributeError swallowed), so
+      tracked time never counted; best streak lived in localStorage and was reset to the
+      server's 0 on each visit. Now `website/streaks.py` (pure, tests/unit/test_streaks.py):
+      a day counts for ANY activity (time, quizzes, booklets, MCQ sessions, marked papers,
+      flashcard reviews), in the student's timezone (`?tz=` from the browser, default
+      Asia/Karachi); returns `streak`, `streak_best`, `week_active`. `/api/time-spent` takes
+      the browser's local `day`; the pagehide beacon is sent as JSON (was text/plain -> 422).
+    - **Multi-board profile**: Board dropdown -> board chips (PUT /api/me/boards, first =
+      main; hidden `grade` select follows). `save_profile` no longer archives every subject
+      when the main board changes - only subjects of boards the student dropped.
+      Dashboard "Add a subject" lists all the student's boards.
+    - Header: full width, logo hard left, `.header-end` (search + account) hard right.
+      Dashboard section tabs (`sync_nav.DASH_TABS`, stamped in the CRUMB block;
+      `ui.dash_tabs()` on /my-papers). `ui.page_search()` filter box (notes chapters,
+      resources folders incl. files deep inside, explore). Explore rebuilt. Notes chapter
+      cards: numbered, colour-cycled, subtopics always shown. Builder chapters colour-cycled.
+      Profile: formula cards per subject (ring + due today), feedback form (-> /api/feedback),
+      photo cropper `static/avatar-crop.js` (drag / zoom / pinch -> 512 px JPEG).
+    - Dashboard tabs = ONE sticky row under the header (the crumb strip is hidden on those
+      pages). **Progress tracking is free for every subject** (tutor): the free-plan
+      "first subject only" blur in topical-progress.js is gone - don't re-add plan gates
+      to topical/yearly progress.
+
+31. **Home hero v2 (2026-09-28, local).** Tagline "You already work hard. Let's make it
+    count." + a MacBook-style laptop (`demo-player.js` `data-frame="laptop"`: lid opens on first
+    view) playing `static/demos/hero/timeline.json`: an intro title card ("Not sure where to
+    start?"), 10 real screenshots (pick board -> subject -> chapters -> booklet -> mark scheme ->
+    Explain -> marks -> dashboard) and an "Ask Tee" card with WhatsApp + free-demo buttons.
+    Timeline steps may be `{card: {...}}` instead of `shot`. The player fetches only the next
+    two screenshots. Replaced the three.js hero (hero3d.js no longer loaded) and the lower
+    "See it in action" section (demos/how-it-works deleted). **Re-capture after UI changes**:
+    `.venv\Scripts\python scripts\capture_demo_shots.py --base http://localhost:8017`.
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

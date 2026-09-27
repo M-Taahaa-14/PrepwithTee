@@ -824,3 +824,21 @@ html[data-theme="dark"] .dash-ach-streak-pill { background:linear-gradient(135de
 @media (max-width: 1200px) {
   .page-back-bar { padding: 7px 16px; }
 }
+
+/* ── 2026-09-28: hero + banners line up with the card grid; reminder card ── */
+.hub-hero { max-width: calc(1360px - 56px); margin: 22px auto 0; border-radius: 26px;
+  width: calc(100% - 56px); box-sizing: border-box; padding: 30px 32px 32px; }
+.hub-banners { max-width: 1360px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+@media (max-width: 600px) { .hub-hero { width: calc(100% - 24px); margin-top: 12px; border-radius: 20px; padding: 22px 18px; } }
+.dash-remind { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding: 16px 20px; border-radius: 18px;
+  background: linear-gradient(100deg, var(--yellow) 0%, var(--white) 75%); border: 1px solid var(--yellow-line);
+  border-left: 5px solid var(--yellow-ink); }
+.dash-remind-ic { font-size: 1.7rem; line-height: 1; flex: none; }
+.dash-remind-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.dash-remind-text p { margin: 0; font: 800 .68rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--yellow-ink); }
+.dash-remind-text strong { font-size: 1rem; color: var(--ink); }
+.dash-remind-text span { font-size: .86rem; color: var(--grey); }
+.dash-remind-btn { flex: none; font: 800 .86rem/1 "Hanken Grotesk", sans-serif; text-decoration: none; padding: .7rem 1rem;
+  border-radius: 11px; background: var(--accent); color: var(--on-accent); }
+.dash-remind-btn:hover { background: var(--accent-hover); }
+@media (max-width: 640px) { .dash-remind { flex-wrap: wrap; } .dash-remind-btn { width: 100%; text-align: center; } }

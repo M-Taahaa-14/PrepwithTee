@@ -8,7 +8,7 @@
  *   tests    a mock test (kind "test") has no chips: Test / Mark scheme tabs, a
  *            countdown, and the separate mark scheme unlocks on "Finish test"
  */
-import { api } from "/auth.js?v=20260927k";
+import { api } from "/auth.js?v=20260929a";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20260928a";
 import { paperButton } from "/paper-theme.js?v=20260928a";

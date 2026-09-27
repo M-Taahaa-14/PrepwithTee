@@ -4,7 +4,7 @@
  *     signed-in student with no saved boards, and from "Edit my boards".
  * Page state is embedded by catalog.py as JSON in #cat-state.
  */
-import { api } from "/auth.js?v=20260927k";
+import { api } from "/auth.js?v=20260929a";
 
 const state = JSON.parse(document.getElementById("cat-state")?.textContent || "{}");
 
@@ -104,3 +104,124 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("[data-open-boards]")) openBoards();
 });
 if (state.signedIn && state.needsBoards) openBoards({ required: true });
+
+// ── Board + subject picker (ui.picker) ─────────────────────────────────────
+// Board tabs filter the bands in place; the search box filters tiles by name
+// or code across every board. "/" focuses the search. The chosen board is
+// remembered per section (localStorage, best effort). Without JS every board
+// simply shows - the markup is complete.
+function initPicker(root) {
+  const tabs = [...root.querySelectorAll("button.pk-tab[data-pk-board]")];
+  const bands = [...root.querySelectorAll(".pk-board")];
+  const input = root.querySelector("[data-pk-q]");
+  const none = root.querySelector(".pk-none");
+  const echo = root.querySelector("[data-pk-echo]");
+  const key = "pk-board:" + location.pathname.split("/")[1];
+  let board = "";
+  try { board = localStorage.getItem(key) || ""; } catch (_) { /* private mode */ }
+  if (board && !bands.some((b) => b.dataset.pkBoard === board)) board = "";
+  if (location.hash && bands.some((b) => b.id === location.hash.slice(1))) board = location.hash.slice(1);
+
+  function apply() {
+    const q = (input?.value || "").trim().toLowerCase();
+    const words = q.split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const band of bands) {
+      const onBoard = !board || q ? true : band.dataset.pkBoard === board;
+      let n = 0;
+      for (const t of band.querySelectorAll(".pk-tile")) {
+        const hit = !words.length || words.every((w) => t.dataset.q.includes(w));
+        t.hidden = !hit;
+        if (hit) n++;
+      }
+      band.hidden = !onBoard || n === 0;
+      if (!band.hidden) shown += n;
+    }
+    for (const t of tabs) {
+      const on = (t.dataset.pkBoard || "") === board && !q;
+      t.classList.toggle("is-on", on || (!q && !board && !t.dataset.pkBoard));
+      t.setAttribute("aria-pressed", String(t.classList.contains("is-on")));
+    }
+    if (none) {
+      none.hidden = shown > 0;
+      if (echo) echo.textContent = `"${input?.value.trim() || ""}"`;
+    }
+  }
+
+  tabs.forEach((t) => t.addEventListener("click", () => {
+    board = t.dataset.pkBoard || "";
+    if (input) input.value = "";
+    try { localStorage.setItem(key, board); } catch (_) { /* ignore */ }
+    apply();
+  }));
+  input?.addEventListener("input", apply);
+  input?.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { input.value = ""; apply(); input.blur(); }
+    if (e.key === "Enter") {                      // open the only / first match
+      const first = root.querySelector(".pk-tile:not([hidden]) .pk-link");
+      if (first) location.href = first.href;
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+    const el = document.activeElement;
+    if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+    if (!input || input.offsetParent === null) return;
+    e.preventDefault();
+    input.focus();
+  });
+  apply();
+}
+document.querySelectorAll("[data-pk]").forEach(initPicker);
+
+// ── In-page search (ui.page_search) ─────────────────────────────────────────
+// Filters a long list on the page (chapters, resource folders and files) as
+// you type. Every word must match the item's data-q, or its text.
+function initPageSearch(root) {
+  const input = root.querySelector("[data-ps-q]");
+  const count = root.querySelector("[data-ps-count]");
+  const items = [...document.querySelectorAll(root.dataset.psItems)];
+  const groupSel = root.dataset.psGroups;
+  if (!input || !items.length) { root.hidden = true; return; }
+  const hay = items.map((el) => (el.dataset.q || el.textContent).toLowerCase());
+  function apply() {
+    const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    items.forEach((el, i) => {
+      const hit = !words.length || words.every((w) => hay[i].includes(w));
+      el.hidden = !hit;
+      if (hit) shown++;
+    });
+    if (groupSel) {
+      const groups = new Set(items.map((el) => el.closest(groupSel)).filter(Boolean));
+      groups.forEach((g) => { g.hidden = words.length > 0 && !g.querySelector(`${root.dataset.psItems}:not([hidden])`); });
+    }
+    count.textContent = words.length ? `${shown} of ${items.length}` : "";
+  }
+  input.addEventListener("input", apply);
+  input.addEventListener("keydown", (e) => { if (e.key === "Escape") { input.value = ""; apply(); } });
+}
+document.querySelectorAll("[data-ps]").forEach(initPageSearch);
+
+// ── Board filter on "Your subjects" (/papers) ──────────────────────────────
+document.querySelectorAll("[data-bf]").forEach((bar) => {
+  const scope = bar.closest("section") || document;
+  const rows = [...scope.querySelectorAll(".ui-mine[data-board]")];
+  const key = "bf-board";
+  function show(board) {
+    rows.forEach((r) => { r.hidden = !!board && r.dataset.board !== board; });
+    bar.querySelectorAll("[data-bf-board]").forEach((b) => {
+      const on = (b.dataset.bfBoard || "") === board;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    try { localStorage.setItem(key, board); } catch (_) { /* ignore */ }
+  }
+  bar.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-bf-board]");
+    if (b) show(b.dataset.bfBoard || "");
+  });
+  let saved = "";
+  try { saved = localStorage.getItem(key) || ""; } catch (_) { /* ignore */ }
+  if (saved && bar.querySelector(`[data-bf-board="${saved}"]`)) show(saved);
+});

@@ -224,17 +224,17 @@
         {
           element: '.profile-sidebar',
           popover: {
-            title: '👤 Your profile card',
-            description: 'Name, grade level, photo, and a quick summary of today\'s formula reviews and subjects enrolled. The grade level determines which subjects and papers appear across the whole site.',
+            title: '👤 Jump around',
+            description: 'Jump straight to any part of your profile, or open your dashboard, papers and progress.',
             side: 'right', align: 'start',
           },
         },
         {
-          element: '.profile-avatar-wrap',
+          element: '.pf-hero',
           popover: {
-            title: '📷 Photo & grade badge',
-            description: 'Click the camera icon to update your profile photo. The grade badge (e.g. O Level) is what filters syllabuses site-wide — change it in the form below if needed.',
-            side: 'right', align: 'start',
+            title: '📷 Photo & boards',
+            description: 'Change your photo here. The board chips (O Level, IGCSE, A Level) are what filter subjects site-wide - change your board and subjects in the form below.',
+            side: 'bottom', align: 'start',
           },
         },
         {

@@ -389,11 +389,11 @@
 .pwt-cb-escalate a:hover { text-decoration: underline !important; }
 
 /* Dark mode */
-html[data-theme="dark"] .pwt-chatbot-panel { background: #13161d; border-color: #2b3240; }
+html[data-theme="dark"] .pwt-chatbot-panel { background: #222838; border-color: #3b435a; }
 html[data-theme="dark"] .pwt-chatbot-body { background: #0a0a16; }
-html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #2b3240; color: #e8e8ff; }
+html[data-theme="dark"] .pwt-cb-msg.bot { background: #1a1936; border-color: #3b435a; color: #e8e8ff; }
 html[data-theme="dark"] .pwt-chatbot-chips,
-html[data-theme="dark"] .pwt-chatbot-foot { background: #13161d; border-color: #2b3240; }
+html[data-theme="dark"] .pwt-chatbot-foot { background: #222838; border-color: #3b435a; }
 html[data-theme="dark"] .pwt-cb-chip { background: #1e1b38; border-color: #38326a; color: #ddd; }
 html[data-theme="dark"] .pwt-chatbot-input { background: #181730; border-color: #343c4c; color: #fff; }
 html[data-theme="dark"] .pwt-chatbot-tooltip { background: #2E1B4A; }

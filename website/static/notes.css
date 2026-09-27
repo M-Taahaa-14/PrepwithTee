@@ -18,26 +18,43 @@ a.nt-card.is-soon { opacity: .75; }
 
 /* subject page: chapter cards */
 .nt-group + .nt-group { margin-top: 1.4rem; }
-.nt-chs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: .8rem; }
-.nt-ch { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: .95rem 1rem;
-  display: grid; gap: .55rem; align-content: start; }
-.nt-ch.has-notes { border-top: 3px solid var(--green-ink); }
-.nt-ch header { display: flex; align-items: flex-start; justify-content: space-between; gap: .6rem; }
-.nt-ch-name { font: 800 1.02rem/1.25 "Archivo", sans-serif; color: var(--ink); text-decoration: none; }
-.nt-ch-name:hover { color: var(--navy); text-decoration: underline; }
-.nt-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.nt-chs { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1rem; align-items: stretch; }
+.nt-ch { position: relative; display: flex; flex-direction: column; gap: .75rem; padding: 1rem 1.05rem 1rem;
+  border-radius: 18px; border: 1px solid var(--t-line, var(--line)); overflow: hidden;
+  background: linear-gradient(170deg, var(--t, var(--cream)) 0%, var(--white) 38%); }
+.nt-ch::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--t-ink); }
+.nt-ch header { display: flex; align-items: flex-start; gap: .7rem; }
+.nt-ch-num { flex: none; width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center;
+  font: 800 .85rem/1 "Archivo", sans-serif; background: var(--t-ink); color: var(--pk-on, #fff); }
+.nt-ch-name { flex: 1; min-width: 0; font: 800 1.06rem/1.25 "Archivo", sans-serif; color: var(--ink); text-decoration: none; padding-top: .1rem; }
+.nt-ch-name:hover { color: var(--t-ink); }
+.nt-ch .nt-badge, .nt-ch .nt-soon { flex: none; margin-top: .3rem; }
+.nt-notes { list-style: none; margin: 0; padding: .55rem .7rem; display: grid; gap: .3rem; border-radius: 12px;
+  background: var(--white); border: 1px solid var(--t-line, var(--line)); }
 .nt-notes li { display: flex; justify-content: space-between; gap: .6rem; font-size: .9rem; }
-.nt-notes a { color: var(--navy); text-decoration: none; font-weight: 600; }
+.nt-notes a { color: var(--t-ink); text-decoration: none; font-weight: 700; }
 .nt-notes a::before { content: "📄 "; }
 .nt-notes a:hover { text-decoration: underline; }
 .nt-notes span { color: var(--grey); font-size: .76rem; white-space: nowrap; }
-.nt-subs summary { cursor: pointer; font-size: .8rem; color: var(--grey); }
-.nt-subs ul, .nt-sublist { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .2rem; font-size: .84rem; color: var(--grey); }
-.nt-subs li::before, .nt-sublist li::before { content: "○"; margin-right: .45rem; color: var(--line); }
-.nt-subs li.is-on, .nt-sublist li.is-on { color: var(--ink); }
-.nt-subs li.is-on::before, .nt-sublist li.is-on::before { content: "✓"; color: var(--green-ink); font-weight: 800; }
-.nt-practise { justify-self: start; font-size: .82rem; font-weight: 700; color: var(--orange-ink); text-decoration: none; }
+.nt-subs p { margin: 0 0 .4rem; font: 700 .64rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--grey); }
+.nt-subs ul, .nt-sublist { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.nt-subs li { font-size: .8rem; font-weight: 600; color: var(--ink); background: var(--white); border: 1px solid var(--t-line, var(--line));
+  border-radius: 999px; padding: .3rem .6rem; }
+.nt-subs li.is-on { background: var(--green); border-color: var(--green-line); color: var(--green-ink); }
+.nt-subs li.is-on::before { content: "✓ "; font-weight: 800; }
+.nt-sublist { display: grid; gap: .2rem; font-size: .84rem; color: var(--grey); }
+.nt-sublist li::before { content: "○"; margin-right: .45rem; color: var(--line); }
+.nt-sublist li.is-on { color: var(--ink); }
+.nt-sublist li.is-on::before { content: "✓"; color: var(--green-ink); font-weight: 800; }
+.nt-ch footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+  padding-top: .6rem; border-top: 1px dashed var(--t-line, var(--line)); }
+.nt-read { font-size: .82rem; font-weight: 800; color: var(--pk-on, #fff); background: var(--t-ink); text-decoration: none;
+  padding: .45rem .75rem; border-radius: 9px; }
+.nt-read:hover { filter: brightness(1.08); }
+.nt-practise { font-size: .82rem; font-weight: 800; color: var(--t-ink); text-decoration: none; }
 .nt-practise:hover { text-decoration: underline; }
+.nt-tree [hidden] { display: none !important; }
 
 /* chapter page */
 .nt-note-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .7rem; }

@@ -12,7 +12,7 @@
  * unlocks when the student finishes). Build -> /papers/view/{id} in a new tab.
  * The exact pool size comes from POST /api/booklets/count (debounced).
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20260927k";
+import { api, UpgradeRequiredError } from "/auth.js?v=20260929a";
 
 const root = document.getElementById("builder");
 const SYL = root?.dataset.syllabus;
@@ -396,7 +396,7 @@ async function build() {
     const dark = document.documentElement.dataset.theme === "dark";
     win.document.write(`<title>Setting up your paper…</title><body style="font:16px system-ui;
       display:grid;place-items:center;height:100vh;margin:0;color:${dark ? "#e8ebf1" : "#4C2E72"};
-      background:${dark ? "#0f1117" : "#FDF9F3"}">Setting up your ${test ? "mock test" : "paper"}…</body>`);
+      background:${dark ? "#1c2130" : "#FDF9F3"}">Setting up your ${test ? "mock test" : "paper"}…</body>`);
   }
   btn.disabled = true;
   btn.textContent = "Building…";

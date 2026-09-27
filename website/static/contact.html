@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260928b">
+  <link rel="stylesheet" href="styles.css?v=20260929e">
   <style>
     /* ── PAGE-LOCAL TOKENS ─────────────────────────────────────── */
     :root {
@@ -64,29 +64,29 @@
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --c-form-bg:    #160d2c;
-        --c-form-border:#2a1850;
-        --c-input-bg:   #0f0820;
+        --c-form-bg:    #293043;
+        --c-form-border:#3a4259;
+        --c-input-bg:   #1f2433;
         --c-input-bd:   rgba(255,255,255,.13);
         --c-input-ink:  #f0ebe0;
-        --c-label:      #7a7090;
+        --c-label:      #b7bfcf;
         --c-pill-bd:    rgba(255,255,255,.15);
-        --c-faq-bg:     #0d0820;
-        --c-faq-card:   #160d2c;
+        --c-faq-bg:     #232939;
+        --c-faq-card:   #293043;
         --c-faq-ink:    #f0ebe0;
         --c-faq-bd:     rgba(255,255,255,.1);
       }
     }
     :root[data-theme="dark"] {
-      --c-form-bg:    #160d2c;
-      --c-form-border:#2a1850;
-      --c-input-bg:   #0f0820;
+      --c-form-bg:    #293043;
+      --c-form-border:#3a4259;
+      --c-input-bg:   #1f2433;
       --c-input-bd:   rgba(255,255,255,.13);
       --c-input-ink:  #f0ebe0;
-      --c-label:      #7a7090;
+      --c-label:      #b7bfcf;
       --c-pill-bd:    rgba(255,255,255,.15);
-      --c-faq-bg:     #0d0820;
-      --c-faq-card:   #160d2c;
+      --c-faq-bg:     #232939;
+      --c-faq-card:   #293043;
       --c-faq-ink:    #f0ebe0;
       --c-faq-bd:     rgba(255,255,255,.1);
     }
@@ -99,57 +99,6 @@
       align-items: center;
       overflow: hidden;
       background: var(--c-hero);
-    }
-    #world-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-    /* SVG dot layer — viewBox matches canvas logical coords (1000×500) */
-    .dots-svg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: visible;
-    }
-    @keyframes pulse-gold {
-      0%   { r: 9;  opacity: .85; }
-      100% { r: 36; opacity: 0;   }
-    }
-    @keyframes pulse-gold2 {
-      0%   { r: 9;  opacity: .5; }
-      100% { r: 56; opacity: 0;  }
-    }
-    @keyframes pulse-city {
-      0%   { r: 6;  opacity: .7; }
-      100% { r: 24; opacity: 0;  }
-    }
-    @keyframes pulse-city2 {
-      0%   { r: 6;  opacity: .35; }
-      100% { r: 34; opacity: 0;   }
-    }
-    .rg1 { animation: pulse-gold  2.9s ease-out infinite;
-           transform-box: fill-box; transform-origin: center; }
-    .rg2 { animation: pulse-gold2 2.9s ease-out 1.1s infinite;
-           transform-box: fill-box; transform-origin: center; }
-    .rc1 { animation: pulse-city  3.3s ease-out infinite;
-           transform-box: fill-box; transform-origin: center; }
-    .rc2 { animation: pulse-city2 3.3s ease-out 1.4s infinite;
-           transform-box: fill-box; transform-origin: center; }
-
-    /* Left-biased gradient — map shows on the right */
-    .hero-grad {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(100deg,
-        rgba(9,6,26,.96) 0%,
-        rgba(9,6,26,.82) 42%,
-        rgba(9,6,26,.35) 65%,
-        rgba(9,6,26,.04) 100%);
-      pointer-events: none;
     }
     .hero-content {
       position: relative;
@@ -500,6 +449,74 @@
     .form-msg.ok  { color: #059669; }
     .form-msg.err { color: #dc2626; }
 
+
+    /* ── 2026-09-28 refresh: reach-Tee card, hero buttons, colour-coded topics ── */
+    .hero-ctas-c { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 6px; }
+    .hc-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 12px; text-decoration: none;
+      font: 800 .95rem/1 'Hanken Grotesk', sans-serif; transition: transform .15s, filter .15s; }
+    .hc-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    .hc-wa { background: #25d366; color: #06301a; }
+    .hc-ghost { background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.28); }
+    .reach { display: grid; gap: 10px; margin-bottom: 1.6rem; }
+    .reach-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 14px; text-decoration: none;
+      background: var(--c-info-item); border: 1px solid var(--c-info-border); transition: background .13s, border-color .13s, transform .13s; }
+    .reach-row:hover { transform: translateX(2px); }
+    .reach-ic { flex: none; width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 17px; }
+    .reach-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
+    .reach-txt b { color: #F0ECE2; font-size: .95rem; }
+    .reach-txt small { color: rgba(240,236,226,.6); font-size: .78rem; overflow-wrap: anywhere; }
+    .reach-go { color: rgba(240,236,226,.5); font-weight: 800; }
+    .reach-wa { background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.45); }
+    .reach-wa .reach-ic { background: #25d366; }
+    .reach-wa:hover { background: rgba(37,211,102,.22); }
+    .reach-demo .reach-ic { background: rgba(245,165,36,.9); }
+    .reach-demo:hover { border-color: rgba(245,165,36,.55); }
+    .reach-mail .reach-ic { background: rgba(167,139,250,.35); }
+    .reach-mail:hover { border-color: rgba(167,139,250,.55); }
+    .info-facts { display: grid; gap: 12px; margin: 0 0 1.4rem; padding: 1.2rem 0 0; border-top: 1px solid rgba(255,255,255,.09); }
+    .info-facts dt { font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: rgba(240,236,226,.5); margin-bottom: 3px; }
+    .info-facts dd { margin: 0; color: #F0ECE2; font-size: .9rem; line-height: 1.45; }
+    .c-grid { grid-template-columns: 340px 1fr; }
+    /* topic pills: one colour each */
+    .spill:nth-child(1) { --sp: var(--lav, #E4DEF9);    --sp-ink: var(--lav-ink, #4A2E8F); }
+    .spill:nth-child(2) { --sp: var(--yellow, #FBF2D2); --sp-ink: var(--yellow-ink, #866312); }
+    .spill:nth-child(3) { --sp: var(--pink, #FBDCE8);   --sp-ink: var(--pink-ink, #B0326E); }
+    .spill:nth-child(4) { --sp: var(--green, #D4F0E0);  --sp-ink: var(--green-ink, #16704A); }
+    .spill:nth-child(5) { --sp: var(--blue, #D9EBFB);   --sp-ink: var(--blue-ink, #14568C); }
+    .spill:nth-child(6) { --sp: var(--teal, #D2EFEC);   --sp-ink: var(--teal-ink, #12706A); }
+    .spill { background: var(--sp) !important; color: var(--sp-ink) !important; border-color: transparent !important; font-weight: 700; }
+    .spill.on, .spill[aria-pressed="true"], .spill.active, .spill.sel { background: var(--sp-ink) !important; color: #fff !important;
+      box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+    html[data-theme="dark"] .spill.on, html[data-theme="dark"] .spill[aria-pressed="true"],
+    html[data-theme="dark"] .spill.active, html[data-theme="dark"] .spill.sel { color: var(--page, #1c2130) !important; }
+
+    /* ── Clean hero (2026-09-28: the world map is gone) ── */
+    .hero-clean { min-height: 0;
+      background:
+        radial-gradient(700px 360px at 85% 20%, rgba(124, 92, 240, .28), transparent 70%),
+        radial-gradient(520px 300px at 10% 100%, rgba(245, 165, 36, .14), transparent 70%),
+        linear-gradient(160deg, #1b1438 0%, #120d27 55%, #16213d 100%); }
+    .hero-2col { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr); gap: 48px; align-items: center;
+      max-width: 1120px; padding-top: 70px; padding-bottom: 70px; }
+    .tee-contact { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 18px; align-items: center; padding: 18px;
+      border-radius: 24px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .35); backdrop-filter: blur(6px); }
+    /* the photo is a wide landscape shot: zoom onto Tee's head and shoulders */
+    .tee-contact-ph { width: 132px; height: 164px; border-radius: 16px; box-shadow: 0 0 0 3px rgba(245, 165, 36, .55);
+      background: #5c7a5a url("meettee.jpeg") no-repeat; background-size: 380% auto; background-position: 50% 70%; }
+    .tee-contact-body { display: grid; gap: 6px; min-width: 0; }
+    .tee-contact-status { display: inline-flex; align-items: center; gap: 7px; width: fit-content; font-size: .72rem; font-weight: 700;
+      color: #86efac; background: rgba(34, 197, 94, .12); border: 1px solid rgba(34, 197, 94, .35); padding: 4px 9px; border-radius: 999px; }
+    .tee-contact-status i { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 0 4px rgba(74, 222, 128, .2); }
+    .tee-contact-name { color: #fff; font: 800 1.2rem/1.2 'Archivo', sans-serif; }
+    .tee-contact-role { color: rgba(240, 236, 226, .6); font-size: .82rem; }
+    .tee-contact p { margin: 4px 0 0; color: rgba(240, 236, 226, .85); font-size: .88rem; line-height: 1.5; font-style: italic; }
+    .tee-contact-facts { display: flex; gap: 18px; margin: 8px 0 0; }
+    .tee-contact-facts dt { color: #fbd38d; font: 800 1.1rem/1 'Archivo', sans-serif; }
+    .tee-contact-facts dd { margin: 3px 0 0; color: rgba(240, 236, 226, .55); font-size: .72rem; }
+    @media (max-width: 900px) { .hero-2col { grid-template-columns: 1fr; gap: 28px; padding-top: 48px; padding-bottom: 48px; } }
+    @media (max-width: 460px) { .tee-contact { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; }
+      .tee-contact-ph { width: 96px; height: 120px; } }
     /* Success state */
     .form-ok {
       display: none;
@@ -594,7 +611,8 @@
 
     /* ── TRUST BAND ────────────────────────────────────────────── */
     .trust-band {
-      background: var(--navy-deep, #2E1B4A);
+      /* same deep gradient as the hero, in both themes (--navy-deep is bright purple in dark mode) */
+      background: linear-gradient(160deg, #1b1438 0%, #120d27 55%, #16213d 100%);
       padding: 38px 28px;
     }
     .trust-inner {
@@ -651,8 +669,9 @@
         <a href="/blog" class="nav-link">Blog</a>
         <a href="/pricing.html" class="nav-link">Pricing</a>
       </nav>
-      <div class="header-right"></div>
+      <div class="header-end"><button class="nav-search" type="button" data-site-search aria-label="Search PrepWithTee" title="Search (Ctrl K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><div class="header-right"></div></div>
     </div>
+  <script>(function(){if(window.pwtOpenSearch)return;var m=null;function o(q){(m?Promise.resolve(m):import('/site-search.js?v=20260929a').then(function(x){return m=x})).then(function(x){x.open(q||'')}).catch(function(){location.href='/explore'})}window.pwtOpenSearch=o;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-site-search]');if(b){e.preventDefault();o()}});document.addEventListener('keydown',function(e){var a=document.activeElement,t=a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();o();return}if(e.key==='/'&&!t&&!e.ctrlKey&&!e.metaKey&&!e.altKey){var l=document.querySelector('[data-pk-q]');if(l&&l.offsetParent!==null)return;e.preventDefault();o()}})})();</script>
   </header>
 <!--NAV:END-->
 <!--CRUMB:START — breadcrumb bar. Do not edit here; edit CRUMBS in website/sync_nav.py then run: python sync_nav.py -->
@@ -661,66 +680,32 @@
 <!--CRUMB:END-->
 
 <!-- ══ HERO ═══════════════════════════════════════════════════════════ -->
-<section class="hero-section" aria-label="Contact hero">
-  <canvas id="world-canvas" aria-hidden="true"></canvas>
-
-  <!-- Dots — coordinate space 0 0 1000 500 stretched to fill section -->
-  <svg class="dots-svg" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
-    <!-- Lahore — home base, gold, most prominent -->
-    <circle class="rg1" cx="707" cy="162" r="9"   fill="none" stroke="#E8913A" stroke-width="1.6"/>
-    <circle class="rg2" cx="707" cy="162" r="9"   fill="none" stroke="#E8913A" stroke-width="1"/>
-    <circle           cx="707" cy="162" r="5.2" fill="#E8913A"/>
-    <circle           cx="707" cy="162" r="5.2" fill="none"   stroke="rgba(255,200,100,.65)" stroke-width="2.5"/>
-
-    <!-- London -->
-    <circle class="rc1" cx="500" cy="107" r="6" fill="none" stroke="#a78bfa" stroke-width="1.3" style="animation-delay:.4s"/>
-    <circle class="rc2" cx="500" cy="107" r="6" fill="none" stroke="#a78bfa" stroke-width=".7"  style="animation-delay:1.7s"/>
-    <circle           cx="500" cy="107" r="3.5" fill="#a78bfa"/>
-
-    <!-- Dubai -->
-    <circle class="rc1" cx="654" cy="180" r="6" fill="none" stroke="#67e8f9" stroke-width="1.3" style="animation-delay:.9s"/>
-    <circle class="rc2" cx="654" cy="180" r="6" fill="none" stroke="#67e8f9" stroke-width=".7"  style="animation-delay:2.2s"/>
-    <circle           cx="654" cy="180" r="3.5" fill="#67e8f9"/>
-
-    <!-- Cairo -->
-    <circle class="rc1" cx="587" cy="167" r="5.5" fill="none" stroke="#a78bfa" stroke-width="1.2" style="animation-delay:1.5s"/>
-    <circle           cx="587" cy="167" r="3"   fill="#a78bfa"/>
-
-    <!-- Lagos -->
-    <circle class="rc1" cx="510" cy="232" r="5"   fill="none" stroke="#67e8f9" stroke-width="1.1" style="animation-delay:.2s"/>
-    <circle           cx="510" cy="232" r="2.8" fill="#67e8f9"/>
-
-    <!-- Nairobi -->
-    <circle class="rc1" cx="603" cy="254" r="5.5" fill="none" stroke="#a78bfa" stroke-width="1.2" style="animation-delay:1.1s"/>
-    <circle           cx="603" cy="254" r="3"   fill="#a78bfa"/>
-
-    <!-- Dhaka -->
-    <circle class="rc1" cx="751" cy="184" r="5.5" fill="none" stroke="#67e8f9" stroke-width="1.2" style="animation-delay:.7s"/>
-    <circle           cx="751" cy="184" r="3"   fill="#67e8f9"/>
-
-    <!-- Colombo -->
-    <circle class="rc1" cx="722" cy="231" r="4.5" fill="none" stroke="#a78bfa" stroke-width="1"   style="animation-delay:1.9s"/>
-    <circle           cx="722" cy="231" r="2.5" fill="#a78bfa"/>
-
-    <!-- Kuala Lumpur -->
-    <circle class="rc1" cx="783" cy="241" r="5"   fill="none" stroke="#67e8f9" stroke-width="1.1" style="animation-delay:.35s"/>
-    <circle           cx="783" cy="241" r="2.8" fill="#67e8f9"/>
-
-    <!-- Singapore (small, close to KL) -->
-    <circle cx="789" cy="247" r="2.2" fill="#a78bfa" opacity=".9"/>
-  </svg>
-
-  <div class="hero-grad" aria-hidden="true"></div>
-
-  <div class="hero-content">
+<section class="hero-section hero-clean" aria-label="Contact hero">
+  <div class="hero-content hero-2col">
+  <div class="hero-left">
     <p class="hero-eyebrow">Students in 10+ countries</p>
     <h1>How can we<br><em>help you?</em></h1>
-    <p class="hero-sub">Cambridge O-Level &amp; IGCSE prep — Physics, Maths, and Computer Science. One message. One day. One reply.</p>
+    <p class="hero-sub">Cambridge O Level, IGCSE &amp; A Level - lessons with Tee, help with the platform, or a question about your syllabus. One message, a real reply, usually the same day.</p>
+    <div class="hero-ctas-c"><a class="hc-btn hc-wa" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20some%20help%20with%20my%20Cambridge%20exams." target="_blank" rel="noopener">💬 WhatsApp Tee</a><a class="hc-btn hc-ghost" href="#contact-form">✉️ Write a message</a></div>
     <div class="hero-pills">
       <span class="hero-pill"><span class="hp-dot"></span>Reply within 24 hours</span>
       <span class="hero-pill"><span class="hp-dot green"></span>Online sessions available</span>
-      <span class="hero-pill"><span class="hp-dot"></span>5 Cambridge syllabi</span>
+      <span class="hero-pill"><span class="hp-dot"></span>13 Cambridge subjects</span>
     </div>
+  </div>
+  <aside class="tee-contact" aria-label="Who you will be talking to">
+    <div class="tee-contact-ph" role="img" aria-label="Muhammad Taahaa (Tee), your tutor"></div>
+    <div class="tee-contact-body">
+      <span class="tee-contact-status"><i></i>Usually replies the same day</span>
+      <b class="tee-contact-name">You'll be talking to Tee</b>
+      <span class="tee-contact-role">Muhammad Taahaa &middot; founder &amp; tutor</span>
+      <p>&ldquo;I read and answer every message myself - lessons, the platform, or a question about your syllabus.&rdquo;</p>
+      <dl class="tee-contact-facts">
+        <div><dt>50+</dt><dd>students mentored</dd></div>
+        <div><dt>5+ yrs</dt><dd>teaching Cambridge</dd></div>
+      </dl>
+    </div>
+  </aside>
   </div>
 </section>
 
@@ -733,43 +718,36 @@
 
   <div class="c-grid">
 
-    <!-- INFO CARD -->
+    <!-- INFO CARD: the fastest ways to reach Tee, then the details -->
     <aside class="info-card">
-      <h3>Contact<br>information</h3>
-      <p class="info-sub">Based in Lahore, teaching students globally. Reach us whichever way works for you.</p>
+      <h3>Talk to Tee</h3>
+      <p class="info-sub">Based in Lahore, teaching students around the world. Pick whatever is easiest for you.</p>
 
-      <div class="qc-list">
-        <a class="qc" href="mailto:nexgentutors6@gmail.com">
-          <span class="qc-icon">✉️</span>
-          <span class="qc-body">
-            <span class="qc-lbl">Email</span>
-            <span class="qc-val">nexgentutors6@gmail.com</span>
-          </span>
+      <div class="reach">
+        <a class="reach-row reach-wa" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20some%20help%20with%20my%20Cambridge%20exams." target="_blank" rel="noopener">
+          <span class="reach-ic" aria-hidden="true">💬</span>
+          <span class="reach-txt"><b>WhatsApp</b><small>Fastest - usually within a few hours</small></span>
+          <span class="reach-go" aria-hidden="true">→</span>
         </a>
-        <div class="qc">
-          <span class="qc-icon">📍</span>
-          <span class="qc-body">
-            <span class="qc-lbl">Location</span>
-            <span class="qc-val">Lahore, Pakistan</span>
-          </span>
-        </div>
-        <div class="qc">
-          <span class="qc-icon">🎓</span>
-          <span class="qc-body">
-            <span class="qc-lbl">Subjects</span>
-            <span class="qc-val">Physics · Maths · Computer Science</span>
-          </span>
-        </div>
-        <div class="qc">
-          <span class="qc-icon">🌐</span>
-          <span class="qc-body">
-            <span class="qc-lbl">Sessions</span>
-            <span class="qc-val">Online via Zoom / Google Meet</span>
-          </span>
-        </div>
+        <a class="reach-row reach-demo" href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20book%20a%20free%20demo%20lesson." target="_blank" rel="noopener">
+          <span class="reach-ic" aria-hidden="true">🎓</span>
+          <span class="reach-txt"><b>Book a free demo lesson</b><small>One-on-one, no commitment</small></span>
+          <span class="reach-go" aria-hidden="true">→</span>
+        </a>
+        <a class="reach-row reach-mail" href="mailto:nexgentutors6@gmail.com">
+          <span class="reach-ic" aria-hidden="true">✉️</span>
+          <span class="reach-txt"><b>Email</b><small>nexgentutors6@gmail.com</small></span>
+          <span class="reach-go" aria-hidden="true">→</span>
+        </a>
       </div>
 
-      <div class="info-div"></div>
+      <dl class="info-facts">
+        <div><dt>📍 Where</dt><dd>Lahore, Pakistan - and online worldwide</dd></div>
+        <div><dt>🎓 Boards</dt><dd>Cambridge O Level, IGCSE &amp; A Level</dd></div>
+        <div><dt>📚 Subjects</dt><dd>Maths, Physics, Chemistry, Computer Science, Islamiyat, Pakistan Studies</dd></div>
+        <div><dt>🌐 Lessons</dt><dd>Online via Zoom / Google Meet</dd></div>
+      </dl>
+
       <p class="info-live"><span class="live-dot"></span>We usually reply the same day</p>
     </aside>
 
@@ -850,7 +828,7 @@
 
       <details class="fq" open>
         <summary>Which subjects and syllabi do you cover?</summary>
-        <div class="fq-body">We teach <strong>Physics</strong> (Cambridge 5054 O-Level &amp; 0625 IGCSE), <strong>Mathematics</strong> (4024 O-Level &amp; 0580 IGCSE), and <strong>Computer Science</strong> (2210 O-Level &amp; 0478 IGCSE). All teaching is aligned to the 2026–2028 Cambridge syllabi. If you're unsure which syllabus your school uses, just tell us your school name and we'll confirm.</div>
+        <div class="fq-body">Cambridge <strong>O Level</strong> (Maths 4024, Physics 5054, Chemistry 5070, Computer Science 2210, Islamiyat 2058, Pakistan Studies 2059), <strong>IGCSE</strong> (Maths 0580, Physics 0625, Chemistry 0620, Computer Science 0478) and <strong>A Level</strong> (Maths 9709, Physics 9702, Computer Science 9618). Everything is aligned to the current Cambridge syllabi. Not sure which syllabus your school uses? Tell us your school name and we'll confirm.</div>
       </details>
 
       <details class="fq">
@@ -895,114 +873,16 @@
 <!-- ══ TRUST BAND ═════════════════════════════════════════════════════ -->
 <div class="trust-band">
   <div class="trust-inner">
-    <div class="t-item"><div class="t-num">500+</div><div class="t-desc">Students taught</div></div>
+    <div class="t-item"><div class="t-num">50+</div><div class="t-desc">Students mentored</div></div>
     <div class="t-item"><div class="t-num">10+</div><div class="t-desc">Countries reached</div></div>
-    <div class="t-item"><div class="t-num">5</div><div class="t-desc">Cambridge syllabi</div></div>
+    <div class="t-item"><div class="t-num">13</div><div class="t-desc">Cambridge subjects</div></div>
     <div class="t-item"><div class="t-num">24h</div><div class="t-desc">Reply guarantee</div></div>
-    <div class="t-item"><div class="t-num">2,405+</div><div class="t-desc">Past-paper questions</div></div>
+    <div class="t-item"><div class="t-num">52,984</div><div class="t-desc">Past-paper questions</div></div>
   </div>
 </div>
 
 <!-- ══ SCRIPTS ════════════════════════════════════════════════════════ -->
 <script>
-/* ── World-map canvas ─────────────────────────────────────────────── */
-(function () {
-  const cv  = document.getElementById('world-canvas');
-  const ctx = cv.getContext('2d');
-
-  function draw() {
-    const W = cv.offsetWidth, H = cv.offsetHeight;
-    if (!W || !H) return;
-    cv.width = W; cv.height = H;
-    const sx = W / 1000, sy = H / 500;
-
-    /* Background */
-    ctx.fillStyle = '#09061a';
-    ctx.fillRect(0, 0, W, H);
-
-    /* Latitude / longitude grid — very subtle */
-    ctx.strokeStyle = 'rgba(130,100,200,.055)';
-    ctx.lineWidth = .6;
-    for (let lon = -180; lon <= 180; lon += 30) {
-      const x = (lon + 180) / 360 * W;
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let lat = -75; lat <= 75; lat += 30) {
-      const y = (90 - lat) / 180 * H;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-
-    /* Continents — purple-tinted fill, faint lavender edge */
-    ctx.fillStyle   = 'rgba(76,46,114,.26)';
-    ctx.strokeStyle = 'rgba(167,139,250,.12)';
-    ctx.lineWidth   = .85;
-
-    function poly(pts) {
-      ctx.beginPath();
-      ctx.moveTo(pts[0] * sx, pts[1] * sy);
-      for (let i = 2; i < pts.length; i += 2)
-        ctx.lineTo(pts[i] * sx, pts[i+1] * sy);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    /* North America */
-    poly([148,38, 205,33, 245,31, 263,50, 279,61, 285,90, 267,109, 297,122,
-          293,154, 259,192, 229,242, 191,264, 169,251, 129,208, 95,169,
-          85,133, 88,95, 110,70, 133,55]);
-    /* Greenland */
-    poly([292,22, 334,15, 369,23, 365,53, 335,63, 296,55, 290,37]);
-    /* South America */
-    poly([233,255, 291,252, 309,278, 315,318, 301,362, 275,415,
-          248,445, 222,443, 201,415, 193,380, 204,342, 216,302, 222,274]);
-    /* Europe */
-    poly([459,63, 468,55, 483,55, 513,52, 538,61, 544,78, 532,97,
-          518,113, 497,126, 475,131, 462,119, 453,104, 452,84]);
-    /* Africa */
-    poly([455,133, 501,122, 544,128, 573,145, 597,168, 606,205, 598,250,
-          581,302, 563,355, 544,408, 521,437, 499,446, 472,441, 452,415,
-          437,374, 432,331, 439,268, 445,212, 449,168]);
-    /* Asia main */
-    poly([543,58, 583,52, 623,47, 687,43, 763,46, 827,55, 873,75, 907,108,
-          913,145, 893,185, 853,218, 806,228, 765,242, 725,256, 695,270,
-          660,282, 629,267, 603,252, 579,236, 559,218, 543,195,
-          541,162, 557,142, 552,111, 541,87]);
-    /* Indian subcontinent */
-    poly([619,145, 655,138, 674,158, 683,193, 673,225, 651,248,
-          622,252, 605,233, 605,201, 611,169]);
-    /* SE Asia */
-    poly([765,240, 799,232, 833,235, 849,253, 841,276, 816,282, 790,270, 768,257]);
-    /* Australia */
-    poly([763,308, 826,298, 863,302, 885,323, 889,358, 873,392,
-          846,414, 805,418, 769,402, 748,375, 745,342, 754,318]);
-    /* Japan */
-    poly([896,108, 909,102, 914,119, 906,131, 894,126]);
-    /* British Isles */
-    poly([465,73, 472,66, 480,68, 479,81, 471,85, 464,79]);
-    /* Iceland */
-    poly([441,50, 457,44, 463,53, 456,60, 441,59]);
-    /* New Zealand */
-    poly([909,373, 916,379, 911,393, 903,390, 904,377]);
-
-    /* Subtle ocean shimmer curves */
-    ctx.strokeStyle = 'rgba(103,232,249,.038)';
-    ctx.lineWidth   = .5;
-    for (let i = 0; i < 5; i++) {
-      const y = H * (.18 + i * .14);
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.bezierCurveTo(W*.3, y - 9, W*.7, y + 9, W, y);
-      ctx.stroke();
-    }
-  }
-
-  draw();
-  let raf;
-  const ro = new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
-  ro.observe(cv.parentElement);
-})();
-
 /* ── Subject pill toggle ──────────────────────────────────────────── */
 document.querySelectorAll('#pill-row .spill').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1096,6 +976,7 @@ document.getElementById('contact-form').addEventListener('submit', async e => {
   } catch {}
 })();
 </script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/scratch-pen.js?v=20260927l"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 RES_DIR = ROOT / "data" / "resources"
-RES_V = "20260928a"                        # bump with resource-viewer.js / catalog.css
+RES_V = "20260929b"                        # bump with resource-viewer.js / catalog.css
 EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".webp", ".docx", ".pptx", ".xlsx", ".zip", ".txt"}
 INLINE = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
 _e = _catalog._e
@@ -172,19 +172,26 @@ def _file_rows(files: list[dict]) -> str:
     for f in files:
         kind = _KIND_ICON.get(f["ext"], "FILE")
         href = view_url(f["rel"]) if f["ext"] in INLINE else f"/api/resources/file?rel={quote(f['rel'])}"
-        rows.append(f'<li><a class="rs-file" href="{_e(href)}"{" download" if f["ext"] not in INLINE else ""}>'
+        rows.append(f'<li data-q="{_e(f["title"].lower())}"><a class="rs-file" href="{_e(href)}"{" download" if f["ext"] not in INLINE else ""}>'
                     f'<i class="rs-kind rs-kind-{kind.lower()}">{kind}</i>'
                     f'<span class="rs-file-name">{_e(f["title"])}</span>'
                     f'<small>{_size(f["size"])}</small></a></li>')
     return f'<ul class="rs-files">{"".join(rows)}</ul>' if rows else ""
 
 
+_FOLDER_TONES = ["lav", "blue", "green", "orange", "pink", "teal", "yellow"]
+
+
 def _folder_cards(dirs: list[dict], base: str) -> str:
     cards = []
-    for d in dirs:
+    for i, d in enumerate(dirs):
+        # search text = the folder and every file inside it, so "kinematics"
+        # finds the teacher folder that holds a kinematics PDF
+        q = " ".join([d["title"]] + [f["title"] for f in _all_files(d)]).lower()
         sub = f"{len(d['dirs'])} folders · " if d["dirs"] else ""
         preview = ", ".join(x["title"] for x in (d["dirs"][:3] or d["files"][:3]))
-        cards.append(f'<a class="rs-folder" href="{_e(base)}/{d["slug"]}">'
+        cards.append(f'<a class="rs-folder cat-tone-{_FOLDER_TONES[i % len(_FOLDER_TONES)]}" '
+                     f'href="{_e(base)}/{d["slug"]}" data-q="{_e(q[:4000])}">'
                      f'<span class="rs-folder-ic" aria-hidden="true"></span>'
                      f'<b>{_e(d["title"])}</b><small>{sub}{d["count"]} file{"s" if d["count"] != 1 else ""}</small>'
                      f'{f"<span class=rs-folder-peek>{_e(preview)}</span>" if preview else ""}</a>')
@@ -197,21 +204,31 @@ def _page(*, title, desc, path, body, crumbs, user, noindex=False, ld=None):
                                              state=state, noindex=noindex, ld=ld), bool(user))
 
 
-def _subject_card(code: str, tree: dict) -> str:
-    s = SUBJECTS[code]
-    teachers = ", ".join(d["title"] for d in tree["dirs"][:4])
-    return f"""
-    <a class="cat-subj cat-tone-{s['tone']} rs-card" href="{subject_url(code)}">
-      <div class="cat-subj-top"><span class="cat-code">{code}</span><span class="rs-count">{tree['count']} files</span></div>
-      <h3>{_e(s['plain'])}</h3>
-      <p class="cat-subj-meta">{_e(teachers)}</p>
-    </a>"""
-
-
-def _board_grid(board: str) -> str:
+def _picker(user: dict | None, board: str | None = None) -> str:
+    """The shared board/subject picker (ui.picker) over subjects with resources."""
+    import ui
+    state = _catalog._student_state(user)
     idx = index()["subjects"]
-    codes = [c for c, s in SUBJECTS.items() if s["board_slug"] == board and c in idx]
-    return f'<div class="cat-grid">{"".join(_subject_card(c, idx[c]) for c in codes)}</div>' if codes else ""
+    boards = [board] if board else ui.board_order(state)
+    tiles = {}
+    for b in boards:
+        tiles[b] = []
+        for c in ui.codes_for(b, state):
+            if c not in idx:
+                continue
+            t = idx[c]
+            tiles[b].append(ui.tile(
+                code=c, url=subject_url(c), flag="on" if c in state["enrolled"] else "",
+                stats=[(f'{t["count"]:,}', "files"), (str(len(t["dirs"])), "collections")],
+                actions=[("Open resources", subject_url(c), "primary"),
+                         ("Our notes", _notes_url(c), "ghost")]))
+    return ui.picker(tiles, state=state, board_links="/resources/{board}" if board else None,
+                     active=board or "", empty='<p class="cat-note">Nothing here yet.</p>')
+
+
+def _notes_url(code: str) -> str:
+    import notes
+    return notes.notes_url(code)
 
 
 def _shelf_cards() -> str:
@@ -232,9 +249,6 @@ def resources_hub(user: dict | None = Depends(_auth.maybe_user)):
     import ui
     idx = index()
     total = sum(t["count"] for t in idx["subjects"].values()) + sum(t["count"] for t in idx["shelves"].values())
-    boards = "".join(f'<section class="ui-board" id="{b}"><h2 class="cat-group"><a href="/resources/{b}">'
-                     f'{BOARD_SHORT[b]}</a></h2>{grid}</section>'
-                     for b in BOARD_SHORT if (grid := _board_grid(b)))
     faq_html, faq_ld = ui.faq([
         ("How are Resources different from PrepWithTee notes?",
          'PrepWithTee notes (<a href="/notes">/notes</a>) are written by us against the syllabus and link '
@@ -257,6 +271,7 @@ def resources_hub(user: dict | None = Depends(_auth.maybe_user)):
       <div class="cat-actions"><a class="cat-btn" href="#boards">Find your subject</a>
         <a class="cat-btn cat-btn-ghost" href="/notes">PrepWithTee notes</a></div>
     </header>
+    {_picker(user)}
     <section class="ui-compare">
       <article><h3>{ui.icon("notes")} PrepWithTee notes</h3><p>Our own notes, written chapter by chapter
         against the official syllabus, each linked to its past-paper questions.</p>
@@ -271,7 +286,6 @@ def resources_hub(user: dict | None = Depends(_auth.maybe_user)):
         ("Practise straight after", 'Do a <a href="/papers/topical">topical paper</a> on the same chapter the same day.'),
     ], "How to use them", "ui-steps-row")}
     <section><h2 class="ui-h2">For every subject</h2>{_shelf_cards()}</section>
-    <div id="boards">{boards}</div>
     {faq_html}"""
     return _page(title="Cambridge Notes & Resources - Teachers' PDF Notes, Books, Worksheets | PrepWithTee",
                  desc="Well-known teachers' notes, textbooks, solved worksheets, official syllabuses and "
@@ -334,7 +348,7 @@ def resource_viewer(f: str, user: dict | None = Depends(_auth.maybe_user)):
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="/main.js?v=20260928a"></script>
-<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/resource-viewer.js?v={RES_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
@@ -379,7 +393,7 @@ def resources_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-lede">Pick a subject to see every teacher's notes, the books and the worksheets we hold for it.</p>
       <div class="cat-actions"><a class="cat-btn cat-btn-ghost" href="/notes/{board}">PrepWithTee {BOARD_SHORT[board]} notes</a></div>
     </header>
-    {_board_grid(board) or '<p class="cat-note">Nothing here yet.</p>'}
+    {_picker(user, board)}
     <section><h2 class="ui-h2">For every subject</h2>{_shelf_cards()}</section>"""
     return _page(title=f"Cambridge {BOARD_SHORT[board]} Notes, Books & Worksheets - PrepWithTee",
                  desc=f"Teachers' notes, books and worksheets for Cambridge {BOARD_SHORT[board]} subjects.",
@@ -433,6 +447,8 @@ def resources_subject(board: str, subject: str, folder: str = "",
       <p class="cat-lede">{_e(lede)}</p>
     </header>
     {tip}
+    {ui.page_search("Search " + ("these folders and files" if trail else s["plain"] + " resources") + ", e.g. a teacher or topic",
+                    ".rs-folder, .rs-files li", "section") if (node["dirs"] or len(node["files"]) > 6) else ""}
     {folders}
     {loose}"""
     return _page(title=(f"{h1} - {s['plain']} {code} Resources | PrepWithTee" if trail else

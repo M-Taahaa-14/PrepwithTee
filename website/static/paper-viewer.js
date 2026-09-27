@@ -9,7 +9,7 @@
  *   progress Mark done, marks out of the paper total, and the official grade
  *            thresholds for the sitting (same data the old library showed)
  */
-import { api } from "/auth.js?v=20260927k";
+import { api } from "/auth.js?v=20260929a";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20260928a";
 import { paperButton } from "/paper-theme.js?v=20260928a";

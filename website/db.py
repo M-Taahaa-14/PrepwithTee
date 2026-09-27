@@ -35,6 +35,79 @@ if USE_PG:
         print(f"Database startup migration warning: {_e}")
 
 
+# ── Connection pool ──────────────────────────────────────────────────────────
+# Every query used to open a fresh TLS connection to the Supabase pooler
+# (~0.3-1 s each from the server), so a page that asked the DB once per subject
+# (/yearly: 13 subjects) took 14 s and a signed-in /papers much longer. Keep a
+# small pool of open connections per worker instead. A connection idle for a
+# while is pinged before reuse (the pooler drops idle clients). Nobody ever
+# waits: with no idle connection a new one is opened, and at most PG_POOL_MAX
+# idle ones are kept.
+import threading as _threading
+import time as _time
+
+_POOL_LOCK = _threading.Lock()
+_POOL_MAX = int(os.environ.get("PG_POOL_MAX", "12"))   # idle connections kept per worker
+_IDLE_PING_S = 60
+_idle: list = []                                        # [(conn, last_used)]
+# NOT psycopg2.pool: its pools close every returned connection above `minconn`,
+# so with minconn=0 nothing was ever reused (and a big minconn opens them all
+# at import).
+
+
+def _dsn_kwargs() -> dict:
+    return {"keepalives": 1, "keepalives_idle": 30, "keepalives_interval": 10,
+            "keepalives_count": 3, "connect_timeout": 15}
+
+
+def _new_conn():
+    conn = psycopg2.connect(os.environ["DATABASE_URL"], **_dsn_kwargs())
+    conn.autocommit = False
+    return conn
+
+
+def _pg_acquire():
+    """(raw psycopg2 connection, pooled?) - an idle one if there is one."""
+    while True:
+        with _POOL_LOCK:
+            item = _idle.pop() if _idle else None
+        if item is None:
+            return _new_conn(), True
+        conn, last = item
+        if conn.closed:
+            continue
+        if _time.time() - last > _IDLE_PING_S:     # the pooler drops idle clients
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT 1")
+                conn.rollback()
+            except Exception:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                continue
+        return conn, True
+
+
+def _pg_release(conn, pooled: bool) -> None:
+    keep = pooled and not conn.closed
+    if keep:
+        try:
+            conn.rollback()                          # never hand on an open transaction
+        except Exception:
+            keep = False
+    if keep:
+        with _POOL_LOCK:
+            if len(_idle) < _POOL_MAX:
+                _idle.append((conn, _time.time()))
+                return
+    try:
+        conn.close()
+    except Exception:
+        pass
+
+
 class _Row(dict):
     """Dict that also supports positional [0] indexing (like sqlite3.Row)."""
     def __getitem__(self, key):
@@ -64,8 +137,10 @@ class _PgResult:
 class _PgConn:
     """sqlite3-compatible wrapper around a psycopg2 connection."""
 
-    def __init__(self, conn):
+    def __init__(self, conn, pooled: bool = False):
         self._conn = conn
+        self._pooled = pooled
+        self._released = False
 
     def execute(self, sql, params=()):
         sql = _pg_sql(sql)
@@ -86,7 +161,16 @@ class _PgConn:
         self._conn.commit()
 
     def close(self):
-        self._conn.close()
+        if self._released:
+            return
+        self._released = True
+        _pg_release(self._conn, self._pooled)
+
+    def __del__(self):                           # a caller that forgot close()
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def __enter__(self):
         return self
@@ -114,16 +198,19 @@ def _pg_sql(sql: str) -> str:
 def connect():
     """Context manager that yields a sqlite3-compatible connection to the pipeline DB."""
     if USE_PG:
-        conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        conn.autocommit = False
+        conn, pooled = _pg_acquire()
+        wrapped = _PgConn(conn, pooled)
         try:
-            yield _PgConn(conn)
+            yield wrapped
             conn.commit()
         except Exception:
-            conn.rollback()
+            try:
+                conn.rollback()
+            except Exception:
+                pass
             raise
         finally:
-            conn.close()
+            wrapped.close()
     else:
         conn = sqlite3.connect(_INDEX_DB)
         conn.row_factory = sqlite3.Row
@@ -141,9 +228,8 @@ def plain_connect():
     Call .close() when done.
     """
     if USE_PG:
-        conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        conn.autocommit = False
-        return _PgConn(conn)
+        conn, pooled = _pg_acquire()
+        return _PgConn(conn, pooled)
     else:
         conn = sqlite3.connect(_INDEX_DB)
         conn.row_factory = sqlite3.Row

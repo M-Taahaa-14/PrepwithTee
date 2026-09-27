@@ -37,6 +37,7 @@ _ICONS = {
     "book": '<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5M19 17v4H6"/>',
     "user": '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
     "map": '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
+    "search": '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
 }
 
 
@@ -73,7 +74,7 @@ def subject_tabs(code: str, active: str) -> str:
     s = catalog.SUBJECTS[code]
     cur = ' aria-current="page"'
     tabs = "".join(
-        f'<a class="ui-stab{" is-on" if k == active else ""}" href="{_e(url)}"'
+        f'<a class="ui-stab{" is-on" if k == active else ""}" data-sec="{k}" href="{_e(url)}"'
         f'{cur if k == active else ""}>{icon(ic)}<span>{_e(label)}</span></a>'
         for k, label, url, ic in subject_links(code))
     return (f'<nav class="ui-stabs cat-tone-{s["tone"]}" aria-label="{_e(s["plain"])} {code} sections">'
@@ -122,3 +123,163 @@ def callout(text: str, tone: str = "gold", icon_name: str = "ai") -> str:
 
 def json_ld(block: dict) -> str:
     return f'<script type="application/ld+json">{json.dumps(block, ensure_ascii=False)}</script>'
+
+
+# ── Board + subject picker ───────────────────────────────────────────────────
+# ONE picker for every section (topical, mock tests, yearly, MCQ, notes,
+# resources) so a student learns it once: board tabs + search on top, each
+# board a coloured band, and every subject an equal-sized tile with the same
+# parts in the same places - icon + status flag, name, code, a stats row, and
+# at most two buttons. (Tutor, 2026-09-27: the old grids felt "scrambled".)
+
+BOARD_THEME = {                  # board -> (monogram, long name)
+    "o-level": ("O", "Cambridge O Level"),
+    "igcse": ("IG", "Cambridge IGCSE"),
+    "a-level": ("A", "Cambridge International A Level"),
+}
+
+# Subject glyphs by family (the tone catalog._FAMILY gives each family).
+_SUBJECT_ICONS = {
+    "lav": '<path d="M5 6h14M9 6v12M15 6v9a3 3 0 003 3"/>',                              # maths: pi
+    "green": ('<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/>'
+              '<ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/>'
+              '<ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>'),  # physics: atom
+    "orange": ('<path d="M9 3h6M10 3v6l-5.5 9.5A1.7 1.7 0 006 21h12a1.7 1.7 0 001.5-2.5L14 9V3"/>'
+               '<path d="M7.5 15h9"/>'),                                                 # chemistry: flask
+    "pink": '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',                        # computing: </>
+    "teal": ('<path d="M15.5 4.5a8 8 0 100 15 6.5 6.5 0 010-15z"/>'
+             '<path d="M17.5 9.5l.6 1.4 1.5.1-1.1 1 .3 1.5-1.3-.8-1.3.8.3-1.5-1.1-1 1.5-.1z"/>'),  # islamiyat
+    "yellow": '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',                                     # pakistan studies
+    "blue": '<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/>',
+}
+
+
+def subject_icon(tone: str, cls: str = "pk-glyph") -> str:
+    return (f'<svg class="{cls}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
+            f'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+            f'{_SUBJECT_ICONS.get(tone, _SUBJECT_ICONS["blue"])}</svg>')
+
+
+_FLAGS = {"on": "Enrolled", "lock": "Not enrolled", "soon": "Coming soon"}
+
+
+def tile(*, code: str, url: str, stats: list[tuple[str, str]], flag: str = "",
+         actions: list[tuple] = (), soon: bool = False, years: str = "",
+         more: list[tuple[str, str]] = ()) -> str:
+    """One subject tile. stats = [(value, label)] (max 2 - they must never
+    truncate); years = "2010–2025" shown beside the code; flag = on|lock|soon|"";
+    actions = [(label, href or None, kind "primary"|"ghost"|"gold", extra attrs)] (max 2).
+    more = [(label, href)]: a slim "Also" row of the subject's other sections, so
+    nothing that used to be one click away (MCQ, notes) is lost to the 2-button cap.
+    The name is a stretched link, so the whole tile opens `url`."""
+    import catalog
+    s = catalog.SUBJECTS[code]
+    board = catalog.BOARD_SHORT[s["board_slug"]]
+    st = "".join(f'<div><dt>{_e(k)}</dt><dd>{_e(v)}</dd></div>' for v, k in stats[:2])
+    acts = []
+    for a in list(actions)[:2]:
+        label, href, kind, attrs = (list(a) + ["", ""])[:4]
+        cls = f'pk-btn pk-btn-{kind or "primary"}'
+        if href:
+            acts.append(f'<a class="{cls}" href="{_e(href)}" {attrs}>{_e(label)}</a>')
+        else:
+            acts.append(f'<button class="{cls}" type="button" {attrs}>{_e(label)}</button>')
+    mark = icon("check") if flag == "on" else icon("lock") if flag == "lock" else ""
+    flag_html = f'<span class="pk-flag pk-flag-{flag}">{mark}{_FLAGS.get(flag, flag)}</span>' if flag else ""
+    q = f'{s["plain"]} {s["name"]} {code} {board}'.lower()
+    cls = "pk-tile cat-tone-" + s["tone"] + (" is-mine" if flag == "on" else "") + (" is-soon" if soon else "")
+    return (f'<article class="{cls}" data-q="{_e(q)}">'
+            f'<div class="pk-top"><span class="pk-ic">{subject_icon(s["tone"])}</span>{flag_html}</div>'
+            f'<h3><a class="pk-link" href="{_e(url)}">{_e(s["plain"])}</a></h3>'
+            f'<p class="pk-sub"><span class="pk-code">{code}</span>{_e(board)}'
+            + (f'<span class="pk-years">{_e(years)}</span>' if years else "") + '</p>'
+            + (f'<dl class="pk-stats">{st}</dl>' if st else "")
+            + (f'<nav class="pk-more" aria-label="More for {_e(s["plain"])} {code}"><span>Also</span>'
+               + "".join(f'<a href="{_e(h)}">{_e(lab)}</a>' for lab, h in more) + '</nav>' if more else "")
+            + (f'<div class="pk-acts">{"".join(acts)}</div>' if acts else "")
+            + '</article>')
+
+
+def picker(tiles_by_board: dict[str, list[str]], *, state: dict | None = None,
+           board_links: str | None = None, active: str = "", anchor: str = "boards",
+           subtitle=None, search: bool = True, empty: str = "") -> str:
+    """Board tabs + search + one coloured band of tiles per board.
+
+    tiles_by_board: {board_slug: [tile html]} in display order (empty boards skipped).
+    board_links: when set (e.g. "/yearly/{board}"), the tabs are links to the
+      per-board pages (and `active` marks the current one); otherwise the tabs
+      filter the bands in place (picker.js) and "All boards" shows every one.
+    subtitle: fn(board, n_tiles) -> html under each board's name."""
+    import catalog
+    boards = [b for b, t in tiles_by_board.items() if t]
+    if not boards:
+        return empty
+    mine = set((state or {}).get("boards") or [])
+    yours = '<em>yours</em>'
+    tabs = []
+    if board_links:
+        for b in board_order(state):
+            on = b == active
+            cur = ' aria-current="page"' if on else ""
+            tabs.append(f'<a class="pk-tab pk-b-{b}{" is-on" if on else ""}" href="{_e(board_links.format(board=b))}"'
+                        f'{cur}><i></i>{catalog.BOARD_SHORT[b]}{yours if b in mine else ""}</a>')
+    else:
+        total = sum(len(tiles_by_board[b]) for b in boards)
+        tabs.append('<button class="pk-tab is-on" type="button" data-pk-board="" aria-pressed="true">'
+                    f'All boards <b>{total}</b></button>')
+        for b in boards:
+            tabs.append(f'<button class="pk-tab pk-b-{b}" type="button" data-pk-board="{b}" aria-pressed="false">'
+                        f'<i></i>{catalog.BOARD_SHORT[b]} <b>{len(tiles_by_board[b])}</b>'
+                        f'{yours if b in mine else ""}</button>')
+    srch = ""
+    if search:
+        srch = (f'<label class="pk-search">{icon("search")}<span class="sr-only">Search subjects</span>'
+                '<input type="search" data-pk-q placeholder="Search a subject or code, e.g. Physics or 5054" '
+                'autocomplete="off"><kbd>/</kbd></label>')
+    bands = []
+    for b in boards:
+        mono, long = BOARD_THEME[b]
+        n = len(tiles_by_board[b])
+        sub = subtitle(b, n) if subtitle else f"{n} subject{'s' if n != 1 else ''}"
+        badge = '<span class="pk-yours">Your board</span>' if b in mine else ""
+        bands.append(f'<section class="pk-board pk-b-{b}" data-pk-board="{b}" id="{b}">'
+                     f'<header class="pk-bhead"><span class="pk-bmark">{mono}</span>'
+                     f'<div><h2>{_e(long)}</h2><p>{sub}</p></div>{badge}</header>'
+                     f'<div class="pk-grid">{"".join(tiles_by_board[b])}</div></section>')
+    return (f'<div class="pk" id="{_e(anchor)}" data-pk>'
+            f'<div class="pk-bar"><nav class="pk-tabs" aria-label="Boards">{"".join(tabs)}</nav>{srch}</div>'
+            + "".join(bands)
+            + '<p class="pk-none" hidden>No subject matches <b data-pk-echo></b>. '
+              'Try the subject name or its 4-digit code.</p></div>')
+
+
+def dash_tabs(current: str) -> str:
+    """The dashboard section tabs (sync_nav.DASH_TABS) for a server-rendered
+    page, e.g. /my-papers - the static pages get them stamped by sync_nav.py."""
+    import sync_nav
+    return sync_nav.dash_tabs_html(current).replace('class="dtabs"', 'class="dtabs dtabs-inline"', 1)
+
+
+def page_search(placeholder: str, items: str, groups: str = "section, .nt-group") -> str:
+    """A filter box for long pages (a subject's chapters, a resources folder):
+    hides every `items` element whose data-q (or text) misses a typed word, and
+    any `groups` container left empty. Behaviour: catalog.js ([data-ps])."""
+    return (f'<div class="ps" data-ps data-ps-items="{_e(items)}" data-ps-groups="{_e(groups)}">'
+            f'<label class="pk-search ps-box">{icon("search")}<span class="sr-only">Search this page</span>'
+            f'<input type="search" data-ps-q placeholder="{_e(placeholder)}" autocomplete="off"></label>'
+            f'<span class="ps-count" data-ps-count aria-live="polite"></span></div>')
+
+
+def board_order(state: dict | None) -> list[str]:
+    """The student's boards first, then the rest."""
+    import catalog
+    mine = list((state or {}).get("boards") or [])
+    return mine + [b for b in catalog.BOARD_SHORT if b not in mine]
+
+
+def codes_for(board: str, state: dict | None = None) -> list[str]:
+    """A board's subjects, enrolled ones first (stable otherwise)."""
+    import catalog
+    enrolled = (state or {}).get("enrolled") or set()
+    codes = [c for c, s in catalog.SUBJECTS.items() if s["board_slug"] == board]
+    return sorted(codes, key=lambda c: c not in enrolled)

@@ -98,6 +98,8 @@ import resources as _resources_mod
 app.include_router(_resources_mod.router)
 import explore as _explore_mod
 app.include_router(_explore_mod.router)
+import search as _search_mod
+app.include_router(_search_mod.router)
 
 
 @app.get("/solver", include_in_schema=False)

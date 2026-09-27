@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260928b">
+  <link rel="stylesheet" href="styles.css?v=20260929e">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
@@ -466,9 +466,9 @@
     :root { --fc-card: #fff; }
 
     html[data-theme="dark"] {
-      --page:      #0f1117;
-      --cream:     #13161d;
-      --line:      #2b3240;
+      --page:      #1c2130;
+      --cream:     #222838;
+      --line:      #3b435a;
       --ink:       #e4e0f8;
       --grey:      #a1a9b8;
       --navy:      #a898e8;
@@ -480,7 +480,7 @@
       --blue:      #0c1a30;   --blue-ink:   #64b4fc;
       --teal:      #081e22;   --teal-ink:   #44dcd0;
       --yellow:    #261a04;   --yellow-ink: #f2d464;
-      --fc-card: #13161d;
+      --fc-card: #222838;
     }
 
     /* cards + inputs */
@@ -491,14 +491,14 @@
     html[data-theme="dark"] .slc-formula-label,
     html[data-theme="dark"] .slc-list-title,
     html[data-theme="dark"] .slc-list li { color: var(--ink); }
-    html[data-theme="dark"] .cc { background: #181c24; border-color: var(--line); }
+    html[data-theme="dark"] .cc { background: #262c3d; border-color: var(--line); }
     html[data-theme="dark"] .sl-sel {
-      background: #12151c url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a87b0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .6rem center;
+      background: #1f2433 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238a87b0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .6rem center;
       color: var(--ink); border-color: var(--line);
     }
-    html[data-theme="dark"] .sl-search { background: #12151c; color: var(--ink); }
-    html[data-theme="dark"] .sl-pill { background: #12151c; }
-    html[data-theme="dark"] .sl-pill.active { background: var(--navy); color: #0f1117; border-color: var(--navy); }
+    html[data-theme="dark"] .sl-search { background: #1f2433; color: var(--ink); }
+    html[data-theme="dark"] .sl-pill { background: #1f2433; }
+    html[data-theme="dark"] .sl-pill.active { background: var(--navy); color: #1c2130; border-color: var(--navy); }
 
     /* header */
     html[data-theme="dark"] .site-header { background: #0b0d12; border-bottom-color: var(--line); }
@@ -513,8 +513,8 @@
     }
 
     /* lightbox faces in dark mode stay the same (dark backdrop already) */
-    html[data-theme="dark"] .fc-lb-front { background: #1b2029; border-color: #343c4c; }
-    html[data-theme="dark"] .fc-lb-back  { background: #1b2029; border-color: var(--gold); }
+    html[data-theme="dark"] .fc-lb-front { background: #2b3144; border-color: #343c4c; }
+    html[data-theme="dark"] .fc-lb-back  { background: #2b3144; border-color: var(--gold); }
   </style>
 </head>
 <body>
@@ -535,8 +535,9 @@
         <a href="/blog" class="nav-link">Blog</a>
         <a href="/pricing.html" class="nav-link">Pricing</a>
       </nav>
-      <div class="header-right"></div>
+      <div class="header-end"><button class="nav-search" type="button" data-site-search aria-label="Search PrepWithTee" title="Search (Ctrl K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><div class="header-right"></div></div>
     </div>
+  <script>(function(){if(window.pwtOpenSearch)return;var m=null;function o(q){(m?Promise.resolve(m):import('/site-search.js?v=20260929a').then(function(x){return m=x})).then(function(x){x.open(q||'')}).catch(function(){location.href='/explore'})}window.pwtOpenSearch=o;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-site-search]');if(b){e.preventDefault();o()}});document.addEventListener('keydown',function(e){var a=document.activeElement,t=a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();o();return}if(e.key==='/'&&!t&&!e.ctrlKey&&!e.metaKey&&!e.altKey){var l=document.querySelector('[data-pk-q]');if(l&&l.offsetParent!==null)return;e.preventDefault();o()}})})();</script>
   </header>
 <!--NAV:END-->
 <!--CRUMB:START — breadcrumb bar. Do not edit here; edit CRUMBS in website/sync_nav.py then run: python sync_nav.py -->
@@ -1148,9 +1149,9 @@
 
   })();
   </script>
-  <script type="module" src="/auth.js?v=20260927k"></script>
+  <script type="module" src="/auth.js?v=20260929a"></script>
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
-  <script src="tour.js?v=20260829a"></script>
+  <script src="tour.js?v=20260929a"></script>
 </body>
 </html>
 

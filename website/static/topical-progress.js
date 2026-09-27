@@ -11,7 +11,7 @@
  */
 
 import { requireProfile } from "/auth.js";
-import { lockElement, setPlan, setRole } from "/upgrade-modal.js";
+import { setPlan, setRole } from "/upgrade-modal.js";
 import {
   BOARD_OF_GRADE, STATUSES, PAPER_STEPS,
   api, teeLoader, esc, key,
@@ -112,21 +112,12 @@ async function selectSubject(code) {
 
   renderTopics();
 
-  // Free users can only track progress on their first enrolled subject.
-  const firstEnrolled = state.enrolled[0];
-  const isPrivilegedUser = user.role === "teacher" || user.role === "admin";
-  const isLocked = !isPrivilegedUser && user.plan === "free" && firstEnrolled && code !== firstEnrolled;
+  // Progress tracking is free for every subject and every plan (tutor,
+  // 2026-09-28) - the old "free plan = first subject only" blur is gone.
   const topicList = document.getElementById("topic-list");
   if (topicList) {
     topicList.classList.remove("pwt-locked");
     topicList.querySelectorAll(".pwt-lock-chip").forEach(c => c.remove());
-    if (isLocked) {
-      lockElement(topicList, {
-        minPlan: "pro",
-        label: "Upgrade to track all subjects",
-        message: "Free plan lets you track progress in one subject. Upgrade to Pro to unlock all subjects.",
-      });
-    }
   }
 }
 

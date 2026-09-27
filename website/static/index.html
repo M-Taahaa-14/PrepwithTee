@@ -88,13 +88,13 @@
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260928b">
+  <link rel="stylesheet" href="styles.css?v=20260929e">
   <!-- Neither sheet styles anything above the fold here (tools.css is only for
        the tool dock / print), so load them without blocking first paint. -->
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="tools.css?v=20260927j" media="print" onload="this.media='all'">
 
-  <link rel="stylesheet" href="demo-player.css?v=20260927l" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="demo-player.css?v=20260929a">
 </head>
 
 <body>
@@ -123,8 +123,9 @@
         <a href="/blog" class="nav-link">Blog</a>
         <a href="/pricing.html" class="nav-link">Pricing</a>
       </nav>
-      <div class="header-right"></div>
+      <div class="header-end"><button class="nav-search" type="button" data-site-search aria-label="Search PrepWithTee" title="Search (Ctrl K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><div class="header-right"></div></div>
     </div>
+  <script>(function(){if(window.pwtOpenSearch)return;var m=null;function o(q){(m?Promise.resolve(m):import('/site-search.js?v=20260929a').then(function(x){return m=x})).then(function(x){x.open(q||'')}).catch(function(){location.href='/explore'})}window.pwtOpenSearch=o;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-site-search]');if(b){e.preventDefault();o()}});document.addEventListener('keydown',function(e){var a=document.activeElement,t=a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();o();return}if(e.key==='/'&&!t&&!e.ctrlKey&&!e.metaKey&&!e.altKey){var l=document.querySelector('[data-pk-q]');if(l&&l.offsetParent!==null)return;e.preventDefault();o()}})})();</script>
   </header>
 <!--NAV:END-->
 
@@ -133,22 +134,27 @@
   <section class="hero hero-home">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Cambridge O Level &middot; IGCSE &middot; A Level &middot; Lahore &amp; Online</p>
-        <h1 data-persona-headline>Cambridge O Level, IGCSE &amp; A Level tutoring — <em>topical past papers, notes &amp; AI tutor, all in one place.</em></h1>
-        <p class="sub" data-persona-sub>Expert tuition for O Level and IGCSE Maths, Physics and Computer Science in Lahore &mdash; plus free topical past papers (2020&ndash;2025), chapter revision notes, MCQ practice and an AI tutor. Real Cambridge questions by topic, with every mark scheme explained.</p>
+        <p class="eyebrow hero-eyebrow">O Level &middot; IGCSE &middot; A Level &mdash; practice + 1-on-1 tutoring</p>
+        <h1 data-persona-headline>You already work hard. <em>Let&rsquo;s make it count.</em></h1>
+        <p class="sub" data-persona-sub>Every Cambridge question on the chapter you&rsquo;re stuck on, in one booklet, with the official mark scheme after each one &mdash; plus papers by year, revision notes, an AI tutor, and Tee for one-on-one lessons when you want a real person.</p>
         <div class="hero-ctas">
-          <a href="#contact" class="btn btn-dark" data-persona-cta>Book a free demo lesson</a>
-          <a href="/papers" class="btn btn-outline">Try the papers engine</a>
+          <a href="/papers/topical" class="btn btn-dark" data-persona-cta>Build my first booklet &mdash; free</a>
+          <a href="#contact" class="btn btn-outline">Book a free lesson with Tee</a>
         </div>
-        <div class="hero-stats">
-          <div><b id="stat-questions">3,000+</b><span>real Cambridge questions, topic by topic</span></div>
-          <div><b>1-on-1</b><span>your lesson, your pace &mdash; always</span></div>
-          <div><b>2020&ndash;25</b><span>every session &amp; variant covered</span></div>
-          <div><b>Free</b><span>first demo lesson, no commitment</span></div>
-        </div>
+        <ul class="hero-proof" aria-label="What you get">
+          <li><b id="stat-questions">52,984</b> real Cambridge questions</li>
+          <li><b>2010&ndash;2025</b> every session &amp; variant</li>
+          <li><b>Official</b> mark schemes</li>
+          <li><b>Free</b> to start</li>
+        </ul>
       </div>
-      <div class="hero-3d">
-        <canvas id="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-demo">
+        <!-- demo-player.js: a laptop playing "PrepWithTee in 40 seconds" (scripts/capture_demo_shots.py) -->
+        <div class="dp" data-frame="laptop" data-demo="/demos/hero/timeline.json" role="region"
+             aria-label="PrepWithTee in 40 seconds - a short walkthrough">
+          <img src="/demos/hero/05-booklet.jpg" alt="A topical booklet built on PrepWithTee" width="1280" height="800"
+               fetchpriority="high" style="width:100%;height:auto;border-radius:14px;box-shadow:0 20px 50px rgba(20,14,45,.25)">
+        </div>
       </div>
     </div>
   </section>
@@ -162,26 +168,16 @@
       <div class="reveal"><b class="count" data-target="50" data-suffix="+">0</b>
         <span>students mentored, one at a time</span>
       </div>
-      <div class="reveal"><b class="count" data-target="3059" data-suffix="+">0</b>
+      <div class="reveal"><b class="count" data-target="52984" data-suffix="">0</b>
         <span>real Cambridge questions, classified by topic</span>
       </div>
-      <div class="reveal"><b class="count" data-target="6">0</b>
-        <span>Cambridge courses across three boards</span>
+      <div class="reveal"><b class="count" data-target="13">0</b>
+        <span>Cambridge subjects across three boards</span>
       </div>
     </div>
   </section>
 
 
-  <!-- ============ SEE IT IN ACTION (demo-player.js; shots from scripts/capture_demo_shots.py) ============ -->
-  <section class="section demo-section" id="see-it">
-    <div class="container">
-      <p class="eyebrow reveal centered">See it in action</p>
-      <h2 class="section-title reveal centered">From a blank page to a<br>marked paper in <em>a minute.</em></h2>
-      <div class="dp" data-demo="/demos/how-it-works/timeline.json" role="region" aria-label="How PrepWithTee works - a short demo">
-        <img src="/demos/how-it-works/04-booklet.jpg" alt="A topical booklet built on PrepWithTee" loading="lazy" width="1280" height="800" style="width:100%;height:auto;border-radius:18px">
-      </div>
-    </div>
-  </section>
 
   <!-- ============ JOURNEY LADDER ============ -->
   <section class="section journey-section">
@@ -318,152 +314,48 @@
     </div>
   </section>
 
-  <!-- ============ PLATFORM SHOWCASE (MATCHING TARGET DESIGN) ============ -->
-  <section class="section section-cream walkthrough-section" id="showcase-section">
-    <div class="container pwt-showcase-container">
+  <!-- ============ HOW IT WORKS: 4 steps with real screenshots (demos/showcase, capture_demo_shots.py) ============ -->
+  <section class="section sc2-section" id="showcase-section">
+    <div class="container sc2">
+      <p class="eyebrow reveal centered">How students use it</p>
+      <h2 class="section-title reveal centered">Four steps, one place. <em>No more tab-hopping.</em></h2>
 
-      <!-- Top horizontal step selector pills -->
-      <div class="pwt-showcase-tabs">
-        <button class="pwt-sc-tab active" data-step="1" type="button">
-          <span class="pwt-sc-num">1</span> Study from Notes
-        </button>
-        <button class="pwt-sc-tab" data-step="2" type="button">
-          <span class="pwt-sc-num">2</span> Practice Past Papers
-        </button>
-        <button class="pwt-sc-tab" data-step="3" type="button">
-          <span class="pwt-sc-num">3</span> Custom-built AI
-        </button>
-        <button class="pwt-sc-tab" data-step="4" type="button">
-          <span class="pwt-sc-num">4</span> Evaluate & Reflect
-        </button>
+      <div class="sc2-tabs" role="tablist" aria-label="How PrepWithTee works">
+        <button class="sc2-tab is-on sc2-t-teal" role="tab" type="button" aria-selected="true" aria-controls="sc2-panel" data-step="0">
+          <span class="sc2-num">1</span><span class="sc2-lbl">Learn it</span><i class="sc2-bar"><b></b></i></button>
+        <button class="sc2-tab sc2-t-lav" role="tab" type="button" aria-selected="false" aria-controls="sc2-panel" data-step="1">
+          <span class="sc2-num">2</span><span class="sc2-lbl">Practise it</span><i class="sc2-bar"><b></b></i></button>
+        <button class="sc2-tab sc2-t-pink" role="tab" type="button" aria-selected="false" aria-controls="sc2-panel" data-step="2">
+          <span class="sc2-num">3</span><span class="sc2-lbl">Get unstuck</span><i class="sc2-bar"><b></b></i></button>
+        <button class="sc2-tab sc2-t-orange" role="tab" type="button" aria-selected="false" aria-controls="sc2-panel" data-step="3">
+          <span class="sc2-num">4</span><span class="sc2-lbl">Track it</span><i class="sc2-bar"><b></b></i></button>
       </div>
 
-      <!-- Main Showcase Card -->
-      <div class="pwt-showcase-card">
-        
-        <!-- Left Content Side -->
-        <div class="pwt-showcase-left">
-          <div class="pwt-sc-icon-box" id="sc-icon">📖</div>
-          <span class="pwt-sc-step-label" id="sc-step-num">STEP 01</span>
-          <h3 class="pwt-sc-title" id="sc-title">Study from Notes</h3>
-          <p class="pwt-sc-desc" id="sc-desc">Access premium notes, flashcards and key definitions.</p>
-          
-          <div class="pwt-sc-pills" id="sc-pills">
-            <span class="pwt-sc-pill">Notes</span>
-            <span class="pwt-sc-pill">Flashcards</span>
-            <span class="pwt-sc-pill">Definitions</span>
-            <span class="pwt-sc-pill">Your Notes</span>
-          </div>
-
-          <a href="login.html" class="pwt-sc-cta" id="sc-cta">Try it now →</a>
+      <div class="sc2-card sc2-t-teal" id="sc2-panel" role="tabpanel" aria-live="polite">
+        <div class="sc2-copy">
+          <span class="sc2-ic" aria-hidden="true">📘</span>
+          <p class="sc2-step">Step 1 of 4</p>
+          <h3 class="sc2-title">Learn the chapter</h3>
+          <p class="sc2-desc">Clear revision notes written against the official syllabus - definitions, worked examples and the mistakes examiners punish - one chapter at a time.</p>
+          <ul class="sc2-list">
+            <li>Notes for every syllabus chapter</li>
+            <li>Teachers' PDF notes and books in Resources</li>
+            <li>Formula sheets, definitions and flashcards</li>
+          </ul>
+          <a class="sc2-cta" href="/notes">Open revision notes <span aria-hidden="true">→</span></a>
         </div>
-
-        <!-- Right Mac / iPad Window Mockup Side -->
-        <div class="pwt-showcase-right">
-          <div class="pwt-mac-window">
-            <div class="pwt-mac-head">
-              <div class="pwt-mac-dots">
-                <span class="pwt-mac-dot red"></span>
-                <span class="pwt-mac-dot yellow"></span>
-                <span class="pwt-mac-dot green"></span>
-              </div>
-              <span class="pwt-mac-title" id="sc-win-title">Notes & Flashcards — PrepWithTee</span>
-            </div>
-            
-            <div class="pwt-mac-body" id="sc-window-body">
-              <!-- Slide 1: Study from Notes -->
-              <div class="pwt-sc-img active" data-slide="1">
-                <div style="padding:20px;background:#FAF9F6;color:#1A1A2E;height:100%;display:flex;flex-direction:column;gap:10px;text-align:left;overflow:hidden">
-                  <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #E5E7EB;padding-bottom:8px">
-                    <span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:0.9rem;color:#2E1B4A">📚 1. Eukaryotic Cell Structures</span>
-                    <span style="background:#EBF7EE;color:#1B8738;padding:3px 8px;border-radius:6px;font-size:0.75rem;font-weight:700">O Level / IGCSE</span>
-                  </div>
-                  <p style="font-size:0.82rem;color:#4B5563;line-height:1.45;margin:0">
-                    A eukaryotic cell contains a true nucleus and membrane-bound organelles. Key structures include nucleus, mitochondria, and cell membrane.
-                  </p>
-                  <div style="background:#FFF;border:1.5px solid #E8913A;border-left:4px solid #E8913A;padding:10px 12px;border-radius:8px;font-size:0.8rem">
-                    <strong style="color:#E8913A">Key Definition:</strong> <em>Phospholipid Bilayer</em> — two layers of fat-like molecules forming the semi-permeable cell membrane.
-                  </div>
-                </div>
-              </div>
-
-              <!-- Slide 2: Practice Past Papers (Topical Progress UI from Screenshot 2) -->
-              <div class="pwt-sc-img" data-slide="2">
-                <div style="padding:16px;background:#FAF9F6;color:#1A1A2E;height:100%;display:flex;flex-direction:column;gap:8px;text-align:left;overflow:hidden">
-                  <div style="background:#E0D7F5;padding:8px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:0.84rem;color:#2E1B4A">
-                    <span>P1 · Theory (Computer Science 9618)</span>
-                    <span style="font-size:0.75rem;font-weight:600">9 chapters · 3 confident</span>
-                  </div>
-                  <div style="display:flex;flex-direction:column;gap:6px">
-                    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:0.78rem">
-                      <span style="font-weight:700">01 Information Representation</span>
-                      <span style="background:#EBF7EE;color:#1B8738;padding:2px 8px;border-radius:6px;font-weight:700">Confident ✓</span>
-                    </div>
-                    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:0.78rem">
-                      <span style="font-weight:700">02 Communication</span>
-                      <span style="background:#FEF3E6;color:#D97706;padding:2px 8px;border-radius:6px;font-weight:700">Learning…</span>
-                    </div>
-                    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;font-size:0.78rem">
-                      <span style="font-weight:700">03 Hardware</span>
-                      <span style="background:#F1F5F9;color:#64748B;padding:2px 8px;border-radius:6px;font-weight:600">Not started</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Slide 3: Custom-built AI (AI Tutor UI from Screenshot 3) -->
-              <div class="pwt-sc-img" data-slide="3">
-                <div style="padding:18px;background:#FAF9F6;color:#1A1A2E;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;overflow:hidden">
-                  <div style="font-size:2.2rem;line-height:1">🦉</div>
-                  <h4 style="margin:0;font-family:'Archivo',sans-serif;font-size:1.05rem;color:#2E1B4A">Hi, I'm your AI Tutor</h4>
-                  <p style="margin:0;font-size:0.78rem;color:#64748B;max-width:320px">Ask me anything from your Cambridge syllabus or pick a prompt below.</p>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
-                    <span style="background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:4px 10px;font-size:0.72rem;font-weight:600">📝 Practice questions</span>
-                    <span style="background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:4px 10px;font-size:0.72rem;font-weight:600">💡 Explain concept</span>
-                    <span style="background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:4px 10px;font-size:0.72rem;font-weight:600">⚠️ Exam mistakes</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Slide 4: Evaluate & Reflect (Student Dashboard from Screenshot 1) -->
-              <div class="pwt-sc-img" data-slide="4">
-                <div style="padding:16px;background:#FAF9F6;color:#1A1A2E;height:100%;display:flex;flex-direction:column;gap:10px;text-align:left;overflow:hidden">
-                  <div style="background:#fff;border:1.5px solid #E8913A;border-top:4px solid #E8913A;border-radius:10px;padding:10px 14px">
-                    <span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:0.82rem;color:#2E1B4A;letter-spacing:0.04em">TODAY'S MISSION</span>
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font-size:0.78rem;font-weight:600">
-                      <span>Complete a 25-minute focus session</span>
-                      <span style="background:#FEF3E6;color:#D97706;padding:2px 6px;border-radius:4px;font-weight:800">+40 XP</span>
-                    </div>
-                  </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:0.76rem">
-                      <strong style="color:#2E1B4A;display:block">Computer Science</strong>
-                      <span style="color:#1B8738;font-weight:700">● 3 Confident</span> · 6 Learning
-                    </div>
-                    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:10px;font-size:0.76rem">
-                      <strong style="color:#2E1B4A;display:block">Physics 5054</strong>
-                      <span style="color:#1B8738;font-weight:700">● 5 Confident</span> · 4 Learning
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+        <figure class="sc2-shot">
+          <div class="sc2-browser">
+            <div class="sc2-bar-top"><span class="sc2-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="sc2-url">prepwithtee.com<b>/notes/igcse/physics-0625</b></span></div>
+            <div class="sc2-imgs">
+              <img class="is-on" src="/demos/showcase/notes.jpg" alt="A PrepWithTee revision note: Hooke's Law and springs" width="1280" height="800" loading="lazy">
+              <img src="/demos/showcase/papers.jpg" alt="The topical builder: tick the chapters you need" width="1280" height="800" loading="lazy">
+              <img src="/demos/showcase/ai.jpg" alt="A step-by-step explanation next to the past paper" width="1280" height="800" loading="lazy">
+              <img src="/demos/showcase/progress.jpg" alt="Chapter progress: confident, learning, not started" width="1280" height="800" loading="lazy">
             </div>
           </div>
-
-          <!-- Bottom Carousel Bar -->
-          <div class="pwt-carousel-nav">
-            <button class="pwt-car-btn" id="sc-prev" type="button" title="Previous Step">←</button>
-            <div class="pwt-car-dots" id="sc-dots">
-              <span class="pwt-car-dot active" data-step="1"></span>
-              <span class="pwt-car-dot" data-step="2"></span>
-              <span class="pwt-car-dot" data-step="3"></span>
-              <span class="pwt-car-dot" data-step="4"></span>
-            </div>
-            <button class="pwt-car-btn" id="sc-next" type="button" title="Next Step">→</button>
-          </div>
-        </div>
-
+        </figure>
       </div>
     </div>
   </section>
@@ -840,22 +732,7 @@
   </button>
 
   <script src="main.js?v=20260928a"></script>
-  <script>
-/* Load the 3D hero only after the page is done loading, and skip on mobile
-   so we dont pay 275 KB + 1.7 s of CPU on small screens. */
-var conn = navigator.connection || {};
-/* Also skip on slow links / Data Saver: 290 KB of three.js at PTCL-to-Mumbai
-   speeds is ~15 s of bandwidth taken from everything else on the page. */
-if (window.innerWidth >= 768 && !conn.saveData && !/2g|3g/.test(conn.effectiveType || "")) {
-  window.addEventListener("load", function() {
-    var s = document.createElement("script");
-    s.type = "module";
-    s.src = "hero3d.js?v=20260805g";
-    document.body.appendChild(s);
-  });
-}
-</script>
-  <script type="module" src="/auth.js?v=20260927k"></script>
+  <script type="module" src="/auth.js?v=20260929a"></script>
 
   <script src="tools-core.js?v=20260927j"></script>
   <script src="tools-nav.js?v=20260811d"></script>
@@ -1030,126 +907,102 @@ if (window.innerWidth >= 768 && !conn.saveData && !/2g|3g/.test(conn.effectiveTy
       });
     }
 
-    /* ---- Platform Showcase Auto-Scroll Controller (Matching Image 4 & 5) ---- */
-    (function() {
-      const steps = [
-        {
-          num: "STEP 01",
-          title: "Study from Notes",
-          desc: "Access premium notes, flashcards and key definitions.",
-          icon: "📖",
-          pills: ["Notes", "Flashcards", "Definitions", "Your Notes"],
-          href: "/resources",
-          ctaText: "Try it now →",
-          winTitle: "Notes & Flashcards — PrepWithTee"
-        },
-        {
-          num: "STEP 02",
-          title: "Practice Past Papers",
-          desc: "Build topical past paper packs on demand with official mark schemes.",
-          icon: "📄",
-          pills: ["Topical Papers", "Mark Schemes", "MCQ Drills", "Custom PDF"],
-          href: "/papers",
-          ctaText: "Build a paper →",
-          winTitle: "Topical Past Papers — PrepWithTee"
-        },
-        {
-          num: "STEP 03",
-          title: "Custom-built AI",
-          desc: "Ask doubt questions, get instant worked solutions or photo problem solving.",
-          icon: "🤖",
-          pills: ["AI Tutor", "Step Explainer", "Photo Solver", "Voice Mode"],
-          href: "tutor.html",
-          ctaText: "Ask AI Tutor →",
-          winTitle: "AI Assistant — PrepWithTee"
-        },
-        {
-          num: "STEP 04",
-          title: "Evaluate & Reflect",
-          desc: "Track chapter understanding, view grade trends, and target weak topics.",
-          icon: "📊",
-          pills: ["Topic Tracker", "Grade Trends", "Performance", "Parent Reports"],
-          href: "dashboard.html",
-          ctaText: "View Dashboard →",
-          winTitle: "Dashboard Analytics — PrepWithTee"
-        }
+    /* ---- How it works: 4 steps, real screenshots, auto-advances (pauses on hover/focus) ---- */
+    (function () {
+      const root = document.getElementById("showcase-section");
+      if (!root) return;
+      const STEPS = [
+        { tone: "teal", ic: "📘", title: "Learn the chapter", url: "/notes/igcse/physics-0625",
+          desc: "Clear revision notes written against the official syllabus - definitions, worked examples and the mistakes examiners punish - one chapter at a time.",
+          list: ["Notes for every syllabus chapter", "Teachers' PDF notes and books in Resources", "Formula sheets, definitions and flashcards"],
+          cta: "Open revision notes", href: "/notes" },
+        { tone: "lav", ic: "📑", title: "Practise it topically", url: "/papers/igcse/physics-0625",
+          desc: "Tick the chapters you're stuck on and get a booklet of real Cambridge questions - newest papers first, the official mark scheme after each one.",
+          list: ["52,984 questions sorted by chapter and subtopic", "Papers by year, MCQ practice and timed mock tests", "Write on it, download it, come back to it"],
+          cta: "Build a topical booklet", href: "/papers/topical" },
+        { tone: "pink", ic: "✨", title: "Get unstuck in seconds", url: "/yearly/view/37",
+          desc: "Tap Explain on any question for a step-by-step solution checked against the official mark scheme - or Guide me for hints without the answer.",
+          list: ["Explanations on every past-paper question", "AI Tutor and Photo Solver for anything else", "Tee for one-on-one help when you want a person"],
+          cta: "Try the AI Tutor", href: "/tutor.html" },
+        { tone: "orange", ic: "📈", title: "Track what's working", url: "/topical-progress.html",
+          desc: "Mark each chapter as you go, log your paper scores against Cambridge's grade thresholds, and keep your streak alive on the dashboard.",
+          list: ["Chapter progress - free for every subject", "Paper scores and predicted grades", "Parents and teachers see the same picture"],
+          cta: "See your dashboard", href: "/dashboard.html" },
       ];
+      const DUR = 6000;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const tabs = [...root.querySelectorAll(".sc2-tab")];
+      const card = root.querySelector(".sc2-card");
+      const imgs = [...root.querySelectorAll(".sc2-imgs img")];
+      const $ = (s) => card.querySelector(s);
+      let cur = 0, timer = null, started = 0, left = DUR, held = new Set(["offscreen"]);
 
-      let current = 0;
-      let timer = null;
-
-      const tabs = document.querySelectorAll('.pwt-sc-tab');
-      const dots = document.querySelectorAll('.pwt-car-dot');
-      const prevBtn = document.getElementById('sc-prev');
-      const nextBtn = document.getElementById('sc-next');
-
-      const iconEl = document.getElementById('sc-icon');
-      const stepNumEl = document.getElementById('sc-step-num');
-      const titleEl = document.getElementById('sc-title');
-      const descEl = document.getElementById('sc-desc');
-      const pillsEl = document.getElementById('sc-pills');
-      const ctaEl = document.getElementById('sc-cta');
-      const winTitleEl = document.getElementById('sc-win-title');
-      const slides = document.querySelectorAll('.pwt-sc-img');
-
-      function gotoStep(idx) {
-        current = (idx + steps.length) % steps.length;
-        const s = steps[current];
-
-        if (iconEl) iconEl.textContent = s.icon;
-        if (stepNumEl) stepNumEl.textContent = s.num;
-        if (titleEl) titleEl.textContent = s.title;
-        if (descEl) descEl.textContent = s.desc;
-        if (winTitleEl) winTitleEl.textContent = s.winTitle;
-
-        if (ctaEl) {
-          ctaEl.href = s.href;
-          ctaEl.textContent = s.ctaText;
-        }
-
-        if (pillsEl) {
-          pillsEl.innerHTML = s.pills.map(p => `<span class="pwt-sc-pill">${p}</span>`).join('');
-        }
-
-        tabs.forEach((t, i) => t.classList.toggle('active', i === current));
-        dots.forEach((d, i) => d.classList.toggle('active', i === current));
-
-        slides.forEach((slide, i) => {
-          slide.classList.toggle('active', i === current);
+      function show(i) {
+        cur = (i + STEPS.length) % STEPS.length;
+        const s = STEPS[cur];
+        card.className = `sc2-card sc2-t-${s.tone}`;
+        $(".sc2-ic").textContent = s.ic;
+        $(".sc2-step").textContent = `Step ${cur + 1} of ${STEPS.length}`;
+        $(".sc2-title").textContent = s.title;
+        $(".sc2-desc").textContent = s.desc;
+        $(".sc2-list").innerHTML = s.list.map((x) => `<li>${x}</li>`).join("");
+        const cta = $(".sc2-cta");
+        cta.href = s.href;
+        cta.firstChild.textContent = s.cta + " ";
+        $(".sc2-url").innerHTML = `prepwithtee.com<b>${s.url}</b>`;
+        imgs.forEach((im, k) => { im.classList.toggle("is-on", k === cur); if (k === cur) im.loading = "eager"; });
+        tabs.forEach((t, k) => {
+          t.classList.toggle("is-on", k === cur);
+          t.classList.toggle("is-past", k < cur);
+          t.setAttribute("aria-selected", String(k === cur));
         });
+        restart();
       }
-
-      function startAuto() {
-        stopAuto();
-        timer = setInterval(() => gotoStep(current + 1), 4500);
+      function restart() {
+        clearTimeout(timer);
+        left = DUR;
+        tabs.forEach((t) => t.style.setProperty("--p", "0"));
+        run();
       }
-
-      function stopAuto() {
-        if (timer) clearInterval(timer);
+      function run() {
+        if (reduced || held.size) return;
+        started = Date.now();
+        const bar = tabs[cur].querySelector(".sc2-bar b");
+        bar.style.transition = "none";
+        bar.style.width = `${(1 - left / DUR) * 100}%`;
+        void bar.offsetWidth;
+        bar.style.transition = `width ${left}ms linear`;
+        bar.style.width = "100%";
+        timer = setTimeout(() => show(cur + 1), left);
       }
+      function hold(why) {
+        if (held.has(why)) return;
+        held.add(why);
+        clearTimeout(timer);
+        left = Math.max(0, left - (Date.now() - started));
+        const bar = tabs[cur].querySelector(".sc2-bar b");
+        bar.style.transition = "none";
+        bar.style.width = `${(1 - left / DUR) * 100}%`;
+      }
+      function release(why) { if (held.delete(why) && !held.size) run(); }
 
-      tabs.forEach((t, i) => {
-        t.addEventListener('click', () => { gotoStep(i); startAuto(); });
+      tabs.forEach((t, k) => t.addEventListener("click", () => show(k)));
+      root.addEventListener("keydown", (e) => {
+        if (!e.target.closest(".sc2-tab")) return;
+        if (e.key === "ArrowRight") { e.preventDefault(); show(cur + 1); tabs[cur].focus(); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); show(cur - 1); tabs[cur].focus(); }
       });
-
-      dots.forEach((d, i) => {
-        d.addEventListener('click', () => { gotoStep(i); startAuto(); });
-      });
-
-      if (prevBtn) prevBtn.addEventListener('click', () => { gotoStep(current - 1); startAuto(); });
-      if (nextBtn) nextBtn.addEventListener('click', () => { gotoStep(current + 1); startAuto(); });
-
-      const card = document.querySelector('.pwt-showcase-card');
-      if (card) {
-        card.addEventListener('mouseenter', stopAuto);
-        card.addEventListener('mouseleave', startAuto);
-      }
-
-      gotoStep(0);
-      startAuto();
+      card.addEventListener("mouseenter", () => hold("hover"));
+      card.addEventListener("mouseleave", () => release("hover"));
+      root.addEventListener("focusin", () => hold("focus"));
+      root.addEventListener("focusout", () => release("focus"));
+      new IntersectionObserver(([e]) => (e.isIntersecting ? release("offscreen") : hold("offscreen")),
+        { threshold: 0.35 }).observe(card);
+      document.addEventListener("visibilitychange", () => (document.hidden ? hold("tab") : release("tab")));
+      show(0);
     })();
   </script>
-  <script type="module" src="demo-player.js?v=20260927l"></script>
+  <script type="module" src="demo-player.js?v=20260929a"></script>
 </body>
 
 </html>

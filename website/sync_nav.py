@@ -94,6 +94,35 @@ CRUMBS: dict[str, list[tuple[str, str]]] = {
     "terms.html": [("Terms", "/terms.html")],
     "privacy.html": [("Privacy", "/privacy.html")],
 }
+# Dashboard section tabs (tutor, 2026-09-28: moving between the dashboard's own
+# pages was hard). Stamped inside the CRUMB block of every page listed here;
+# /my-papers (server-rendered) draws the same bar from ui.dash_tabs().
+DASH_TABS = [
+    ("Overview", "/dashboard.html", "📊"),
+    ("Chapter progress", "/topical-progress.html", "📈"),
+    ("Paper scores", "/yearly-progress.html", "🎯"),
+    ("My papers", "/my-papers", "🗂️"),
+    ("Homework", "/homework.html", "📝"),
+    ("Calendar", "/calendar.html", "📅"),
+    ("Analytics", "/analytics.html", "📉"),
+    ("Achievements", "/achievements.html", "🏆"),
+    ("Flashcards", "/fc-progress.html", "🃏"),
+    ("Profile", "/profile.html", "👤"),
+]
+DASH_TAB_PAGES = {u.lstrip("/") for _n, u, _i in DASH_TABS if u.endswith(".html")}
+
+
+def dash_tabs_html(current: str) -> str:
+    tabs = []
+    for name, url, ic in DASH_TABS:
+        on = url == current
+        cur = ' aria-current="page"' if on else ""
+        tabs.append(f'<a class="dtab{" is-on" if on else ""}" href="{url}"{cur}>'
+                    f'<span aria-hidden="true">{ic}</span>{_esc(name)}</a>')
+    return ('<nav class="dtabs" aria-label="Dashboard sections"><div class="container dtabs-in">'
+            + "".join(tabs) + "</div></nav>")
+
+
 SITE = "https://prepwithtee.com"
 _CRUMB_RE = re.compile(r"<!--CRUMB:START.*?<!--CRUMB:END-->\n?", re.S)
 # the single-link bars this replaces: <div class="page-back-bar"><a ...>Dashboard</a></div>
@@ -124,7 +153,8 @@ def crumb_block(page: str) -> str | None:
             f'<a class="pg-back" href="{parent[1]}"><svg viewBox="0 0 24 24" aria-hidden="true">'
             '<path d="M15 5l-7 7 7 7"/></svg><span>' + _esc(parent[0]) + "</span></a>"
             f'<nav class="pg-crumbs" aria-label="Breadcrumb">{links}</nav></div></div>\n'
-            f'<script type="application/ld+json">{ld}</script>\n'
+            + (dash_tabs_html("/" + page) + "\n" if page in DASH_TAB_PAGES else "")
+            + f'<script type="application/ld+json">{ld}</script>\n'
             "<!--CRUMB:END-->\n")
 
 

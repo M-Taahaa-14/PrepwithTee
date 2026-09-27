@@ -44,10 +44,11 @@ const PERSONAS = [
 /* ── Hero copy swapped per persona ────────────────────────────────────────── */
 const HERO_COPY = {
   student: {
-    headline: "Every Cambridge past paper. Organised by topic.",
-    sub: "Physics, Maths and Computer Science — sorted by chapter, not by year, so you revise what matters.",
-    cta: "Start practising free",
-    ctaHref: "/login.html",
+    headline: "You already work hard.",
+    em: "Let’s make it count.",
+    sub: "Every Cambridge question on the chapter you’re stuck on, in one booklet, with the official mark scheme after each one — so every hour goes where the marks are.",
+    cta: "Build my first booklet — free",
+    ctaHref: "/papers/topical",
   },
   teacher: {
     headline: "Grow your tutoring practice with a ready-made student base.",
@@ -56,7 +57,8 @@ const HERO_COPY = {
     ctaHref: "/teacher-apply.html",
   },
   parent: {
-    headline: "Expert Cambridge tutoring, with full progress visibility.",
+    headline: "Your child already works hard.",
+    em: "Let’s make it count.",
     sub: "Your child practises real past papers under a qualified teacher. You see every session and every result.",
     cta: "Book a free demo",
     ctaHref: "https://wa.me/923204884375?text=Hi%21+I%27d+like+to+book+a+free+demo+lesson.",
@@ -94,7 +96,11 @@ export function applyPersonaHero(persona) {
   const sub = document.querySelector("[data-persona-sub]");
   const cta = document.querySelector("[data-persona-cta]");
 
-  if (hl) hl.textContent = copy.headline;
+  if (hl) {
+    // headline + an optional second, highlighted line (<em>), built as nodes
+    hl.textContent = copy.em ? copy.headline + " " : copy.headline;
+    if (copy.em) { const em = document.createElement("em"); em.textContent = copy.em; hl.appendChild(em); }
+  }
   if (sub) sub.textContent = copy.sub;
   if (cta) {
     cta.textContent = copy.cta;

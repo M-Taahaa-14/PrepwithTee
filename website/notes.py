@@ -39,7 +39,7 @@ import catalog as _catalog
 router = APIRouter()
 
 NOTES_DIR = Path(__file__).resolve().parent / "static" / "notes-content"
-NOTES_V = "20260926a"                     # bump with notes.css / notes-page.js
+NOTES_V = "20260929a"                     # bump with notes.css / notes-page.js
 _e = _catalog._e
 SUBJECTS = _catalog.SUBJECTS
 BOARD_SHORT = _catalog.BOARD_SHORT
@@ -151,25 +151,33 @@ def _page(*, title, desc, path, body, crumbs, user, noindex=False, ld=None, kate
     return _catalog._respond(html, bool(user))
 
 
-def _subject_card(code: str) -> str:
-    s = SUBJECTS[code]
-    n = _count(code)
-    chs = len(index().get(code, {}))
-    meta = (f"{n} note{'s' if n != 1 else ''} · {chs} chapter{'s' if chs != 1 else ''}"
-            if n else "Notes coming soon")
-    return f"""
-    <a class="cat-subj cat-tone-{s['tone']} nt-card{' is-soon' if not n else ''}" href="{notes_url(code)}">
-      <div class="cat-subj-top"><span class="cat-code">{code}</span>
-        {'<span class="nt-badge">Notes</span>' if n else '<span class="nt-soon">Coming soon</span>'}</div>
-      <h3>{_e(s['plain'])}</h3>
-      <p class="cat-subj-meta">{meta}</p>
-    </a>"""
+def _picker(user: dict | None, board: str | None = None) -> str:
+    """The shared board/subject picker (ui.picker): subjects with notes first."""
+    import ui
+    state = _catalog._student_state(user)
+    boards = [board] if board else ui.board_order(state)
+    tiles = {}
+    for b in boards:
+        codes = sorted(ui.codes_for(b, state), key=lambda c: (c not in state["enrolled"], -_count(c)))
+        tiles[b] = []
+        for c in codes:
+            n = _count(c)
+            chs = len(index().get(c, {}))
+            if n:
+                stats = [(str(n), "notes"), (str(chs), "chapters")]
+                actions = [("Read notes", notes_url(c), "primary"),
+                           ("Practise", _catalog.subject_url(c), "ghost")]
+            else:
+                stats = [("Soon", "notes"), (str(len(_catalog.chapters(c)) or "—"), "chapters")]
+                actions = [("See chapters", notes_url(c), "primary")]
+            tiles[b].append(ui.tile(code=c, url=notes_url(c), stats=stats, actions=actions, soon=not n,
+                                    flag="on" if c in state["enrolled"] else ("soon" if not n else "")))
 
-
-def _board_grid(board: str) -> str:
-    codes = [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
-    codes.sort(key=lambda c: -_count(c))
-    return f'<div class="cat-grid">{"".join(_subject_card(c) for c in codes)}</div>'
+    def sub(b, n_tiles):
+        have = sum(1 for c in ui.codes_for(b) if _count(c))
+        return f"{n_tiles} subjects · {have} with notes"
+    return ui.picker(tiles, state=state, subtitle=sub,
+                     board_links="/notes/{board}" if board else None, active=board or "")
 
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
@@ -177,8 +185,6 @@ def _board_grid(board: str) -> str:
 @router.get("/notes", response_class=HTMLResponse)
 def notes_hub(user: dict | None = Depends(_auth.maybe_user)):
     total = sum(_count(c) for c in SUBJECTS)
-    sections = "".join(f'<h2 class="cat-group"><a href="/notes/{b}">{BOARD_SHORT[b]}</a></h2>{_board_grid(b)}'
-                       for b in BOARD_SHORT)
     import ui
     faq_html, faq_ld = ui.faq([
         ("Who writes PrepWithTee notes?",
@@ -201,6 +207,7 @@ def notes_hub(user: dict | None = Depends(_auth.maybe_user)):
       <div class="cat-actions"><a class="cat-btn" href="#boards">Find your subject</a>
         <a class="cat-btn cat-btn-ghost" href="/resources">Teachers' notes &amp; books</a></div>
     </header>
+    {_picker(user)}
     <section class="ui-compare">
       <article class="is-here"><h3>{ui.icon("notes")} PrepWithTee notes <small>you are here</small></h3>
         <p>Written by us, chapter by chapter against the syllabus. Every note links to the past-paper
@@ -215,7 +222,6 @@ def notes_hub(user: dict | None = Depends(_auth.maybe_user)):
         ("Practise straight away", "Every note ends with <b>Practise this chapter</b> - real past-paper questions."),
         ("Come back before the exam", "The chapter page lists what you need to know; tick it off."),
     ], "How to study with notes", "ui-steps-row")}
-    <div id="boards">{sections}</div>
     {faq_html}"""
     return _page(title="Cambridge Revision Notes | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Free Cambridge O Level, IGCSE and A Level revision notes, organised by syllabus "
@@ -234,7 +240,7 @@ def notes_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-lede">Pick a subject to see its syllabus chapters and the notes for each.</p>
       <div class="cat-actions"><a class="cat-btn cat-btn-ghost" href="/resources/{board}">{BOARD_SHORT[board]} teachers' notes &amp; books</a></div>
     </header>
-    {_board_grid(board)}"""
+    {_picker(user, board)}"""
     return _page(title=f"Cambridge {BOARD_SHORT[board]} Revision Notes — PrepWithTee",
                  desc=f"Cambridge {BOARD_SHORT[board]} revision notes by syllabus chapter.",
                  path=f"/notes/{board}", body=body, user=user,
@@ -248,25 +254,34 @@ def _subject_or_404(board: str, subject: str) -> dict:
     return s
 
 
-def _chapter_card(code: str, ch: dict) -> str:
+_CH_TONES = ["lav", "blue", "green", "orange", "pink", "teal", "yellow"]
+
+
+def _chapter_card(code: str, ch: dict, n: int = 0) -> str:
+    """One chapter on the subject page: numbered, colour-cycled, with its
+    syllabus subtopics ALWAYS listed (tutor, 2026-09-28 - no click to expand)."""
     notes = index().get(code, {}).get(ch["slug"], [])
-    covered = {n["subtopic"] for n in notes if n.get("subtopic")}
+    covered = {x["subtopic"] for x in notes if x.get("subtopic")}
     subs = "".join(f'<li class="{"is-on" if x["name"] in covered else ""}">{_e(x["name"])}</li>'
                    for x in ch["subtopics"])
     note_links = "".join(
-        f'<li><a href="{notes_url(code, ch["slug"], n["slug"])}">{_e(n["title"])}</a>'
-        f'<span>{n["minutes"]} min</span></li>' for n in notes)
+        f'<li><a href="{notes_url(code, ch["slug"], x["slug"])}">{_e(x["title"])}</a>'
+        f'<span>{x["minutes"]} min</span></li>' for x in notes)
+    tone = _CH_TONES[n % len(_CH_TONES)]
+    badge = (f'<span class="nt-badge">{len(notes)} note{"s" if len(notes) != 1 else ""}</span>' if notes
+             else '<span class="nt-soon">Coming soon</span>')
     return f"""
-    <article class="nt-ch{' has-notes' if notes else ''}" id="ch-{ch['slug']}">
+    <article class="nt-ch cat-tone-{tone}{' has-notes' if notes else ''}" id="ch-{ch['slug']}" data-q="{_e((ch['display'] + ' ' + ' '.join(x['name'] for x in ch['subtopics'])).lower())}">
       <header>
+        <span class="nt-ch-num">{n + 1:02d}</span>
         <a class="nt-ch-name" href="{notes_url(code, ch['slug'])}">{_e(ch['display'])}</a>
-        {f'<span class="nt-badge">{len(notes)} note{"s" if len(notes) != 1 else ""}</span>' if notes
-         else '<span class="nt-soon">Coming soon</span>'}
+        {badge}
       </header>
       {f'<ul class="nt-notes">{note_links}</ul>' if notes else ''}
-      {f'<details class="nt-subs"><summary>{len(ch["subtopics"])} syllabus subtopics</summary><ul>{subs}</ul></details>'
+      {f'<div class="nt-subs"><p>{len(ch["subtopics"])} syllabus subtopic{"s" if len(ch["subtopics"]) != 1 else ""}</p><ul>{subs}</ul></div>'
        if ch['subtopics'] else ''}
-      <a class="nt-practise" href="{_practise(code, ch['name'])}">Practise this chapter →</a>
+      <footer><a class="nt-read" href="{notes_url(code, ch['slug'])}">Open chapter</a>
+        <a class="nt-practise" href="{_practise(code, ch['name'])}">Practise questions →</a></footer>
     </article>"""
 
 
@@ -277,15 +292,16 @@ def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.ma
     chs = _catalog.chapters(code)
     by = {c["name"]: c for c in chs}
     groups = _catalog.paper_groups(code)
+    order = {c["name"]: i for i, c in enumerate(chs)}
     if groups:
         tree = "".join(
             f'<section class="nt-group"><h2 class="cat-group">{_e(g["eyebrow"])} · {_e(g["title"])}'
             + (f' <span class="cat-level cat-level-{g["level"]}">{"AS Level" if g["level"] == "AS" else "A Level"}</span>'
                if g["level"] else "")
-            + f'</h2><div class="nt-chs">{"".join(_chapter_card(code, by[n]) for n in g["chapters"] if n in by)}</div></section>'
+            + f'</h2><div class="nt-chs">{"".join(_chapter_card(code, by[n], order[n]) for n in g["chapters"] if n in by)}</div></section>'
             for g in groups)
     else:
-        tree = f'<div class="nt-chs">{"".join(_chapter_card(code, c) for c in chs)}</div>'
+        tree = f'<div class="nt-chs">{"".join(_chapter_card(code, c, i) for i, c in enumerate(chs))}</div>'
     meta = subject_meta(code)
     n = _count(code)
     covered = len(index().get(code, {}))
@@ -314,7 +330,8 @@ def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.ma
       </div>
     </header>
     {f'<details class="nt-guide"><summary>How to use these notes</summary><ul>{guide}</ul></details>' if guide else ''}
-    {tree}"""
+    {ui.page_search("Search chapters and subtopics, e.g. " + (chs[0]["display"] if chs else "forces"), ".nt-ch")}
+    <div class="nt-tree">{tree}</div>"""
     ld = [{"@context": "https://schema.org", "@type": "Course",
            "name": f"Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) revision notes",
            "description": lede[:300],

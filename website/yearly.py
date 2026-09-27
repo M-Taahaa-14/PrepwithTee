@@ -20,6 +20,8 @@ marks - paper-viewer.js hides those for guests.
 
 import json
 import re
+import threading
+import time
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -87,14 +89,49 @@ def sittings(code: str, year: int | None = None) -> list[dict]:
                                               e["paper"], e["variant"]))
 
 
+_YEARS_CACHE: dict = {"at": 0.0, "data": {}}
+_YEARS_TTL_S = 600
+_YEARS_LOCK = threading.Lock()
+
+
+def _all_years() -> dict[str, list[tuple[int, int, int]]]:
+    """{syllabus: [(year, paper, question papers)]} for the whole archive,
+    in ONE query, cached for 10 min. Every picker, subject tab row and hub asks
+    for this per subject; one query each made /yearly take 14 s on production."""
+    if time.time() - _YEARS_CACHE["at"] < _YEARS_TTL_S:
+        return _YEARS_CACHE["data"]
+    with _YEARS_LOCK:
+        if time.time() - _YEARS_CACHE["at"] < _YEARS_TTL_S:
+            return _YEARS_CACHE["data"]
+        con = _db.plain_connect()
+        try:
+            rows = con.execute(
+                "SELECT syllabus, year, paper, COUNT(*) AS n FROM papers WHERE kind = 'qp' "
+                "GROUP BY syllabus, year, paper").fetchall()
+        finally:
+            con.close()
+        data: dict[str, list[tuple[int, int, int]]] = {}
+        for r in rows:
+            data.setdefault(r["syllabus"], []).append((int(r["year"]), int(r["paper"]), int(r["n"])))
+        _YEARS_CACHE.update(at=time.time(), data=data)
+        return data
+
+
 def subject_years(code: str) -> list[tuple[int, int]]:
-    con = _db.plain_connect()
-    try:
-        return [(r["year"], r["n"]) for r in con.execute(
-            "SELECT year, COUNT(*) AS n FROM papers WHERE syllabus = ? AND kind = 'qp' "
-            "GROUP BY year ORDER BY year DESC", [code]).fetchall()]
-    finally:
-        con.close()
+    """[(year, question papers)] newest first."""
+    per: dict[int, int] = {}
+    for y, _p, n in _all_years().get(code, []):
+        per[y] = per.get(y, 0) + n
+    return sorted(per.items(), reverse=True)
+
+
+def mcq_years(code: str) -> list[tuple[int, int]]:
+    """[(year, multiple-choice question papers)] newest first."""
+    per: dict[int, int] = {}
+    for y, p, n in _all_years().get(code, []):
+        if is_mcq(code, p, y):
+            per[y] = per.get(y, 0) + n
+    return sorted(per.items(), reverse=True)
 
 
 def _paper_row(paper_id: int) -> dict | None:
@@ -275,28 +312,37 @@ def _year_block(code: str, year: int, items: list[dict], open_: bool) -> str:
     </details>"""
 
 
-def _board_cards(board: str, kind: str, state: dict) -> str:
-    cards = []
-    codes = [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
-    if kind == "mcq":
-        codes = [c for c in codes if c in mcq_codes()]
-    years = {c: subject_years(c) for c in codes}
-    for c in sorted(codes, key=lambda c: c not in state["enrolled"]):
-        if not years[c]:
+def _tiles(board: str, kind: str, state: dict) -> list[str]:
+    """Picker tiles (ui.tile) for one board: every subject with papers by year,
+    or with multiple-choice papers (kind="mcq")."""
+    import ui
+    out = []
+    for c in ui.codes_for(board, state):
+        if kind == "mcq" and c not in mcq_codes():
             continue
-        s = SUBJECTS[c]
-        span = f"{years[c][-1][0]}–{years[c][0][0]}"
-        n = sum(n for _y, n in years[c])
+        yrs = mcq_years(c) if kind == "mcq" else subject_years(c)
+        if not yrs:
+            continue
+        n = sum(n for _y, n in yrs)
         url = yearly_url(c) if kind == "yearly" else mcq_url(c)
         mine = c in state["enrolled"]
-        cards.append(f"""
-        <a class="cat-subj cat-tone-{s['tone']}{' is-enrolled' if mine else ''}" href="{url}">
-          <div class="cat-subj-top"><span class="cat-code">{c}</span>
-            {'<span class="cat-badge cat-badge-on">Enrolled</span>' if mine else ''}</div>
-          <h3>{_e(s['plain'])}</h3>
-          <p class="cat-subj-meta">{n:,} question papers · {span}</p>
-        </a>""")
-    return f'<div class="cat-grid">{"".join(cards)}</div>' if cards else ""
+        if kind == "yearly":
+            actions = [("Open papers", url, "primary"), ("Latest year", yearly_url(c, yrs[0][0]), "ghost")]
+            stats = [(f"{n:,}", "papers"), (str(len(yrs)), "years")]
+        else:
+            actions = [("Practise MCQs", url, "primary"), ("Papers by year", yearly_url(c), "ghost")]
+            stats = [(f"{n:,}", "MCQ papers"), (str(len(yrs)), "years")]
+        out.append(ui.tile(code=c, url=url, stats=stats, actions=actions, flag="on" if mine else "",
+                           years=f"{yrs[-1][0]}–{yrs[0][0]}"))
+    return out
+
+
+def _picker(kind: str, state: dict, board: str | None = None) -> str:
+    import ui
+    boards = [board] if board else ui.board_order(state)
+    base = "/yearly/{board}" if kind == "yearly" else None
+    return ui.picker({b: _tiles(b, kind, state) for b in boards}, state=state,
+                     board_links=base if board else None, active=board or "")
 
 
 def _page(*, title, desc, path, body, crumbs, user, noindex=False, ld=None, scripts=()):
@@ -323,7 +369,7 @@ def _how_codes() -> str:
 def _mcq_how() -> str:
     import ui
     return ui.steps([
-        ("Choose a subject", "Below - every subject with a multiple-choice paper."),
+        ("Choose a subject", "Above - every subject with a multiple-choice paper."),
         ("Full paper or topics", "Sit a real paper against the official time, or a set from chosen chapters."),
         ("Check as you go, or at the end", "Live check reveals each answer as you lock it in."),
         ("Review", "Every wrong option explained, so the same trap does not get you twice."),
@@ -332,12 +378,6 @@ def _mcq_how() -> str:
 @router.get("/yearly", response_class=HTMLResponse)
 def yearly_hub(user: dict | None = Depends(_auth.maybe_user)):
     state = _catalog._student_state(user)
-    sections = []
-    order = (state["boards"] or []) + [b for b in BOARD_SHORT if b not in (state["boards"] or [])]
-    for b in order:
-        grid = _board_cards(b, "yearly", state)
-        if grid:
-            sections.append(f'<h2 class="cat-group"><a href="/yearly/{b}">{BOARD_SHORT[b]}</a></h2>{grid}')
     body = f"""
     <header class="cat-hero cat-hero-sm">
       <p class="cat-eyebrow">Yearly past papers</p>
@@ -346,8 +386,8 @@ def yearly_hub(user: dict | None = Depends(_auth.maybe_user)):
         sitting. Open one to read the paper with its mark scheme side by side, and ask for a
         worked explanation of any question. <b>No account needed.</b></p>
     </header>
-    {_how_codes()}
-    {''.join(sections)}"""
+    {_picker("yearly", state)}
+    {_how_codes()}"""
     return _page(title="Cambridge Past Papers by Year | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Cambridge O Level, IGCSE and A Level past papers by year and session, "
                       "with mark schemes and inserts.",
@@ -440,7 +480,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260928a"></script>
-<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store" if user else "public, max-age=300"})
@@ -458,7 +498,7 @@ def yearly_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-lede">Question papers, mark schemes and inserts for every Cambridge
         {BOARD_SHORT[board]} subject we cover, sitting by sitting.</p>
     </header>
-    {_board_cards(board, "yearly", state)}"""
+    {_picker("yearly", state, board)}"""
     return _page(title=f"Cambridge {BOARD_SHORT[board]} Past Papers by Year — PrepWithTee",
                  desc=f"Cambridge {BOARD_SHORT[board]} past papers by year, with mark schemes.",
                  path=f"/yearly/{board}", body=body, user=user,
@@ -591,8 +631,6 @@ def yearly_year(board: str, subject: str, year: int, user: dict | None = Depends
 @router.get("/mcq", response_class=HTMLResponse)
 def mcq_hub(user: dict | None = Depends(_auth.maybe_user)):
     state = _catalog._student_state(user)
-    sections = [f'<h2 class="cat-group">{BOARD_SHORT[b]}</h2>{grid}'
-                for b in BOARD_SHORT if (grid := _board_cards(b, "mcq", state))]
     body = f"""
     <header class="cat-hero cat-hero-sm">
       <p class="cat-eyebrow">MCQ practice</p>
@@ -601,8 +639,8 @@ def mcq_hub(user: dict | None = Depends(_auth.maybe_user)):
         full timed paper, marked instantly against the official answer key - with an
         explanation of why each wrong option is wrong.</p>
     </header>
-    {_mcq_how()}
-    {''.join(sections)}"""
+    {_picker("mcq", state)}
+    {_mcq_how()}"""
     return _page(title="Cambridge MCQ Past Paper Practice | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Practise Cambridge multiple-choice past-paper questions, marked instantly "
                       "against the official answer keys.",

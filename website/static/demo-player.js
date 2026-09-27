@@ -1,6 +1,6 @@
 /* demo-player.js — screenshot "videos" of the real site (P3).
  *
- *   <div class="dp" data-demo="/demos/how-it-works/timeline.json"
+ *   <div class="dp" data-demo="/demos/hero/timeline.json" data-frame="laptop"
  *        aria-label="How PrepWithTee works"></div>
  *
  * The timeline (scripts/capture_demo_shots.py) lists steps
@@ -10,6 +10,13 @@
  * a caption, and chapter buttons. It loads nothing until the section is near
  * the screen, plays only while visible, pauses on hover / focus / hidden tab,
  * and with reduced motion it just shows the frames with prev / next.
+ *
+ * Extras (home-page hero, 2026-09-28):
+ *   - data-frame="laptop": a MacBook-style laptop instead of a tablet; the lid
+ *     swings open the first time the player comes into view.
+ *   - title cards: a step may have {card: {eyebrow, title, text, buttons:[{label,
+ *     href, kind}]}} instead of a shot - a full-screen slide ("Not sure where to
+ *     start?", "Talk to Tee") whose buttons are real links.
  */
 const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
@@ -31,21 +38,27 @@ class DemoPlayer {
     this.steps = tl.steps;
     this.chapters = [...new Set(this.steps.map((s) => s.chapter))];
     this.render(tl);
-    this.steps.forEach((s) => { const im = new Image(); im.src = this.base + s.shot; });   // warm the cache
     this.show(0, true);
+    if (this.laptop) this.bindOpen();
     if (!REDUCED) this.bindPlay();
   }
 
   render(tl) {
     const r = this.root;
-    r.innerHTML = `
-      <div class="dp-device"><div class="dp-screen" style="aspect-ratio:${tl.w}/${tl.h}">
+    this.laptop = r.dataset.frame === "laptop";
+    const screen = `<div class="dp-screen" style="aspect-ratio:${tl.w}/${tl.h}">
         <div class="dp-stage">
           <img class="dp-img is-front" alt="" decoding="async"><img class="dp-img" alt="" decoding="async">
           <span class="dp-cursor">${CURSOR}</span><span class="dp-ripple"></span>
         </div>
+        <div class="dp-card" aria-live="polite"></div>
         <span class="dp-paused" aria-hidden="true">Paused</span>
-      </div></div>
+      </div>`;
+    r.classList.toggle("dp-laptop", this.laptop);
+    r.innerHTML = (this.laptop
+      ? `<div class="dp-device dp-mac"><div class="dp-lid"><span class="dp-cam" aria-hidden="true"></span>${screen}</div>
+           <div class="dp-base" aria-hidden="true"></div></div>`
+      : `<div class="dp-device">${screen}</div>`) + `
       <div class="dp-caption"><span class="dp-n"></span><p aria-live="polite"></p></div>
       <div class="dp-bar">
         <button type="button" class="dp-btn" data-act="prev" aria-label="Previous">‹</button>
@@ -58,6 +71,8 @@ class DemoPlayer {
     this.stage = r.querySelector(".dp-stage");
     this.cursor = r.querySelector(".dp-cursor");
     this.ripple = r.querySelector(".dp-ripple");
+    this.card = r.querySelector(".dp-card");
+    this.screenEl = r.querySelector(".dp-screen");
     if (REDUCED) r.querySelector(".dp-play").hidden = true;
     r.addEventListener("click", (e) => {
       const act = e.target.closest("[data-act]")?.dataset.act;
@@ -76,6 +91,22 @@ class DemoPlayer {
     this.clear();
     this.i = i;
     const s = this.steps[i];
+    // title card: a full-screen slide over the (softly blurred) last screenshot
+    this.screenEl.classList.toggle("is-card", !!s.card);
+    if (s.card) {
+      const c = s.card;
+      this.card.className = `dp-card dp-card-${c.tone || "intro"}`;
+      this.card.innerHTML = `
+        ${c.eyebrow ? `<span class="dp-card-eye">${esc(c.eyebrow)}</span>` : ""}
+        <b class="dp-card-title">${esc(c.title)}</b>
+        ${c.text ? `<span class="dp-card-text">${esc(c.text)}</span>` : ""}
+        ${(c.buttons || []).length ? `<span class="dp-card-btns">${c.buttons.map((x) =>
+          `<a class="dp-card-btn dp-card-btn-${esc(x.kind || "primary")}" href="${esc(x.href)}"
+             ${/^https?:/.test(x.href) ? 'target="_blank" rel="noopener"' : ""}>${esc(x.label)}</a>`).join("")}</span>` : ""}`;
+      this.cursor.classList.remove("is-on");
+      this.stage.style.transform = "scale(1)";
+    }
+    if (!s.shot) { this.caption(s, i); return this.next(s, i); }
     // crossfade: load into the back image, then bring it forward
     const back = this.imgs[1 - this.front];
     back.src = this.base + s.shot;
@@ -109,6 +140,24 @@ class DemoPlayer {
         this.later(() => this.cursor.classList.remove("is-click"), 1650);
       }
     }
+    this.caption(s, i);
+    this.next(s, i);
+  }
+
+  // Fetch only the next screenshot or two (the hero must not pull ~1 MB up front).
+  warm(i) {
+    for (let k = 1; k <= 2; k++) {
+      const n = this.steps[(i + k) % this.steps.length];
+      if (n && n.shot && !n._warm) { n._warm = true; const im = new Image(); im.src = this.base + n.shot; }
+    }
+  }
+
+  next(s, i) {
+    this.warm(i);
+    if (this.playing) this.later(() => this.show((i + 1) % this.steps.length), s.dur + (i === this.steps.length - 1 ? 1500 : 0));
+  }
+
+  caption(s, i) {
     // caption + chapter progress
     this.root.querySelector(".dp-n").textContent = `${i + 1}/${this.steps.length}`;
     this.root.querySelector(".dp-caption p").textContent = s.caption;
@@ -120,7 +169,17 @@ class DemoPlayer {
       const done = inCh.filter(([, j]) => j <= i).length;
       b.querySelector("b").style.width = k < cur ? "100%" : k > cur ? "0%" : `${(done / inCh.length) * 100}%`;
     });
-    if (this.playing) this.later(() => this.show((i + 1) % this.steps.length), s.dur + (i === this.steps.length - 1 ? 1500 : 0));
+  }
+
+  // The laptop lid swings open the first time the player is on screen.
+  bindOpen() {
+    if (REDUCED) { this.root.classList.add("is-open"); return; }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      setTimeout(() => this.root.classList.add("is-open"), 250);
+    }, { threshold: 0.3 });
+    io.observe(this.root);
   }
 
   jump(i) { this.show(i); }

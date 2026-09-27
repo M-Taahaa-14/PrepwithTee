@@ -13,7 +13,7 @@
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260928b">
+  <link rel="stylesheet" href="styles.css?v=20260929e">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b">
   <link rel="stylesheet" href="tools.css?v=20260927j">
   <!-- profile v20260901a -->
@@ -373,6 +373,143 @@
       .profile-grid { grid-template-columns: 1fr; }
       .profile-form-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── Redesign (2026-09-27): colour hero, section nav, tinted sections ── */
+    .profile-page { justify-content: flex-start; }
+    .pf-hero { position: relative; overflow: hidden; isolation: isolate; display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.6rem; align-items: center;
+      margin-bottom: 24px; padding: 28px 30px; border-radius: 26px; border: 1px solid var(--line);
+      background:
+        radial-gradient(520px 260px at 100% 0%, color-mix(in srgb, var(--pink) 90%, transparent), transparent 70%),
+        radial-gradient(420px 240px at 0% 100%, color-mix(in srgb, var(--blue) 85%, transparent), transparent 70%),
+        linear-gradient(135deg, var(--lav) 0%, var(--white) 60%); }
+    .pf-hero-id { display: flex; align-items: center; gap: 22px; min-width: 0; }
+    .pf-avatar-col { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: none; }
+    .pf-hero .profile-avatar { width: 104px; height: 104px; font-size: 2.2rem; background: var(--accent); color: var(--on-accent);
+      box-shadow: 0 0 0 5px var(--white), 0 0 0 7px var(--lav-line), 0 14px 30px rgba(60, 30, 120, .22); }
+    .pf-photo-status { font-size: .72rem; color: var(--grey); margin: 0; min-height: 1rem; text-align: center; }
+    .pf-hero .pf-avatar-btn { background: var(--white); }
+    .pf-hero-text { min-width: 0; display: grid; gap: 6px; }
+    .pf-hello { margin: 0; font: 800 .7rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--orange-ink); }
+    .pf-hero .profile-name { text-align: left; font: 800 clamp(1.6rem, 3vw, 2.2rem)/1.1 "Archivo", sans-serif; color: var(--purple); letter-spacing: -.01em; }
+    .pf-hero .profile-email { text-align: left; font-size: .88rem; overflow: hidden; text-overflow: ellipsis; }
+    .pf-hero-boards { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .pf-board-chip { font: 800 .72rem/1 "Hanken Grotesk", sans-serif; padding: .42rem .7rem; border-radius: 999px;
+      background: var(--lav); color: var(--lav-ink); border: 1px solid var(--lav-line); }
+    .pf-board-chip.pf-b-igcse { background: var(--blue); color: var(--blue-ink); border-color: var(--blue-line); }
+    .pf-board-chip.pf-b-a-level { background: var(--orange); color: var(--orange-ink); border-color: var(--orange-line); }
+    .pf-hero-stats { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pf-st { border-radius: 16px; padding: 14px 16px; background: var(--st-bg); border: 1px solid var(--st-line); }
+    .pf-st dt { font: 700 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--st-ink); opacity: .9; }
+    .pf-st dd { margin: 6px 0 0; font: 800 1.55rem/1.1 "Archivo", sans-serif; color: var(--ink); font-variant-numeric: tabular-nums;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pf-st-lav { --st-bg: var(--lav); --st-ink: var(--lav-ink); --st-line: var(--lav-line); }
+    .pf-st-green { --st-bg: var(--green); --st-ink: var(--green-ink); --st-line: var(--green-line); }
+    .pf-st-orange { --st-bg: var(--orange); --st-ink: var(--orange-ink); --st-line: var(--orange-line); }
+    .pf-st-blue { --st-bg: var(--blue); --st-ink: var(--blue-ink); --st-line: var(--blue-line); }
+
+    .profile-grid { grid-template-columns: 250px minmax(0, 1fr); }
+    .profile-sidebar { position: sticky; top: 88px; }
+    .pf-toc { gap: 2px !important; padding: 12px !important; }
+    .pf-side-h { margin: 2px 8px 6px; font: 800 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--grey); }
+    .pf-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin: 0 6px 0 4px; background: var(--dot); }
+    .pf-dot-lav { --dot: var(--lav-ink); } .pf-dot-blue { --dot: var(--blue-ink); } .pf-dot-yellow { --dot: var(--yellow-ink); }
+    .pf-dot-green { --dot: var(--green-ink); } .pf-dot-teal { --dot: var(--teal-ink); } .pf-dot-pink { --dot: var(--pink-ink); }
+    .pf-dot-orange { --dot: var(--orange-ink); }
+    .profile-nav-link:hover { background: var(--accent-soft); color: var(--ink); }
+
+    .profile-section { border-width: 1px; border-top: 4px solid var(--sec-ink, var(--line)); }
+    .pf-tone-lav { --sec: var(--lav); --sec-ink: var(--lav-ink); }     .pf-tone-blue { --sec: var(--blue); --sec-ink: var(--blue-ink); }
+    .pf-tone-yellow { --sec: var(--yellow); --sec-ink: var(--yellow-ink); } .pf-tone-green { --sec: var(--green); --sec-ink: var(--green-ink); }
+    .pf-tone-teal { --sec: var(--teal); --sec-ink: var(--teal-ink); }   .pf-tone-pink { --sec: var(--pink); --sec-ink: var(--pink-ink); }
+    .pf-tone-orange { --sec: var(--orange); --sec-ink: var(--orange-ink); }
+    .profile-section-head { background: linear-gradient(90deg, var(--sec, var(--cream)) 0%, transparent 75%); border-bottom-width: 1px; }
+    .profile-section-title { display: flex; align-items: center; gap: 10px; scroll-margin-top: 96px;
+      font: 800 1.08rem/1.2 "Archivo", system-ui, sans-serif !important; text-transform: none; letter-spacing: -.005em; color: var(--ink); }
+    .pf-sec-ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; font-size: 1.05rem;
+      background: var(--white); border: 1px solid var(--line); }
+    .pf-head-link { font-size: .8rem; font-weight: 700; color: var(--sec-ink); text-decoration: none; }
+    .pf-empty { margin: 0; color: var(--grey); font-size: .9rem; line-height: 1.55; }
+    .pf-empty a { color: var(--purple-bright); font-weight: 700; }
+
+    .cat-tone-lav    { --t: var(--lav);    --t-ink: var(--lav-ink);    --t-line: var(--lav-line); }
+    .cat-tone-green  { --t: var(--green);  --t-ink: var(--green-ink);  --t-line: var(--green-line); }
+    .cat-tone-orange { --t: var(--orange); --t-ink: var(--orange-ink); --t-line: var(--orange-line); }
+    .cat-tone-pink   { --t: var(--pink);   --t-ink: var(--pink-ink);   --t-line: var(--pink-line); }
+    .cat-tone-teal   { --t: var(--teal);   --t-ink: var(--teal-ink);   --t-line: var(--teal-line); }
+    .cat-tone-yellow { --t: var(--yellow); --t-ink: var(--yellow-ink); --t-line: var(--yellow-line); }
+    .cat-tone-blue   { --t: var(--blue);   --t-ink: var(--blue-ink);   --t-line: var(--blue-line); }
+    .pf-boards { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pf-b-o-level { --bt: var(--lav); --bt-ink: var(--lav-ink); --bt-line: var(--lav-line); }
+    .pf-b-igcse { --bt: var(--blue); --bt-ink: var(--blue-ink); --bt-line: var(--blue-line); }
+    .pf-b-a-level { --bt: var(--orange); --bt-ink: var(--orange-ink); --bt-line: var(--orange-line); }
+    .pf-board-opt { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px;
+      cursor: pointer; font: 700 .9rem/1 "Hanken Grotesk", sans-serif; color: var(--ink); background: var(--page);
+      border: 1.5px solid var(--line); transition: background .12s, border-color .12s; }
+    .pf-board-opt i { width: 16px; height: 16px; border-radius: 5px; border: 2px solid var(--bt-ink); display: grid; place-items: center; }
+    .pf-board-opt[aria-pressed="true"] { background: var(--bt); border-color: var(--bt-ink); color: var(--bt-ink); }
+    .pf-board-opt[aria-pressed="true"] i { background: var(--bt-ink); }
+    .pf-board-opt[aria-pressed="true"] i::after { content: "✓"; color: var(--white); font: 900 .65rem/1 sans-serif; }
+    .pf-board-opt.is-main::after { content: "Main"; font: 800 .58rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em;
+      text-transform: uppercase; padding: 3px 6px; border-radius: 999px; background: var(--bt-ink); color: var(--white); }
+    html[data-theme="dark"] .pf-board-opt[aria-pressed="true"] i::after,
+    html[data-theme="dark"] .pf-board-opt.is-main::after { color: var(--page); }
+    .pf-board-opt:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .pf-subjects-grid { display: grid; gap: 12px; }
+    .pf-sgroup p { margin: 0 0 6px; font: 800 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--grey); }
+    .pf-sgroup > div { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pf-fgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .pf-fcard { display: flex; gap: 14px; align-items: center; padding: 14px; border-radius: 16px; border: 1px solid var(--t-line);
+      background: linear-gradient(150deg, var(--t) 0%, var(--white) 80%); }
+    .pf-ring { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+      background: conic-gradient(var(--t-ink) calc(var(--p) * 1%), color-mix(in srgb, var(--t-ink) 14%, transparent) 0); }
+    .pf-ring b { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; background: var(--white);
+      font: 800 .82rem/1 "Archivo", sans-serif; color: var(--ink); }
+    .pf-fbody { min-width: 0; display: grid; gap: 4px; }
+    .pf-fbody h3 { margin: 0; font: 800 .98rem/1.2 "Archivo", sans-serif; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .pf-fbody p { margin: 0; font-size: .8rem; color: var(--grey); }
+    .pf-due { color: var(--orange-ink); }
+    .pf-fbtn { justify-self: start; margin-top: 4px; font: 800 .78rem/1 "Hanken Grotesk", sans-serif; text-decoration: none;
+      padding: .45rem .7rem; border-radius: 9px; background: var(--t-ink); color: var(--white); }
+    html[data-theme="dark"] .pf-fbtn { color: var(--page); }
+    .pf-fb { display: grid; gap: 14px; }
+    .pf-fb-types { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pf-fb-types label { cursor: pointer; }
+    .pf-fb-types input { position: absolute; opacity: 0; pointer-events: none; }
+    .pf-fb-types span { display: inline-block; padding: 9px 14px; border-radius: 12px; border: 1.5px solid var(--line);
+      background: var(--page); font-size: .85rem; font-weight: 700; color: var(--ink); }
+    .pf-fb-types input:checked + span { background: var(--pink); border-color: var(--pink-ink); color: var(--pink-ink); }
+    .pf-fb-types input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .pf-fb textarea { font: inherit; font-size: .9rem; padding: 10px 13px; border-radius: 10px; border: 1.5px solid var(--line);
+      background: var(--page); color: var(--ink); resize: vertical; min-height: 110px; }
+    .pf-fb-row { display: flex; align-items: center; gap: 12px; }
+    .pf-fb-send { --t-ink: var(--pink-ink); border: 0; cursor: pointer; font-size: .85rem; padding: .65rem 1rem; }
+    .pf-subj-grid.is-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+    .pf-subj { display: grid; gap: 8px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--t-line);
+      background: linear-gradient(160deg, var(--t) 0%, var(--white) 75%); }
+    .pf-subj header { display: flex; align-items: center; justify-content: space-between; }
+    .pf-subj-code { font: 700 .72rem/1 ui-monospace, Consolas, monospace; color: var(--t-ink); background: var(--white);
+      border: 1px solid var(--t-line); border-radius: 6px; padding: .25rem .4rem; }
+    .pf-subj small { color: var(--grey); font-weight: 700; font-size: .74rem; }
+    .pf-subj h3 { margin: 0; font: 800 1.1rem/1.2 "Archivo", sans-serif; }
+    .pf-subj h3 a { color: var(--ink); text-decoration: none; }
+    .pf-subj h3 a:hover { color: var(--t-ink); }
+    .pf-subj nav { display: flex; flex-wrap: wrap; gap: 5px; }
+    .pf-subj nav a { font: 700 .74rem/1 "Hanken Grotesk", sans-serif; text-decoration: none; color: var(--t-ink);
+      background: var(--white); border: 1px solid var(--t-line); border-radius: 8px; padding: .38rem .5rem; }
+    .pf-subj nav a:hover { background: var(--t-ink); color: var(--white); }
+
+    .pf-subject-btn[data-on="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .pf-subjects-grid { background: var(--cream); }
+
+    @media (max-width: 960px) { .pf-hero { grid-template-columns: 1fr; } }
+    @media (max-width: 860px) { .profile-sidebar { position: static; } }
+    @media (max-width: 560px) {
+      .pf-hero { padding: 22px 18px; }
+      .pf-hero-id { flex-direction: column; text-align: center; }
+      .pf-hero .profile-name, .pf-hero .profile-email { text-align: center; }
+      .pf-hero-boards { justify-content: center; }
+    }
   </style>
 </head>
 
@@ -395,12 +532,14 @@
         <a href="/blog" class="nav-link">Blog</a>
         <a href="/pricing.html" class="nav-link">Pricing</a>
       </nav>
-      <div class="header-right"></div>
+      <div class="header-end"><button class="nav-search" type="button" data-site-search aria-label="Search PrepWithTee" title="Search (Ctrl K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><div class="header-right"></div></div>
     </div>
+  <script>(function(){if(window.pwtOpenSearch)return;var m=null;function o(q){(m?Promise.resolve(m):import('/site-search.js?v=20260929a').then(function(x){return m=x})).then(function(x){x.open(q||'')}).catch(function(){location.href='/explore'})}window.pwtOpenSearch=o;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-site-search]');if(b){e.preventDefault();o()}});document.addEventListener('keydown',function(e){var a=document.activeElement,t=a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();o();return}if(e.key==='/'&&!t&&!e.ctrlKey&&!e.metaKey&&!e.altKey){var l=document.querySelector('[data-pk-q]');if(l&&l.offsetParent!==null)return;e.preventDefault();o()}})})();</script>
   </header>
 <!--NAV:END-->
 <!--CRUMB:START — breadcrumb bar. Do not edit here; edit CRUMBS in website/sync_nav.py then run: python sync_nav.py -->
 <div class="pg-crumbbar"><div class="container pg-crumbbar-in"><a class="pg-back" href="/dashboard.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Dashboard</span></a><nav class="pg-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">›</span> <a href="/dashboard.html">Dashboard</a><span aria-hidden="true">›</span> <span aria-current="page">Profile</span></nav></div></div>
+<nav class="dtabs" aria-label="Dashboard sections"><div class="container dtabs-in"><a class="dtab" href="/dashboard.html"><span aria-hidden="true">📊</span>Overview</a><a class="dtab" href="/topical-progress.html"><span aria-hidden="true">📈</span>Chapter progress</a><a class="dtab" href="/yearly-progress.html"><span aria-hidden="true">🎯</span>Paper scores</a><a class="dtab" href="/my-papers"><span aria-hidden="true">🗂️</span>My papers</a><a class="dtab" href="/homework.html"><span aria-hidden="true">📝</span>Homework</a><a class="dtab" href="/calendar.html"><span aria-hidden="true">📅</span>Calendar</a><a class="dtab" href="/analytics.html"><span aria-hidden="true">📉</span>Analytics</a><a class="dtab" href="/achievements.html"><span aria-hidden="true">🏆</span>Achievements</a><a class="dtab" href="/fc-progress.html"><span aria-hidden="true">🃏</span>Flashcards</a><a class="dtab is-on" href="/profile.html" aria-current="page"><span aria-hidden="true">👤</span>Profile</a></div></nav>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepwithtee.com/"}, {"@type": "ListItem", "position": 2, "name": "Dashboard", "item": "https://prepwithtee.com/dashboard.html"}, {"@type": "ListItem", "position": 3, "name": "Profile", "item": "https://prepwithtee.com/profile.html"}]}</script>
 <!--CRUMB:END-->
 
@@ -516,7 +655,7 @@
   <script src="tools-nav.js?v=20260811d"></script>
 
   <script type="module">
-    import { requireAuth, api, getUser } from "/auth.js?v=20260927k";
+    import { requireAuth, api, getUser } from "/auth.js?v=20260929a";
 
     const root = document.getElementById("profile-root");
 
@@ -591,54 +730,64 @@
       const enrollments = (user.enrollments || []);
 
       root.innerHTML = `
+      <section class="pf-hero">
+        <div class="pf-hero-id">
+          <div class="pf-avatar-col">
+            <div class="profile-avatar" id="pf-avatar">
+              ${user.picture_url
+                ? `<img src="${esc(user.picture_url)}" alt="" id="pf-avatar-img">`
+                : `<span id="pf-avatar-initials">${initials(user.name)}</span>`}
+            </div>
+            <button class="pf-avatar-btn" type="button" title="Change photo">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10L11 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 4l2.5 2.5" stroke="currentColor" stroke-width="1.6"/></svg>
+              Change photo
+              <input type="file" id="pf-photo-input" accept="image/jpeg,image/png,image/webp" aria-label="Upload profile photo">
+            </button>
+            <p id="pf-photo-status" class="pf-photo-status"></p>
+          </div>
+          <div class="pf-hero-text">
+            <p class="pf-hello">Your profile</p>
+            <h1 class="profile-name" id="pf-name">${esc(user.name || "Student")}</h1>
+            <p class="profile-email">${esc(user.email || "")}</p>
+            <div class="pf-hero-boards" id="pf-hero-boards">
+              ${user.grade ? `<span class="pf-board-chip">${esc(gradeLabel(user.grade))}</span>` : ""}
+            </div>
+          </div>
+        </div>
+        <dl class="pf-hero-stats">
+          <div class="pf-st pf-st-lav"><dt>Subjects</dt><dd>${enrollments.length}</dd></div>
+          <div class="pf-st pf-st-green"><dt>Formulas learned</dt><dd>${totalReviewed}</dd></div>
+          <div class="pf-st pf-st-orange"><dt>Reviews today</dt><dd>${todayDone}</dd></div>
+          <div class="pf-st pf-st-blue"><dt>Plan</dt><dd>${esc(({free:"Free",solo:"Solo",three:"3 Subjects",all:"All Subjects"})[(user.usageData||{}).plan || user.plan || "free"] || "Free")}</dd></div>
+        </dl>
+      </section>
+
       <div class="profile-grid">
 
-        <!-- Sidebar -->
+        <!-- Sidebar: jump to a section + shortcuts -->
         <aside class="profile-sidebar">
-          <div class="profile-card">
-            <div class="profile-avatar-wrap">
-              <div class="profile-avatar" id="pf-avatar">
-                ${user.picture_url
-                  ? `<img src="${esc(user.picture_url)}" alt="" id="pf-avatar-img">`
-                  : `<span id="pf-avatar-initials">${initials(user.name)}</span>`}
-              </div>
-              <button class="pf-avatar-btn" type="button" title="Change photo">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M11 2.5 13.5 5 6 12.5H3.5V10L11 2.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.5 4l2.5 2.5" stroke="currentColor" stroke-width="1.6"/></svg>
-                Change photo
-                <input type="file" id="pf-photo-input" accept="image/jpeg,image/png,image/webp" aria-label="Upload profile photo">
-              </button>
-              <p id="pf-photo-status" style="font-size:.75rem;color:var(--grey);margin:0;min-height:1rem;text-align:center;"></p>
-              <h1 class="profile-name" id="pf-name">${esc(user.name || "Student")}</h1>
-              <span class="profile-grade-badge">${esc(gradeLabel(user.grade))}</span>
-              <p class="profile-email">${esc(user.email || "")}</p>
-            </div>
-
-            <div class="profile-stat-row">
-              <div class="profile-stat">
-                <span class="profile-stat-val">${todayDone}</span>
-                <span class="profile-stat-lbl">Today's reviews</span>
-              </div>
-              <div class="profile-stat-divider"></div>
-              <div class="profile-stat">
-                <span class="profile-stat-val">${totalReviewed}</span>
-                <span class="profile-stat-lbl">Formulas learned</span>
-              </div>
-              <div class="profile-stat-divider"></div>
-              <div class="profile-stat">
-                <span class="profile-stat-val">${enrollments.length}</span>
-                <span class="profile-stat-lbl">Subjects</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Nav shortcuts -->
-          <div class="profile-card" style="gap:4px;padding:12px;">
+          <nav class="profile-card pf-toc" aria-label="Profile sections">
+            <p class="pf-side-h">On this page</p>
+            <a href="#pf-sec-subjects" class="profile-nav-link"><span class="pf-dot pf-dot-lav"></span>My subjects</a>
+            <a href="#pf-sec-details" class="profile-nav-link"><span class="pf-dot pf-dot-blue"></span>Personal details</a>
+            <a href="#pf-sec-plan" class="profile-nav-link"><span class="pf-dot pf-dot-yellow"></span>Plan &amp; usage</a>
+            <a href="#pf-sec-review" class="profile-nav-link"><span class="pf-dot pf-dot-green"></span>Formula reviews</a>
+            ${(user.role || "student") === "student" ? `
+            <a href="#pf-sec-code" class="profile-nav-link"><span class="pf-dot pf-dot-teal"></span>Parent code</a>
+            <a href="#pf-sec-refer" class="profile-nav-link"><span class="pf-dot pf-dot-pink"></span>Refer a friend</a>` : ""}
+            <a href="#pf-sec-feedback" class="profile-nav-link"><span class="pf-dot pf-dot-pink"></span>Feedback &amp; problems</a>
+            <a href="#pf-sec-account" class="profile-nav-link"><span class="pf-dot pf-dot-orange"></span>Account</a>
+          </nav>
+          <nav class="profile-card pf-toc" aria-label="Shortcuts">
+            <p class="pf-side-h">Shortcuts</p>
             <a href="/dashboard.html" class="profile-nav-link"><span class="profile-nav-icon">📊</span>Dashboard</a>
-            <a href="/papers"    class="profile-nav-link"><span class="profile-nav-icon">📄</span>Past Papers</a>
-            <a href="/formulas.html"  class="profile-nav-link"><span class="profile-nav-icon">📐</span>Formula Sheets</a>
-            <a href="/homework.html"  class="profile-nav-link"><span class="profile-nav-icon">📝</span>Homework</a>
-            <a href="/definitions.html" class="profile-nav-link"><span class="profile-nav-icon">📚</span>Definitions Hub</a>
-          </div>
+            <a href="/papers" class="profile-nav-link"><span class="profile-nav-icon">📄</span>Past papers</a>
+            <a href="/my-papers" class="profile-nav-link"><span class="profile-nav-icon">🗂️</span>My papers</a>
+            <a href="/topical-progress.html" class="profile-nav-link"><span class="profile-nav-icon">📈</span>Progress</a>
+            <a href="/notes" class="profile-nav-link"><span class="profile-nav-icon">📚</span>Revision notes</a>
+            <a href="/formulas.html" class="profile-nav-link"><span class="profile-nav-icon">📐</span>Formula sheets</a>
+            <a href="/homework.html" class="profile-nav-link"><span class="profile-nav-icon">📝</span>Homework</a>
+          </nav>
         </aside>
 
         <!-- Main -->
@@ -672,51 +821,26 @@
             <p style="font-size:.78rem;opacity:.7;margin:14px 0 0 0;">Hit <b>Save profile</b> below when done — we'll take you straight to Step 2.</p>
           </div>` : ""}
 
-          <!-- Formula review progress -->
-          <div class="profile-section">
-            <div class="profile-section-head">
-              <h2 class="profile-section-title">Formula Review Progress</h2>
-              <a href="/formulas.html" style="font-size:.8rem;color:var(--purple);text-decoration:none;font-weight:700;">Open review →</a>
-            </div>
-            <div class="profile-section-body">
-              ${Object.keys(reviewStats).length === 0
-                ? `<p style="color:var(--grey);font-size:.88rem;">No reviews yet — <a href="/formulas.html" style="color:var(--purple);font-weight:700;">start your first session</a>.</p>`
-                : Object.keys(reviewStats).map(syl => {
-                    const s = reviewStats[syl];
-                    const pct = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0;
-                    return `<div class="review-subject-row">
-                      <div class="review-subject-hd">
-                        <span class="review-subject-name">${esc(SUBJECT_NAMES[syl] || syl)}</span>
-                        <span class="review-subject-count">${s.done} / ${s.total} formulas</span>
-                      </div>
-                      <div class="review-bar-wrap">
-                        <div class="review-bar-fill" style="width:${pct}%"></div>
-                      </div>
-                    </div>`;
-                  }).join("")}
-            </div>
-          </div>
-
           <!-- Enrolled subjects -->
-          ${enrollments.length > 0 ? `
-          <div class="profile-section">
+          <div class="profile-section pf-tone-lav">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Enrolled Subjects</h2>
+              <h2 class="profile-section-title" id="pf-sec-subjects"><span class="pf-sec-ic">🎓</span>My subjects</h2>
+              <a href="#pf-subjects-grid" class="pf-head-link">Add or remove →</a>
             </div>
             <div class="profile-section-body">
-              <div class="enrolled-grid">
-                ${enrollments.map(e => `
+              <div class="enrolled-grid pf-subj-grid" id="pf-subj-grid">
+                ${enrollments.length ? enrollments.map(e => `
                   <div class="enrolled-chip">
                     ${esc(e.subject || e.syllabus || e)}
                     ${e.syllabus ? `<span class="chip-code">${esc(e.syllabus)}</span>` : ""}
-                  </div>`).join("")}
+                  </div>`).join("") : `<p class="pf-empty">No subjects yet - tick the ones you study under <a href="#pf-subjects-grid">Personal details</a>. Each one unlocks its topical papers, mock tests, MCQs and progress tracking.</p>`}
               </div>
             </div>
-          </div>` : ""}
+          </div>
 
-        <div class="profile-section">
+        <div class="profile-section pf-tone-blue">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Personal Details</h2>
+              <h2 class="profile-section-title" id="pf-sec-details"><span class="pf-sec-ic">✏️</span>Personal details</h2>
             </div>
             <div class="profile-section-body">
               <div id="pf-alert" class="auth-alert" hidden role="alert"></div>
@@ -728,12 +852,18 @@
                            value="${esc(user.name || "")}">
                   </div>
                   <div class="profile-form-field">
-                    <label>Board<span class="req-star" aria-label="required">*</span></label>
-                    <select name="grade" id="pf-grade-select" data-styled data-placeholder="Select your board">
-                      <option value="">Select your board</option>
-                      <option value="O Level"${(user.grade && (user.grade === "O Level" || user.grade.includes("O Level"))) ? " selected" : ""}>Cambridge O Level</option>
-                      <option value="IGCSE"${(user.grade && (user.grade === "IGCSE" || user.grade.includes("IGCSE"))) ? " selected" : ""}>Cambridge IGCSE</option>
-                      <option value="A Level"${(user.grade && (user.grade === "A Level" || user.grade.includes("A Level"))) ? " selected" : ""}>Cambridge A Level</option>
+                    <label id="pf-boards-lbl">Boards<span class="req-star" aria-label="required">*</span></label>
+                    <div class="pf-boards" id="pf-boards" role="group" aria-labelledby="pf-boards-lbl">
+                      <button type="button" class="pf-board-opt pf-b-o-level" data-board="o-level" aria-pressed="false"><i></i>O Level</button>
+                      <button type="button" class="pf-board-opt pf-b-igcse" data-board="igcse" aria-pressed="false"><i></i>IGCSE</button>
+                      <button type="button" class="pf-board-opt pf-b-a-level" data-board="a-level" aria-pressed="false"><i></i>A Level</button>
+                    </div>
+                    <p class="pf-subjects-hint" id="pf-boards-hint">Pick every board you study (e.g. O Level + A Level). Saves straight away.</p>
+                    <select name="grade" id="pf-grade-select" hidden aria-hidden="true" tabindex="-1">
+                      <option value=""></option>
+                      <option value="O Level"${(user.grade && user.grade.includes("O Level")) ? " selected" : ""}>O Level</option>
+                      <option value="IGCSE"${(user.grade && user.grade.includes("IGCSE")) ? " selected" : ""}>IGCSE</option>
+                      <option value="A Level"${(user.grade && user.grade.includes("A Level")) ? " selected" : ""}>A Level</option>
                     </select>
                   </div>
 
@@ -795,9 +925,9 @@
           </div>
 
           <!-- Plan & Subscription -->
-          <div class="profile-section">
+          <div class="profile-section pf-tone-yellow">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Subscription</h2>
+              <h2 class="profile-section-title" id="pf-sec-plan"><span class="pf-sec-ic">⭐</span>Plan &amp; usage</h2>
             </div>
             <div class="profile-section-body" style="display:flex;flex-direction:column;gap:12px;">
               ${(() => {
@@ -864,14 +994,14 @@
                           const barColor = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "linear-gradient(90deg, #8b5cf6, #a78bfa)";
 
                           return `
-                            <div style="background: var(--surface, #f9fafb); border: 1.5px solid var(--line); padding: 12px 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
+                            <div style="background: var(--page); border: 1.5px solid var(--line); padding: 12px 16px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
                               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
                                 <div style="flex: 1;">
-                                  <b style="font-size: 0.88rem; color: var(--text); display: block; margin-bottom: 2px;">${title}</b>
+                                  <b style="font-size: 0.88rem; color: var(--ink); display: block; margin-bottom: 2px;">${title}</b>
                                   <span style="font-size: 0.72rem; color: var(--grey); line-height: 1.2; display: block;">${desc}</span>
                                 </div>
                                 <div style="text-align: right; white-space: nowrap;">
-                                  <span style="font-size: 0.95rem; font-weight: 700; color: var(--text);">${item.used}</span>
+                                  <span style="font-size: 0.95rem; font-weight: 700; color: var(--ink);">${item.used}</span>
                                   <span style="font-size: 0.8rem; color: var(--grey);"> / ${limitLabel}</span>
                                 </div>
                               </div>
@@ -906,11 +1036,22 @@
             </div>
           </div>
 
+          <!-- Formula review progress -->
+          <div class="profile-section pf-tone-green">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title" id="pf-sec-review"><span class="pf-sec-ic">📐</span>Formula reviews</h2>
+              <a href="/formulas.html" class="pf-head-link">All formula sheets →</a>
+            </div>
+            <div class="profile-section-body">
+              <div class="pf-fgrid" id="pf-formulas"><p class="pf-empty">Loading your formula sheets…</p></div>
+            </div>
+          </div>
+
           <!-- Student Code (students only) -->
           ${(user.role || "student") === "student" ? `
-          <div class="profile-section" id="pf-code-section">
+          <div class="profile-section pf-tone-teal" id="pf-code-section">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Student Code</h2>
+              <h2 class="profile-section-title" id="pf-sec-code"><span class="pf-sec-ic">👪</span>Parent code</h2>
             </div>
             <div class="profile-section-body">
               <p style="font-size:.85rem;color:var(--grey);margin-bottom:10px;">
@@ -919,7 +1060,7 @@
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                 <span id="pf-student-code" style="font-family:monospace;font-size:1.5rem;
                   font-weight:700;letter-spacing:.15em;color:var(--purple);
-                  background:var(--surface,#f9fafb);border:1.5px solid var(--border,#e5e7eb);
+                  background:var(--page);border:1.5px solid var(--line);
                   padding:8px 20px;border-radius:10px;">—</span>
                 <button id="pf-copy-code" style="font-size:.8rem;padding:7px 14px;border-radius:8px;
                   border:1px solid var(--border,#e5e7eb);background:none;cursor:pointer;
@@ -930,9 +1071,9 @@
 
           <!-- Refer a Friend (students only) -->
           ${(user.role || "student") === "student" ? `
-          <div class="profile-section" id="pf-referral-section">
+          <div class="profile-section pf-tone-pink" id="pf-referral-section">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Refer a Friend</h2>
+              <h2 class="profile-section-title" id="pf-sec-refer"><span class="pf-sec-ic">🎁</span>Refer a friend</h2>
               <span id="pf-ref-points" style="font-size:.8rem;font-weight:700;color:var(--purple);"></span>
             </div>
             <div class="profile-section-body" style="display:flex;flex-direction:column;gap:12px;">
@@ -958,10 +1099,39 @@
             </div>
           </div>` : ""}
 
-          <!-- Account -->
-          <div class="profile-section">
+          <!-- Feedback / report a problem -->
+          <div class="profile-section pf-tone-pink">
             <div class="profile-section-head">
-              <h2 class="profile-section-title">Account</h2>
+              <h2 class="profile-section-title" id="pf-sec-feedback"><span class="pf-sec-ic">💬</span>Feedback &amp; report a problem</h2>
+            </div>
+            <div class="profile-section-body">
+              <form id="pf-fb" class="pf-fb" novalidate>
+                <div class="pf-fb-types" role="radiogroup" aria-label="What is it about?">
+                  <label><input type="radio" name="fbkind" value="broken" checked><span>🐞 Something is broken</span></label>
+                  <label><input type="radio" name="fbkind" value="content"><span>📄 Wrong answer / mark scheme</span></label>
+                  <label><input type="radio" name="fbkind" value="idea"><span>💡 Idea or request</span></label>
+                  <label><input type="radio" name="fbkind" value="general"><span>💬 General feedback</span></label>
+                </div>
+                <div class="profile-form-field">
+                  <label for="pf-fb-page">Which page or question? <em style="font-weight:400;text-transform:none;">(optional)</em></label>
+                  <input type="text" id="pf-fb-page" maxlength="300" placeholder="Paste the link, or e.g. 5054 May/June 2023 Paper 22 Q4">
+                </div>
+                <div class="profile-form-field">
+                  <label for="pf-fb-msg">What happened?</label>
+                  <textarea id="pf-fb-msg" rows="4" maxlength="2000" placeholder="Tell us what you expected and what you saw instead."></textarea>
+                </div>
+                <div class="pf-fb-row">
+                  <button type="submit" class="pf-fbtn pf-fb-send">Send to the team</button>
+                  <span class="profile-save-msg" id="pf-fb-msg-out" role="status"></span>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Account -->
+          <div class="profile-section pf-tone-orange">
+            <div class="profile-section-head">
+              <h2 class="profile-section-title" id="pf-sec-account"><span class="pf-sec-ic">🔐</span>Account</h2>
             </div>
             <div class="profile-section-body" style="display:flex;flex-direction:column;gap:14px;">
               <p style="font-size:.88rem;color:var(--grey);margin:0;">
@@ -984,7 +1154,7 @@
                            border:1.5px solid var(--line);background:var(--page);color:var(--ink);font-size:.88rem;">
                   <div style="display:flex;gap:8px;align-items:center;">
                     <button id="pf-save-pw" style="padding:8px 18px;border-radius:8px;border:none;
-                      background:var(--purple);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;">
+                      background:var(--accent);color:var(--on-accent);font-weight:700;font-size:.85rem;cursor:pointer;">
                       Update password
                     </button>
                     <span id="pf-pw-msg" style="font-size:.8rem;"></span>
@@ -1616,7 +1786,7 @@
 
       // Init StyledDropdowns
       if (window.StyledDropdown && form) {
-        if (form.grade) new window.StyledDropdown(form.grade, { placeholder: "Select qualification" });
+        // Boards are chips now (#pf-boards); the grade <select> stays hidden.
         if (form.gender) new window.StyledDropdown(form.gender, { placeholder: "Prefer not to say" });
       }
 
@@ -1629,6 +1799,9 @@
       };
       let _metaSubjects = null;   // cached from /api/meta
       let _enrolled = new Set();  // currently enrolled syllabus codes
+      let _boardsCache = null;    // /api/boards, for the "My subjects" tiles
+      let _boards = [];           // the student's boards (slugs), main board first
+      let _boardNames = {};
       const _wasProfileComplete = !!user.profile_complete;  // snapshot at page load
 
       async function loadSubjectsData() {
@@ -1642,39 +1815,179 @@
         } catch (e) {
           _metaSubjects = [];
         }
-        renderSubjectPicker(form?.grade?.value || "");
+        // Students pick boards on /papers (student_boards); older accounts only
+        // have the single `grade`. Show both, and pre-fill an empty Board field.
+        try {
+          const [mine, all] = await Promise.all([api("/api/me/boards"), api("/api/boards")]);
+          _boardNames = Object.fromEntries((all.boards || []).map(b => [b.slug, b.name]));
+          _boards = (mine.boards || []).slice();
+          if (!_boards.length) {            // older accounts: only the single `grade`
+            const g = document.getElementById("pf-grade-select")?.value;
+            const slug = Object.keys(SLUG_TO_GRADE).find(k => SLUG_TO_GRADE[k] === g);
+            if (slug) _boards = [slug];
+          }
+          if (mine.primary && _boards.includes(mine.primary))
+            _boards = [mine.primary, ..._boards.filter(b => b !== mine.primary)];
+          syncBoardsUI();
+          renderSubjectTiles(all.boards || []);
+        } catch (e) { /* the form still works without it */ }
+        renderFormulas();
+        renderSubjectPicker();
       }
 
-      function renderSubjectPicker(gradeVal) {
+      // ── Boards (multi-select; first = main board) ────────────────────────────
+      const SLUG_TO_GRADE = { "o-level": "O Level", "igcse": "IGCSE", "a-level": "A Level" };
+      function syncBoardsUI() {
+        document.querySelectorAll(".pf-board-opt").forEach(btn => {
+          const i = _boards.indexOf(btn.dataset.board);
+          btn.setAttribute("aria-pressed", String(i >= 0));
+          btn.classList.toggle("is-main", i === 0);
+          btn.title = i === 0 ? "Your main board" : "";
+        });
+        const sel = document.getElementById("pf-grade-select");
+        if (sel) sel.value = SLUG_TO_GRADE[_boards[0]] || "";
+        const chips = document.getElementById("pf-hero-boards");
+        if (chips) chips.innerHTML = _boards.map(b =>
+          `<span class="pf-board-chip pf-b-${esc(b)}">${esc(_boardNames[b] || b)}</span>`).join("");
+      }
+      document.querySelectorAll(".pf-board-opt").forEach(btn => btn.addEventListener("click", async () => {
+        const b = btn.dataset.board;
+        const prev = _boards.slice();
+        _boards = _boards.includes(b) ? _boards.filter(x => x !== b) : [..._boards, b];
+        const hint = document.getElementById("pf-boards-hint");
+        if (!_boards.length) { _boards = prev; hint.textContent = "Keep at least one board."; return; }
+        syncBoardsUI();
+        renderSubjectPicker();
+        try {
+          await api("/api/me/boards", { method: "PUT", body: { boards: _boards, primary: _boards[0] } });
+          hint.textContent = "Saved. Your first board is your main one.";
+        } catch (err) {
+          _boards = prev; syncBoardsUI(); renderSubjectPicker();
+          hint.textContent = err.message || "Could not save your boards.";
+        }
+      }));
+
+
+      // ── Formula reviews: one card per enrolled subject with a formula sheet ──
+      async function renderFormulas() {
+        const box = document.getElementById("pf-formulas");
+        if (!box) return;
+        let data;
+        try { data = await (await fetch("/data/formulas.json", { credentials: "same-origin" })).json(); }
+        catch (e) { box.innerHTML = `<p class="pf-empty">Could not load formula sheets.</p>`; return; }
+        const sy = data.syllabuses || {};
+        const keysOf = (code, seen = new Set()) => {        // every formula key "code/topic/name"
+          const v = sy[code]; if (!v || seen.has(code)) return [];
+          seen.add(code);
+          if (!v.groups && !v.components && v.same_as) return keysOf(v.same_as, seen);
+          let n = 0;
+          (function walk(o) {
+            if (Array.isArray(o)) return o.forEach(walk);
+            if (o && typeof o === "object") {
+              if (Array.isArray(o.formulas)) n += o.formulas.length;
+              Object.values(o).forEach(x => { if (x && typeof x === "object" && x !== o.formulas) walk(x); });
+            }
+          })(v.groups || v.components);
+          return n;
+        };
+        let st = {};
+        try { st = (JSON.parse(localStorage.getItem("pwt_ar_v1") || "{}").reviews) || {}; } catch (e) {}
+        const today = new Date().toISOString().slice(0, 10);
+        const codes = [..._enrolled].filter(c => sy[c]);
+        if (!codes.length) {
+          box.innerHTML = `<p class="pf-empty">None of your subjects has a formula sheet yet. Browse every sheet in
+            <a href="/formulas.html">Formula sheets</a>.</p>`;
+          return;
+        }
+        box.innerHTML = codes.map((c, i) => {
+          const total = keysOf(c) || 0;
+          const mine = Object.entries(st).filter(([k]) => k.split("/")[0] === c);
+          const learned = mine.filter(([, r]) => (r.reps || 0) > 0).length;
+          const due = mine.filter(([, r]) => (r.reps || 0) > 0 && r.due && r.due <= today).length;
+          const pct = total ? Math.min(100, Math.round(learned / total * 100)) : 0;
+          const tone = ["lav", "green", "blue", "orange", "pink", "teal"][i % 6];
+          const name = (sy[c].subject || SUBJECT_NAMES[c] || c);
+          return `<article class="pf-fcard cat-tone-${tone}">
+            <div class="pf-ring" style="--p:${pct}"><b>${pct}%</b></div>
+            <div class="pf-fbody">
+              <h3>${esc(name)} <span class="pf-subj-code">${esc(c)}</span></h3>
+              <p>${learned} of ${total} formulas learned${due ? ` · <b class="pf-due">${due} due today</b>` : learned ? " · nothing due" : ""}</p>
+              <a class="pf-fbtn" href="/formulas.html?syllabus=${encodeURIComponent(c)}">${due ? "Review now" : learned ? "Keep going" : "Start learning"}</a>
+            </div></article>`;
+        }).join("");
+      }
+
+      // ── Feedback / report a problem (same inbox as the floating Feedback tab) ──
+      const fbForm = document.getElementById("pf-fb");
+      if (fbForm) fbForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        const out = document.getElementById("pf-fb-msg-out");
+        const msg = document.getElementById("pf-fb-msg").value.trim();
+        const where = document.getElementById("pf-fb-page").value.trim();
+        const kind = (fbForm.querySelector('input[name="fbkind"]:checked') || {}).value || "general";
+        const LABEL = { broken: "Something is broken", content: "Wrong answer / mark scheme",
+                        idea: "Idea or request", general: "General feedback" };
+        if (msg.length < 5) { out.className = "profile-save-msg fail"; out.textContent = "Tell us a little more first."; return; }
+        const btn = fbForm.querySelector("button[type=submit]");
+        btn.disabled = true; out.className = "profile-save-msg"; out.textContent = "Sending…";
+        try {
+          const r = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ type: kind === "idea" || kind === "general" ? "feedback" : "issue",
+              message: `[${LABEL[kind]}]${where ? " " + where + " -" : ""} ${msg}
+
+(${user.email || ""})`,
+              name: user.name || null, page: where || "profile" }) });
+          if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || "Could not send.");
+          fbForm.reset();
+          out.className = "profile-save-msg ok"; out.textContent = "Thanks - sent. We read every one.";
+        } catch (err) {
+          out.className = "profile-save-msg fail"; out.textContent = err.message || "Could not send. Try again.";
+        } finally { btn.disabled = false; }
+      });
+      // "My subjects": one colour tile per enrolled subject with its section links.
+      function renderSubjectTiles(boards) {
+        if (boards) _boardsCache = boards;
+        const grid = document.getElementById("pf-subj-grid");
+        if (!grid || !_boardsCache || !_enrolled || !_enrolled.size) return;
+        boards = _boardsCache;
+        const subs = [];
+        boards.forEach(b => (b.subjects || []).forEach(s => { if (_enrolled.has(s.code)) subs.push({ ...s, board: b.short }); }));
+        if (!subs.length) return;
+        grid.classList.add("is-tiles");
+        grid.innerHTML = subs.map(s => `
+          <article class="pf-subj cat-tone-${esc(s.tone || "lav")}">
+            <header><span class="pf-subj-code">${esc(s.code)}</span><small>${esc(s.board)}</small></header>
+            <h3><a href="${esc(s.url)}">${esc(s.plain || s.name)}</a></h3>
+            <nav>${(s.links || []).map(l => `<a class="sec-${esc(l.key)}" href="${esc(l.url)}">${esc(l.label)}</a>`).join("")}</nav>
+          </article>`).join("");
+      }
+
+      function renderSubjectPicker() {
         const grid = document.getElementById("pf-subjects-grid");
         if (!grid) return;
         if (_metaSubjects === null) {
           grid.innerHTML = `<span class="pf-subjects-empty">Loading…</span>`;
           return;
         }
-        const board = GRADE_TO_BOARD[gradeVal] || null;
-        if (!board) {
-          grid.innerHTML = `<span class="pf-subjects-empty">Select your board above to see available subjects.</span>`;
+        if (!_boards.length) {
+          grid.innerHTML = `<span class="pf-subjects-empty">Pick your board(s) above to see their subjects.</span>`;
           return;
         }
-        const visible = _metaSubjects.filter(s => s.board === board || _enrolled.has(s.syllabus));
-
-        if (!visible.length) {
-          grid.innerHTML = `<span class="pf-subjects-empty">No subjects available for this qualification yet.</span>`;
-          return;
-        }
-
-        grid.innerHTML = visible.map(s => {
+        const names = _boards.map(b => GRADE_TO_BOARD[SLUG_TO_GRADE[b]]);
+        // chosen boards first, then any enrolled subject from another board
+        const groups = names.map(n => [n, _metaSubjects.filter(s => s.board === n)]);
+        const other = _metaSubjects.filter(s => !names.includes(s.board) && _enrolled.has(s.syllabus));
+        if (other.length) groups.push(["Other boards", other]);
+        const btn = s => {
           const on = _enrolled.has(s.syllabus);
-          const offBoard = board && s.board !== board;
-          return `<button type="button" class="pf-subject-btn"
-              data-syllabus="${esc(s.syllabus)}" data-on="${on}"
-              title="${esc(s.board)} · ${esc(s.syllabus)}"
-              ${offBoard ? 'style="opacity:.6;"' : ''}>
-            ${on ? "✓ " : ""}${esc(s.short || s.name)}
-            <span style="font-size:.68rem;opacity:.7;font-weight:600;">${esc(s.syllabus)}</span>
-          </button>`;
-        }).join("");
+          return `<button type="button" class="pf-subject-btn" data-syllabus="${esc(s.syllabus)}" data-on="${on}"
+              title="${esc(s.board)} · ${esc(s.syllabus)}">${on ? "✓ " : ""}${esc(s.short || s.name)}
+            <span style="font-size:.68rem;opacity:.7;font-weight:600;">${esc(s.syllabus)}</span></button>`;
+        };
+        grid.innerHTML = groups.filter(([, list]) => list.length).map(([n, list]) =>
+          `<div class="pf-sgroup"><p>${esc(n)}</p><div>${list.map(btn).join("")}</div></div>`).join("")
+          || `<span class="pf-subjects-empty">No subjects available for these boards yet.</span>`;
 
         grid.querySelectorAll(".pf-subject-btn").forEach(btn => {
           btn.addEventListener("click", () => toggleSubject(btn));
@@ -1699,7 +2012,8 @@
             _enrolled.add(syllabus);
           }
           // Re-render with updated enrollment state
-          renderSubjectPicker(form?.grade?.value || "");
+          renderSubjectPicker();
+          renderSubjectTiles(null);
         } catch (err) {
           alert(err.message || "Could not update subject.");
           btn.disabled = false;
@@ -1711,9 +2025,7 @@
       // StyledDropdown fires a native 'change' event on the underlying <select>,
       // so this listener works whether the user picks via the styled UI or natively.
       if (gradeSelectEl) {
-        gradeSelectEl.addEventListener("change", () => {
-          renderSubjectPicker(gradeSelectEl.value);
-        });
+        gradeSelectEl.addEventListener("change", () => renderSubjectPicker());
       }
 
       // Kick off data load
@@ -1730,7 +2042,7 @@
         msgEl.textContent = "";
         const name = form.name.value.trim();
         if (!name) { showMsg("fail", "Name can't be empty."); return; }
-        if (!form.grade.value) { showMsg("fail", "Please select your board (O Level / IGCSE / A Level)."); return; }
+        if (!form.grade.value) { showMsg("fail", "Please pick your board(s) (O Level / IGCSE / A Level)."); return; }
         if (_enrolled.size === 0 && !_wasProfileComplete) {
           showMsg("fail", "Please tick at least one subject below before saving.");
           setTimeout(() => {
@@ -1799,7 +2111,7 @@
       const signoutBtn = document.getElementById("pf-signout");
       if (signoutBtn) {
         signoutBtn.addEventListener("click", async () => {
-          const { logout } = await import("/auth.js?v=20260927k");
+          const { logout } = await import("/auth.js?v=20260929a");
           logout();
         });
       }
@@ -1866,10 +2178,22 @@
       const photoInput = document.getElementById("pf-photo-input");
       if (photoInput) {
         photoInput.addEventListener("change", async function () {
-          const file = this.files[0];
-          if (!file) return;
+          const picked = this.files[0];
+          if (!picked) return;
           const statusEl = document.getElementById("pf-photo-status");
           const avatarEl = document.getElementById("pf-avatar");
+          // Let the student position + zoom the photo inside a circle first.
+          let file = picked;
+          try {
+            const { cropImage } = await import("/avatar-crop.js?v=20260929a");
+            const blob = await cropImage(picked);
+            if (!blob) { this.value = ""; return; }          // cancelled
+            file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
+          } catch (err) {
+            if (statusEl) { statusEl.textContent = err.message || "Could not open that photo."; statusEl.style.color = "#d93025"; }
+            this.value = "";
+            return;
+          }
           if (statusEl) {
             statusEl.textContent = "Uploading…";
             statusEl.style.color = "var(--grey)";
@@ -1979,7 +2303,7 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
-  <script src="tour.js?v=20260829a"></script>
+  <script src="tour.js?v=20260929a"></script>
 
 <script>
 /* ── Minimal QR code generator (Version 2, ECC-L, alphanumeric + byte mode) ─

@@ -107,15 +107,33 @@ def save_profile(req: ProfileUpdate, user: _CurrentUser,
     # If grade changes, archive current active enrollments
     new_grade = updates.get("grade")
     if new_grade and old_grade and new_grade != old_grade:
-        _udb.archive_all_enrollments(user["id"])
-        # Check if student previously had archived enrollments matching the new board/grade
-        archived = _udb.get_archived_enrollments(user["id"])
-        restored = []
-        for s in archived:
-            board_name, _ = _udb.BOARDS_MAP.get(s, ("", ""))
-            if new_grade.lower() in board_name.lower():
+        # Students may study on several boards (student_boards, picked on the
+        # profile / papers pages); `grade` is only their MAIN board. So keep every
+        # subject whose board is still one of theirs, archive the rest, and bring
+        # back archived subjects of those boards. Without saved boards: the old
+        # single-board rule (archive everything, restore the new board's).
+        try:
+            saved, _primary = _udb.get_boards(user["id"])
+        except Exception:
+            saved = []
+        slug_names = {"o-level": "o level", "igcse": "igcse", "a-level": "a level"}
+        keep = {slug_names[b] for b in saved if b in slug_names} | {new_grade.lower()}
+
+        def on_kept_board(syl: str) -> bool:
+            board_name = _udb.BOARDS_MAP.get(syl, ("", ""))[0].lower()
+            return any(k in board_name for k in keep)
+
+        if saved:
+            for s in _udb.get_enrollments(user["id"]):
+                if not on_kept_board(s):
+                    _udb.unenroll(user["id"], s)
+        else:
+            _udb.archive_all_enrollments(user["id"])
+        # bring back what they had on the NEW main board (only that one - an
+        # archived subject on another kept board may have been removed on purpose)
+        for s in _udb.get_archived_enrollments(user["id"]):
+            if new_grade.lower() in _udb.BOARDS_MAP.get(s, ("", ""))[0].lower():
                 _udb.restore_enrollment(user["id"], s)
-                restored.append(s)
 
     # Mark profile complete only when the student has BOTH a grade AND at least one subject enrolled.
     # Never demote an already-complete profile.
@@ -1080,9 +1098,31 @@ def list_classes(user: _CurrentUser):
 
 # ── Dashboard ──────────────────────────────────────────────────────────────────
 
+def _safe(fn, default):
+    try:
+        return fn()
+    except Exception:
+        return default
+
+
+def _flashcard_days(uid: str) -> list[str]:
+    """Timestamps (one per distinct UTC day) of the student's flashcard reviews."""
+    import flashcards as _fc
+    con = _fc._con()
+    try:
+        rows = con.execute("SELECT DISTINCT substr(reviewed_at, 1, 19) AS t FROM fc_review_events "
+                           "WHERE student_id = ? ORDER BY t DESC LIMIT 2000", [uid]).fetchall()
+    finally:
+        con.close()
+    return [r["t"] for r in rows]
+
+
 @router.get("/api/dashboard")
-def dashboard(user: _CurrentUser):
+def dashboard(user: _CurrentUser, tz: str = ""):
+    import streaks as _streaks
     uid = user["id"]
+    zone = _streaks.zone(tz)
+    today = _streaks.local_today(zone)
     got = _udb.gather(
         enrollments=lambda: _udb.get_enrollments(uid),
         archived_enrollments=lambda: _udb.get_archived_enrollments(uid),
@@ -1091,7 +1131,12 @@ def dashboard(user: _CurrentUser):
         assignments=lambda: _udb.get_assignments(uid, 60),
         papers=lambda: _udb.get_paper_progress(uid),
         classes=lambda: _udb.get_class_log(uid, 500),
-        today_seconds=lambda: _udb.get_today_time_spent(uid),
+        today_seconds=lambda: _udb.get_today_time_spent(uid, today.isoformat()),
+        booklets=lambda: _safe(lambda: _udb.list_booklets(uid, 200), []),
+        mcq=lambda: _safe(lambda: _udb.list_mcq_sessions(uid, None, 200), []),
+        time_days=lambda: _safe(lambda: _udb.get_time_spent_range(
+            uid, (today - __import__("datetime").timedelta(days=400)).isoformat(), today.isoformat()), []),
+        fc_days=lambda: _safe(lambda: _flashcard_days(uid), []),
     )
     enrollments = got["enrollments"]
     archived_enrollments = got["archived_enrollments"]
@@ -1099,26 +1144,22 @@ def dashboard(user: _CurrentUser):
     quizzes = got["quizzes"]
     recent_quizzes = quizzes[:5]
 
-    # Streak: consecutive days with any platform activity (quiz or time spent)
-    streak = 0
-    from datetime import date, timedelta
+    # Streak: consecutive LOCAL days with any activity at all (streaks.py).
     days: set = set()
-    for q in quizzes:
-        d = (q.get("created_at") or "")[:10]
+    for row in got["time_days"]:
+        if (row.get("seconds") or 0) > 0:
+            days.add(row["date"])
+    stamps = ([q.get("created_at") for q in quizzes]
+              + [b.get("created_at") for b in got["booklets"]]
+              + [m.get(k) for m in got["mcq"] for k in ("created_at", "submitted_at")]
+              + [p.get("updated_at") for p in got["papers"]]
+              + list(got["fc_days"]))
+    for ts in stamps:
+        d = _streaks.local_day(ts, zone)
         if d:
             days.add(d)
-    today = date.today()
-    one_year_ago = (today - timedelta(days=365)).isoformat()
-    try:
-        for row in _udb.get_time_spent_range(uid, one_year_ago, today.isoformat()):
-            days.add(row["date"])
-    except Exception:
-        pass
-    # Start from today; fall back to yesterday if today not yet recorded
-    day = today.isoformat() if today.isoformat() in days else (today - timedelta(days=1)).isoformat()
-    while day in days:
-        streak += 1
-        day = (date.fromisoformat(day) - timedelta(days=1)).isoformat()
+    streak, streak_best = _streaks.streaks(days, today)
+    week = [(today - __import__("datetime").timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
 
     assignments = [_decorate_assignment(a) for a in got["assignments"]]
     open_hw = [a for a in assignments if a["status"] != "done"]
@@ -1138,6 +1179,9 @@ def dashboard(user: _CurrentUser):
         "paper_summary": _paper_summary(got["papers"]),
         "recent_quizzes": recent_quizzes,
         "streak": streak,
+        "streak_best": streak_best,
+        "active_today": today.isoformat() in days,
+        "week_active": [d in days for d in week],        # last 7 local days, oldest first
         "today_seconds": got["today_seconds"],
         "homework": {
             "open": len(open_hw),
@@ -1789,6 +1833,7 @@ def newsletter_unsubscribe(token: str):
 
 class TimeSpentReq(BaseModel):
     seconds: int
+    day: str | None = None      # the browser's local YYYY-MM-DD
 
 
 @router.post("/api/time-spent")
@@ -1797,7 +1842,8 @@ def record_time_spent(req: TimeSpentReq, user: _CurrentUser):
         return {"ok": True}
     # Cap maximum increment to 5 minutes to prevent abuse
     sec = min(max(req.seconds, 1), 300)
-    _udb.add_time_spent(user["id"], sec)
+    import streaks as _streaks
+    _udb.add_time_spent(user["id"], sec, _streaks.valid_client_day(req.day))
     return {"ok": True}
 
 

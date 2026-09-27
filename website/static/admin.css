@@ -1394,7 +1394,7 @@ html[data-theme="dark"] .pm-note-banner { background: #422006; color: #fde68a; b
   border-color: var(--navy, #2E1B4A);
   background: color-mix(in srgb, var(--navy, #2E1B4A) 6%, transparent);
 }
-html[data-theme="dark"] .plan-card { background: var(--surface, #1a1a30); border-color: var(--border, #2b3240); }
+html[data-theme="dark"] .plan-card { background: var(--surface, #1a1a30); border-color: var(--border, #3b435a); }
 html[data-theme="dark"] .plan-card:hover { border-color: var(--gold, #d4a017); }
 html[data-theme="dark"] .plan-card.selected { border-color: var(--gold, #d4a017); background: color-mix(in srgb, var(--gold, #d4a017) 8%, transparent); }
 

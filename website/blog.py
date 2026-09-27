@@ -344,7 +344,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
 <script src="/main.js?v=20260928a"></script>
 <script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 </body>
 </html>"""
 

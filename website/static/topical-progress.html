@@ -15,7 +15,7 @@
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260928b">
+  <link rel="stylesheet" href="styles.css?v=20260929e">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
   <link rel="stylesheet" href="tools.css?v=20260927j">
@@ -40,12 +40,14 @@
         <a href="/blog" class="nav-link">Blog</a>
         <a href="/pricing.html" class="nav-link">Pricing</a>
       </nav>
-      <div class="header-right"></div>
+      <div class="header-end"><button class="nav-search" type="button" data-site-search aria-label="Search PrepWithTee" title="Search (Ctrl K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><div class="header-right"></div></div>
     </div>
+  <script>(function(){if(window.pwtOpenSearch)return;var m=null;function o(q){(m?Promise.resolve(m):import('/site-search.js?v=20260929a').then(function(x){return m=x})).then(function(x){x.open(q||'')}).catch(function(){location.href='/explore'})}window.pwtOpenSearch=o;document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-site-search]');if(b){e.preventDefault();o()}});document.addEventListener('keydown',function(e){var a=document.activeElement,t=a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault();o();return}if(e.key==='/'&&!t&&!e.ctrlKey&&!e.metaKey&&!e.altKey){var l=document.querySelector('[data-pk-q]');if(l&&l.offsetParent!==null)return;e.preventDefault();o()}})})();</script>
   </header>
 <!--NAV:END-->
 <!--CRUMB:START — breadcrumb bar. Do not edit here; edit CRUMBS in website/sync_nav.py then run: python sync_nav.py -->
 <div class="pg-crumbbar"><div class="container pg-crumbbar-in"><a class="pg-back" href="/papers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>Past papers</span></a><nav class="pg-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">›</span> <a href="/papers">Past papers</a><span aria-hidden="true">›</span> <span aria-current="page">Topical progress</span></nav></div></div>
+<nav class="dtabs" aria-label="Dashboard sections"><div class="container dtabs-in"><a class="dtab" href="/dashboard.html"><span aria-hidden="true">📊</span>Overview</a><a class="dtab is-on" href="/topical-progress.html" aria-current="page"><span aria-hidden="true">📈</span>Chapter progress</a><a class="dtab" href="/yearly-progress.html"><span aria-hidden="true">🎯</span>Paper scores</a><a class="dtab" href="/my-papers"><span aria-hidden="true">🗂️</span>My papers</a><a class="dtab" href="/homework.html"><span aria-hidden="true">📝</span>Homework</a><a class="dtab" href="/calendar.html"><span aria-hidden="true">📅</span>Calendar</a><a class="dtab" href="/analytics.html"><span aria-hidden="true">📉</span>Analytics</a><a class="dtab" href="/achievements.html"><span aria-hidden="true">🏆</span>Achievements</a><a class="dtab" href="/fc-progress.html"><span aria-hidden="true">🃏</span>Flashcards</a><a class="dtab" href="/profile.html"><span aria-hidden="true">👤</span>Profile</a></div></nav>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://prepwithtee.com/"}, {"@type": "ListItem", "position": 2, "name": "Past papers", "item": "https://prepwithtee.com/papers"}, {"@type": "ListItem", "position": 3, "name": "Topical progress", "item": "https://prepwithtee.com/topical-progress.html"}]}</script>
 <!--CRUMB:END-->
 
@@ -105,13 +107,13 @@
     </aside>
   </div>
 
-  <script type="module" src="/auth.js?v=20260927k"></script>
-  <script type="module" src="/topical-progress.js?v=20260830a"></script>
+  <script type="module" src="/auth.js?v=20260929a"></script>
+  <script type="module" src="/topical-progress.js?v=20260929a"></script>
   <script src="tools-core.js?v=20260927j"></script>
   <script src="tools-nav.js?v=20260811d"></script>
   <script src="tools-dock.js?v=20260810k"></script>
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
-  <script src="tour.js?v=20260829a"></script>
-  <script defer src="chatbot-widget.js?v=20260927b"></script>
+  <script src="tour.js?v=20260929a"></script>
+  <script defer src="chatbot-widget.js?v=20260929a"></script>
 </body>
 </html>

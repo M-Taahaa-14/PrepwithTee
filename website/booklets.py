@@ -11,8 +11,9 @@
     GET  /papers/view/{id}                the viewer page (noindex)
 
 Rules (tutor, 2026-09-24): at most 4 chapters per booklet, any number of
-subtopics inside them; questions from every picked chapter/subtopic, mixed
-rather than grouped (selection.select_mixed); only enrolled students build.
+subtopics inside them; questions from every picked chapter/subtopic
+(selection.select_mixed), printed newest paper first - 2025, 2024, ...
+(selection.order_recent_first, tutor 2026-09-27); only enrolled students build.
 
 Two kinds (tutor, 2026-09-27 - the old papers.html Test Builder moved here):
 `booklet` = compose, mark scheme after each question (or none); `test` =
@@ -57,7 +58,7 @@ import auth as _auth
 import catalog as _catalog
 import db as _db
 import users_db as _udb
-from selection import select_mixed
+from selection import order_recent_first, select_mixed
 
 router = APIRouter()
 
@@ -66,7 +67,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260928a"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260929a"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -230,7 +231,7 @@ def question_pool(sel: Selection) -> list[dict]:
     con = _db.plain_connect()
     try:
         rows = con.execute(
-            f"""SELECT q.id, q.marks, c.topic, c.secondary_topic, c.subtopic,
+            f"""SELECT q.id, q.number, q.sub_part, q.marks, c.topic, c.secondary_topic, c.subtopic,
                        p.year, p.session, p.paper, p.variant
                 FROM questions q
                 JOIN classifications c ON c.question_id = q.id
@@ -255,6 +256,8 @@ def question_pool(sel: Selection) -> list[dict]:
         else:
             bucket = home
         pool.append({"id": r["id"], "bucket": bucket, "year": r["year"],
+                     "session": r["session"], "paper": r["paper"], "variant": r["variant"],
+                     "number": r["number"], "sub_part": r["sub_part"],
                      "marks": r["marks"], "chapter": home})
     return pool
 
@@ -306,7 +309,9 @@ def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)
         raise HTTPException(400, "No questions match that selection. Widen the year "
                                  "range or paper filter, or pick different chapters.")
     seed = req.seed if req.seed is not None else secrets.randbits(31)
-    chosen = select_mixed(pool, req.max_questions, seed)
+    # Which questions: still a mix covering every picked chapter. Their order:
+    # newest paper first, never shuffled.
+    chosen = order_recent_first(select_mixed(pool, req.max_questions, seed))
     subj = _catalog.SUBJECTS[req.syllabus]
     title = (("Mock test: " if req.kind == "test" else "")
              + " · ".join(known[p.chapter]["display"] for p in req.picks)
@@ -527,7 +532,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260928a"></script>
-<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
@@ -671,7 +676,9 @@ def my_papers_page(syllabus: str = "", user: dict | None = Depends(_auth.maybe_u
     sec_old = (f'<section class="mp-sec"><h2 class="ui-h2">Older - kept as a record</h2>'
                f'<p class="cat-note mp-note">Not opened for {RETENTION_DAYS} days, so the PDF was removed.</p>'
                f'<div class="mp-list">{"".join(_paper_card(b, inked) for b in old)}</div></section>') if old else ""
+    import ui
     body = f"""
+    {ui.dash_tabs("/my-papers")}
     <header class="cat-hero cat-hero-sm">
       <p class="cat-eyebrow">My papers</p>
       <h1>Papers you have built</h1>

@@ -1066,9 +1066,11 @@ def get_monthly_usage(user_id: str, period_start: str | None = None) -> dict:
         return counts
 
 
-def add_time_spent(user_id: str, seconds: int) -> None:
+def add_time_spent(user_id: str, seconds: int, day: str | None = None) -> None:
+    """Add active seconds to the student's LOCAL calendar day (`day`, sent by
+    the browser), falling back to the server's date."""
     from datetime import date
-    today = date.today().isoformat()
+    today = day or date.today().isoformat()
     if _USE_SUPABASE:
         try:
             r = (_client().table("daily_time_spent")
@@ -1099,9 +1101,9 @@ def add_time_spent(user_id: str, seconds: int) -> None:
             c.commit()
 
 
-def get_today_time_spent(user_id: str) -> int:
+def get_today_time_spent(user_id: str, day: str | None = None) -> int:
     from datetime import date
-    today = date.today().isoformat()
+    today = day or date.today().isoformat()
     if _USE_SUPABASE:
         try:
             r = (_client().table("daily_time_spent")
@@ -1116,6 +1118,27 @@ def get_today_time_spent(user_id: str) -> int:
         with _local() as c:
             row = c.execute("SELECT seconds FROM daily_time_spent WHERE user_id=? AND date=?", (user_id, today)).fetchone()
             return row[0] if row else 0
+
+
+def get_time_spent_range(user_id: str, start_date: str, end_date: str) -> list[dict]:
+    """[{date, seconds}] for every day in [start_date, end_date] with tracked
+    time. (The dashboard's streak called this for months before it existed -
+    the AttributeError was swallowed, so tracked time never counted.)"""
+    if _USE_SUPABASE:
+        r = (_client().table("daily_time_spent")
+             .select("date, seconds")
+             .eq("user_id", user_id)
+             .gte("date", start_date)
+             .lte("date", end_date)
+             .order("date")
+             .execute())
+        return r.data or []
+    with _local() as c:
+        rows = c.execute(
+            "SELECT date, seconds FROM daily_time_spent "
+            "WHERE user_id=? AND date>=? AND date<=? ORDER BY date",
+            (user_id, start_date, end_date)).fetchall()
+        return [{"date": r[0], "seconds": r[1]} for r in rows]
 
 
 def get_weekly_time_spent(user_id: str) -> list[dict]:

@@ -75,35 +75,73 @@ SECTIONS = [
 ]
 
 
+_GROUP_TONES = {"Practise past papers": "lav", "Learn": "green", "AI help": "pink", "Tools": "orange",
+                "Your account": "blue", "About PrepWithTee": "teal"}
+
+# The four doors most students want first.
+_START = [
+    ("topical", "Topical past papers", "/papers/topical", "Pick chapters, get real questions + mark scheme", "lav"),
+    ("yearly", "Papers by year", "/yearly", "Every sitting, no account needed", "blue"),
+    ("notes", "Revision notes", "/notes", "Chapter-by-chapter, linked to questions", "green"),
+    ("ai", "AI Tutor & Photo Solver", "/tutor.html", "Stuck? Ask, or snap a photo of the question", "pink"),
+]
+
+
 @router.get("/explore", response_class=HTMLResponse)
 def explore(user: dict | None = Depends(_auth.maybe_user)):
     import ui
     state = _catalog._student_state(user)
+    n_pages = sum(len(items) for _h, _i, items in SECTIONS)
+    n_ch = sum(len(_catalog.chapters(c)) for c in _catalog.SUBJECTS)
+    n_q = sum(_catalog.subject_stats(c)["questions"] for c in _catalog.SUBJECTS)
+    start = "".join(
+        f'<a class="ex-start cat-tone-{tone}" href="{_e(url)}"><span class="ex-start-ic">{ui.icon(ic)}</span>'
+        f'<b>{_e(t)}</b><span>{_e(d)}</span><i>{ui.icon("arrow")}</i></a>'
+        for ic, t, url, d, tone in _START)
     groups = []
     for head, ic, items in SECTIONS:
+        tone = _GROUP_TONES.get(head, "lav")
         lis = "".join(
-            f'<li><a href="{_e(url)}"><b>{_e(label)}</b><span>{_e(what)}</span>'
+            f'<li data-q="{_e((label + " " + what + " " + head).lower())}"><a href="{_e(url)}"><b>{_e(label)}</b><span>{_e(what)}</span>'
             + ('<i class="ui-acct" title="Needs a free account">Account</i>' if acct and not user else "")
             + "</a></li>" for label, url, what, acct in items)
-        groups.append(f'<section class="ex-group"><h2>{ui.icon(ic)}{_e(head)}</h2><ul>{lis}</ul></section>')
-    rows = []
+        groups.append(f'<section class="ex-group cat-tone-{tone}"><h2><span class="ex-gic">{ui.icon(ic)}</span>'
+                      f'{_e(head)}<small>{len(items)}</small></h2><ul>{lis}</ul></section>')
+    bands = []
     for board, subs in _catalog.BOARDS:
         b = _catalog.BOARD_SLUGS[board]
-        trs = "".join(
-            f'<tr><th scope="row"><span class="cat-code">{c}</span> {_e(_catalog.SUBJECTS[c]["plain"])}</th><td>'
-            + " ".join(f'<a href="{_e(url)}">{_e(label)}</a>' for _k, label, url, _i in ui.subject_links(c))
-            + "</td></tr>" for c, _n in subs)
-        rows.append(f'<h3 class="cat-group">{_catalog.BOARD_SHORT[b]}</h3>'
-                    f'<table class="ex-subjects"><tbody>{trs}</tbody></table>')
+        mono, long = ui.BOARD_THEME[b]
+        cards = []
+        for c, _n in subs:
+            s = _catalog.SUBJECTS[c]
+            links = "".join(f'<a class="sec-{k}" href="{_e(url)}">{ui.icon(ic)}{_e(label)}</a>'
+                            for k, label, url, ic in ui.subject_links(c))
+            cards.append(f'<article class="ex-subj cat-tone-{s["tone"]}" data-q="{_e((s["name"] + " " + c + " " + long).lower())}">'
+                         f'<header><span class="pk-ic">{ui.subject_icon(s["tone"])}</span>'
+                         f'<div><b>{_e(s["plain"])}</b><small><span class="pk-code">{c}</span></small></div></header>'
+                         f'<nav>{links}</nav></article>')
+        bands.append(f'<section class="pk-board pk-b-{b}"><header class="pk-bhead"><span class="pk-bmark">{mono}</span>'
+                     f'<div><h2>{_e(long)}</h2><p>{len(subs)} subjects</p></div></header>'
+                     f'<div class="ex-subjs">{"".join(cards)}</div></section>')
     body = f"""
-    <header class="cat-hero cat-hero-sm">
+    <header class="cat-hero cat-hero-sm ex-hero">
       <p class="cat-eyebrow">Explore</p>
-      <h1>Everything on PrepWithTee</h1>
-      <p class="cat-lede">Every page, with one line on what it is for. Pages marked <i class="ui-acct">Account</i>
-        need a free account.</p>
+      <h1>Everything on PrepWithTee, in one place</h1>
+      <p class="cat-lede">Every page with one line on what it is for, and every subject's sections side by side.
+        Pages marked <i class="ui-acct">Account</i> need a free account.</p>
+      <button class="ex-bigsearch" type="button" data-site-search>{ui.icon("search")}
+        <span>Search subjects, chapters, notes and tools…</span><kbd>Ctrl K</kbd></button>
+      <dl class="ui-hero-stats ex-stats">
+        <div class="cat-tone-lav"><dt>Pages</dt><dd>{n_pages}</dd></div>
+        <div class="cat-tone-blue"><dt>Subjects</dt><dd>{len(_catalog.SUBJECTS)}</dd></div>
+        <div class="cat-tone-green"><dt>Chapters</dt><dd>{n_ch}</dd></div>
+        <div class="cat-tone-orange"><dt>Questions</dt><dd>{n_q:,}</dd></div>
+      </dl>
     </header>
+    <section><h2 class="ui-h2">Start here</h2><div class="ex-starts">{start}</div></section>
+    {ui.page_search("Filter this page, e.g. calculator, flashcards, physics", ".ex-group li, .ex-subj", ".ex-group, .pk-board")}
     <div class="ex-groups">{''.join(groups)}</div>
-    <section><h2 class="ui-h2">Every subject, every section</h2>{''.join(rows)}</section>"""
+    <section class="ex-map"><h2 class="ui-h2">Every subject, every section</h2>{''.join(bands)}</section>"""
     return _catalog._respond(_catalog._shell(
         title="Explore PrepWithTee - Every Page and Subject", path="/explore", body=body, state=state,
         desc="Every PrepWithTee page in one place: past papers by topic and year, MCQ practice, mock tests, "

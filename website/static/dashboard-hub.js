@@ -658,15 +658,19 @@ function renderGreeting(name) {
 
 // ── Streak display ────────────────────────────────────────────────────────────
 
-function setStreak(n) {
+function setStreak(n, best) {
   currentStreak = n;
   const el = document.getElementById("hub-streak-num");
   if (el) el.textContent = n;
   try {
     localStorage.setItem("pwt_streak", JSON.stringify(n));
     const prev = JSON.parse(localStorage.getItem("pwt_streak_max") || "0");
-    if (n > prev) localStorage.setItem("pwt_streak_max", JSON.stringify(n));
+    const top = Math.max(prev, n, best || 0);
+    if (top !== prev) localStorage.setItem("pwt_streak_max", JSON.stringify(top));
+    const bestEl = document.getElementById("hub-streak-best");
+    if (bestEl) bestEl.textContent = top;
   } catch {}
+  try { window.pwtDashAch && window.pwtDashAch(); } catch {}
   _scheduleSync();
 }
 
@@ -1036,7 +1040,9 @@ async function init() {
       lsSet(K.BADGES, srv.badges || []);
       try {
         localStorage.setItem("pwt_streak", JSON.stringify(srv.streak || 0));
-        localStorage.setItem("pwt_streak_max", JSON.stringify(srv.streak_max || 0));
+        // never LOWER the best streak from a stale server copy (it used to reset it to 0)
+        const localMax = JSON.parse(localStorage.getItem("pwt_streak_max") || "0");
+        localStorage.setItem("pwt_streak_max", JSON.stringify(Math.max(localMax, srv.streak_max || 0)));
       } catch {}
       if (srv.focus && Object.keys(srv.focus).length) lsSet(K.FOCUS, srv.focus);
       if (srv.missions && Object.keys(srv.missions).length) lsSet(K.MISSIONS, srv.missions);
@@ -1059,8 +1065,8 @@ async function init() {
 
   // Fetch dashboard data
   try {
-    const [dash, meta] = await Promise.all([api("/api/dashboard"), api("/api/meta")]);
-    setStreak(dash.streak || 0);
+    const [dash, meta] = await Promise.all([api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || "")), api("/api/meta")]);
+    setStreak(dash.streak || 0, dash.streak_best || 0);
     const timeTodayEl = document.getElementById("hub-time-today");
     if (timeTodayEl) {
       const mins = Math.round((dash.today_seconds || 0) / 60);

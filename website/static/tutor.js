@@ -1,4 +1,4 @@
-import { getUser } from "./auth.js?v=20260927k";
+import { getUser } from "./auth.js?v=20260929a";
 
 (function () {
   "use strict";

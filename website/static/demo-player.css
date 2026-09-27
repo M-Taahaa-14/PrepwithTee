@@ -53,3 +53,47 @@
 @media (prefers-reduced-motion: reduce) {
   .dp-stage, .dp-img, .dp-cursor, .dp-ch b { transition: none; }
 }
+
+/* ── Laptop frame (data-frame="laptop"): lid opens on first view ─────────── */
+.dp-laptop { max-width: 760px; gap: 12px; }
+.dp-mac { padding: 0; background: none; box-shadow: none; border-radius: 0; perspective: 1800px; }
+.dp-mac::before { display: none; }
+.dp-lid { position: relative; padding: 3.2% 3.2% 4%; border-radius: 22px 22px 8px 8px;
+  background: linear-gradient(180deg, #1d2029, #0b0c10); box-shadow: inset 0 0 0 2px #3a3f4c, 0 26px 60px rgba(20, 14, 45, .30);
+  transform-origin: 50% 100%; transform: rotateX(-86deg); opacity: .35;
+  transition: transform 1.5s cubic-bezier(.2, .8, .2, 1), opacity .9s ease; }
+.dp-laptop.is-open .dp-lid { transform: rotateX(0deg); opacity: 1; }
+.dp-cam { position: absolute; left: 50%; top: 1.3%; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%;
+  background: #2d313c; box-shadow: inset 0 0 0 1.5px #464b58; }
+.dp-mac .dp-screen { border-radius: 6px; }
+.dp-base { position: relative; height: 16px; margin: 0 -7%; border-radius: 3px 3px 22px 22px;
+  background: linear-gradient(180deg, #e6e8ee 0%, #c3c7d0 55%, #9ea3ae 100%);
+  box-shadow: 0 18px 30px -12px rgba(20, 14, 45, .45); }
+.dp-base::before { content: ""; position: absolute; left: 50%; top: 0; width: 18%; height: 6px; margin-left: -9%;
+  border-radius: 0 0 10px 10px; background: linear-gradient(180deg, #a9adb8, #c9ccd4); }
+html[data-theme="dark"] .dp-base { background: linear-gradient(180deg, #8d93a1 0%, #5c6170 60%, #3d414d 100%); }
+.dp-laptop .dp-caption p { font-size: 1rem; }
+.dp-laptop .dp-caption { min-height: 2.4em; }
+
+/* ── Title cards ("Not sure where to start?", "Talk to Tee") ────────────── */
+.dp-card { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: .7rem;
+  padding: 6% 9%; text-align: center; opacity: 0; pointer-events: none; transition: opacity .6s ease;
+  background: radial-gradient(90% 80% at 50% 0%, rgba(124, 92, 240, .35), transparent 70%),
+              linear-gradient(160deg, #241b4d 0%, #16122e 60%, #1b2a4f 100%); color: #fff; }
+.dp-screen.is-card .dp-card { opacity: 1; pointer-events: auto; }
+.dp-screen.is-card .dp-stage { filter: blur(6px) brightness(.7); transition: filter .6s ease; }
+.dp-card-eye { font: 800 clamp(.55rem, 1.3vw, .72rem)/1 "Hanken Grotesk", sans-serif; letter-spacing: .14em; text-transform: uppercase;
+  color: #ffc98a; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); padding: .45em .8em; border-radius: 999px; }
+.dp-card-title { font: 800 clamp(1.05rem, 3.4vw, 2.1rem)/1.12 "Playfair Display", Georgia, serif; letter-spacing: -.01em; max-width: 18ch; }
+.dp-card-text { font: 500 clamp(.72rem, 1.6vw, .98rem)/1.45 "Hanken Grotesk", sans-serif; color: rgba(255, 255, 255, .82); max-width: 42ch; }
+.dp-card-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: .3rem; }
+.dp-card-btn { font: 800 clamp(.68rem, 1.5vw, .9rem)/1 "Hanken Grotesk", sans-serif; text-decoration: none; padding: .7em 1.1em;
+  border-radius: 999px; transition: transform .15s ease, filter .15s ease; }
+.dp-card-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.dp-card-btn-primary { background: #25d366; color: #06301a; }
+.dp-card-btn-ghost { background: rgba(255, 255, 255, .12); color: #fff; border: 1px solid rgba(255, 255, 255, .3); }
+.dp-card-btn-gold { background: linear-gradient(135deg, #f5a524, #f0c040); color: #2a1606; }
+.dp-card-btn:focus-visible { outline: 2px solid #ffc98a; outline-offset: 2px; }
+.dp-card-tee { background: radial-gradient(90% 80% at 50% 0%, rgba(245, 165, 36, .30), transparent 70%),
+               linear-gradient(160deg, #2a1d4f 0%, #181330 60%, #102a2a 100%); }
+@media (prefers-reduced-motion: reduce) { .dp-lid, .dp-card, .dp-screen.is-card .dp-stage { transition: none; } }

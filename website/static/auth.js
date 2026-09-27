@@ -447,6 +447,9 @@ export async function initNavbar() {
 
   // Active time spent tracking for students
   if (user && user.role === "student") {
+    // the student's own calendar day, so streaks roll over at THEIR midnight
+    const localDay = () => { const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
     let activeSeconds = 0;
     let isTabActive = true;
 
@@ -463,7 +466,7 @@ export async function initNavbar() {
           fetch("/api/time-spent", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ seconds: 30 }),
+            body: JSON.stringify({ seconds: 30, day: localDay() }),
             keepalive: true
           }).catch(() => {});
           activeSeconds = 0;
@@ -473,7 +476,9 @@ export async function initNavbar() {
 
     window.addEventListener("pagehide", () => {
       if (activeSeconds > 0) {
-        navigator.sendBeacon("/api/time-spent", JSON.stringify({ seconds: activeSeconds }));
+        // as JSON: a bare string beacon is text/plain, which the API rejected (422)
+        navigator.sendBeacon("/api/time-spent", new Blob(
+          [JSON.stringify({ seconds: activeSeconds, day: localDay() })], { type: "application/json" }));
       }
     });
   }

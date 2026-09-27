@@ -103,7 +103,9 @@ def test_board_page_personalised_and_not_cached(client, new_student):
     r = client.get("/papers/igcse")
     assert r.headers["cache-control"] == "private, no-store"
     html = r.text
-    assert html.index("Your subjects") < html.index("All IGCSE subjects")
+    # enrolled subjects come first in the board's band, flagged "Enrolled"
+    assert html.index('data-q="physics physics 0625') < html.index('data-q="mathematics mathematics 0580')
+    assert "pk-flag-on" in html
     assert 'data-enrol="0580"' in html and 'data-enrol="0625"' not in html
 
 

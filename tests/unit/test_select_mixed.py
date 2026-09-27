@@ -60,3 +60,15 @@ def test_quotas_invariants(sizes, total):
 
 def test_empty_pool():
     assert select_mixed([], 10) == [] and interleave({}) == []
+
+
+def test_order_recent_first_newest_paper_then_question_number():
+    from selection import order_recent_first
+    rows = [
+        {"id": 1, "year": 2019, "session": "s", "paper": 2, "variant": "1", "number": 3},
+        {"id": 2, "year": 2025, "session": "m", "paper": 2, "variant": "2", "number": 7},
+        {"id": 3, "year": 2025, "session": "w", "paper": 2, "variant": "1", "number": 9},
+        {"id": 4, "year": 2025, "session": "w", "paper": 2, "variant": "1", "number": 2},
+        {"id": 5, "year": 2022, "session": "s", "paper": 1, "variant": "3", "number": 1},
+    ]
+    assert [q["id"] for q in order_recent_first(rows)] == [4, 3, 2, 5, 1]

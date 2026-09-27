@@ -10,10 +10,10 @@ def test_enrol_build_and_view(student, shots):
 
     # Locked subject -> enrol free -> builder appears
     page.goto("/papers/igcse")
-    card = page.locator(".cat-subj", has_text="Physics")
+    card = page.locator(".pk-tile", has_text="Physics")
     card.get_by_role("button", name="Enrol free").click()
     page.wait_for_load_state()
-    expect(page.locator(".cat-subj.is-enrolled", has_text="Physics")).to_be_visible()
+    expect(page.locator(".pk-tile.is-mine", has_text="Physics")).to_be_visible()
 
     page.goto("/papers/igcse/physics-0625?pick=Motion")
     expect(page.locator(".bld-slot").first).to_contain_text("Motion")

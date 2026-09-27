@@ -125,3 +125,20 @@ def select_mixed(pool: list[dict], max_questions: int, seed: int | None = None) 
     for rows in picked.values():
         rng.shuffle(rows)
     return shake(interleave(picked), rng)
+
+
+# Within a year, the later sitting first: Oct/Nov, then May/June, then Feb/March.
+_SESSION_RANK = {"w": 0, "s": 1, "m": 2}
+
+
+def order_recent_first(rows: list[dict]) -> list[dict]:
+    """The booklet's reading order: newest paper first (2025, 2024, ...), and
+    within one sitting the questions in paper order (tutor, 2026-09-27 -
+    replaces the shuffled order). Rows without paper details keep their place
+    after the dated ones."""
+    def key(q):
+        return (-(q.get("year") or 0), _SESSION_RANK.get(q.get("session") or "", 9),
+                q.get("paper") or 0, str(q.get("variant") or ""), q.get("number") or 0,
+                str(q.get("sub_part") or ""))
+    return sorted(rows, key=key)
+

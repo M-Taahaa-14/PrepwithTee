@@ -39,8 +39,8 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260928a"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260928b"    # the site-wide styles.css pin
+CSS_V = "20260929c"       # bump with catalog.css / catalog.js (immutable caching)
+STYLES_V = "20260929e"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
@@ -279,14 +279,18 @@ def _student_state(user: dict | None) -> dict:
     """Boards + enrolled syllabuses for the signed-in user (empty when anonymous)."""
     if not user:
         return {"user": None, "boards": [], "primary": None, "enrolled": set()}
-    try:
-        boards, primary = _udb.get_boards(user["id"])
-    except Exception:
-        boards, primary = [], None
-    try:
-        enrolled = set(_udb.get_enrollments(user["id"]))
-    except Exception:
-        enrolled = set()
+    def safe(fn, default):
+        def run():
+            try:
+                return fn(user["id"])
+            except Exception:
+                return default
+        return run
+    # Two REST round-trips to Supabase: run them side by side.
+    got = _udb.gather(boards=safe(_udb.get_boards, ([], None)),
+                      enrolled=safe(_udb.get_enrollments, []))
+    boards, primary = got["boards"]
+    enrolled = set(got["enrolled"])
     if not boards and enrolled:
         # Not saved yet: infer from what they study so the page is still right.
         inferred = sorted({board_of(c) for c in enrolled if board_of(c)})
@@ -299,10 +303,15 @@ def _student_state(user: dict | None) -> dict:
 
 @router.get("/api/boards")
 def api_boards():
+    import ui
     return {"boards": [
         {"slug": BOARD_SLUGS[b], "name": b, "short": BOARD_SHORT[BOARD_SLUGS[b]],
-         "subjects": [{"code": c, "name": n, "slug": SUBJECTS[c]["slug"],
-                       "url": subject_url(c)} for c, n in subs]}
+         "subjects": [{"code": c, "name": n, "plain": SUBJECTS[c]["plain"], "slug": SUBJECTS[c]["slug"],
+                       "tone": SUBJECTS[c]["tone"], "url": subject_url(c),
+                       # every section page of the subject (profile subject cards)
+                       "links": [{"key": k, "label": label, "url": url}
+                                 for k, label, url, _ic in ui.subject_links(c)]}
+                      for c, n in subs]}
         for b, subs in BOARDS]}
 
 
@@ -415,7 +424,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 <script src="/main.js?v=20260928a"></script>
 <script src="/tools-core.js?v=20260927j"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260927k"></script>
+<script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>
@@ -431,54 +440,6 @@ def _respond(html: str, signed_in: bool) -> HTMLResponse:
 def _years(stats: dict) -> str:
     y0, y1 = stats.get("year_min"), stats.get("year_max")
     return f"{y0}–{y1}" if y0 and y1 else ""
-
-
-def _subject_card(code: str, state: dict, test: bool = False) -> str:
-    s = SUBJECTS[code]
-    st = subject_stats(code)
-    enrolled = code in state["enrolled"]
-    url = subject_url(code) + ("?mode=test#builder" if test else "")
-    meta = f'{st["chapters"]} chapters · {st["questions"]:,} questions'
-    yrs = _years(st)
-    locked = bool(state["user"]) and not enrolled
-    if enrolled and test:
-        actions = f'<a class="cat-btn" href="{url}">Build a mock test</a>'
-        badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
-    elif enrolled:
-        actions = (f'<a class="cat-btn" href="{url}">Topical</a>'
-                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">By year</a>'
-                   + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ</a>'
-                      if st["has_mcq"] else ""))
-        badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
-    elif locked:
-        actions = (f'<button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">'
-                   f'Enrol free</button><a class="cat-btn cat-btn-ghost" href="{url}">Preview</a>')
-        badge = '<span class="cat-badge" aria-label="Not enrolled">🔒</span>'
-    else:
-        actions = (f'<a class="cat-btn" href="{url}">{"Mock tests" if test else "Chapters"}</a>'
-                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">By year</a>')
-        badge = ""
-    return f"""
-    <article class="cat-subj cat-tone-{s['tone']}{' is-enrolled' if enrolled else ' is-locked' if locked else ''}">
-      <div class="cat-subj-top"><span class="cat-code">{code}</span>{badge}</div>
-      <h3><a href="{url}">{_e(s['plain'])}</a></h3>
-      <p class="cat-subj-meta">{meta}{f' · {yrs}' if yrs else ''}</p>
-      <div class="cat-subj-actions">{actions}</div>
-    </article>"""
-
-
-def _board_tabs(active: str, state: dict, q: str = "") -> str:
-    mine = state["boards"] or []
-    order = mine + [b for b in BOARD_SHORT if b not in mine] if state["user"] else list(BOARD_SHORT)
-    tabs = []
-    for b in order:
-        cls = "cat-tab" + (" is-active" if b == active else "") + (" is-mine" if b in mine else "")
-        current = ' aria-current="page"' if b == active else ""
-        tabs.append(f'<a class="{cls}" href="/papers/{b}{q}"{current}>{BOARD_SHORT[b]}</a>')
-    if state["user"]:
-        tabs.append('<button class="cat-tab cat-tab-add" type="button" data-open-boards>'
-                    'Edit my boards</button>')
-    return f'<nav class="cat-tabs" aria-label="Boards">{"".join(tabs)}</nav>'
 
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
@@ -502,24 +463,43 @@ def _subjects_of(board: str) -> list[str]:
     return [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
 
 
-def _grouped_cards(state: dict, test: bool = False) -> str:
-    """Every board's subject cards, the student's boards (and subjects) first."""
-    out = []
-    for b in _board_order(state):
-        codes = sorted(_subjects_of(b), key=lambda c: c not in state["enrolled"])
-        out.append(f'<section class="ui-board" id="{b}"><h2 class="cat-group">'
-                   f'<a href="/papers/{b}">{BOARD_SHORT[b]}</a><span>{len(codes)}</span></h2>'
-                   f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in codes)}</div></section>')
-    return "".join(out)
+def topical_tile(code: str, state: dict, test: bool = False) -> str:
+    import ui
+    st = subject_stats(code)
+    url = subject_url(code) + ("?mode=test#builder" if test else "")
+    enrolled = code in state["enrolled"]
+    locked = bool(state["user"]) and not enrolled
+    if enrolled:
+        flag = "on"
+        actions = [("Mock test" if test else "Topical booklet", url, "primary"),
+                   ("By year", _yearly_url(code), "ghost")]
+    elif locked:
+        flag = "lock"
+        actions = [("Enrol free", None, "gold", f'data-enrol="{code}"'), ("Preview", url, "ghost")]
+    else:
+        flag = ""
+        actions = [("Mock tests" if test else "See chapters", url, "primary"),
+                   ("By year", _yearly_url(code), "ghost")]
+    import notes as _notes
+    more = ([("MCQ", _mcq_url(code))] if st["has_mcq"] else []) + [("Notes", _notes.notes_url(code))]
+    if test:
+        more.insert(0, ("Topical", subject_url(code)))
+    return ui.tile(code=code, url=url, flag=flag, actions=actions, more=more,
+                   stats=[(str(st["chapters"]), "chapters"), (f'{st["questions"]:,}', "questions")],
+                   years=_years(st))
 
 
-def _board_jump(state: dict) -> str:
-    return ('<nav class="cat-tabs" aria-label="Jump to a board">'
-            + "".join(f'<a class="cat-tab{" is-mine" if b in (state["boards"] or []) else ""}" href="#{b}">'
-                      f'{BOARD_SHORT[b]}</a>' for b in _board_order(state))
-            + ('<button class="cat-tab cat-tab-add" type="button" data-open-boards>Edit my boards</button>'
-               if state["user"] else "")
-            + "</nav>")
+def _topical_picker(state: dict, test: bool = False, board: str | None = None) -> str:
+    """The shared picker (ui.picker) for topical / mock tests."""
+    import ui
+    boards = [board] if board else ui.board_order(state)
+
+    def sub(b, n):
+        mine = sum(1 for c in _subjects_of(b) if c in state["enrolled"])
+        return f"{n} subjects" + (f" · you study {mine}" if mine else "")
+    return ui.picker({b: [topical_tile(c, state, test) for c in ui.codes_for(b, state)] for b in boards},
+                     state=state, subtitle=sub,
+                     board_links=("/papers/{board}" if board else None), active=board or "")
 
 
 def _recent_booklets(state: dict, n: int = 3) -> list[dict]:
@@ -542,14 +522,29 @@ def _continue_block(state: dict) -> str:
             'You have not enrolled in a subject yet. Enrolling is free - open any subject below and '
             'press <b>Enrol free</b> to unlock its topical papers, mock tests, MCQ practice and progress '
             'tracking.', tone="blue", icon_name="user")
+    # the student's boards first (their order), then any other board they study on
+    order = ui.board_order(state)
+    mine.sort(key=lambda c: order.index(SUBJECTS[c]["board_slug"]))
     rows = []
     for c in mine:
         s = SUBJECTS[c]
-        links = "".join(f'<a href="{_e(url)}">{ui.icon(ic)}{_e(label)}</a>'
-                        for _k, label, url, ic in ui.subject_links(c))
-        rows.append(f'<article class="ui-mine cat-tone-{s["tone"]}"><header><span class="cat-code">{c}</span>'
+        links = "".join(f'<a class="sec-{k}" href="{_e(url)}">{ui.icon(ic)}{_e(label)}</a>'
+                        for k, label, url, ic in ui.subject_links(c))
+        rows.append(f'<article class="ui-mine cat-tone-{s["tone"]}" data-board="{s["board_slug"]}">'
+                    f'<header><span class="cat-code">{c}</span>'
                     f'<b>{_e(s["plain"])}</b><small>{BOARD_SHORT[s["board_slug"]]}</small></header>'
                     f'<nav>{links}</nav></article>')
+    # Board filter first (tutor, 2026-09-28): only when they study on 2+ boards.
+    boards = [b for b in order if any(SUBJECTS[c]["board_slug"] == b for c in mine)]
+    filt = ""
+    if len(boards) > 1:
+        filt = ('<nav class="pk-tabs ui-bf" data-bf aria-label="Filter your subjects by board">'
+                '<button class="pk-tab is-on" type="button" data-bf-board="" aria-pressed="true">All boards '
+                f'<b>{len(mine)}</b></button>'
+                + "".join(f'<button class="pk-tab pk-b-{b}" type="button" data-bf-board="{b}" aria-pressed="false">'
+                          f'<i></i>{BOARD_SHORT[b]} <b>{sum(1 for c in mine if SUBJECTS[c]["board_slug"] == b)}</b></button>'
+                          for b in boards)
+                + "</nav>")
     recent = _recent_booklets(state)
     rec = ""
     if recent:
@@ -558,7 +553,7 @@ def _continue_block(state: dict) -> str:
             f'<span>{_e(b["title"] or "Topical paper")}</span></a></li>' for b in recent)
         rec = (f'<div class="ui-recent"><h3>Papers you built recently</h3><ul>{items}</ul>'
                f'<a class="ui-more" href="/my-papers">All my papers {ui.icon("arrow")}</a></div>')
-    return (f'<section class="ui-continue"><h2 class="ui-h2">Your subjects</h2>'
+    return (f'<section class="ui-continue"><h2 class="ui-h2">Your subjects</h2>{filt}'
             f'<div class="ui-continue-grid"><div class="ui-mine-list">{"".join(rows)}</div>{rec}</div></section>')
 
 
@@ -623,13 +618,15 @@ def _which_block() -> str:
 
 
 def _board_cards() -> str:
+    import ui
     cards = []
     for board, subs in BOARDS:
         b = BOARD_SLUGS[board]
         names = ", ".join(_plain(n) for _c, n in subs)
         total = sum(subject_stats(c)["questions"] for c, _n in subs)
         cards.append(f"""
-        <article class="cat-board">
+        <article class="cat-board pk-b-{b}">
+          <span class="pk-bmark" aria-hidden="true">{ui.BOARD_THEME[b][0]}</span>
           <span class="cat-board-eyebrow">Cambridge</span>
           <h3><a href="/papers/{b}">{BOARD_SHORT[b]}</a></h3>
           <p>{_e(names)}</p>
@@ -710,18 +707,17 @@ def page_topical(user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-eyebrow">Topical past papers</p>
       <h1>Past-paper questions, sorted by chapter</h1>
       <p class="cat-lede">Every question from every paper we hold is tagged to its syllabus chapter and
-        subtopic. Choose up to four chapters, narrow the years or papers if you like, and get one mixed
-        booklet - original questions, official mark scheme after each.</p>
+        subtopic. Choose up to four chapters, narrow the years or papers if you like, and get one
+        booklet - newest papers first, original questions, official mark scheme after each.</p>
     </header>
+    {_topical_picker(state)}
     {ui.steps([
-        ("Open your subject", "Pick a subject below. Enrolling is free and unlocks the builder."),
+        ("Open your subject", "Pick a subject above. Enrolling is free and unlocks the builder."),
         ("Choose chapters", "Tick up to four chapters, or tap subtopic chips to take just part of one."),
         ("Filter (optional)", "Limit the years, the paper (e.g. Paper 2 only) and the number of questions."),
         ("Open and practise", "Your booklet opens in the viewer in a few seconds: write on it, check the mark "
                               "scheme, ask for an explanation, or download the PDF."),
     ], "How it works", "ui-steps-row")}
-    {_board_jump(state)}
-    {_grouped_cards(state)}
     {ui.callout('Built papers are listed on <a href="/my-papers">My papers</a> and stay ready to open for 30 '
                 'days after you last opened them.', tone="blue", icon_name="history") if state["user"] else ''}"""
     return _respond(_shell(
@@ -744,14 +740,14 @@ def page_mock_tests(user: dict | None = Depends(_auth.maybe_user)):
         thing: an exam cover, a countdown at about a minute per mark, and a mark scheme that stays locked
         until you press <b>Finish test</b>.</p>
     </header>
+    {_topical_picker(state, test=True)}
     {ui.steps([
-        ("Pick a subject", "Open a subject below and switch the builder to <b>Mock test</b>."),
+        ("Pick a subject", "Open a subject above and switch the builder to <b>Mock test</b>."),
         ("Choose what it covers", "Up to four chapters, any subtopics, the years and papers to draw from."),
         ("Sit it timed", "Start the timer, write your answers on the paper or on your own sheet."),
         ("Finish and mark", "Press Finish to unlock the mark scheme, mark honestly, and note the topics to redo."),
     ], "How a mock test works", "ui-steps-row")}
-    {_board_jump(state)}
-    {_grouped_cards(state, test=True)}"""
+"""
     return _respond(_shell(
         title="Cambridge Mock Tests from Past Papers | O Level, IGCSE & A Level - PrepWithTee",
         desc="Timed, exam-style Cambridge mock tests built from real past-paper questions on the chapters you "
@@ -768,15 +764,6 @@ def page_board(board: str, mode: str = "", user: dict | None = Depends(_auth.may
         return RedirectResponse(f"/papers/mock-tests#{board}", 301)
     state = _student_state(user)
     codes = _subjects_of(board)
-    mine = [c for c in codes if c in state["enrolled"]]
-    rest = [c for c in codes if c not in state["enrolled"]]
-    sections = []
-    if mine:
-        sections.append(f'<h2 class="cat-group">Your subjects <span>{len(mine)}</span></h2>'
-                        f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in mine)}</div>')
-    label = f"All {BOARD_SHORT[board]} subjects" if mine or not state["user"] else "Choose your subjects"
-    sections.append(f'<h2 class="cat-group">{label}</h2>'
-                    f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in rest)}</div>')
     note = ("" if state["user"] else
             '<p class="cat-note">Enrolling is free. <a href="/login.html?signup=1&amp;next=/papers/'
             f'{board}">Create an account</a> to unlock topical papers, mock tests, MCQ practice '
@@ -792,8 +779,7 @@ def page_board(board: str, mode: str = "", user: dict | None = Depends(_auth.may
       <div class="cat-actions"><a class="cat-btn cat-btn-ghost" href="/yearly/{board}">{BOARD_SHORT[board]} papers by year</a>
         <a class="cat-btn cat-btn-ghost" href="/notes/{board}">{BOARD_SHORT[board]} notes</a></div>
     </header>
-    {_board_tabs(board, state)}
-    {''.join(sections)}
+    {_topical_picker(state, board=board)}
     {note}"""
     ld = [{"@context": "https://schema.org", "@type": "ItemList",
            "itemListElement": [{"@type": "ListItem", "position": i + 1,
@@ -829,7 +815,7 @@ def _subject_actions(s: dict, state: dict, chapter: str | None = None, test: boo
                 f'Practise this chapter</a>'
                 f'<a class="cat-btn cat-btn-ghost" href="{subject_url(code)}?mode=test&amp;pick={_e(quote(chapter))}#builder">'
                 f'Mock test on it</a>')
-    return (f'<a class="cat-btn" href="#builder">{"Build a mock test" if test else "Build a topical paper"}</a>'
+    return (f'<a class="cat-btn" href="#builder">{"Build a mock test" if test else "Build a topical booklet"}</a>'
             f'<a class="cat-btn cat-btn-ghost" href="/topical-progress.html?syllabus={code}">My progress</a>'
             f'<a class="cat-btn cat-btn-ghost" href="/my-papers?syllabus={code}">Papers I built</a>')
 

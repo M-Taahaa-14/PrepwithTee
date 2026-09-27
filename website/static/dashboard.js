@@ -20,14 +20,15 @@ const BOARD_OF_GRADE = {
 
 let meta = null;
 let dash = null;
-let board = null;          // the student's board, or null if we can't map it
+let board = null;          // the student's MAIN board, or null if we can't map it
+let boards = [];           // every board they study (student_boards), main first
 
 /* Kick the data fetches off immediately, in parallel with the auth check.
    Both endpoints require the session cookie and 401 on their own, so there is
    nothing to gain by waiting for /auth/me first — and waiting cost a full
    round-trip (~0.6 s to Supabase's region) before the page even started
    loading. The rejection is swallowed here and re-read inside init(). */
-const dataPromise = Promise.all([api("/api/dashboard"), api("/api/meta")]);
+const dataPromise = Promise.all([api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || "")), api("/api/meta")]);
 dataPromise.catch(() => {});
 
 const user = await requireProfile();
@@ -35,6 +36,13 @@ if (user) init();
 
 async function init() {
   board = BOARD_OF_GRADE[user.grade] || null;
+  boards = board ? [board] : [];
+  try {                     // students may study on several boards (profile / papers pages)
+    const mine = await api("/api/me/boards");
+    const SLUG = { "o-level": "Cambridge O Level", "igcse": "Cambridge IGCSE", "a-level": "Cambridge A Level" };
+    const got = (mine.boards || []).map(b => SLUG[b]).filter(Boolean);
+    if (got.length) { boards = got; board = SLUG[mine.primary] || got[0]; }
+  } catch { /* single-board fallback */ }
   // Set active plan + role so modal knows current tier (teachers/admins skip all walls)
   setRole(user.role);
   const isPrivileged = user.role === "teacher" || user.role === "admin";
@@ -314,9 +322,13 @@ function renderHomework() {
  *  already enrolled in — otherwise a subject kept from a previous board
  *  would be impossible to un-enrol from. */
 function visibleSubjects(enrolled) {
-  if (!board) return meta.subjects;
-  return meta.subjects.filter(s => s.board === board || enrolled.has(s.syllabus));
+  if (!boards.length) return meta.subjects;
+  // the student's boards (main board first), then anything enrolled elsewhere
+  const rank = s => boards.includes(s.board) ? boards.indexOf(s.board) : boards.length;
+  return meta.subjects.filter(s => boards.includes(s.board) || enrolled.has(s.syllabus))
+    .sort((a, b) => rank(a) - rank(b));
 }
+const shortBoard = b => String(b || "").replace("Cambridge ", "");
 
 function greet(u) {
   const hour = new Date().getHours();
@@ -468,15 +480,15 @@ function renderEnrol() {
 
   const note = document.getElementById("enrol-note");
   if (note) {
-    note.textContent = board
-      ? `${board} · ${subjects.filter(s => s.board === board).length} subjects live`
+    note.textContent = boards.length
+      ? `${boards.map(shortBoard).join(" + ")} · ${subjects.filter(s => boards.includes(s.board)).length} subjects live`
       : "Free — unlocks papers, revision and tests";
   }
 
   if (!subjects.length) {
     box.innerHTML = `
       <div class="dash-empty">
-        <p><strong>Nothing live for ${esc(board || "your board")} yet.</strong>
+        <p><strong>Nothing live for ${esc(boards.map(shortBoard).join(" + ") || "your board")} yet.</strong>
         More syllabuses are being added — or switch board below if that's not
         the qualification you're sitting.</p>
       </div>`;
@@ -485,7 +497,7 @@ function renderEnrol() {
 
   box.innerHTML = subjects.map(s => {
     const on = enrolled.has(s.syllabus);
-    const offBoard = board && s.board !== board;
+    const offBoard = boards.length && !boards.includes(s.board);
     const questions = s.topics.reduce((n, t) => n + t.count, 0);
     return `
       <div class="enrol-card${on ? " on" : ""}${offBoard ? " off-board" : ""}">
@@ -494,12 +506,12 @@ function renderEnrol() {
           <p class="enrol-board">${esc(s.board)} · ${esc(s.syllabus)}</p>
           <p class="enrol-count">${questions.toLocaleString()} questions ·
              ${s.topics.length} chapters</p>
-          ${offBoard ? `<p class="enrol-flag">Not part of your ${esc(user.grade)}
+          ${offBoard ? `<p class="enrol-flag">Not on your boards
              — kept because you're enrolled.</p>` : ""}
         </div>
         <button type="button" class="btn ${on ? "btn-outline" : "btn-gold"} enrol-btn"
                 data-syllabus="${esc(s.syllabus)}" data-on="${on}" data-subject-name="${esc(s.short)}">
-          ${on ? "Enrolled" : "Add subject"}
+          ${on ? "Remove subject" : "+ Add subject"}
         </button>
       </div>`;
   }).join("");
@@ -515,7 +527,7 @@ function renderBoardSwitch() {
   if (!box) return;
   box.hidden = false;
   box.querySelector(".board-switch-current").textContent =
-    board || user.grade || "not set";
+    boards.length ? boards.map(shortBoard).join(" + ") : (user.grade || "not set");
 }
 
 async function toggleEnrol(btn) {
@@ -538,7 +550,7 @@ async function toggleEnrol(btn) {
       await api("/api/enrollments", { method: "POST", body: { syllabus } });
     }
     // Refetch rather than patch — the rings depend on the same data.
-    dash = await api("/api/dashboard");
+    dash = await api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || ""));
     renderRings();
     renderEnrol();
     renderArchived();
@@ -637,7 +649,7 @@ function renderArchived() {
       try {
         await api("/api/enrollments", { method: "POST", body: { syllabus } });
         // Refetch and re-render
-        dash = await api("/api/dashboard");
+        dash = await api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || ""));
         renderRings();
         renderEnrol();
         renderArchived();
