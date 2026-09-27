@@ -547,6 +547,20 @@ linked), not agreement with any external file.
     after UI changes**: `.venv\Scripts\python scripts\capture_demo_shots.py` against the
     local server (demo student "Ayesha Khan", paper 37 for stored explanations); it
     asserts every cursor target is on screen. Viewer stages scroll, not the window.
+    **Pre-2017 mark schemes (2026-09-27)**: the linker only read table-style schemes, so
+    ~470 old structured schemes (9709, 9702, 5054, 5070, 0620, 2210/0478 2015-16, parts of
+    0580...) had NO ms_entries anywhere - booklets said "Mark scheme: not available".
+    `link_ms.legacy_boundaries()` now reads the margin layout: question number alone at the
+    left margin (x ~ 50, +16 tolerance), optional Section prefix `A1`/`B7` (5070), pages
+    count once they carry mark codes or Question/Answer headings; cuts on the ruled line
+    above a question when there is one (tall maths rises above its number); continuation
+    pages start below any repeated table header. Used when the table parser finds fewer
+    questions than the QP; capped at the QP's last number; 9702 P5's numbered marking
+    points are ignored in favour of the largest "(N marks)" headers. +4,103 entries
+    (37,082 -> 40,985 of 42,154 questions have a scheme). Still unlinked: 0478_m20_ms_12,
+    0580_m16_ms_22, 9709_s17_41/s19_41/w19_42 (+ 0580_s17_21 Q15, broken text layer).
+    Tests: tests/unit/test_legacy_ms.py. Production needs sync_ms_to_supabase --apply +
+    the crop bundle + deleting built booklet PDFs (they rebuild on open).
 
 ## Ground rules for future sessions
 

@@ -235,6 +235,153 @@ def build_ms_regions(doc, boundaries, pages) -> list[list[dict]]:
     return regions
 
 
+# ── Pre-2017 "margin" mark schemes ────────────────────────────────────────────
+# No Question/Answer/Marks table: portrait pages, a two-line running header
+# ('Page 4 | Mark Scheme | Syllabus | Paper' / 'GCE AS/A LEVEL - Oct/Nov 2012 |
+# 9709 | 11'), then each question starts with its number alone in the left
+# margin (x ~ 50) and parts (a)/(i) are indented further in. The first pages
+# are marking notes / abbreviations - they carry no mark codes, so a page only
+# counts once it has one.
+# optional Section A/B prefix: O Level Chemistry numbers them A1..A6, B7..B10
+MARGIN_REF_RE = re.compile(r"^[AB]?(\d{1,2})(?=$|\s|\()")
+MARK_CODE_RE = re.compile(r"\[\s*\d{1,2}\s*\]|\b(?:[BMACD]\d|DM\d|M1A1)\b|;")
+LEGACY_SIDE = 40.0         # the margin numbers sit at x ~ 50, so crop wider than SIDE_MARGIN
+LEGACY_HEADER_Y = 70.0     # everything above is the running header
+
+
+def _legacy_header_bottom(page) -> float:
+    ys = [w[3] for w in _words(page) if w[1] < LEGACY_HEADER_Y]
+    return (max(ys) + 4.0) if ys else LEGACY_HEADER_Y
+
+
+def _words(page):
+    try:
+        return page.get_text("words")
+    except RuntimeError:           # a few old PDFs overflow MuPDF's parser on one page
+        return []
+
+
+def legacy_boundaries(doc, qp_max: int | None = None) -> tuple[list[dict], list[int]]:
+    """Question starts [{'page','y','n'}] and the content pages of a margin MS."""
+    rows, pages = [], []
+    for pno in range(doc.page_count):
+        words = _words(doc[pno])
+        body = [w for w in words if w[1] >= LEGACY_HEADER_Y]
+        text = " ".join(w[4] for w in body)
+        headed = "Question" in text and "Answer" in text     # plain-number Mark column
+        if not body or not (headed or MARK_CODE_RE.search(text)):
+            continue
+        pages.append(pno)
+        lines: dict[tuple, list] = {}
+        for w in body:
+            lines.setdefault((w[5], w[6]), []).append(w)       # (block, line)
+        for ws in lines.values():
+            first = min(ws, key=lambda w: w[0])
+            m = MARGIN_REF_RE.match(first[4])
+            if m:
+                line = " ".join(w[4] for w in sorted(ws, key=lambda w: w[0]))
+                rows.append((pno, first[1], int(m.group(1)), first[0], line))
+    if not rows:
+        return [], pages
+    # the margin column = the leftmost x any number starts at; fractions and
+    # working inside the answer column sit well to the right of it
+    margin = min(r[3] for r in rows)
+    rows = sorted((p, y, n, line) for p, y, n, x, line in rows if x <= margin + 16)
+    boundaries = _ascending(rows)
+    if qp_max and len(boundaries) > qp_max:
+        # numbered marking points (9702 P5: '1 ... 7' inside Question 1) look
+        # like question numbers; the real starts are headed '2 Analysis ... (15 marks)'
+        headed = _marks_headers(doc, pages)
+        if len(headed) == qp_max:
+            boundaries = [{**b, "n": i + 1} for i, b in enumerate(headed)]
+    return boundaries, pages
+
+
+HEADED_Q_RE = re.compile(r"\(\s*(\d+)\s*marks\s*\)", re.I)
+
+
+def _marks_headers(doc, pages) -> list[dict]:
+    """Lines carrying the paper's largest '(N marks)' total, in reading order:
+    the question headers of a scheme whose sub-headings carry smaller totals
+    (9702 P5: 'Planning (15 marks)' > 'Defining the problem (3 marks)')."""
+    found = []
+    for pno in pages:
+        try:
+            blocks = doc[pno].get_text("dict")["blocks"]
+        except RuntimeError:
+            continue
+        for b in blocks:
+            for l in b.get("lines", []):
+                m = HEADED_Q_RE.search("".join(s["text"] for s in l["spans"]))
+                if m and l["bbox"][1] >= LEGACY_HEADER_Y:
+                    found.append((pno, l["bbox"][1], int(m.group(1))))
+    if not found:
+        return []
+    top = max(n for *_, n in found)
+    return [{"page": p, "y": y, "n": 0} for p, y, n in sorted(found) if n == top]
+
+
+def _ascending(rows) -> list[dict]:
+    boundaries, current = [], 0
+    for pno, y, n, _line in rows:
+        if n == current + 1 or (current and current < n <= current + 3):
+            if n > current + 1:
+                log.warning("margin refs jump from %d to %d on page %d", current, n, pno + 1)
+            boundaries.append({"page": pno, "y": y, "n": n})
+            current = n
+    return boundaries
+
+
+def _rule_above(page, y: float, reach: float = 45.0) -> float | None:
+    """y of the nearest ruled table line above y (older schemes often draw
+    one between questions) - tall maths can rise above the question number."""
+    best = None
+    try:
+        drawings = page.get_drawings()
+    except RuntimeError:
+        return None
+    for d in drawings:
+        r = d["rect"]
+        if r.height < 2 and r.width > page.rect.width * 0.4 and y - reach <= r.y0 <= y:
+            best = r.y0 if best is None else max(best, r.y0)
+    return best
+
+
+def _cut_above(page, y: float) -> float:
+    rule = _rule_above(page, y)
+    return rule if rule is not None else y - 6.0
+
+
+def legacy_regions(doc, boundaries, pages) -> list[list[dict]]:
+    regions = []
+    for i, b in enumerate(boundaries):
+        nxt = boundaries[i + 1] if i + 1 < len(boundaries) else None
+        end_page = nxt["page"] if nxt else pages[-1]
+        rects = []
+        for pno in [p for p in pages if b["page"] <= p <= end_page]:
+            page = doc[pno]
+            # continuation pages: below the running header AND any repeated
+            # 'Question | Answer | Mark' table header row
+            top = (_cut_above(page, b["y"]) if pno == b["page"]
+                   else max(_legacy_header_bottom(page), header_bottom(page)))
+            bottom = page.rect.height - CONTENT_BOTTOM_MARGIN
+            clipped = nxt and pno == nxt["page"]
+            if clipped:
+                bottom = _cut_above(page, nxt["y"])
+            if bottom - top < MIN_RECT_HEIGHT:
+                continue
+            rect = {"page": pno, "x0": LEGACY_SIDE, "y0": round(top, 2),
+                    "x1": round(page.rect.width - LEGACY_SIDE, 2), "y1": round(bottom, 2)}
+            try:
+                trim_rect_bottom(page, rect)
+            except RuntimeError:
+                pass
+            if rect["y1"] - rect["y0"] >= MIN_RECT_HEIGHT:
+                rects.append(rect)
+        regions.append(rects)
+    return regions
+
+
 def extract_mcq_answers(doc) -> dict[int, str]:
     """Parse 'Question Answer Marks' table; return {q_number: letter}."""
     answers: dict[int, str] = {}
@@ -247,6 +394,17 @@ def extract_mcq_answers(doc) -> dict[int, str]:
             if q_num not in answers:
                 answers[q_num] = m.group(2).upper()
     return answers
+
+
+def _qp_max_number(con, ms_row) -> int | None:
+    """Highest question number in the matching (segmented) question paper."""
+    row = con.execute(
+        """SELECT MAX(q.number) FROM questions q JOIN papers p ON p.id = q.paper_id
+           WHERE p.kind = 'qp' AND p.syllabus = ? AND p.year = ? AND p.session = ?
+             AND p.paper = ? AND p.variant = ?""",
+        (ms_row["syllabus"], ms_row["year"], ms_row["session"],
+         ms_row["paper"], ms_row["variant"])).fetchone()
+    return row[0] if row and row[0] else None
 
 
 def segment_ms(con, paper_row) -> list[int]:
@@ -287,29 +445,31 @@ def segment_ms(con, paper_row) -> list[int]:
         return sorted(answers.keys())
 
     pages = table_pages(doc)
-    if not pages:
-        db.add_review(con, f"{paper_row['filename']}: no MS table found "
-                           "(older prose-style mark scheme?)",
-                      paper_id=paper_row["id"])
-        log.error("%s: no MS table found - skipped", paper_row["filename"])
-        doc.close()
-        return []
-    boundaries = find_boundaries(doc, pages)
+    boundaries = find_boundaries(doc, pages) if pages else []
+    # pre-2017: no table, question numbers in the left margin. Also tried when
+    # the table parser only finds part of the paper; whichever finds more wins.
+    qp_max = _qp_max_number(con, paper_row)
+    legacy = False
+    if qp_max is None or len(boundaries) < qp_max:
+        lb, lpages = legacy_boundaries(doc, qp_max)
+        if qp_max:          # numbered marking points (e.g. 9702 P5) are not questions
+            lb = [b for b in lb if b["n"] <= qp_max]
+        if len(lb) > len(boundaries):
+            boundaries, pages, legacy = lb, lpages, True
     if not boundaries:
-        db.add_review(con, f"{paper_row['filename']}: table found but no "
-                           "question refs recognised", paper_id=paper_row["id"])
-        log.error("%s: no question refs recognised - skipped",
-                  paper_row["filename"])
+        db.add_review(con, f"{paper_row['filename']}: no question refs recognised "
+                           "(neither a table nor margin numbers)", paper_id=paper_row["id"])
+        log.error("%s: no question refs recognised - skipped", paper_row["filename"])
         doc.close()
         return []
 
-    regions = build_ms_regions(doc, boundaries, pages)
+    regions = (legacy_regions if legacy else build_ms_regions)(doc, boundaries, pages)
     con.execute("DELETE FROM ms_entries WHERE paper_id = ?", (paper_row["id"],))
     # stale complaints from previous runs of this stage no longer apply
     con.execute("DELETE FROM review_queue WHERE paper_id = ? AND resolved = 0",
                 (paper_row["id"],))
 
-    use_sub_parts = paper_row["syllabus"] in SUB_PART_MS_SYLLABUSES
+    use_sub_parts = paper_row["syllabus"] in SUB_PART_MS_SYLLABUSES and not legacy
     total_entries = 0
 
     for i, (bnd, rects) in enumerate(zip(boundaries, regions)):
