@@ -561,6 +561,18 @@ linked), not agreement with any external file.
     0580_m16_ms_22, 9709_s17_41/s19_41/w19_42 (+ 0580_s17_21 Q15, broken text layer).
     Tests: tests/unit/test_legacy_ms.py. Production needs sync_ms_to_supabase --apply +
     the crop bundle + deleting built booklet PDFs (they rebuild on open).
+    **Paper eras (2026-09-27)**: component numbers meant different things before the
+    syllabus changes. `config.is_mcq(syl, paper, year)` - 0620/0625 P2 is MCQ only from
+    2016 (`MCQ_FROM_YEAR`; earlier P2 is Core theory); MCQ pickers use
+    `not_old_theory_sql()`. `config.PAPER_YEARS` + `paper_in_scope()` limit components
+    to their era (0625 P3 = old Extended theory 2010-15; 9709 P6 = old Statistics
+    2010-19); `catalog.OLD_COMPONENTS` / `component(code, paper, year)` label them
+    per year. Segment + link_ms accept `A1`/`B7` numbering (5070 P2). **Every question is
+    now classified** (all 10+ syllabi, 2010-2025) except 9702 P5 (practical planning,
+    tutor: leave out of topicals). Deliberate `status='excluded'`: 0580/4024 matrices +
+    genuine loci; old 9709 P5 = Mechanics 2 (not in the current syllabus, 442 q); old
+    9702 P4 op-amp/sensor/communication questions (removed from 9702 in 2022, ~133 q).
+    Classify chunks live in the scratchpad pattern of item 17 (id + T-code lines).
 
 ## Ground rules for future sessions
 
