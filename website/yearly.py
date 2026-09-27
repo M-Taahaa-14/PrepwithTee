@@ -49,9 +49,9 @@ def mcq_url(code: str) -> str:
     return f"/mcq/{s['board_slug']}/{s['slug']}"
 
 
-def is_mcq(code: str, paper: int) -> bool:
+def is_mcq(code: str, paper: int, year: int | None = None) -> bool:
     from pipeline import config as _pcfg
-    return _pcfg.is_mcq(code, paper)
+    return _pcfg.is_mcq(code, paper, year)
 
 
 def mcq_codes() -> list[str]:
@@ -188,7 +188,7 @@ def _sitting_rows(code: str, items: list[dict]) -> str:
         main = files.get("qp") or files.get("ms") or files.get("in")
         if not main:
             continue
-        mcq = is_mcq(code, e["paper"])
+        mcq = is_mcq(code, e["paper"], e["year"])
         # Fixed slots (QP · MS · Practise · Insert) so the buttons line up down a
         # column; an absent file leaves its slot empty rather than shifting the rest,
         # and inserts come last because most papers have none.
@@ -221,7 +221,7 @@ def _tile(code: str, e: dict) -> str:
     main = files.get("qp") or files.get("ms") or files.get("in")
     if not main:
         return ""
-    mcq = is_mcq(code, e["paper"])
+    mcq = is_mcq(code, e["paper"], e["year"])
     links = [f'<a class="yr-f yr-f-{k}" href="/yearly/view/{main["id"]}?doc={k}" title="{KINDS[k]}">{lab}</a>'
              for k, lab in (("qp", "QP"), ("ms", "MS"), ("in", "Insert")) if k in files]
     if mcq and "qp" in files:
@@ -249,7 +249,7 @@ def _year_block(code: str, year: int, items: list[dict], open_: bool) -> str:
     head = "".join(f'<div class="yr-mh" data-sess="{x}">{SESSION_NAMES.get(x, x)}</div>' for x in sessions)
     rows = []
     for pno in papers:
-        c = _catalog.component(code, pno)
+        c = _catalog.component(code, pno, year)
         lvl = f'<i class="yr-level yr-level-{c["level"]}">{c["level"]}</i>' if c["level"] else ""
         cells = "".join(
             f'<div class="yr-cell" data-sess="{x}" data-label="{SESSION_NAMES.get(x, x)}">'
@@ -400,7 +400,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
              "variant": e["variant"], "sessionName": SESSION_NAMES.get(p["session"], p["session"]),
              "files": files, "doc": doc if doc in files else next(iter(files), "qp"),
              "questions": questions, "msAt": ms_at, "totalMarks": total,
-             "mcq": is_mcq(code, p["paper"]), "backUrl": yearly_url(code, p["year"]),
+             "mcq": is_mcq(code, p["paper"], p["year"]), "backUrl": yearly_url(code, p["year"]),
              "subjectName": s["plain"], "labels": KINDS}
     import blog as _blog
     return HTMLResponse(f"""<!DOCTYPE html>
@@ -602,7 +602,7 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
     code = s["code"]
     if code not in mcq_codes():
         raise HTTPException(404, "No multiple-choice papers for this subject")
-    papers = [e for e in sittings(code) if is_mcq(code, e["paper"]) and "qp" in e["files"]]
+    papers = [e for e in sittings(code) if is_mcq(code, e["paper"], e["year"]) and "qp" in e["files"]]
     if not papers:
         raise HTTPException(404, "No multiple-choice papers yet")
     span = f"{papers[-1]['year']}–{papers[0]['year']}"

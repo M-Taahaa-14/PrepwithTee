@@ -86,7 +86,8 @@ COMPONENTS: dict[str, dict[int, tuple[str, str, str]]] = {
     "9709": {1: ("Pure 1", "Pure Mathematics 1", "AS"),
              3: ("Pure 3", "Pure Mathematics 3", "A2"),
              4: ("Mechanics", "Mechanics", "AS"),
-             5: ("Statistics", "Probability & Statistics 1", "AS")},
+             5: ("Statistics", "Probability & Statistics 1", "AS"),
+             6: ("Statistics (to 2019)", "Probability & Statistics 1 (Paper 6 until 2019)", "AS")},
     "9702": {1: ("MCQ", "Multiple choice", "AS"),
              2: ("AS Structured", "AS structured questions", "AS"),
              4: ("A Level", "A Level structured questions", "A2"),
@@ -100,6 +101,7 @@ COMPONENTS: dict[str, dict[int, tuple[str, str, str]]] = {
     "4024": {1: ("Paper 1", "Paper 1", ""), 2: ("Paper 2", "Paper 2", "")},
     "0625": {1: ("MCQ Core", "Multiple choice (Core)", ""),
              2: ("MCQ Extended", "Multiple choice (Extended)", ""),
+             3: ("Extended (to 2015)", "Theory (Extended)", ""),
              4: ("Extended", "Theory (Extended)", "")},
     "5054": {1: ("MCQ", "Multiple choice", ""), 2: ("Theory", "Theory", "")},
     "5070": {1: ("MCQ", "Multiple choice", ""), 2: ("Theory", "Theory", "")},
@@ -120,9 +122,23 @@ COMPONENTS: dict[str, dict[int, tuple[str, str, str]]] = {
 }
 
 
-def component(code: str, paper: int) -> dict:
-    """{paper, short, label ("P3 · Pure 3"), title, level} for one component."""
+# Cambridge renumbered some papers when a syllabus changed; up to and including
+# the given year the component meant something else.
+OLD_COMPONENTS: dict[tuple[str, int], tuple[int, tuple[str, str, str]]] = {
+    ("9709", 5): (2019, ("Mechanics 2", "Mechanics 2 (old syllabus, not in topicals)", "A2")),
+    ("0625", 2): (2015, ("Theory Core", "Theory (Core)", "")),
+    ("0620", 2): (2015, ("Theory Core", "Theory (Core)", "")),
+    ("0620", 3): (2015, ("Theory Extended", "Theory (Extended)", "")),
+}
+
+
+def component(code: str, paper: int, year: int | None = None) -> dict:
+    """{paper, short, label ("P3 · Pure 3"), title, level} for one component
+    (as it was in `year`, when given - see OLD_COMPONENTS)."""
     short, title, level = COMPONENTS.get(code, {}).get(paper, (f"Paper {paper}", f"Paper {paper}", ""))
+    old = OLD_COMPONENTS.get((code, paper))
+    if year is not None and old and int(year) <= old[0]:
+        short, title, level = old[1]
     return {"paper": paper, "short": short, "label": f"P{paper} · {short}",
             "title": title, "level": level}
 

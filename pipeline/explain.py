@@ -148,7 +148,7 @@ def pending(con, syllabus=None, limit=None, force=False):
 def build_messages(q) -> list[dict]:
     """OpenAI-compatible chat messages for one question."""
     syl, paper = q["syllabus"], q["paper"]
-    mcq = config.is_mcq(syl, paper)
+    mcq = config.is_mcq(syl, paper, q["year"])
     ref = config.source_ref(syl, f"{paper}{q['variant']}", q["session"], q["year"],
                             q["number"], q["sub_part"] or "")
     header = (f"Subject: {_subject(syl)} ({syl})\nSource: {ref}\nChapter: {q['topic']}"
@@ -284,7 +284,7 @@ graph or picture that the text does not describe, reply with exactly
 
 def build_text_messages(q, qtext: str, mstext: str) -> list[dict]:
     syl, paper = q["syllabus"], q["paper"]
-    mcq = config.is_mcq(syl, paper)
+    mcq = config.is_mcq(syl, paper, q["year"])
     ref = config.source_ref(syl, f"{paper}{q['variant']}", q["session"], q["year"],
                             q["number"], q["sub_part"] or "")
     header = (f"Subject: {_subject(syl)} ({syl})\nSource: {ref}\nChapter: {q['topic']}"
@@ -357,7 +357,7 @@ def attempt(q, name: str, route: str, ms: str | None = None):
 def verify(data: dict, q, route: str, ms: str | None, purpose: str, prefer=()) -> tuple[bool | None, str]:
     """A second model compares the solution's final answers with the official mark
     scheme. MCQ needs no model (the key check is exact). None = nobody free to ask."""
-    if config.is_mcq(q["syllabus"], q["paper"]):
+    if config.is_mcq(q["syllabus"], q["paper"], q["year"]):
         return True, "key letter"
     maths = q["syllabus"] in ck.VISION_SUBJECTS
     ms = ms if ms is not None else ck.ms_text(q)
@@ -389,7 +389,7 @@ def generate_one(q, provider: str | None = None, route: str | None = None,
     produced an explanation that agrees with the official answer. Raises
     RateLimited when every provider that could do it is rate limited."""
     route = route or route_of(q)
-    ms = ck.ms_text(q) if not config.is_mcq(q["syllabus"], q["paper"]) else None
+    ms = ck.ms_text(q) if not config.is_mcq(q["syllabus"], q["paper"], q["year"]) else None
     names = [provider] if provider else providers_for(route, purpose)
     limited = None
     for name in names:
@@ -563,7 +563,7 @@ def _drip_worker(name, queues, pacer, args, lock, totals, stop, tries):
                 if tries[q["id"]] < MAX_TRIES:
                     queues["vision"].put((q, "vision"))
                 continue
-            if agrees is None and not config.is_mcq(q["syllabus"], q["paper"]):
+            if agrees is None and not config.is_mcq(q["syllabus"], q["paper"], q["year"]):
                 queues[route].put(item)                  # can't confirm yet: later
                 stop.wait(30)
                 continue
@@ -591,9 +591,9 @@ def run_drip(con, args):
     queues = {"new": queue.Queue(), "text": queue.Queue(), "vision": queue.Queue()}
     for q in pending(con, args.syllabus, None, args.force):
         # Only questions with an official answer to check against.
-        if config.is_mcq(q["syllabus"], q["paper"]) and not q["mcq_answer"]:
+        if config.is_mcq(q["syllabus"], q["paper"], q["year"]) and not q["mcq_answer"]:
             continue
-        if not config.is_mcq(q["syllabus"], q["paper"]) and not q["ms_crop"]:
+        if not config.is_mcq(q["syllabus"], q["paper"], q["year"]) and not q["ms_crop"]:
             continue
         queues["new"].put(q)
     log.info("drip: %d pending with an official answer; providers %s%s", queues["new"].qsize(),

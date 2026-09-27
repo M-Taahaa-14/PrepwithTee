@@ -63,19 +63,32 @@ SUBJECT_FOLDERS = {
 # 9702: P1=MCQ, P2=AS Structured, P4=A2 Structured, P5=Planning&Analysis
 PAPER_MATRIX = {
     "5054": (1, 2),          # P1 multiple choice (added 2026-07), P2 theory
-    "0625": (1, 2, 4),       # P1/P2 multiple choice (core/extended), P4 theory
+    "0625": (1, 2, 3, 4),    # P1/P2 multiple choice (core/extended), P4 theory; P3 = see PAPER_YEARS
     "4024": (1, 2),
     "0580": (2, 4),
     "2210": (1, 2),          # O Level CS; 0478 (IGCSE) is the same papers -> skip
     "0478": (1, 2),          # kept for reference; not processed (== 2210)
     "5070": (1, 2),          # Chemistry O Level: P1 MCQ, P2 theory
     "0620": (1, 2, 3, 4),    # Chemistry IGCSE: P1/P2 MCQ, P3/P4 structured theory
-    "9709": (1, 3, 4, 5),
+    "9709": (1, 3, 4, 5, 6),
     "9702": (1, 2, 4, 5),
     "9618": (1, 2, 3, 4),    # A Level Computer Science
     "2058": (1, 2),          # O Level Islamiyat: P1 Quran/Hadith, P2 History
     "2059": (1, 2),          # O Level Pakistan Studies: P1 History/Culture, P2 Geography
 }
+
+# Components that are only in scope for some years: before the 2016 IGCSE
+# science syllabus, 0625 Paper 3 was the EXTENDED theory paper (what P4 is now);
+# from 2016 it is Core theory, which the site does not carry.
+PAPER_YEARS = {("0625", 3): (2010, 2015),
+               # 9709 before 2020: Paper 6 = Probability & Statistics 1 (today's P5).
+               ("9709", 6): (2010, 2019)}
+
+
+def paper_in_scope(syllabus: str, paper: int, year: int) -> bool:
+    lo, hi = PAPER_YEARS.get((syllabus, paper), (0, 9999))
+    return lo <= int(year) <= hi
+
 
 # Multiple-choice papers. Their mark scheme is a Question/Answer/Marks table,
 # not prose, so composing a per-question mark-scheme crop under each question
@@ -90,8 +103,24 @@ MCQ_PAPERS = {
 }
 
 
-def is_mcq(syllabus: str, paper: int | None) -> bool:
-    return (syllabus, paper) in MCQ_PAPERS
+# Papers that only became multiple choice in a given year. Before the 2016
+# IGCSE science syllabus, 0620/0625 Paper 2 was the Core THEORY paper (written
+# answers, prose mark scheme) - treat those years as structured.
+MCQ_FROM_YEAR = {("0620", 2): 2016, ("0625", 2): 2016}
+
+
+def is_mcq(syllabus: str, paper: int | None, year: int | None = None) -> bool:
+    if (syllabus, paper) not in MCQ_PAPERS:
+        return False
+    since = MCQ_FROM_YEAR.get((syllabus, paper))
+    return since is None or year is None or int(year) >= since
+
+
+def not_old_theory_sql(alias: str = "p") -> str:
+    """SQL condition excluding the pre-MCQ years of MCQ_FROM_YEAR papers."""
+    return " AND ".join(
+        f"NOT ({alias}.syllabus = '{s}' AND {alias}.paper = {n} AND {alias}.year < {y})"
+        for (s, n), y in MCQ_FROM_YEAR.items()) or "1 = 1"
 
 
 YEAR_MIN = 2010

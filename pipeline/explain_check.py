@@ -96,7 +96,7 @@ def _figure_count(pdf_path) -> int:
 
 
 def _is_mcq(q) -> bool:
-    return config.is_mcq(q["syllabus"], q["paper"])
+    return config.is_mcq(q["syllabus"], q["paper"], q["year"])
 
 
 def route(q) -> str:

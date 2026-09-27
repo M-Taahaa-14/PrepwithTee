@@ -89,6 +89,8 @@ def iter_papers(
                 kind = kind.lower()
                 if syl != syllabus or kind not in kinds or int(code[0]) not in papers:
                     continue
+                if not config.paper_in_scope(syllabus, int(code[0]), year):
+                    continue
                 yield {
                     "syllabus": syllabus,
                     "year": year,

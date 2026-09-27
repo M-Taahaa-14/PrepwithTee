@@ -70,7 +70,8 @@ def find_anchors(doc):
             # Require a whitespace/end boundary so '228 as a product' can
             # never match as 22; the modal-x column and ascending-sequence
             # checks below guard against stray margin numbers.
-            m = re.match(r"(\d{1,2})(?:\s|$)", t)
+            # Older O Level Chemistry prefixes the section: 'A1'..'A5', 'B6'..'B9'.
+            m = re.match(r"[AB]?(\d{1,2})(?:\s|$)", t)
             if not m:
                 continue
             n = int(m.group(1))

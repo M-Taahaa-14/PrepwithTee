@@ -31,6 +31,7 @@ import catalog as _catalog
 import db as _db
 import users_db as _udb
 from selection import select_mixed
+from pipeline import config as _pcfg
 
 router = APIRouter()
 
@@ -150,6 +151,7 @@ def mcq_topics(syllabus: str = Query(..., pattern=r"^[0-9A-Za-z]{4,6}$")):
                 JOIN papers p ON p.id = q.paper_id
                 JOIN classifications c ON c.question_id = q.id
                 WHERE p.syllabus = ? AND p.kind = 'qp' AND p.paper IN ({ph})
+                  AND {_pcfg.not_old_theory_sql('p')}
                   AND q.status IS NOT 'excluded'
                 GROUP BY c.topic""", [syllabus, *papers]).fetchall()
     finally:
@@ -228,6 +230,7 @@ def _topical_pool(req: StartReq) -> list[dict]:
                 JOIN papers p ON p.id = q.paper_id
                 JOIN classifications c ON c.question_id = q.id
                 WHERE p.syllabus = ? AND p.kind = 'qp' AND p.paper IN ({pph})
+                  AND {_pcfg.not_old_theory_sql('p')}
                   AND p.year BETWEEN ? AND ? AND q.status IS NOT 'excluded'
                   AND c.topic IN ({tph})""",
             [req.syllabus, *papers, req.year_from, req.year_to, *req.topics]).fetchall()]
@@ -246,7 +249,7 @@ def start_session(req: StartReq, user: dict = Depends(_auth.get_current_user)):
     _require_enrolled(user, code)
     if req.paper_id is not None:
         p = _paper_row(req.paper_id)
-        if not p or p["syllabus"] != code or p["kind"] != "qp" or p["paper"] not in _mcq_papers(code):
+        if not p or p["syllabus"] != code or p["kind"] != "qp" or not _pcfg.is_mcq(code, p["paper"], p["year"]):
             raise HTTPException(404, "That is not a multiple-choice paper for this subject")
         con = _db.plain_connect()
         try:

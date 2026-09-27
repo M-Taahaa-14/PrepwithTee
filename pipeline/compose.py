@@ -1021,7 +1021,7 @@ def build_cover(doc, args, subject, sections, contents=None):
     page.insert_text((bx, y + 6), sub, fontsize=13, fontname="tiit",
                      color=(0.86, 0.88, 0.94))
     all_qs = [q for _, qs in sections for q in qs]
-    n_mcq = sum(1 for q in all_qs if config.is_mcq(q["syllabus"], q["paper"]))
+    n_mcq = sum(1 for q in all_qs if config.is_mcq(q["syllabus"], q["paper"], q["year"]))
     if args.no_ms:
         answers_note = "Questions only"
         answers_blurb = ", cropped straight from the original papers."
@@ -1503,7 +1503,7 @@ def main(argv=None):
             # Multiple choice: the answer is a single letter, so it goes in the
             # grid at the back rather than under the question where it would
             # spoil the attempt.
-            if config.is_mcq(syl, q["paper"]):
+            if config.is_mcq(syl, q["paper"], q["year"]):
                 row = con.execute(
                     """SELECT m.answer FROM ms_entries m
                        JOIN papers mp ON mp.id = m.paper_id

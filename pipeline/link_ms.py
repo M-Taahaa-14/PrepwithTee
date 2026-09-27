@@ -269,7 +269,9 @@ def legacy_boundaries(doc, qp_max: int | None = None) -> tuple[list[dict], list[
         body = [w for w in words if w[1] >= LEGACY_HEADER_Y]
         text = " ".join(w[4] for w in body)
         headed = "Question" in text and "Answer" in text     # plain-number Mark column
-        if not body or not (headed or MARK_CODE_RE.search(text)):
+        # the scheme starts at the first page with mark codes; after that every
+        # page with text belongs to it (a last page may carry plain-number marks)
+        if not body or not (pages or headed or MARK_CODE_RE.search(text)):
             continue
         pages.append(pno)
         lines: dict[tuple, list] = {}
@@ -370,8 +372,12 @@ def legacy_regions(doc, boundaries, pages) -> list[list[dict]]:
                 bottom = _cut_above(page, nxt["y"])
             if bottom - top < MIN_RECT_HEIGHT:
                 continue
-            rect = {"page": pno, "x0": LEGACY_SIDE, "y0": round(top, 2),
-                    "x1": round(page.rect.width - LEGACY_SIDE, 2), "y1": round(bottom, 2)}
+            # widen to the text inside the band: some tables run nearly edge to edge
+            xs = [(w[0], w[2]) for w in _words(page) if top <= w[1] and w[3] <= bottom]
+            x0 = min([LEGACY_SIDE] + [a - 4 for a, _ in xs])
+            x1 = max([page.rect.width - LEGACY_SIDE] + [b + 4 for _, b in xs])
+            rect = {"page": pno, "x0": round(max(0.0, x0), 2), "y0": round(top, 2),
+                    "x1": round(min(page.rect.width, x1), 2), "y1": round(bottom, 2)}
             try:
                 trim_rect_bottom(page, rect)
             except RuntimeError:
@@ -394,6 +400,16 @@ def extract_mcq_answers(doc) -> dict[int, str]:
             if q_num not in answers:
                 answers[q_num] = m.group(2).upper()
     return answers
+
+
+def _score(boundaries: list[dict], qp_max: int | None) -> int:
+    """How many real questions a parse found. A run that does not start at Q1
+    or overshoots the question paper read the wrong column - worth nothing."""
+    if not boundaries or boundaries[0]["n"] != 1:
+        return 0
+    if qp_max and boundaries[-1]["n"] > qp_max:
+        return 0
+    return len(boundaries)
 
 
 def _qp_max_number(con, ms_row) -> int | None:
@@ -421,7 +437,7 @@ def segment_ms(con, paper_row) -> list[int]:
                 (doc.page_count, paper_row["id"]))
 
     # --- MCQ fast path: extract letter answers, no crops needed ---
-    if config.is_mcq(paper_row["syllabus"], paper_row["paper"]):
+    if config.is_mcq(paper_row["syllabus"], paper_row["paper"], paper_row["year"]):
         answers = extract_mcq_answers(doc)
         doc.close()
         if not answers:
@@ -450,11 +466,11 @@ def segment_ms(con, paper_row) -> list[int]:
     # the table parser only finds part of the paper; whichever finds more wins.
     qp_max = _qp_max_number(con, paper_row)
     legacy = False
-    if qp_max is None or len(boundaries) < qp_max:
+    if qp_max is None or _score(boundaries, qp_max) < qp_max:
         lb, lpages = legacy_boundaries(doc, qp_max)
         if qp_max:          # numbered marking points (e.g. 9702 P5) are not questions
             lb = [b for b in lb if b["n"] <= qp_max]
-        if len(lb) > len(boundaries):
+        if _score(lb, qp_max) > _score(boundaries, qp_max):
             boundaries, pages, legacy = lb, lpages, True
     if not boundaries:
         db.add_review(con, f"{paper_row['filename']}: no question refs recognised "

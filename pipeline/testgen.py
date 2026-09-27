@@ -330,7 +330,7 @@ def render_test(con, args, subject, topics, chosen, cache):
         b.divider()
     cover(b.doc, args, subject, topics, chosen, is_ms=False)
     mcq_seqs = [seq for seq, q in enumerate(chosen, 1)
-                if config.is_mcq(args.syllabus, q["paper"])]
+                if config.is_mcq(args.syllabus, q["paper"], q["year"])]
     if mcq_seqs:
         # Multiple-choice questions need somewhere to record answers, so the
         # bubble sheet ships with the test itself (page 2), while the letters
@@ -341,7 +341,7 @@ def render_test(con, args, subject, topics, chosen, cache):
         base = b.doc.page_count
         papers = "/".join(f"P{p}" for p in sorted(
             {q["paper"] for q in chosen
-             if config.is_mcq(args.syllabus, q["paper"])}))
+             if config.is_mcq(args.syllabus, q["paper"], q["year"])}))
         sheets = bubble_sheet(b.doc, mcq_seqs,
                               f"{subject} {args.syllabus}  ·  {papers} Multiple Choice")
         for i in range(len(sheets)):
@@ -376,7 +376,7 @@ def render_ms(con, args, subject, topics, chosen, cache):
         ref = config.source_ref(args.syllabus, code, q["session"], q["year"],
                                 q["number"], q["sub_part"] or "")
 
-        if config.is_mcq(args.syllabus, q["paper"]):
+        if config.is_mcq(args.syllabus, q["paper"], q["year"]):
             row = con.execute(
                 """SELECT m.answer FROM ms_entries m
                    JOIN papers mp ON mp.id = m.paper_id
