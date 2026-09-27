@@ -574,6 +574,29 @@ linked), not agreement with any external file.
     9702 P4 op-amp/sensor/communication questions (removed from 9702 in 2022, ~133 q).
     Classify chunks live in the scratchpad pattern of item 17 (id + T-code lines).
 
+28. **Section pages + navigation (2026-09-28, local, not yet deployed).**
+    - `website/ui.py` = shared SSR blocks: `subject_tabs(code, active)` (Topical / By year /
+      MCQ / Mock test / Notes / Resources on every subject page), `steps`, `mode_card`,
+      `faq` (+FAQPage JSON-LD), `callout`, `back_link`. `catalog._shell` adds a "← Back to
+      <parent crumb>" pill automatically.
+    - Routes: `/papers` = hub (no redirect any more), `/papers/topical`, `/papers/mock-tests`
+      (`?mode=test` 301s there), `/my-papers` (booklets.py), `/resources...` (new
+      `resources.py`, the data/resources folder: subjects, shelves, folders,
+      `/resources/view?f=` viewer), `/explore` (every page). `resources.html` and
+      `notes-view.html` are deleted and 301 to `/resources` / `/notes`.
+    - **Yearly papers are open to everyone** - no login, no enrolment (tutor). Guests get
+      scratch ink; saving ink/marks/done asks them to sign in.
+    - **Booklet retention REVERSED**: a paper not opened for 30 days is a RECORD only
+      (status `expired`, PDF 410, record page, "Build it again" = builder `?pick=A&pick=B`),
+      never rebuilt. `?annotated=1` burns the student's ink into the download (`annot_pdf.py`).
+    - PDF viewers: White/Dark paper toggle (`paper-theme.js`, `<html data-paper>`, inverts only
+      `canvas.vw-pdf`). Annotation inks are TOKENS (`@blue` ...) with a light and a pastel
+      shade - `annotate.js` PALETTE and `annot_pdf.PALETTE` must match; custom colours = hex.
+      Old `annotation-toolbar.js` deleted (scratch-pen covers every page).
+    - Static pages: `sync_nav.py` also stamps a breadcrumb bar (`CRUMBS` table,
+      CRUMB markers, BreadcrumbList JSON-LD) under the header. New static page = add it to
+      CRUMBS, run `python sync_nav.py`.
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

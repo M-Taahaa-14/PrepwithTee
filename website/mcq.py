@@ -35,7 +35,7 @@ from pipeline import config as _pcfg
 
 router = APIRouter()
 
-SESSION_V = "20260927l"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20260928a"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,
@@ -514,7 +514,9 @@ def legacy_solver(syllabus: str = ""):
 
 # ── Annotations ───────────────────────────────────────────────────────────────
 
-_DOC = re.compile(r"^(paper:\d{1,10}|booklet:[A-Za-z0-9_-]{6,16}|mcq:[A-Za-z0-9_-]{6,16}:q\d{1,10})$")
+# booklet:<id>:ms = a mock test's separate mark scheme; res:<16 hex> = a Resources PDF
+_DOC = re.compile(r"^(paper:\d{1,10}|booklet:[A-Za-z0-9_-]{6,16}(:ms)?|mcq:[A-Za-z0-9_-]{6,16}:q\d{1,10}"
+                  r"|res:[0-9a-f]{16})$")
 
 
 def _doc_or_400(doc: str) -> str:

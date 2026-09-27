@@ -11,8 +11,9 @@
  */
 import { api } from "/auth.js?v=20260927k";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
-import { createAnnotator } from "/annotate.js?v=20260927l";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260928a";
+import { paperButton } from "/paper-theme.js?v=20260928a";
+import { createAnnotator } from "/annotate.js?v=20260928a";
 
 let ann = null;                  // the annotation bar, created with the shell
 
@@ -57,6 +58,7 @@ function shell() {
         <button type="button" class="vw-tbtn" data-act="fit" id="vw-z">100%</button>
         <button type="button" class="vw-tbtn" data-act="in" aria-label="Zoom in">+</button>
       </div>
+      ${paperButton()}
       <button type="button" class="vw-tbtn pv-done" data-act="done" aria-pressed="false"
               title="Mark this paper as done">○ <span>Done</span></button>
       <button type="button" class="vw-tbtn" data-act="marks" title="Your marks and the grade thresholds">
@@ -189,6 +191,7 @@ const same = (p) => p.year === S.year && p.session === S.session && +p.paper ===
   String(p.variant ?? "") === String(S.variant ?? "");
 
 async function loadProgress() {
+  if (!S.signedIn) return paintDone();          // guests: nothing to load
   try {
     const d = await api(`/api/papers-progress?syllabus=${encodeURIComponent(S.syllabus)}`);
     V.progress = (d.papers || []).find(same) || null;
@@ -214,7 +217,15 @@ async function saveProgress(fields) {
   paintDone();
 }
 
+function needAccount(what) {
+  if (S.signedIn !== false) return false;
+  toast(`Sign in to ${what} - papers stay free to open without an account.`);
+  setTimeout(() => { location.href = S.loginUrl; }, 1600);
+  return true;
+}
+
 async function toggleDone() {
+  if (needAccount("tick off papers you have done")) return;
   const done = V.progress?.status === "confident";
   try {
     await saveProgress({ status: done ? "not_started" : "confident",
@@ -305,6 +316,7 @@ function renderMarks(panel) {
       toast("Enter a mark between 0 and the paper total.");
       return;
     }
+    if (needAccount("save your marks")) return;     // guests still see their grade live
     try {
       await saveProgress({ status: "confident", score, max_score: max });
       toast("Saved — this paper is marked as done");
@@ -422,7 +434,8 @@ function toast(msg) {
 
 // ── Start ───────────────────────────────────────────────────────────────────
 shell();
-ann = createAnnotator({ mount: document.body });
+ann = createAnnotator({ mount: document.body, persist: S.signedIn !== false,
+                       unsaved: "Not saved - sign in to keep your ink" });
 // Wide screens open side by side when there is a mark scheme to show beside it.
 if (wide() && window.innerWidth >= 1280 && S.files.qp && V.right && !new URLSearchParams(location.search).has("doc")) {
   V.split = true;

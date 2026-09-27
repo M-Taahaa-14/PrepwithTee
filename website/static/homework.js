@@ -221,7 +221,7 @@ function render() {
     : `<div class="dash-empty">
          <p><strong>No homework right now.</strong> When Tee sets you work it
          shows up here, and you'll see a reminder on your dashboard.</p>
-         <a class="btn btn-outline" href="notes-view.html">Revise something anyway</a>
+         <a class="btn btn-outline" href="/notes">Revise something anyway</a>
        </div>`;
 
   const doneCard = document.getElementById("hw-done-card");

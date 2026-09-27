@@ -139,3 +139,17 @@
 .vw-finish { background: var(--green-ink); color: var(--page); }
 html[data-theme="dark"] .vw-finish { color: #0f1117; }
 @media (max-width: 640px) { .vw-seg button { padding: .5rem .55rem; font-size: .76rem; } }
+
+/* ── paper colour (paper-theme.js) ────────────────────────────────── */
+/* Dark paper: the rendered PDF is inverted with hues kept, so black text turns
+   white and a red diagram stays red. Only the PDF canvas - ink layers keep their
+   own (pastel) colours, chips and form fields are untouched. */
+html[data-paper="dark"] .vw-pg { background: #0e1015; box-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+html[data-paper="dark"] .vw-pg canvas.vw-pdf,
+html[data-paper="dark"] .vw-paper-img { filter: invert(1) hue-rotate(180deg) brightness(.94) contrast(.92); }
+html[data-paper="dark"] .vw-stage { background: #07080b; }
+.vw-paper svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; }
+.vw-paper span { margin-left: .3rem; }
+.vw-paper[aria-pressed="true"] { background: #11131a; color: #f3f4f6; border-color: #3a4150; }
+@media (max-width: 900px) { .vw-paper span { display: none; } }

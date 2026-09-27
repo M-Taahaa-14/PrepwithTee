@@ -4,7 +4,7 @@
     /yearly/{board}                           one board's subjects
     /yearly/{board}/{subject}                 every sitting, newest first (SEO text)
     /yearly/{board}/{subject}/{year}          one year
-    /yearly/view/{paper_id}                   the paper viewer (login + enrolled; noindex)
+    /yearly/view/{paper_id}                   the paper viewer (open to everyone; noindex)
     /mcq, /mcq/{board}/{subject}              MCQ practice landing pages
 
 The viewer shows the question paper, mark scheme and insert of one sitting in
@@ -12,6 +12,10 @@ the same PDF.js viewer as topical booklets (pdf-pane.js), side by side on wide
 screens, with Explain / Guide me / Mark scheme chips on every question - the
 question rows and their positions (questions.rects_json) already exist for
 each paper. The old ?tab=yearly|mcq URLs and library.html 301 here.
+
+Yearly papers need NO account and NO enrolment (tutor, 2026-09-27): the viewer
+opens for anyone. Signing in only adds saved annotations, "Mark done" and
+marks - paper-viewer.js hides those for guests.
 """
 
 import json
@@ -28,7 +32,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260927l"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260928a"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -305,6 +309,26 @@ def _page(*, title, desc, path, body, crumbs, user, noindex=False, ld=None, scri
 
 # ── Yearly pages ──────────────────────────────────────────────────────────────
 
+def _how_codes() -> str:
+    """How to read a Cambridge paper code - the thing every new student asks."""
+    import ui
+    return ui.steps([
+        ("Session", "<b>M/J</b> = May/June, <b>O/N</b> = Oct/Nov, <b>F/M</b> = Feb/March (sat in Pakistan and India)."),
+        ("Paper and variant", "<b>22</b> = Paper 2, variant 2. Variants are different papers of the same "
+                              "difficulty, sat in different time zones - all are worth doing."),
+        ("QP, MS, Insert", "Question paper, its mark scheme, and the insert (source booklet) if the paper had one."),
+    ], "Reading a paper code", "ui-steps-row")
+
+
+def _mcq_how() -> str:
+    import ui
+    return ui.steps([
+        ("Choose a subject", "Below - every subject with a multiple-choice paper."),
+        ("Full paper or topics", "Sit a real paper against the official time, or a set from chosen chapters."),
+        ("Check as you go, or at the end", "Live check reveals each answer as you lock it in."),
+        ("Review", "Every wrong option explained, so the same trap does not get you twice."),
+    ], "How MCQ practice works", "ui-steps-row")
+
 @router.get("/yearly", response_class=HTMLResponse)
 def yearly_hub(user: dict | None = Depends(_auth.maybe_user)):
     state = _catalog._student_state(user)
@@ -320,14 +344,15 @@ def yearly_hub(user: dict | None = Depends(_auth.maybe_user)):
       <h1>Cambridge past papers by year</h1>
       <p class="cat-lede">Every question paper, mark scheme and insert we hold, sitting by
         sitting. Open one to read the paper with its mark scheme side by side, and ask for a
-        worked explanation of any question.</p>
+        worked explanation of any question. <b>No account needed.</b></p>
     </header>
+    {_how_codes()}
     {''.join(sections)}"""
     return _page(title="Cambridge Past Papers by Year | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Cambridge O Level, IGCSE and A Level past papers by year and session, "
                       "with mark schemes and inserts.",
                  path="/yearly", body=body, user=user,
-                 crumbs=[("Home", "/"), ("Yearly papers", "/yearly")])
+                 crumbs=[("Home", "/"), ("Past papers", "/papers"), ("By year", "/yearly")])
 
 
 _KEY_RE = re.compile(r"^(\d{4})_([msw])(\d{2})_(?:qp_|ms_)?(\d)(\d?)$")
@@ -367,28 +392,8 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
     p = _paper_row(paper_id)
     if p is None or p["syllabus"] not in SUBJECTS:
         raise HTTPException(404, "Paper not found")
-    here = f"/yearly/view/{paper_id}" + (f"?doc={doc}" if doc in KINDS and doc != "qp" else "")
-    if user is None:
-        return RedirectResponse(f"/login.html?{urlencode({'next': here})}", 302)
     code = p["syllabus"]
     s = SUBJECTS[code]
-    enrolled = code in set(_udb.get_enrollments(user["id"]))
-    if not enrolled and not _staff(user):
-        body = f"""
-        <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
-          <p class="cat-eyebrow">Cambridge {BOARD_SHORT[s['board_slug']]} · {code}</p>
-          <h1>Enrol in {_e(s['plain'])} to open this paper</h1>
-          <p class="cat-lede">Enrolling is free. It unlocks the yearly papers, topical papers,
-            MCQ practice, AI help and progress tracking for {_e(s['plain'])}.</p>
-          <div class="cat-actions">
-            <button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">Enrol free</button>
-            <a class="cat-btn cat-btn-ghost" href="{yearly_url(code)}">Back to {_e(s['plain'])} papers</a>
-          </div>
-        </header>"""
-        return _page(title=f"Enrol in {s['plain']} — PrepWithTee", desc="", path=here,
-                     body=body, user=user, noindex=True,
-                     crumbs=[("Home", "/"), ("Yearly papers", "/yearly"),
-                             (f"{s['plain']} {code}", yearly_url(code))])
     files = _sitting_files(p)
     qp, ms = files.get("qp"), files.get("ms")
     questions, ms_at, total = page_map(p, qp and qp["id"], ms and ms["id"])
@@ -401,7 +406,8 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
              "files": files, "doc": doc if doc in files else next(iter(files), "qp"),
              "questions": questions, "msAt": ms_at, "totalMarks": total,
              "mcq": is_mcq(code, p["paper"], p["year"]), "backUrl": yearly_url(code, p["year"]),
-             "subjectName": s["plain"], "labels": KINDS}
+             "subjectName": s["plain"], "labels": KINDS, "signedIn": bool(user),
+             "loginUrl": f"/login.html?next=/yearly/view/{paper_id}"}
     import blog as _blog
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="en">
@@ -409,7 +415,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
-  <script>try{{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
+  <script>try{{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);var p=localStorage.getItem("pwt-paper");if(p)document.documentElement.setAttribute("data-paper",p)}}catch(e){{}}</script>
   <title>{_e(title)} — PrepWithTee</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -437,7 +443,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script type="module" src="/auth.js?v=20260927k"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 </body>
-</html>""", headers={"Cache-Control": "private, no-store"})
+</html>""", headers={"Cache-Control": "private, no-store" if user else "public, max-age=300"})
 
 
 @router.get("/yearly/{board}", response_class=HTMLResponse)
@@ -456,7 +462,7 @@ def yearly_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
     return _page(title=f"Cambridge {BOARD_SHORT[board]} Past Papers by Year — PrepWithTee",
                  desc=f"Cambridge {BOARD_SHORT[board]} past papers by year, with mark schemes.",
                  path=f"/yearly/{board}", body=body, user=user,
-                 crumbs=[("Home", "/"), ("Yearly papers", "/yearly"),
+                 crumbs=[("Home", "/"), ("Past papers", "/papers"), ("By year", "/yearly"),
                          (BOARD_SHORT[board], f"/yearly/{board}")])
 
 
@@ -497,20 +503,18 @@ def _subject_page(board: str, subject: str, year: int | None, user: dict | None)
         lede = (f"{nqp:,} Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) question papers"
                 f"{f' from {span}' if span else ''}, with mark schemes and inserts - "
                 f"May/June, Oct/Nov and Feb/March, every variant.")
-    actions = [f'<a class="cat-btn cat-btn-ghost" href="{_catalog.subject_url(code)}">Topical papers</a>']
-    if code in mcq_codes():
-        actions.append(f'<a class="cat-btn cat-btn-ghost" href="{mcq_url(code)}">MCQ practice</a>')
+    first = next((e for e in items if "qp" in e["files"]), None)
+    actions = ([f'<a class="cat-btn" href="/yearly/view/{first["files"]["qp"]["id"]}">Open the latest paper</a>']
+               if first else [])
     if user:
         actions.append(f'<a class="cat-btn cat-btn-ghost" href="/yearly-progress.html?syllabus={code}">My progress</a>')
+    import ui
     enrol = ""
-    st = _catalog._student_state(user)
     if not user:
-        enrol = (f'<p class="cat-note"><a href="/login.html?signup=1&amp;next={base}">Create a free '
-                 f'account</a> and enrol in {_e(s["plain"])} to open papers, see mark schemes side '
-                 f'by side and track which ones you have done.</p>')
-    elif code not in st["enrolled"] and not _staff(user):
-        enrol = (f'<p class="cat-note">🔒 <button class="cat-btn cat-btn-gold" type="button" '
-                 f'data-enrol="{code}">Enrol free</button> to open these papers.</p>')
+        enrol = ui.callout(
+            f'Every paper opens straight away - no account needed. <a href="/login.html?signup=1&amp;next={base}">'
+            f'A free account</a> also saves your pen marks, ticks off the papers you have done and records '
+            f'your marks against the grade thresholds.', tone="blue", icon_name="user")
     comps = sorted({e["paper"] for e in items})
     sessions = sorted({e["session"] for e in items}, key=lambda x: SESSION_ORDER.get(x, 9))
     comp_chips = "".join(
@@ -529,6 +533,7 @@ def _subject_page(board: str, subject: str, year: int | None, user: dict | None)
              f'<div><dt>{"Year" if year else "Years"}</dt><dd>{year or span}</dd></div>'
              f'<div><dt>Sessions</dt><dd>{len(sessions)}</dd></div></dl>')
     body = f"""
+    {ui.subject_tabs(code, "yearly")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
       <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · {code} · Yearly</p>
       <h1>{_e(h1)}</h1>
@@ -552,8 +557,15 @@ def _subject_page(board: str, subject: str, year: int | None, user: dict | None)
       <div class="yr-years" data-syllabus="{code}">{blocks}</div>
     </div>
     <p class="yr-none-found" hidden>No papers match those filters.</p>"""
-    crumbs = [("Home", "/"), ("Yearly papers", "/yearly"), (BOARD_SHORT[board], f"/yearly/{board}"),
-              (f"{s['plain']} {code}", base)]
+    crumbs = [("Home", "/"), ("Past papers", "/papers"), ("By year", "/yearly"),
+              (BOARD_SHORT[board], f"/yearly/{board}"), (f"{s['plain']} {code}", base)]
+    body += ui.steps([
+        ("Sit it timed", "Open the question paper, set a timer for the official time, and answer on paper."),
+        ("Mark it honestly", "Switch on <b>Side by side</b>: the mark scheme follows the question you are on."),
+        ("Log your score", "Add your marks - we compare them with that sitting's grade thresholds."),
+        ("Go back to topics", 'Any chapter you lost marks on: build a <a href="' + _catalog.subject_url(code)
+         + '">topical paper</a> on it.'),
+    ], "How to use a past paper", "ui-steps-row ui-steps-after")
     if year:
         crumbs.append((str(year), yearly_url(code, year)))
     return _page(
@@ -589,11 +601,13 @@ def mcq_hub(user: dict | None = Depends(_auth.maybe_user)):
         full timed paper, marked instantly against the official answer key - with an
         explanation of why each wrong option is wrong.</p>
     </header>
+    {_mcq_how()}
     {''.join(sections)}"""
     return _page(title="Cambridge MCQ Past Paper Practice | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Practise Cambridge multiple-choice past-paper questions, marked instantly "
                       "against the official answer keys.",
-                 path="/mcq", body=body, user=user, crumbs=[("Home", "/"), ("MCQ practice", "/mcq")])
+                 path="/mcq", body=body, user=user,
+                 crumbs=[("Home", "/"), ("Past papers", "/papers"), ("MCQ practice", "/mcq")])
 
 
 @router.get("/mcq/{board}/{subject}", response_class=HTMLResponse)
@@ -620,7 +634,9 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
     lede = (f"{len(papers):,} Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) multiple-choice "
             f"papers from {span}. Practise question by question or sit a whole paper against the "
             f"clock, with every answer checked against the official key.")
+    import ui
     body = f"""
+    {ui.subject_tabs(code, "mcq")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
       <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · {code} · MCQ</p>
       <h1>{_e(s['plain'])} {code} MCQ practice</h1>
@@ -639,7 +655,7 @@ def mcq_subject(board: str, subject: str, user: dict | None = Depends(_auth.mayb
     return _page(title=f"{s['plain']} {code} MCQ Practice | Cambridge {BOARD_SHORT[board]} — PrepWithTee",
                  desc=lede[:300], path=mcq_url(code), body=body, user=user,
                  scripts=(f"/yearly.js?v={VIEWER_V}",) + ((f"/mcq-setup.js?v={VIEWER_V}",) if can else ()),
-                 crumbs=[("Home", "/"), ("MCQ practice", "/mcq"),
+                 crumbs=[("Home", "/"), ("Past papers", "/papers"), ("MCQ practice", "/mcq"),
                          (f"{s['plain']} {code}", mcq_url(code))])
 
 

@@ -83,11 +83,18 @@ def test_unknown_pages_404(client, url):
     assert client.get(url).status_code == 404
 
 
-def test_hub_redirects_a_student_with_saved_boards(client, new_student):
-    new_student()
+def test_hub_guides_instead_of_redirecting(client, new_student):
+    u = new_student()
     client.put("/api/me/boards", json={"boards": ["a-level"]})
+    client.post("/api/enrollments", json={"syllabus": "9702"})
     r = client.get("/papers", follow_redirects=False)
-    assert r.status_code == 302 and r.headers["location"] == "/papers/a-level"
+    assert r.status_code == 200
+    html = r.text
+    for href in ("/papers/topical", "/yearly", "/mcq", "/papers/mock-tests", "/my-papers"):
+        assert f'href="{href}"' in html
+    assert "Your subjects" in html and '"@type": "FAQPage"' in html
+    assert 'href="/yearly/a-level/physics-9702"' in html        # quick links for their subject
+    _ = u
 
 
 def test_board_page_personalised_and_not_cached(client, new_student):
@@ -120,7 +127,7 @@ def test_sitemap_lists_catalogue_pages(client):
     ("/papers.html?s=9618", "/papers/a-level/computer-science-9618#builder"),
     ("/papers.html?syllabus=nope", "/papers"),
     # the old Test Builder now lives in the same builder, as "Mock test"
-    ("/papers.html?mode=test", "/papers?mode=test"),
+    ("/papers.html?mode=test", "/papers/mock-tests"),
     ("/papers.html?mode=test&syllabus=0625", "/papers/igcse/physics-0625?mode=test#builder"),
     ("/papers.html?key=5054_s23_22&q=3", "/yearly/open?key=5054_s23_22"),
 ])
@@ -137,13 +144,16 @@ def test_retired_pages_are_gone(client):
     assert client.get("/api/library/search?q=x").status_code == 404
 
 
-def test_mock_test_mode_carries_through_board_pages(client, new_student):
+def test_mock_tests_have_their_own_page(client, new_student):
     new_student()
     client.post("/api/enrollments", json={"syllabus": "5054"})
-    html = client.get("/papers/o-level?mode=test").text
-    assert "mock tests" in html.lower()
+    html = client.get("/papers/mock-tests").text
+    assert "Mock tests" in html and "How a mock test works" in html
     assert 'href="/papers/o-level/physics-5054?mode=test#builder"' in html
-    assert 'href="/papers/igcse?mode=test"' in html
+    for old, new in (("/papers?mode=test", "/papers/mock-tests"),
+                     ("/papers/o-level?mode=test", "/papers/mock-tests#o-level")):
+        r = client.get(old, follow_redirects=False)
+        assert r.status_code == 301 and r.headers["location"] == new
 
 
 def test_builder_tree_groups_chapters_by_paper(client):
@@ -168,3 +178,47 @@ def test_subject_cards_link_to_the_new_yearly_and_mcq_pages(client, new_student)
     assert 'href="/yearly/o-level/physics-5054"' in html
     assert 'href="/mcq/o-level/physics-5054"' in html
     assert "tab=yearly" not in html and "mcq-solver.html" not in html
+
+
+@pytest.mark.parametrize("url", ["/papers/topical", "/papers/mock-tests", "/explore", "/resources",
+                                 "/resources/igcse", "/notes"])
+def test_section_hubs_render(client, url):
+    r = client.get(url)
+    assert r.status_code == 200 and "cat-crumbs" in r.text
+
+
+def test_subject_pages_share_section_tabs(client):
+    for url in ("/papers/o-level/physics-5054", "/yearly/o-level/physics-5054",
+                "/mcq/o-level/physics-5054", "/notes/o-level/physics-5054"):
+        html = client.get(url).text
+        assert 'class="ui-stabs' in html, url
+        assert 'href="/yearly/o-level/physics-5054"' in html and 'href="/notes/o-level/physics-5054"' in html
+
+
+def test_every_nested_page_has_a_back_link(client):
+    html = client.get("/papers/o-level/physics-5054/motion").text
+    assert 'class="ui-back" href="/papers/o-level/physics-5054"' in html
+
+
+def test_old_resource_and_notes_hubs_redirect(client):
+    for old, new in (("/resources.html", "/resources"), ("/notes-view.html", "/notes")):
+        r = client.get(old, follow_redirects=False)
+        assert r.status_code == 301 and r.headers["location"] == new
+
+
+def test_sitemap_lists_new_hubs(client):
+    xml = client.get("/sitemap.xml").text
+    for p in ("/papers/topical", "/papers/mock-tests", "/resources", "/explore"):
+        assert f"{p}</loc>" in xml, p
+    assert "/my-papers" not in xml
+
+
+def test_static_pages_have_a_breadcrumb_bar(client):
+    import sync_nav
+    for page, trail in sync_nav.CRUMBS.items():
+        html = client.get(f"/{page}").text
+        assert '<div class="pg-crumbbar">' in html, page
+        parent = ([("Home", "/")] + trail)[-2]
+        assert f'<a class="pg-back" href="{parent[1]}">' in html, page
+        assert '"@type": "BreadcrumbList"' in html and "page-back-bar" not in html, page
+    assert "pg-crumbbar" not in client.get("/").text               # home has none

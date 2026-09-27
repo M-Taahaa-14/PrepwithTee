@@ -10,8 +10,9 @@
  */
 import { api } from "/auth.js?v=20260927k";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260927d";
-import { createAnnotator } from "/annotate.js?v=20260927l";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260928a";
+import { paperButton } from "/paper-theme.js?v=20260928a";
+import { createAnnotator } from "/annotate.js?v=20260928a";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");
@@ -138,6 +139,7 @@ async function showPart(which) {
   const ms = document.getElementById("vw-stage-ms");
   ms.hidden = which !== "ms";
   document.querySelector(".vw-dl").href = `/api/booklets/${S.id}/pdf?download=1${which === "ms" ? "&part=ms" : ""}`;
+  document.querySelector(".vw-dl-ink").href = `/api/booklets/${S.id}/pdf?annotated=1${which === "ms" ? "&part=ms" : ""}`;
   pane = panes[which] || pane;
   if (which === "ms" && !panes.ms) {
     panes.ms = new PdfPane(ms, {
@@ -215,6 +217,9 @@ function shell() {
         <button type="button" class="vw-tbtn" data-act="fit" id="vw-z">100%</button>
         <button type="button" class="vw-tbtn" data-act="in" aria-label="Zoom in">+</button>
       </div>
+      ${paperButton()}
+      <a class="vw-tbtn vw-dl-ink" href="/api/booklets/${S.id}/pdf?annotated=1"
+         title="Download with your pen, highlighter and text marks">✎ <span>With my ink</span></a>
       <a class="vw-btn vw-dl" href="/api/booklets/${S.id}/pdf?download=1">⤓ <span>Download</span></a>
     </header>
     <div class="vw-body">

@@ -111,18 +111,22 @@ def test_mcq_page_start_button_for_enrolled_student(client, new_student):
 
 # ── viewer ───────────────────────────────────────────────────────────────────
 
-def test_viewer_needs_login(client):
+def test_viewer_opens_for_guests(client):
+    """Tutor, 2026-09-27: yearly papers need no account and no enrolment."""
     p = _paper()
     r = client.get(f"/yearly/view/{p['id']}?doc=ms", follow_redirects=False)
-    assert r.status_code == 302
-    assert r.headers["location"] == f"/login.html?next=%2Fyearly%2Fview%2F{p['id']}%3Fdoc%3Dms"
+    assert r.status_code == 200 and "vw-state" in r.text
+    assert 'name="robots" content="noindex"' in r.text
+    s = _viewer_state(r.text)
+    assert s["signedIn"] is False and s["doc"] == "ms" and s["loginUrl"].startswith("/login.html")
+    assert client.get(s["files"]["qp"]["url"]).status_code == 200      # the PDF itself is public
 
 
-def test_viewer_asks_to_enrol_first(client, new_student):
+def test_viewer_opens_without_enrolling(client, new_student):
     new_student()
     r = client.get(f"/yearly/view/{_paper()['id']}")
-    assert r.status_code == 200 and 'data-enrol="5054"' in r.text
-    assert 'name="robots" content="noindex"' in r.text and "vw-state" not in r.text
+    assert r.status_code == 200 and 'data-enrol="5054"' not in r.text and "vw-state" in r.text
+    assert _viewer_state(r.text)["signedIn"] is True
 
 
 def test_viewer_pairs_the_sitting_and_maps_questions(client, new_student):

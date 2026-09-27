@@ -16,8 +16,9 @@
  */
 import { api } from "/auth.js?v=20260927k";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
-import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260927d";
-import { createAnnotator } from "/annotate.js?v=20260927l";
+import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260928a";
+import { paperButton } from "/paper-theme.js?v=20260928a";
+import { createAnnotator } from "/annotate.js?v=20260928a";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -142,6 +143,7 @@ function shell() {
         <b id="mq-time">--:--</b>
         <button type="button" class="mq-pausebtn" data-act="pause" aria-label="Pause" title="Pause (the paper is hidden while paused)">❚❚</button>
       </div>
+      ${paperButton()}
       <span class="mq-scorechip" id="mq-scorechip" hidden></span>
       <button type="button" class="vw-btn mq-submit" data-act="submit">Submit</button>
     </header>
@@ -320,7 +322,7 @@ async function drawCrop(box, qid) {
     const vp = page.getViewport({ scale: w / base.width });
     const dpr = window.devicePixelRatio || 1;
     const canvas = document.createElement("canvas");
-    canvas.className = "mq-crop-canvas";
+    canvas.className = "mq-crop-canvas vw-paper-img";
     canvas.width = Math.floor(vp.width * dpr);
     canvas.height = Math.floor(vp.height * dpr);
     canvas.style.width = `${vp.width}px`;

@@ -4,8 +4,11 @@
  *   ann.attach(pageEl, "paper:123", 4);   // any positioned element = one "page"
  *
  * Tools: pointer (scroll/click), select (move · edit text · delete · recolour),
- * pen, highlighter, eraser, line, arrow, rectangle, ellipse, text; 6 colours,
- * 3 sizes. While the eraser is on, the bar shows its own options in place of
+ * pen, highlighter, eraser, line, arrow, rectangle, ellipse, text; 12 inks
+ * plus a custom colour picker, 5 sizes. Inks are palette TOKENS ("@blue") drawn
+ * with a high-contrast shade on white paper and a pastel twin on dark paper
+ * (paper-theme.js / the site theme for scratch ink), so ink written in one mode
+ * stays readable in the other. Custom colours are stored as plain hex. While the eraser is on, the bar shows its own options in place of
  * colour/thickness: Partial (cuts through strokes and shapes) | Whole object,
  * and three eraser sizes;
  * undo/redo; clear page. Strokes are stored as fractions of the page (so zoom
@@ -27,8 +30,20 @@
  * Keys: V pointer · S select · P pen · H highlighter · E eraser · T text ·
  *       Delete remove selection · Ctrl+Z / Ctrl+Y.
  */
-const COLORS = ["#1d4ed8", "#111827", "#dc2626", "#16a34a", "#f59e0b", "#9333ea"];
-const SIZES = [0.0022, 0.0042, 0.0085];            // fraction of page width
+// [token, light paper, dark paper, name] - website/annot_pdf.py has the same table.
+const PALETTE = [
+  ["blue", "#1d4ed8", "#93c5fd", "Blue"], ["ink", "#111827", "#f3f4f6", "Black / white"],
+  ["red", "#dc2626", "#fca5a5", "Red"], ["green", "#15803d", "#86efac", "Green"],
+  ["orange", "#ea580c", "#fdba74", "Orange"], ["purple", "#7e22ce", "#d8b4fe", "Purple"],
+  ["pink", "#db2777", "#f9a8d4", "Pink"], ["teal", "#0f766e", "#5eead4", "Teal"],
+  ["yellow", "#ca8a04", "#fde68a", "Yellow"], ["sky", "#0284c7", "#7dd3fc", "Sky"],
+  ["brown", "#92400e", "#e7c9a9", "Brown"], ["grey", "#4b5563", "#cbd5e1", "Grey"],
+];
+const PAL = Object.fromEntries(PALETTE.map(([k, l, d, n]) => [k, { l, d, n }]));
+// the six colours before the palette became tokens (strokes saved with plain hex)
+const LEGACY = { "#1d4ed8": "@blue", "#111827": "@ink", "#dc2626": "@red", "#16a34a": "@green",
+                 "#f59e0b": "@orange", "#9333ea": "@purple" };
+const SIZES = [0.0015, 0.0022, 0.0042, 0.0085, 0.013];   // fraction of page width
 const ERASER_R = [0.008, 0.015, 0.028];            // eraser radius per size, fraction of width
 const ICON = {
   pointer: '<path d="M5 3l14 8-6 2-2 6z"/>',
@@ -67,9 +82,17 @@ async function req(method, url, body) {
 }
 
 export function createAnnotator({ mount = document.body, position = "bottom", persist: saveInk = true,
-                                  collapsed = false } = {}) {
+                                  collapsed = false, unsaved = "Scratch ink — not saved",
+                                  dark = () => document.documentElement.dataset.paper === "dark" } = {}) {
+  /** A stored colour -> the colour to paint now (token by paper theme, legacy hex, custom hex). */
+  const ink = (c) => {
+    if (!c) return ink("@blue");
+    if (c[0] === "@") { const p = PAL[c.slice(1)] || PAL.blue; return dark() ? p.d : p.l; }
+    const old = LEGACY[c.toLowerCase()];
+    return old ? ink(old) : c;
+  };
   const A = {
-    tool: "pointer", color: COLORS[0], size: 1, collapsed: false, eraseMode: "partial", eraseSize: 1,
+    tool: "pointer", color: "@blue", size: 2, collapsed: false, eraseMode: "partial", eraseSize: 1,
     docs: new Map(),      // doc -> Promise<{page: strokes[]}>
     pages: new Map(),     // `${doc}|${page}` -> { el, canvas, strokes, doc, page }
     undo: [], redo: [], saveTimers: new Map(), penSeen: false, listeners: new Set(),
@@ -77,8 +100,10 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   };
   try {
     const s = JSON.parse(localStorage.getItem("pwt-annot") || "{}");
-    if (COLORS.includes(s.color)) A.color = s.color;
-    if (s.size >= 0 && s.size < SIZES.length) A.size = s.size;
+    if (typeof s.color === "string" && (PAL[s.color.slice(1)] || /^#[0-9a-f]{6}$/i.test(s.color))) {
+      A.color = LEGACY[s.color.toLowerCase()] || s.color;
+    }
+    if (s.size >= 0 && s.size < SIZES.length) A.size = s.v === 2 ? s.size : Math.min(SIZES.length - 1, s.size + 1);
     if (s.pos === "top" || s.pos === "bottom") position = s.pos;
     if (s.erase === "stroke" || s.erase === "partial") A.eraseMode = s.erase;
     if (s.esize >= 0 && s.esize < ERASER_R.length) A.eraseSize = s.esize;
@@ -121,14 +146,19 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     <div class="an-pop-wrap an-inkopt">
       <button type="button" class="an-swatch" data-an="colors" title="Colour" aria-label="Colour"
               aria-haspopup="true" aria-expanded="false"><i></i></button>
-      <div class="an-pop" data-pop="colors" hidden>${COLORS.map((c) => `
-        <button type="button" data-color="${c}" style="--c:${c}" aria-label="Colour ${c}"></button>`).join("")}</div>
+      <div class="an-pop an-colors" data-pop="colors" hidden>
+        <p class="an-pop-head" data-ink-head>Inks</p>
+        <div class="an-swatches">${PALETTE.map(([k, , , n]) => `
+          <button type="button" data-color="@${k}" title="${n}" aria-label="${n}"></button>`).join("")}</div>
+        <label class="an-custom" title="Any colour"><input type="color" data-custom value="#1d4ed8">
+          <span>Custom colour</span></label>
+      </div>
     </div>
     <div class="an-pop-wrap an-inkopt">
       <button type="button" class="an-size" data-an="sizes" title="Thickness" aria-label="Thickness"
               aria-haspopup="true" aria-expanded="false"><i></i></button>
       <div class="an-pop" data-pop="sizes" hidden>${SIZES.map((_, i) => `
-        <button type="button" data-size="${i}" aria-label="Size ${i + 1}"><i style="--d:${4 + i * 4}px"></i></button>`).join("")}</div>
+        <button type="button" data-size="${i}" aria-label="Size ${i + 1}"><i style="--d:${3 + i * 3.5}px"></i></button>`).join("")}</div>
     </div>
     <button type="button" data-an="delete" class="an-del" title="Delete selected (Delete)" aria-label="Delete selected" hidden>${svg("trash")}</button>
     <span class="an-sep" aria-hidden="true"></span>
@@ -153,7 +183,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   function persist() {
     try {
       const s = JSON.parse(localStorage.getItem("pwt-annot") || "{}");
-      localStorage.setItem("pwt-annot", JSON.stringify({ ...s, color: A.color, size: A.size,
+      localStorage.setItem("pwt-annot", JSON.stringify({ ...s, color: A.color, size: A.size, v: 2,
                                                          pos: bar.dataset.pos, erase: A.eraseMode,
                                                          esize: A.eraseSize }));
     } catch { /* ignore */ }
@@ -162,9 +192,18 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   function paintBar() {
     bar.querySelectorAll("[data-tool]").forEach((b) =>
       b.setAttribute("aria-pressed", String(b.dataset.tool === A.tool)));
-    bar.querySelector(".an-swatch i").style.background = selected()?.c || A.color;
-    bar.querySelector(".an-size i").style.setProperty("--d", `${4 + A.size * 4}px`);
-    bar.querySelectorAll("[data-color]").forEach((b) => b.classList.toggle("is-on", b.dataset.color === A.color));
+    bar.querySelector(".an-swatch i").style.background = ink(selected()?.c || A.color);
+    bar.querySelector(".an-size i").style.setProperty("--d", `${3 + A.size * 3.5}px`);
+    bar.querySelector(".an-size i").style.background = ink(A.color);
+    bar.dataset.paper = dark() ? "dark" : "light";
+    bar.querySelector("[data-ink-head]").textContent = dark() ? "Pastel inks for dark paper" : "High-contrast inks";
+    bar.querySelectorAll("[data-color]").forEach((b) => {
+      b.style.setProperty("--c", ink(b.dataset.color));
+      b.classList.toggle("is-on", b.dataset.color === A.color);
+    });
+    const custom = bar.querySelector("[data-custom]");
+    custom.closest(".an-custom").classList.toggle("is-on", A.color[0] === "#");
+    if (A.color[0] === "#") custom.value = A.color;
     bar.querySelectorAll("[data-size]").forEach((b) => b.classList.toggle("is-on", +b.dataset.size === A.size));
     bar.querySelectorAll("[data-erase]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.erase === A.eraseMode)));
     bar.querySelectorAll("[data-esize]").forEach((b) => b.setAttribute("aria-checked", String(+b.dataset.esize === A.eraseSize)));
@@ -204,6 +243,23 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       b.setAttribute("aria-expanded", String(b.dataset.an === except && !bar.querySelector(`[data-pop="${except}"]`).hidden)));
   }
 
+  bar.addEventListener("input", (e) => {
+    if (!e.target.matches("[data-custom]")) return;
+    pickColor(e.target.value.toLowerCase());
+  });
+
+  function pickColor(c) {
+    A.color = c; persist();
+    const s = selected();
+    if (s) { mutate(A.sel.key, (list) => { list[A.sel.i] = { ...s, c: A.color }; }); return paintBar(); }
+    if (!DRAWS.has(A.tool) || A.tool === "eraser" || A.tool === "select") A.tool = "pen";
+    return paintBar();
+  }
+
+  // Paper (or, for scratch ink, site) theme changed: repaint with the other shades.
+  new MutationObserver(() => paintBar()).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-paper", "data-theme"] });
+
   bar.addEventListener("click", (e) => {
     const er = e.target.closest("[data-erase]");
     if (er) { A.eraseMode = er.dataset.erase; persist(); return paintBar(); }
@@ -217,13 +273,8 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       return setTool(A.tool === k && k !== "pointer" ? "pointer" : k);
     }
     const c = e.target.closest("[data-color]");
-    if (c) {
-      A.color = c.dataset.color; persist(); closePops();
-      const s = selected();
-      if (s) { mutate(A.sel.key, (list) => { list[A.sel.i] = { ...s, c: A.color }; }); return paintBar(); }
-      if (!DRAWS.has(A.tool) || A.tool === "eraser" || A.tool === "select") A.tool = "pen";
-      return paintBar();
-    }
+    if (c) { closePops(); return pickColor(c.dataset.color); }
+    if (e.target.closest(".an-custom")) return;          // the colour input handles itself
     const s = e.target.closest("[data-size]");
     if (s) { A.size = +s.dataset.size; persist(); closePops(); return paintBar(); }
     const act = e.target.closest("[data-an]")?.dataset.an;
@@ -389,12 +440,13 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.strokeStyle = s.c;
-    ctx.fillStyle = s.c;
+    ctx.strokeStyle = ink(s.c);
+    ctx.fillStyle = ink(s.c);
     const lw = Math.max(1, s.w * w);
     if (s.t === "marker") {
-      ctx.globalAlpha = 0.32;
-      ctx.globalCompositeOperation = "multiply";
+      // multiply darkens white paper; on dark paper "screen" lightens it instead
+      ctx.globalAlpha = dark() ? 0.4 : 0.32;
+      ctx.globalCompositeOperation = dark() ? "screen" : "multiply";
       ctx.lineCap = "butt";
     }
     if (s.t === "pen" || s.t === "marker") {
@@ -676,7 +728,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     if (i >= 0) {
       const s = p.strokes[i];
       p.drag = { start: q, orig: s, before: p.strokes.slice(), moved: false };
-      if (s.c) { A.color = s.c; }
+      if (s.c) { A.color = LEGACY[s.c.toLowerCase()] || s.c; }
     }
     paintBar();
   }
@@ -768,8 +820,8 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     const fs = Math.max(12, s.s * p.el.clientWidth);
     Object.assign(box.style, p.view
       ? { position: "absolute", left: `${s.x * p.el.clientWidth}px`, top: `${s.y * p.el.clientWidth}px`,
-          color: s.c, fontSize: `${fs}px`, zIndex: 66 }
-      : { left: `${s.x * 100}%`, top: `${s.y * 100}%`, color: s.c, fontSize: `${fs}px` });
+          color: ink(s.c), fontSize: `${fs}px`, zIndex: 66 }
+      : { left: `${s.x * 100}%`, top: `${s.y * 100}%`, color: ink(s.c), fontSize: `${fs}px` });
     // hide the canvas copy while it is being edited
     let hidden = null;
     if (index != null) {
@@ -868,7 +920,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
 
   function save(p) {
     if (!saveInk) {
-      if (!A.warned) { A.warned = true; flash("Scratch ink — not saved"); }
+      if (!A.warned) { A.warned = true; flash(unsaved); }
       return;
     }
     clearTimeout(A.saveTimers.get(p.key));

@@ -106,6 +106,19 @@ function gated(P, err) {
       </div>`;
     return true;
   }
+  // Guests (yearly papers open without an account): a way in, not "Not authenticated".
+  if (/not authenticated|401/i.test(String(err?.message || ""))) {
+    const next = encodeURIComponent(location.pathname + location.search);
+    body(P).innerHTML = `
+      <div class="ai-plan">
+        <div class="ai-plan-ico" aria-hidden="true">✦</div>
+        <h3>Sign in for worked explanations</h3>
+        <p>A free account gets you one full explanation, the official mark scheme on every question and
+          saved annotations. The paper itself stays free to read.</p>
+        <a class="ai-btn" href="/login.html?signup=1&next=${next}">Create a free account</a>
+      </div>`;
+    return true;
+  }
   return false;
 }
 

@@ -6,7 +6,7 @@
  * annotator that saves per page, so this stays out of their way.
  * Loaded by auth.js and main.js; the flag makes sure it starts once.
  */
-const V = "20260927l";
+const V = "20260928a";
 
 function start() {
   if (window.__pwtScratchPen) return;
@@ -21,7 +21,9 @@ function start() {
   }
   import(`/annotate.js?v=${V}`).then(({ createAnnotator }) => {
     if (document.querySelector(".an-bar")) return;     // a viewer mounted one meanwhile
-    const ann = createAnnotator({ persist: false, collapsed: true });
+    // scratch ink follows the SITE theme (there is no paper here)
+    const ann = createAnnotator({ persist: false, collapsed: true,
+                                  dark: () => document.documentElement.dataset.theme === "dark" });
     ann.attachViewport(`scratch:${location.pathname}`);
   }).catch(() => { /* optional feature */ });
 }

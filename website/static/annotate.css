@@ -115,3 +115,20 @@
 .an-inst-protractor .an-inst-x { left: -24px; bottom: -6px; }
 .an-viewport .an-inst { pointer-events: auto; }
 .an-insts { display: flex; gap: 2px; }
+
+/* ── ink palette (12 tokens + custom) ─────────────────────────────── */
+.an-pop.an-colors { display: grid; gap: 8px; padding: 10px 12px 12px; width: max-content; }
+.an-pop.an-colors[hidden] { display: none; }
+.an-pop-head { margin: 0; font: 700 .68rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--grey); }
+.an-swatches { display: grid; grid-template-columns: repeat(6, 26px); gap: 7px; }
+.an-custom { display: flex; align-items: center; gap: 8px; font: 600 .78rem/1 "Hanken Grotesk", sans-serif;
+  color: var(--grey); cursor: pointer; padding-top: 6px; border-top: 1px solid var(--line); }
+.an-custom input { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.an-custom input::-webkit-color-swatch-wrapper { padding: 0; }
+.an-custom input::-webkit-color-swatch { border: 0; border-radius: 50%; box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--line); }
+.an-custom input::-moz-color-swatch { border: 0; border-radius: 50%; }
+.an-custom.is-on { color: var(--ink); }
+.an-custom.is-on input::-webkit-color-swatch { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--ink); }
+/* the text-box editor follows the paper */
+html[data-paper="dark"] .vw-pg .an-text, html[data-paper="dark"] .an-text { background: rgba(16, 18, 24, .92); }

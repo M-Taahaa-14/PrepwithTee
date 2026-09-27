@@ -145,6 +145,7 @@ export class PdfPane {
     const vp = page.getViewport({ scale: this.scale });
     const dpr = window.devicePixelRatio || 1;
     const canvas = document.createElement("canvas");
+    canvas.className = "vw-pdf";                 // viewer.css inverts only this for dark paper
     canvas.width = Math.floor(vp.width * dpr);
     canvas.height = Math.floor(vp.height * dpr);
     canvas.style.width = `${vp.width}px`;

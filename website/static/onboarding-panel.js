@@ -46,7 +46,7 @@ const ITEMS = [
     icon:  "📚",
     title: "Resources",
     desc:  "Notes, command words, formula sheets, and revision guides.",
-    href:  "/resources.html",
+    href:  "/resources",
   },
   {
     key:   "tools",

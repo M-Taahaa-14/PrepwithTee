@@ -148,12 +148,11 @@ def test_practice_booklet_has_no_separate_mark_scheme(client, enrolled):
     assert client.get(f"/api/booklets/{b['id']}").json()["kind"] == "booklet"
 
 
-def test_retention_sweeps_unopened_pdfs_and_reopening_rebuilds(client, enrolled):
+def test_retention_keeps_an_old_paper_as_a_record_only(client, enrolled):
     import os
     import booklets as bk
     b = client.post("/api/booklets", json={**PHYS, "max_questions": 3}).json()
     assert wait_ready(client, b["id"])["status"] == "ready"
-    ids = client.get(f"/api/booklets/{b['id']}").json()
     pdf = bk.BOOKLET_DIR / f"{b['id']}.pdf"
     assert pdf.exists() and not list(bk.BOOKLET_DIR.glob(f"{b['id']}.tmp-*"))
 
@@ -168,27 +167,41 @@ def test_retention_sweeps_unopened_pdfs_and_reopening_rebuilds(client, enrolled)
     assert bk.sweep() >= 1 and not pdf.exists()
     assert bk.sweep() == 0
 
-    # the old link still works: status notices, rebuilds the same paper in the same order
-    st = client.get(f"/api/booklets/{b['id']}/status").json()
-    assert st["status"] in ("queued", "building", "ready")
-    assert wait_ready(client, b["id"])["status"] == "ready"
-    assert pdf.exists()
-    again = client.get(f"/api/booklets/{b['id']}").json()
-    assert again["params_json"] == ids["params_json"]
-    assert client.get(f"/api/booklets/{b['id']}/pdf").status_code == 200
+    # tutor, 2026-09-27: older than the window = a record, never rebuilt
+    assert client.get(f"/api/booklets/{b['id']}/status").json()["status"] == "expired"
+    assert client.get(f"/api/booklets/{b['id']}/pdf").status_code == 410
+    assert not pdf.exists()
+    page = client.get(f"/papers/view/{b['id']}").text
+    assert "Record only" in page and "Build it again" in page and "vw-state" not in page
+    listed = client.get("/api/booklets").json()["booklets"]
+    assert next(x for x in listed if x["id"] == b["id"])["available"] is False
+    mine = client.get("/my-papers").text
+    assert "kept as a record" in mine and "pick=Motion" in mine and "pick=Pressure" in mine
 
 
-def test_swept_mock_test_rebuilds_both_files(client, enrolled):
-    import os
-    import booklets as bk
-    b = client.post("/api/booklets", json={**PHYS, "max_questions": 2, "kind": "test"}).json()
+def test_my_papers_lists_builds_and_annotated_download(client, enrolled):
+    b = client.post("/api/booklets", json={**PHYS, "max_questions": 2}).json()
     assert wait_ready(client, b["id"])["status"] == "ready"
-    ms = bk.BOOKLET_DIR / f"{b['id']}_ms.pdf"
-    old = ms.stat().st_mtime - 40 * 86400
-    for f in (ms, bk.BOOKLET_DIR / f"{b['id']}.pdf"):
-        os.utime(f, (old, old))
-    bk.sweep()
-    assert not ms.exists()
-    assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 409   # being rebuilt
-    assert wait_ready(client, b["id"])["status"] == "ready"
-    assert client.get(f"/api/booklets/{b['id']}/pdf?part=ms").status_code == 200
+    html = client.get("/my-papers").text
+    assert f'href="/papers/view/{b["id"]}"' in html and "With my annotations" not in html
+    assert 'name="robots" content="noindex"' in html
+    # no ink yet: the annotated download is just the PDF
+    r = client.get(f"/api/booklets/{b['id']}/pdf?annotated=1")
+    assert r.status_code == 200 and r.headers["content-disposition"].startswith("attachment")
+    ink = [{"t": "pen", "c": "@red", "w": 0.004, "pts": [[0.1, 0.1, 0.5], [0.4, 0.3, 0.5]]},
+           {"t": "text", "c": "#123456", "s": 0.02, "x": 0.2, "y": 0.5, "txt": "my working"},
+           {"t": "arrow", "c": "@blue", "w": 0.004, "a": [0.5, 0.5], "b": [0.7, 0.6]}]
+    assert client.put("/api/annotations", json={"doc": f"booklet:{b['id']}", "page": 2,
+                                                 "strokes": ink}).status_code == 200
+    assert "With my annotations" in client.get("/my-papers").text
+    r = client.get(f"/api/booklets/{b['id']}/pdf?annotated=1")
+    assert r.status_code == 200 and "annotated" in r.headers["content-disposition"]
+    doc = fitz.open(stream=r.content, filetype="pdf")
+    assert "my working" in doc[1].get_text()
+    assert len(doc[1].get_drawings()) > len(fitz.open(
+        stream=client.get(f"/api/booklets/{b['id']}/pdf").content, filetype="pdf")[1].get_drawings())
+
+
+def test_mock_test_mark_scheme_annotations_are_accepted(client, enrolled):
+    r = client.put("/api/annotations", json={"doc": "booklet:abcdef12:ms", "page": 1, "strokes": []})
+    assert r.status_code == 200

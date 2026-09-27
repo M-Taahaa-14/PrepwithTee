@@ -94,6 +94,10 @@ import calc as _calc_mod
 app.include_router(_calc_mod.router)
 import notes as _notes_mod
 app.include_router(_notes_mod.router)
+import resources as _resources_mod
+app.include_router(_resources_mod.router)
+import explore as _explore_mod
+app.include_router(_explore_mod.router)
 
 
 @app.get("/solver", include_in_schema=False)
@@ -2069,17 +2073,19 @@ CHATBOT_SYSTEM = """You are PrepWithTee's concise, friendly support assistant. P
 Coverage: 2020–2025 papers, all sessions and variants.
 
 == FEATURES ==
-- Topical Past Papers: 5,000+ questions organised by topic, with official mark schemes (filter by year, session, variant)
-- AI Tutor (/tutor.html): Step-by-step explanations for any past-paper question; guided hints before full solutions
-- MCQ Practice (/quiz.html): Timed topic-based drills with instant feedback
-- Resources (/resources.html): Formula sheets, definitions glossary, Cambridge command words guide, periodic table, scientific calculator, graph tool, pseudocode editor
-- Notes (/notes.html): Save text or sticky notes linked to any question or topic
-- Flashcards (/flashcards.html): Spaced-repetition card decks for key facts
-- Study Hub (/study-hub.html): Personalised revision plans tracking topic coverage
-- Dashboard (/dashboard.html): Progress analytics, streaks, achievements, yearly & topical performance charts
-- Topical papers (/papers): pick board, subject, chapters and subtopics; build a practice booklet or a mock test
-- Past papers by year (/yearly): every sitting's question paper, mark scheme and insert, side by side
+- Past papers hub (/papers): explains every way to practise and a revision plan
+- Topical papers (/papers/topical): pick board, subject, chapters and subtopics; builds a booklet with the mark scheme after each question
+- Mock tests (/papers/mock-tests): timed exam-style test from chosen chapters; mark scheme unlocks on Finish
+- Past papers by year (/yearly): every sitting's question paper, mark scheme and insert, side by side - opens without an account
 - MCQ practice (/mcq): full papers or topical sets, marked instantly against the official key
+- My papers (/my-papers): every booklet and mock test the student built; open ones from the last 30 days, older ones kept as a record
+- Revision notes (/notes): PrepWithTee's own chapter-by-chapter notes linked to practice
+- Resources (/resources): well-known teachers' PDF notes, books, worksheets, official syllabuses and study planners
+- AI Tutor (/tutor.html) and Photo Solver (/solver): explanations and step-by-step solutions
+- Tools (/tools.html): calculator, graph plotter, formula sheets, definitions, command words, periodic table, pseudocode runner
+- My Notes (/notes.html) and Flashcards (/flashcards.html): personal notes and spaced repetition
+- Dashboard (/dashboard.html): progress, streaks, topical & yearly performance
+- Every page, listed (/explore)
 
 == PRICING ==
 - Free: Monthly capped topical access + all free tools (no card required)
@@ -3798,7 +3804,7 @@ app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 # ── SEO: robots.txt + sitemap.xml ─────────────────────────────────────────────
 
 _PUBLIC_PATHS = [
-    "/", "/subjects.html", "/resources.html",
+    "/", "/subjects.html", "/explore",
     "/pricing.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/blog",
     # Study tools — each has a distinct meta description and real student value
@@ -3816,8 +3822,8 @@ _NOINDEX_PATHS = {
     "/study.html", "/study-hub.html", "/quiz.html",
     "/flashcards.html", "/fc-progress.html",
     "/topical-progress.html", "/yearly-progress.html",
-    "/achievements.html", "/notes.html", "/notes-view.html",
-    "/analytics.html", "/calendar.html",
+    "/achievements.html", "/notes.html",
+    "/analytics.html", "/calendar.html", "/my-papers",
     # Redirect stubs — no content, should never be indexed
     "/revise.html", "/ask.html", "/walkthrough.html",
 }
@@ -3844,7 +3850,7 @@ def sitemap_xml():
         "/yearly": "0.92",
         "/mcq": "0.88",
         "/subjects.html": "0.90",
-        "/resources.html": "0.85",
+        "/resources": "0.85",
         "/pricing.html": "0.80",
         "/tools.html": "0.80",
         "/formulas.html": "0.80",
@@ -3857,7 +3863,7 @@ def sitemap_xml():
     entries = []
     for p in _PUBLIC_PATHS:
         pri = _priority.get(p, "0.60")
-        freq = "weekly" if p in ("/", "/blog", "/resources.html") else "monthly"
+        freq = "weekly" if p in ("/", "/blog") else "monthly"
         entries.append(
             f"  <url><loc>{origin}{p}</loc>"
             f"<changefreq>{freq}</changefreq>"
@@ -3886,6 +3892,13 @@ def sitemap_xml():
             pri = "0.80" if p.count("/") <= 3 else "0.75"
             entries.append(f"  <url><loc>{origin}{p}</loc>"
                            f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
+    except Exception:
+        pass
+    # Resources (hub, boards, subjects, shelves - folder pages are noindex)
+    try:
+        for p in _resources_mod.sitemap_paths():
+            entries.append(f"  <url><loc>{origin}{p}</loc>"
+                           f"<changefreq>monthly</changefreq><priority>0.70</priority></url>")
     except Exception:
         pass
     try:

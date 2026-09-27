@@ -15,33 +15,33 @@
     {
       label: "O Level",
       items: [
-        { name: "Mathematics D", code: "4024", href: "resources.html#/O%20Level%20Mathematics%204024" },
-        { name: "Physics",       code: "5054", href: "resources.html#/O%20Level%20Physics%205054" },
-        { name: "Chemistry",     code: "5070", href: "resources.html#/O%20Level%20Chemistry%205070" },
-        { name: "Computer Science", code: "2210", href: "resources.html" },
-        { name: "Islamiyat",     code: "2058", href: "resources.html" },
-        { name: "Pakistan Studies", code: "2059", href: "resources.html" }
+        { name: "Mathematics D", code: "4024", href: "/resources/o-level/mathematics-4024" },
+        { name: "Physics",       code: "5054", href: "/resources/o-level/physics-5054" },
+        { name: "Chemistry",     code: "5070", href: "/resources/o-level/chemistry-5070" },
+        { name: "Computer Science", code: "2210", href: "/resources" },
+        { name: "Islamiyat",     code: "2058", href: "/resources" },
+        { name: "Pakistan Studies", code: "2059", href: "/resources" }
       ]
     },
     {
       label: "IGCSE",
       items: [
-        { name: "Mathematics",  code: "0580", href: "resources.html#/IGCSE%20Mathematics%200580" },
-        { name: "Physics",      code: "0625", href: "resources.html#/IGCSE%20Physics%200625" },
-        { name: "Computer Science", code: "0478", href: "resources.html" }
+        { name: "Mathematics",  code: "0580", href: "/resources/igcse/mathematics-0580" },
+        { name: "Physics",      code: "0625", href: "/resources/igcse/physics-0625" },
+        { name: "Computer Science", code: "0478", href: "/resources" }
       ]
     },
     {
       label: "A Level",
       items: [
-        { name: "Mathematics",  code: "9709", href: "resources.html#/A%20Level%20Mathematics%209709" },
-        { name: "Physics",      code: "9702", href: "resources.html#/A%20Level%20Physics%209702" }
+        { name: "Mathematics",  code: "9709", href: "/resources/a-level/mathematics-9709" },
+        { name: "Physics",      code: "9702", href: "/resources/a-level/physics-9702" }
       ]
     }
   ];
 
   function buildResources() {
-    var resLink = document.querySelector('a.nav-link[href="resources.html"]');
+    var resLink = document.querySelector('a.nav-link[href="/resources"]');
     if (!resLink || resLink.dataset.resBuilt) return;
     // Don't hijack links already inside the new grouped nav structure
     if (resLink.closest('.nav-group')) return;
@@ -75,7 +75,7 @@
           '</div>';
       }).join("") +
       '</div>' +
-      '<a class="nav-res-all" href="resources.html">All resources →</a>';
+      '<a class="nav-res-all" href="/resources">All resources →</a>';
     menu.innerHTML = colsHtml;
     host.appendChild(menu);
 

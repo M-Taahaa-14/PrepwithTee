@@ -1559,6 +1559,19 @@ def get_annotations(user_id: str, doc_key: str) -> dict[int, list]:
     return out
 
 
+def annotated_docs(user_id: str, prefix: str) -> set[str]:
+    """Doc keys starting with `prefix` on which this user has any ink (My papers)."""
+    if _USE_SUPABASE:
+        rows = (_client().table("page_annotations").select("doc_key")
+                .eq("user_id", user_id).like("doc_key", f"{prefix}%").execute().data or [])
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                "SELECT DISTINCT doc_key FROM page_annotations WHERE user_id=? AND doc_key LIKE ?",
+                (user_id, f"{prefix}%")).fetchall()]
+    return {r["doc_key"] for r in rows}
+
+
 def set_annotations(user_id: str, doc_key: str, page: int, strokes: list) -> None:
     now = datetime.now(timezone.utc).isoformat()
     if _USE_SUPABASE:

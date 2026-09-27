@@ -19,13 +19,15 @@ Two kinds (tutor, 2026-09-27 - the old papers.html Test Builder moved here):
 pipeline.testgen, exam-style cover and the mark scheme as a SEPARATE file
 ({id}_ms.pdf) that the viewer keeps locked until the student finishes.
 
-Retention (tutor's call, 2026-09-26): a built PDF is kept for 30 days after it
-was LAST OPENED (every open refreshes the file's mtime), then sweep() deletes
-the file only. The booklet row keeps its question ids, so opening an old link
-rebuilds the same paper in the same order - the status endpoint notices the
-missing file and queues the rebuild, and the viewer shows its normal loader.
-Builds write to a temporary name and are swapped in atomically, so two workers
-rebuilding at once can never serve a half-written file.
+Retention (tutor, 2026-09-27 - replaces the 2026-09-26 "rebuild on open"): a
+built PDF is kept for 30 days after it was LAST OPENED (every open refreshes the
+file's mtime), then sweep() deletes the file. The booklet row stays, so the
+student's history (/my-papers) keeps it as a RECORD - title, chapters, date,
+size - with a "Build it again" link, but the paper itself no longer opens.
+Builds write to a temporary name and are swapped in atomically.
+
+    GET  /my-papers                       the student's history (SSR, noindex)
+    GET  /api/booklets/{id}/pdf?annotated=1   the PDF with their ink burnt in
 
 The PDF is built by `python -m pipeline.compose --ids ...` in a worker thread,
 exactly as /api/generate shells out: the CLI is the tested interface. Its
@@ -64,7 +66,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260927l"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260928a"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -114,14 +116,17 @@ if os.environ.get("APP_ENV") != "test":
     threading.Thread(target=_sweeper, name="booklet-sweep", daemon=True).start()
 
 
-def _ensure_files(b: dict, user: dict) -> dict:
-    """A ready booklet whose PDF was swept: queue the rebuild (same ids, same order)."""
-    if b["status"] == "ready" and not all(p.exists() for p in _pdf_paths(b)):
-        _udb.update_booklet(b["id"], {"status": "queued", "progress": 0,
-                                      "stage": "Rebuilding your paper"})
-        _EXEC.submit(_build, b["id"], user, False)
-        b = {**b, "status": "queued", "progress": 0, "stage": "Rebuilding your paper"}
-    return b
+def expired(b: dict) -> bool:
+    """Built, but the PDF was swept (not opened for RETENTION_DAYS): record only."""
+    return b["status"] == "ready" and not all(p.exists() for p in _pdf_paths(b))
+
+
+def available_until(b: dict) -> float | None:
+    """When a ready booklet's PDF will be swept if it is not opened again."""
+    try:
+        return BOOKLET_DIR.joinpath(f"{b['id']}.pdf").stat().st_mtime + RETENTION_DAYS * 86400
+    except OSError:
+        return None
 
 
 # ── Request models ────────────────────────────────────────────────────────────
@@ -323,7 +328,8 @@ def my_booklets(user: dict = Depends(_auth.get_current_user)):
     return {"booklets": [
         {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"],
          "status": b["status"], "created_at": b["created_at"], "kind": _kind(b),
-         "questions": len(b.get("question_ids") or []), "url": f"/papers/view/{b['id']}"}
+         "questions": len(b.get("question_ids") or []), "url": f"/papers/view/{b['id']}",
+         "available": not expired(b)}
         for b in _udb.list_booklets(user["id"])]}
 
 
@@ -337,13 +343,17 @@ def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)
 
 @router.get("/api/booklets/{booklet_id}/status")
 def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
-    b = _ensure_files(_owned(booklet_id, user), user)
+    b = _owned(booklet_id, user)
+    if expired(b):
+        return {"status": "expired", "progress": 100, "stage": "Kept as a record",
+                "error": f"This paper was last opened more than {RETENTION_DAYS} days ago, so its PDF "
+                         "has been removed. It stays on My papers as a record."}
     return {"status": b["status"], "progress": b["progress"], "stage": b.get("stage"),
             "error": b.get("error")}
 
 
 @router.get("/api/booklets/{booklet_id}/pdf")
-def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
+def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", annotated: bool = False,
                 user: dict = Depends(_auth.get_current_user)):
     b = _owned(booklet_id, user)
     if b["status"] != "ready":
@@ -351,9 +361,9 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
     if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
         raise HTTPException(404, "No such part")
     pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
-    if not pdf.exists():                       # swept: rebuild in the background
-        _ensure_files(b, user)
-        raise HTTPException(409, "This paper is being rebuilt - it will open in a moment.")
+    if not pdf.exists():
+        raise HTTPException(410, f"This paper was not opened for {RETENTION_DAYS} days, so its PDF has "
+                                 "been removed. It stays on My papers as a record.")
     # "Last opened" - what retention counts from. At most once a day: touching the
     # file changes its ETag / Last-Modified, and PDF.js loads it in byte ranges, so
     # a touch mid-session made the browser stitch ranges of two "versions"
@@ -364,9 +374,18 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper",
     except OSError:
         pass
     name = (re.sub(r"[^A-Za-z0-9]+", "-", b["title"] or booklet_id).strip("-")[:80]
-            + ("-mark-scheme" if part == "ms" else "") + ".pdf")
+            + ("-mark-scheme" if part == "ms" else "") + ("-annotated" if annotated else "") + ".pdf")
+    if annotated:
+        doc = f"booklet:{booklet_id}" + (":ms" if part == "ms" else "")
+        pages = _udb.get_annotations(user["id"], doc)
+        if pages:
+            import annot_pdf
+            from fastapi.responses import Response
+            return Response(annot_pdf.burn(pdf, pages), media_type="application/pdf",
+                            headers={"Content-Disposition": f'attachment; filename="{name}"',
+                                     "Cache-Control": "private, no-store"})
     return FileResponse(pdf, media_type="application/pdf", filename=name,
-                        content_disposition_type="attachment" if download else "inline",
+                        content_disposition_type="attachment" if download or annotated else "inline",
                         headers={"Cache-Control": "private, max-age=3600"})
 
 
@@ -473,6 +492,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
     if user is None:
         return RedirectResponse(f"/login.html?next=/papers/view/{booklet_id}", 302)
     b = _owned(booklet_id, user)
+    if expired(b):
+        return _record_page(b, user)
     import blog as _blog
     esc = _catalog._e
     subj = _catalog.SUBJECTS.get(b["syllabus"], {})
@@ -485,7 +506,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
-  <script>try{{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
+  <script>try{{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);var p=localStorage.getItem("pwt-paper");if(p)document.documentElement.setAttribute("data-paper",p)}}catch(e){{}}</script>
   <title>{esc(b['title'] or 'Topical paper')} — PrepWithTee</title>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -510,3 +531,185 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
+
+
+# ── My papers (history) ───────────────────────────────────────────────────────
+
+def _rebuild_url(b: dict) -> str:
+    """The builder, pre-ticked with the same chapters (and mode)."""
+    from urllib.parse import urlencode
+    params = b.get("params_json") or {}
+    q = [("pick", p["chapter"]) for p in params.get("picks", []) if p.get("chapter")]
+    if _kind(b) == "test":
+        q.append(("mode", "test"))
+    base = _catalog.subject_url(b["syllabus"]) if b["syllabus"] in _catalog.SUBJECTS else "/papers/topical"
+    return f"{base}?{urlencode(q)}#builder" if q else f"{base}#builder"
+
+
+def _date(ts) -> str:
+    from datetime import datetime
+    try:
+        d = (datetime.fromtimestamp(ts) if isinstance(ts, (int, float))
+             else datetime.fromisoformat(str(ts).replace("Z", "+00:00")))
+        return f"{d.day} {d.strftime('%b %Y')}"
+    except Exception:
+        return str(ts or "")[:10]
+
+
+def _paper_card(b: dict, inked: set[str]) -> str:
+    import ui
+    esc = _catalog._e
+    params = b.get("params_json") or {}
+    test = _kind(b) == "test"
+    subj = _catalog.SUBJECTS.get(b["syllabus"], {})
+    chapters = [p["chapter"] for p in params.get("picks", []) if p.get("chapter")]
+    n = len(b.get("question_ids") or [])
+    marks = params.get("total_marks")
+    years = (f"{params.get('year_from')}–{params.get('year_to')}"
+             if params.get("year_from") and params.get("year_to") else "")
+    has_ink = f"booklet:{b['id']}" in inked or f"booklet:{b['id']}:ms" in inked
+    gone = expired(b)
+    if b["status"] in ("queued", "building"):
+        badge, state = '<span class="mp-badge mp-building">Building…</span>', "building"
+    elif b["status"] == "failed":
+        badge, state = '<span class="mp-badge mp-failed">Failed</span>', "failed"
+    elif gone:
+        badge, state = '<span class="mp-badge mp-record">Record only</span>', "record"
+    else:
+        until = available_until(b)
+        badge = f'<span class="mp-badge mp-ready">Ready{f" · until {_date(until)}" if until else ""}</span>'
+        state = "ready"
+    acts = []
+    bid = esc(b["id"])
+    if state in ("ready", "building"):
+        acts.append(f'<a class="cat-btn" href="/papers/view/{bid}">Open</a>')
+    if state == "ready":
+        acts.append(f'<a class="cat-btn cat-btn-ghost" href="/api/booklets/{bid}/pdf?download=1">'
+                    f'{ui.icon("download")} PDF</a>')
+        if has_ink:
+            acts.append(f'<a class="cat-btn cat-btn-ghost" href="/api/booklets/{bid}/pdf?annotated=1" '
+                        f'title="The PDF with your pen, highlighter and text marks">'
+                        f'{ui.icon("download")} With my annotations</a>')
+        if test:
+            acts.append(f'<a class="cat-btn cat-btn-ghost" href="/api/booklets/{bid}/pdf?part=ms&amp;'
+                        f'{"annotated=1" if has_ink else "download=1"}">{ui.icon("download")} Mark scheme</a>')
+    acts.append(f'<a class="cat-btn cat-btn-ghost" href="{esc(_rebuild_url(b))}">Build it again</a>')
+    meta = " · ".join(x for x in (f"{n} questions", f"{marks} marks" if marks else "", years,
+                                   "annotated" if has_ink else "") if x)
+    return f"""
+    <article class="mp-card is-{state} cat-tone-{subj.get('tone', 'blue')}" data-syllabus="{esc(b['syllabus'])}"
+             data-kind="{'test' if test else 'booklet'}">
+      <div class="mp-ic">{ui.icon("test" if test else "topical")}</div>
+      <div class="mp-body">
+        <p class="mp-top"><span class="cat-code">{esc(b['syllabus'])}</span>
+          <span class="mp-kind">{'Mock test' if test else 'Topical paper'}</span>{badge}</p>
+        <h3>{esc(' · '.join(chapters) or b['title'] or 'Topical paper')}</h3>
+        <p class="mp-meta">{esc(subj.get('plain', ''))} · built {_date(b.get('created_at'))} · {esc(meta)}</p>
+        <div class="mp-acts">{''.join(acts)}</div>
+      </div>
+    </article>"""
+
+
+_FILTER_JS = """
+<script>
+(function () {
+  var f = { syl: document.querySelector("[data-mp-syl][aria-pressed=true]")?.dataset.mpSyl || "", kind: "" };
+  function apply() {
+    var shown = 0;
+    document.querySelectorAll(".mp-card").forEach(function (c) {
+      var ok = (!f.syl || c.dataset.syllabus === f.syl) && (!f.kind || c.dataset.kind === f.kind);
+      c.hidden = !ok; if (ok) shown++;
+    });
+    document.querySelectorAll(".mp-sec").forEach(function (s) {
+      s.hidden = !s.querySelector(".mp-card:not([hidden])");
+    });
+    var none = document.querySelector(".mp-none");
+    if (none) none.hidden = shown > 0;
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-mp-syl],[data-mp-kind]"); if (!b) return;
+    if (b.hasAttribute("data-mp-syl")) f.syl = b.dataset.mpSyl; else f.kind = b.dataset.mpKind;
+    b.parentNode.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    apply();
+  });
+  apply();
+})();
+</script>"""
+
+
+@router.get("/my-papers", response_class=HTMLResponse)
+def my_papers_page(syllabus: str = "", user: dict | None = Depends(_auth.maybe_user)):
+    if user is None:
+        return RedirectResponse("/login.html?next=/my-papers", 302)
+    esc = _catalog._e
+    state = _catalog._student_state(user)
+    rows = _udb.list_booklets(user["id"], 300)
+    try:
+        inked = _udb.annotated_docs(user["id"], "booklet:")
+    except Exception:
+        inked = set()
+    codes = sorted({b["syllabus"] for b in rows})
+    live = [b for b in rows if not expired(b)]
+    old = [b for b in rows if expired(b)]
+    chips = "".join(
+        f'<button type="button" class="yr-chip" data-mp-syl="{esc(c)}" aria-pressed="{str(c == syllabus).lower()}">'
+        f'{esc(c)} <span>{esc(_catalog.SUBJECTS.get(c, {}).get("plain", ""))}</span></button>' for c in codes)
+    bar = (f'<div class="yr-bar mp-bar" role="toolbar" aria-label="Filter papers">'
+           f'<div class="yr-chips"><button type="button" class="yr-chip" data-mp-syl="" '
+           f'aria-pressed="{str(syllabus not in codes).lower()}">All subjects</button>{chips}</div>'
+           f'<div class="yr-chips"><button type="button" class="yr-chip" data-mp-kind="" aria-pressed="true">All</button>'
+           f'<button type="button" class="yr-chip" data-mp-kind="booklet" aria-pressed="false">Topical</button>'
+           f'<button type="button" class="yr-chip" data-mp-kind="test" aria-pressed="false">Mock tests</button></div>'
+           f'</div>') if rows else ""
+    empty = ("" if rows else
+             '<div class="ui-empty"><h2>No papers yet</h2><p>Topical papers and mock tests you build appear '
+             'here, together with your annotations. Build your first one from a subject page.</p>'
+             '<div class="cat-actions"><a class="cat-btn" href="/papers/topical">Build a topical paper</a>'
+             '<a class="cat-btn cat-btn-ghost" href="/papers/mock-tests">Make a mock test</a></div></div>')
+    sec_live = (f'<section class="mp-sec"><h2 class="ui-h2">Ready to open</h2><div class="mp-list">'
+                f'{"".join(_paper_card(b, inked) for b in live)}</div></section>') if live else ""
+    sec_old = (f'<section class="mp-sec"><h2 class="ui-h2">Older - kept as a record</h2>'
+               f'<p class="cat-note mp-note">Not opened for {RETENTION_DAYS} days, so the PDF was removed.</p>'
+               f'<div class="mp-list">{"".join(_paper_card(b, inked) for b in old)}</div></section>') if old else ""
+    body = f"""
+    <header class="cat-hero cat-hero-sm">
+      <p class="cat-eyebrow">My papers</p>
+      <h1>Papers you have built</h1>
+      <p class="cat-lede">Every topical paper and mock test you have made. A paper stays ready to open - with
+        your pen and highlighter marks - for {RETENTION_DAYS} days after you last opened it. After that it is
+        kept here as a record, and <b>Build it again</b> makes a fresh one on the same chapters.</p>
+      <dl class="cat-stats"><div><dt>Built</dt><dd>{len(rows)}</dd></div>
+        <div><dt>Ready to open</dt><dd>{len(live)}</dd></div>
+        <div><dt>Records</dt><dd>{len(old)}</dd></div></dl>
+      <div class="cat-actions"><a class="cat-btn" href="/papers/topical">New topical paper</a>
+        <a class="cat-btn cat-btn-ghost" href="/papers/mock-tests">New mock test</a></div>
+    </header>
+    {bar}
+    {empty}
+    {sec_live}
+    {sec_old}
+    <p class="cat-note mp-none" hidden>Nothing matches those filters.</p>
+    {_FILTER_JS}"""
+    html = _catalog._shell(title="My papers - PrepWithTee", desc="Topical papers and mock tests you built.",
+                           path="/my-papers", body=body, state=state, noindex=True,
+                           crumbs=[("Home", "/"), ("Past papers", "/papers"), ("My papers", "/my-papers")])
+    html = html.replace("</head>", f'  <link rel="stylesheet" href="/yearly.css?v={VIEWER_V}">\n</head>', 1)
+    return HTMLResponse(html, headers={"Cache-Control": "private, no-store"})
+
+
+def _record_page(b: dict, user: dict) -> HTMLResponse:
+    state = _catalog._student_state(user)
+    body = f"""
+    <header class="cat-hero cat-hero-sm">
+      <p class="cat-eyebrow">Kept as a record</p>
+      <h1>This paper is no longer stored</h1>
+      <p class="cat-lede">It was last opened more than {RETENTION_DAYS} days ago, so its PDF was removed. The
+        record stays on My papers - build it again for a fresh copy on the same chapters.</p>
+    </header>
+    <div class="mp-list">{_paper_card(b, set())}</div>"""
+    return HTMLResponse(_catalog._shell(
+        title="Paper record - PrepWithTee", desc="", path=f"/papers/view/{b['id']}", body=body,
+        state=state, noindex=True,
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("My papers", "/my-papers"),
+                ("Record", f"/papers/view/{b['id']}")]),
+        headers={"Cache-Control": "private, no-store"})

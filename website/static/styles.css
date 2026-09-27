@@ -8842,3 +8842,25 @@ html[data-theme="dark"] .mini:hover {
 .footer-col .footer-nl-links a { display: inline; color: #8899b5; }
 .footer-col .footer-nl-links a:hover { color: #fff; transform: none; }
 html[data-theme="dark"] .btn-gold { color: #1f1405; }
+
+/* ── Breadcrumb bar on static pages (stamped by website/sync_nav.py) ──── */
+.pg-crumbbar { background: var(--page); border-bottom: 1px solid var(--line); }
+.pg-crumbbar-in { display: flex; align-items: center; gap: .85rem; min-height: 46px; padding-top: .45rem;
+  padding-bottom: .45rem; overflow: hidden; }
+.pg-back { flex: none; display: inline-flex; align-items: center; gap: .3rem; text-decoration: none; color: var(--ink);
+  font: 700 .8rem/1 "Hanken Grotesk", system-ui, sans-serif; padding: .4rem .7rem .4rem .45rem; border-radius: 999px;
+  background: var(--white); border: 1px solid var(--line); }
+.pg-back:hover { border-color: var(--accent); color: var(--purple-bright); }
+.pg-back svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.pg-crumbs { display: flex; align-items: center; gap: .35rem; min-width: 0; font-size: .8rem; color: var(--grey);
+  white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+.pg-crumbs::-webkit-scrollbar { display: none; }
+.pg-crumbs a { color: var(--grey); text-decoration: none; }
+.pg-crumbs a:hover { color: var(--purple-bright); text-decoration: underline; }
+.pg-crumbs [aria-current] { color: var(--ink); font-weight: 700; }
+.pg-crumbs span[aria-hidden] { opacity: .6; }
+@media (max-width: 560px) {
+  .pg-crumbs a:not(:last-of-type), .pg-crumbs a:not(:last-of-type) + span[aria-hidden] { display: none; }
+}
+@media print { .pg-crumbbar { display: none; } }

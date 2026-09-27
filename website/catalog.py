@@ -39,8 +39,8 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260927l"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260928a"    # the site-wide styles.css pin
+CSS_V = "20260928a"       # bump with catalog.css / catalog.js (immutable caching)
+STYLES_V = "20260928b"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
@@ -367,6 +367,10 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
     crumb_html = " <span aria-hidden=\"true\">›</span> ".join(
         f'<a href="{_e(u)}">{_e(n)}</a>' if i < len(crumbs) - 1 else f"<span>{_e(n)}</span>"
         for i, (n, u) in enumerate(crumbs))
+    back = ""
+    if len(crumbs) > 2:
+        import ui
+        back = ui.back_link(crumbs[-2][1], crumbs[-2][0])
     needs_boards = bool(state["user"]) and (not state["boards"] or state.get("boards_inferred"))
     page_state = {"signedIn": bool(state["user"]), "boards": state["boards"],
                   "needsBoards": needs_boards,
@@ -384,6 +388,10 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
   <link rel="canonical" href="{_e(canonical)}">
   {robots}
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PrepWithTee">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#4C2E72" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1117" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="{_e(title)}">
   <meta property="og:description" content="{_e(desc)}">
   <meta property="og:url" content="{_e(canonical)}">
@@ -398,8 +406,8 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 </head>
 <body class="cat-page">
 {_blog._nav()}
-<main class="cat-wrap">
-  <nav class="cat-crumbs" aria-label="Breadcrumb">{crumb_html}</nav>
+<main class="cat-wrap" id="main">
+  <div class="cat-topline">{back}<nav class="cat-crumbs" aria-label="Breadcrumb">{crumb_html}</nav></div>
   {body}
 </main>
 {_blog._foot()}
@@ -432,21 +440,26 @@ def _subject_card(code: str, state: dict, test: bool = False) -> str:
     url = subject_url(code) + ("?mode=test#builder" if test else "")
     meta = f'{st["chapters"]} chapters · {st["questions"]:,} questions'
     yrs = _years(st)
+    locked = bool(state["user"]) and not enrolled
     if enrolled and test:
         actions = f'<a class="cat-btn" href="{url}">Build a mock test</a>'
         badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
     elif enrolled:
         actions = (f'<a class="cat-btn" href="{url}">Topical</a>'
-                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Yearly</a>'
+                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">By year</a>'
                    + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ</a>'
                       if st["has_mcq"] else ""))
         badge = '<span class="cat-badge cat-badge-on">Enrolled</span>'
-    else:
+    elif locked:
         actions = (f'<button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">'
                    f'Enrol free</button><a class="cat-btn cat-btn-ghost" href="{url}">Preview</a>')
         badge = '<span class="cat-badge" aria-label="Not enrolled">🔒</span>'
+    else:
+        actions = (f'<a class="cat-btn" href="{url}">{"Mock tests" if test else "Chapters"}</a>'
+                   f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">By year</a>')
+        badge = ""
     return f"""
-    <article class="cat-subj cat-tone-{s['tone']}{' is-enrolled' if enrolled else ' is-locked'}">
+    <article class="cat-subj cat-tone-{s['tone']}{' is-enrolled' if enrolled else ' is-locked' if locked else ''}">
       <div class="cat-subj-top"><span class="cat-code">{code}</span>{badge}</div>
       <h3><a href="{url}">{_e(s['plain'])}</a></h3>
       <p class="cat-subj-meta">{meta}{f' · {yrs}' if yrs else ''}</p>
@@ -469,80 +482,317 @@ def _board_tabs(active: str, state: dict, q: str = "") -> str:
 
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
+#
+#   /papers                 the past-papers hub: what each mode is, when to use
+#                           it, a revision plan, boards, FAQ (never redirects)
+#   /papers/topical         topical: how the builder works + every subject
+#   /papers/mock-tests      mock tests: how they work + every subject
+#   /papers/{board}         topical subjects for one board
+#   /papers/{board}/{subject}[/{chapter}]   the builder / one chapter
+#
+# Subject-level pages carry ui.subject_tabs so a student can hop between the
+# topical, yearly, MCQ, mock-test, notes and resources pages of one subject.
 
-@router.get("/papers", response_class=HTMLResponse)
-def page_hub(mode: str = "", user: dict | None = Depends(_auth.maybe_user)):
-    state = _student_state(user)
-    q = "?mode=test" if mode == "test" else ""
-    if state["user"] and state["boards"] and not state.get("boards_inferred"):
-        return RedirectResponse(f"/papers/{state['primary'] or state['boards'][0]}{q}", 302)
+def _board_order(state: dict) -> list[str]:
+    mine = state["boards"] or []
+    return mine + [b for b in BOARD_SHORT if b not in mine]
+
+
+def _subjects_of(board: str) -> list[str]:
+    return [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
+
+
+def _grouped_cards(state: dict, test: bool = False) -> str:
+    """Every board's subject cards, the student's boards (and subjects) first."""
+    out = []
+    for b in _board_order(state):
+        codes = sorted(_subjects_of(b), key=lambda c: c not in state["enrolled"])
+        out.append(f'<section class="ui-board" id="{b}"><h2 class="cat-group">'
+                   f'<a href="/papers/{b}">{BOARD_SHORT[b]}</a><span>{len(codes)}</span></h2>'
+                   f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in codes)}</div></section>')
+    return "".join(out)
+
+
+def _board_jump(state: dict) -> str:
+    return ('<nav class="cat-tabs" aria-label="Jump to a board">'
+            + "".join(f'<a class="cat-tab{" is-mine" if b in (state["boards"] or []) else ""}" href="#{b}">'
+                      f'{BOARD_SHORT[b]}</a>' for b in _board_order(state))
+            + ('<button class="cat-tab cat-tab-add" type="button" data-open-boards>Edit my boards</button>'
+               if state["user"] else "")
+            + "</nav>")
+
+
+def _recent_booklets(state: dict, n: int = 3) -> list[dict]:
+    if not state["user"]:
+        return []
+    try:
+        return _udb.list_booklets(state["user"]["id"], n)
+    except Exception:
+        return []
+
+
+def _continue_block(state: dict) -> str:
+    """Signed-in students: their subjects with one-click links, and recent papers."""
+    if not state["user"]:
+        return ""
+    import ui
+    mine = [c for c in SUBJECTS if c in state["enrolled"]]
+    if not mine:
+        return ui.callout(
+            'You have not enrolled in a subject yet. Enrolling is free - open any subject below and '
+            'press <b>Enrol free</b> to unlock its topical papers, mock tests, MCQ practice and progress '
+            'tracking.', tone="blue", icon_name="user")
+    rows = []
+    for c in mine:
+        s = SUBJECTS[c]
+        links = "".join(f'<a href="{_e(url)}">{ui.icon(ic)}{_e(label)}</a>'
+                        for _k, label, url, ic in ui.subject_links(c))
+        rows.append(f'<article class="ui-mine cat-tone-{s["tone"]}"><header><span class="cat-code">{c}</span>'
+                    f'<b>{_e(s["plain"])}</b><small>{BOARD_SHORT[s["board_slug"]]}</small></header>'
+                    f'<nav>{links}</nav></article>')
+    recent = _recent_booklets(state)
+    rec = ""
+    if recent:
+        items = "".join(
+            f'<li><a href="/papers/view/{_e(b["id"])}">{ui.icon("test" if (b.get("params_json") or {}).get("kind") == "test" else "topical")}'
+            f'<span>{_e(b["title"] or "Topical paper")}</span></a></li>' for b in recent)
+        rec = (f'<div class="ui-recent"><h3>Papers you built recently</h3><ul>{items}</ul>'
+               f'<a class="ui-more" href="/my-papers">All my papers {ui.icon("arrow")}</a></div>')
+    return (f'<section class="ui-continue"><h2 class="ui-h2">Your subjects</h2>'
+            f'<div class="ui-continue-grid"><div class="ui-mine-list">{"".join(rows)}</div>{rec}</div></section>')
+
+
+def _mode_cards(state: dict) -> str:
+    import ui
+    tq = sum(subject_stats(c)["questions"] for c in SUBJECTS)
+    cards = [
+        ui.mode_card(key="topical", title="Topical papers", url="/papers/topical", tone="lav",
+                     blurb="Pick up to four chapters (and any subtopics) and get a booklet of real "
+                           "Cambridge questions on just those topics, with the mark scheme after each.",
+                     best="learning a chapter, or fixing a weak topic", cta="Build a topical paper",
+                     meta=f"{tq:,} questions sorted by chapter"),
+        ui.mode_card(key="yearly", title="Papers by year", url="/yearly", tone="blue",
+                     blurb="Every question paper, mark scheme and insert, sitting by sitting. Opens "
+                           "straight away - no account needed - with the mark scheme side by side.",
+                     best="exam practice under real timing", cta="Browse by year",
+                     meta="May/June, Oct/Nov and Feb/March · every variant"),
+        ui.mode_card(key="mcq", title="MCQ practice", url="/mcq", tone="orange",
+                     blurb="Multiple-choice papers one question at a time or as a full timed paper, "
+                           "marked instantly against the official answer key.",
+                     best="Paper 1 speed and accuracy", cta="Practise MCQs",
+                     meta="Instant marking · timed or relaxed"),
+        ui.mode_card(key="test", title="Mock tests", url="/papers/mock-tests", tone="green",
+                     blurb="A timed, exam-style test from the chapters you choose. The mark scheme is "
+                           "a separate file that unlocks when you press Finish.",
+                     best="checking a topic is really exam-ready", cta="Make a mock test",
+                     meta="About 1 minute per mark"),
+    ]
+    history = ""
+    if state["user"]:
+        history = (f'<a class="ui-mode ui-mode-slim" href="/my-papers">'
+                   f'<span class="ui-mode-ic">{ui.icon("history")}</span><span class="ui-mode-body">'
+                   f'<b class="ui-mode-title">My papers</b><span class="ui-mode-blurb">Every topical '
+                   f'booklet and mock test you have built, with your annotations.</span></span>'
+                   f'<span class="ui-mode-cta">Open {ui.icon("arrow")}</span></a>')
+    return f'<div class="ui-modes">{"".join(cards)}</div>{history}'
+
+
+_PLAN = [
+    ("Learn the chapter", 'Read the <a href="/notes">revision notes</a> for it, or your teacher\'s '
+                          'notes in <a href="/resources">Resources</a>. Keep the syllabus points in view.'),
+    ("Practise it topically", 'Build a <a href="/papers/topical">topical paper</a> on that chapter. '
+                              'Answer in full, then mark yourself with the official scheme after each question.'),
+    ("Fix what you missed", "Open <b>Explain</b> or <b>Guide me</b> on any question you dropped marks on, "
+                            "and redo it a few days later."),
+    ("Prove it under time", 'Sit a <a href="/papers/mock-tests">mock test</a> on the chapter, then '
+                            'full <a href="/yearly">papers by year</a> once most chapters are done.'),
+]
+
+_WHICH = [
+    ("I have just finished a chapter in class", "Topical paper on that chapter, mark scheme on."),
+    ("I keep losing marks on one topic", "Topical paper on the subtopic only, then a mock test a week later."),
+    ("My exam is in 6-8 weeks", "One full paper by year every few days, timed, marked honestly."),
+    ("I need Paper 1 speed", "MCQ practice as a full timed paper, then review every wrong option."),
+    ("I want to know if I am exam-ready", "Mock test on 3-4 chapters, then compare with the grade thresholds."),
+]
+
+
+def _which_block() -> str:
+    rows = "".join(f'<li><b>{_e(a)}</b><span>{_e(b)}</span></li>' for a, b in _WHICH)
+    return f'<section class="ui-which"><h2 class="ui-h2">Which one should I use?</h2><ul>{rows}</ul></section>'
+
+
+def _board_cards() -> str:
     cards = []
     for board, subs in BOARDS:
         b = BOARD_SLUGS[board]
         names = ", ".join(_plain(n) for _c, n in subs)
         total = sum(subject_stats(c)["questions"] for c, _n in subs)
         cards.append(f"""
-        <a class="cat-board" href="/papers/{b}{q}">
+        <article class="cat-board">
           <span class="cat-board-eyebrow">Cambridge</span>
-          <h2>{BOARD_SHORT[b]}</h2>
+          <h3><a href="/papers/{b}">{BOARD_SHORT[b]}</a></h3>
           <p>{_e(names)}</p>
-          <span class="cat-board-count">{total:,} topical questions →</span>
-        </a>""")
-    hero = ("""
-    <header class="cat-hero">
-      <p class="cat-eyebrow">Mock tests</p>
-      <h1>Exam-style tests from real Cambridge questions.</h1>
-      <p class="cat-lede">Pick your board and subject, choose up to four chapters, and get a
-        timed test with an exam cover - the mark scheme comes as a separate file you unlock
-        when you finish.</p>
-    </header>""" if q else """
-    <header class="cat-hero">
-      <p class="cat-eyebrow">Topical past papers</p>
-      <h1>Every Cambridge past-paper question, sorted by chapter.</h1>
-      <p class="cat-lede">Pick your board, enrol in your subjects for free, then build a
-        paper from up to four chapters. Questions are cropped straight from the original
-        papers, with the official mark scheme alongside.</p>
-    </header>""")
-    body = f"""{hero}
-    <section class="cat-boards">{''.join(cards)}</section>"""
+          <span class="cat-board-count">{total:,} topical questions</span>
+          <nav class="cat-board-links"><a href="/papers/{b}">Topical</a><a href="/yearly/{b}">By year</a>
+            <a href="/notes/{b}">Notes</a><a href="/resources/{b}">Resources</a></nav>
+        </article>""")
+    return f'<section class="cat-boards">{"".join(cards)}</section>'
+
+
+@router.get("/papers", response_class=HTMLResponse)
+def page_hub(mode: str = "", user: dict | None = Depends(_auth.maybe_user)):
+    if mode == "test":
+        return RedirectResponse("/papers/mock-tests", 301)
+    import ui
+    state = _student_state(user)
+    tq = sum(subject_stats(c)["questions"] for c in SUBJECTS)
+    faq_html, faq_ld = ui.faq([
+        ("Are these the real Cambridge questions?",
+         "Yes. Every question is cropped straight from the original Cambridge PDF - diagrams, graphs and "
+         "answer lines exactly as printed - and paired with the official mark scheme."),
+        ("Do I need an account?",
+         "Papers by year open without one. A free account lets you build topical papers and mock tests, "
+         "practise MCQs, save your annotations and track progress for the subjects you enrol in."),
+        ("How long are my topical papers kept?",
+         'Each paper you build stays ready to open for 30 days after you last opened it, with your '
+         'annotations. After that it stays on <a href="/my-papers">My papers</a> as a record of what you '
+         'practised.'),
+        ("What is the difference between a topical paper and a mock test?",
+         "A topical paper shows the mark scheme right after every question so you learn as you go. A mock "
+         "test is timed and exam-styled; its mark scheme is a separate file that unlocks when you finish."),
+        ("Which years are covered?",
+         "Most subjects go back to 2010-2015 and run to the latest session, with every variant of May/June, "
+         "Oct/Nov and Feb/March."),
+    ])
+    body = f"""
+    <header class="ui-hero">
+      <div class="ui-hero-text">
+        <p class="cat-eyebrow">Past papers</p>
+        <h1>Every Cambridge past paper - by topic, by year, or as a test.</h1>
+        <p class="cat-lede">Real questions cropped from the original papers, always with the official mark
+          scheme. Choose how you want to practise below; if you are not sure, the revision plan further
+          down tells you what to do and when.</p>
+        <div class="cat-actions">
+          <a class="cat-btn" href="/papers/topical">Build a topical paper</a>
+          <a class="cat-btn cat-btn-ghost" href="/yearly">Browse papers by year</a>
+        </div>
+      </div>
+      <dl class="ui-hero-stats">
+        <div><dt>Topical questions</dt><dd>{tq:,}</dd></div>
+        <div><dt>Subjects</dt><dd>{len(SUBJECTS)}</dd></div>
+        <div><dt>Boards</dt><dd>O Level · IGCSE · A Level</dd></div>
+      </dl>
+    </header>
+    {_continue_block(state)}
+    <section><h2 class="ui-h2">Choose how to practise</h2>{_mode_cards(state)}</section>
+    {ui.steps(_PLAN, "A revision plan that works", "ui-plan")}
+    <section><h2 class="ui-h2">Pick your board</h2>{_board_cards()}</section>
+    {_which_block()}
+    {faq_html}"""
+    ld = [faq_ld, {"@context": "https://schema.org", "@type": "CollectionPage",
+                   "name": "Cambridge past papers", "url": f"{SITE_ORIGIN}/papers",
+                   "description": "Topical, yearly, MCQ and mock-test practice from real Cambridge papers."}]
     return _respond(_shell(
-        title="Cambridge Topical Past Papers | O Level, IGCSE & A Level — PrepWithTee",
-        desc="Free topical past papers for Cambridge O Level, IGCSE and A Level: every "
-             "question sorted by syllabus chapter and subtopic, with official mark schemes.",
+        title="Cambridge Past Papers - Topical, Yearly, MCQ & Mock Tests | PrepWithTee",
+        desc="Cambridge O Level, IGCSE and A Level past papers four ways: topical by chapter, full papers "
+             "by year, instantly marked MCQs and timed mock tests - all with official mark schemes.",
         path="/papers", body=body, crumbs=[("Home", "/"), ("Past papers", "/papers")],
-        state=state), bool(user))
+        state=state, ld=ld), bool(user))
+
+
+@router.get("/papers/topical", response_class=HTMLResponse)
+def page_topical(user: dict | None = Depends(_auth.maybe_user)):
+    import ui
+    state = _student_state(user)
+    body = f"""
+    <header class="cat-hero cat-hero-sm">
+      <p class="cat-eyebrow">Topical past papers</p>
+      <h1>Past-paper questions, sorted by chapter</h1>
+      <p class="cat-lede">Every question from every paper we hold is tagged to its syllabus chapter and
+        subtopic. Choose up to four chapters, narrow the years or papers if you like, and get one mixed
+        booklet - original questions, official mark scheme after each.</p>
+    </header>
+    {ui.steps([
+        ("Open your subject", "Pick a subject below. Enrolling is free and unlocks the builder."),
+        ("Choose chapters", "Tick up to four chapters, or tap subtopic chips to take just part of one."),
+        ("Filter (optional)", "Limit the years, the paper (e.g. Paper 2 only) and the number of questions."),
+        ("Open and practise", "Your booklet opens in the viewer in a few seconds: write on it, check the mark "
+                              "scheme, ask for an explanation, or download the PDF."),
+    ], "How it works", "ui-steps-row")}
+    {_board_jump(state)}
+    {_grouped_cards(state)}
+    {ui.callout('Built papers are listed on <a href="/my-papers">My papers</a> and stay ready to open for 30 '
+                'days after you last opened them.', tone="blue", icon_name="history") if state["user"] else ''}"""
+    return _respond(_shell(
+        title="Topical Past Papers by Chapter | Cambridge O Level, IGCSE & A Level - PrepWithTee",
+        desc="Build topical past papers from real Cambridge questions: pick chapters and subtopics, filter by "
+             "year and paper, and get the official mark scheme after every question.",
+        path="/papers/topical", body=body, state=state,
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("Topical", "/papers/topical")]), bool(user))
+
+
+@router.get("/papers/mock-tests", response_class=HTMLResponse)
+def page_mock_tests(user: dict | None = Depends(_auth.maybe_user)):
+    import ui
+    state = _student_state(user)
+    body = f"""
+    <header class="cat-hero cat-hero-sm cat-tone-green">
+      <p class="cat-eyebrow">Mock tests</p>
+      <h1>Exam-style tests from real Cambridge questions</h1>
+      <p class="cat-lede">Choose the chapters, the number of questions or marks, and sit it like the real
+        thing: an exam cover, a countdown at about a minute per mark, and a mark scheme that stays locked
+        until you press <b>Finish test</b>.</p>
+    </header>
+    {ui.steps([
+        ("Pick a subject", "Open a subject below and switch the builder to <b>Mock test</b>."),
+        ("Choose what it covers", "Up to four chapters, any subtopics, the years and papers to draw from."),
+        ("Sit it timed", "Start the timer, write your answers on the paper or on your own sheet."),
+        ("Finish and mark", "Press Finish to unlock the mark scheme, mark honestly, and note the topics to redo."),
+    ], "How a mock test works", "ui-steps-row")}
+    {_board_jump(state)}
+    {_grouped_cards(state, test=True)}"""
+    return _respond(_shell(
+        title="Cambridge Mock Tests from Past Papers | O Level, IGCSE & A Level - PrepWithTee",
+        desc="Timed, exam-style Cambridge mock tests built from real past-paper questions on the chapters you "
+             "choose, with a separate mark scheme that unlocks when you finish.",
+        path="/papers/mock-tests", body=body, state=state,
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("Mock tests", "/papers/mock-tests")]), bool(user))
 
 
 @router.get("/papers/{board}", response_class=HTMLResponse)
 def page_board(board: str, mode: str = "", user: dict | None = Depends(_auth.maybe_user)):
     if board not in BOARD_SHORT:
         raise HTTPException(404, "Unknown board")
+    if mode == "test":
+        return RedirectResponse(f"/papers/mock-tests#{board}", 301)
     state = _student_state(user)
-    test = mode == "test"
-    codes = [c for c, s in SUBJECTS.items() if s["board_slug"] == board]
+    codes = _subjects_of(board)
     mine = [c for c in codes if c in state["enrolled"]]
     rest = [c for c in codes if c not in state["enrolled"]]
     sections = []
     if mine:
         sections.append(f'<h2 class="cat-group">Your subjects <span>{len(mine)}</span></h2>'
-                        f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in mine)}</div>')
+                        f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in mine)}</div>')
     label = f"All {BOARD_SHORT[board]} subjects" if mine or not state["user"] else "Choose your subjects"
     sections.append(f'<h2 class="cat-group">{label}</h2>'
-                    f'<div class="cat-grid">{"".join(_subject_card(c, state, test) for c in rest)}</div>')
+                    f'<div class="cat-grid">{"".join(_subject_card(c, state) for c in rest)}</div>')
     note = ("" if state["user"] else
             '<p class="cat-note">Enrolling is free. <a href="/login.html?signup=1&amp;next=/papers/'
-            f'{board}">Create an account</a> to unlock topical papers, yearly papers, MCQ practice '
-            'and progress tracking for each subject.</p>')
+            f'{board}">Create an account</a> to unlock topical papers, mock tests, MCQ practice '
+            'and progress tracking for each subject. Papers by year open without an account.</p>')
     if state["user"]:
         note = ('<p class="cat-note">Enrolling is free and unlocks everything for that subject: '
-                'topical and yearly papers, MCQ practice, AI help and progress tracking.</p>')
+                'topical papers, mock tests, MCQ practice, AI help and progress tracking.</p>')
     body = f"""
     <header class="cat-hero cat-hero-sm">
-      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]}{' · Mock tests' if test else ''}</p>
-      <h1>{BOARD_SHORT[board]} {'mock tests' if test else 'topical past papers'}</h1>
+      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · Topical</p>
+      <h1>{BOARD_SHORT[board]} topical past papers</h1>
       <p class="cat-lede">{_e(BOARD_BLURB[board])}</p>
+      <div class="cat-actions"><a class="cat-btn cat-btn-ghost" href="/yearly/{board}">{BOARD_SHORT[board]} papers by year</a>
+        <a class="cat-btn cat-btn-ghost" href="/notes/{board}">{BOARD_SHORT[board]} notes</a></div>
     </header>
-    {_board_tabs(board, state, "?mode=test" if test else "")}
+    {_board_tabs(board, state)}
     {''.join(sections)}
     {note}"""
     ld = [{"@context": "https://schema.org", "@type": "ItemList",
@@ -551,9 +801,9 @@ def page_board(board: str, mode: str = "", user: dict | None = Depends(_auth.may
                                 "url": f"{SITE_ORIGIN}{subject_url(c)}"}
                                for i, c in enumerate(codes)]}]
     return _respond(_shell(
-        title=f"Cambridge {BOARD_SHORT[board]} Topical Past Papers — PrepWithTee",
+        title=f"Cambridge {BOARD_SHORT[board]} Topical Past Papers - PrepWithTee",
         desc=BOARD_BLURB[board], path=f"/papers/{board}", body=body, state=state, ld=ld,
-        crumbs=[("Home", "/"), ("Past papers", "/papers"),
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("Topical", "/papers/topical"),
                 (BOARD_SHORT[board], f"/papers/{board}")]), bool(user))
 
 
@@ -564,32 +814,37 @@ def _subject_or_404(board: str, subject: str) -> dict:
     return s
 
 
-def _subject_actions(s: dict, state: dict, chapter: str | None = None) -> str:
+def _subject_actions(s: dict, state: dict, chapter: str | None = None, test: bool = False) -> str:
     code = s["code"]
     if not state["user"]:
         nxt = subject_url(code)
         return (f'<a class="cat-btn cat-btn-gold" href="/login.html?signup=1&amp;next={nxt}">'
-                f'Create a free account to build papers</a>')
-    if code not in state["enrolled"]:
+                f'Create a free account to build papers</a>'
+                f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Papers by year (no account)</a>')
+    if code not in state["enrolled"] and state["user"].get("role") not in ("teacher", "admin"):
         return (f'<button class="cat-btn cat-btn-gold" type="button" data-enrol="{code}">'
                 f'🔒 Enrol free to unlock {_e(s["plain"])}</button>')
-    st = subject_stats(code)
-    build = (f"{subject_url(code)}?pick={_e(quote(chapter))}#builder" if chapter
-             else "#builder")
-    return (f'<a class="cat-btn" href="{build}">Build a topical paper</a>'
-            f'<a class="cat-btn cat-btn-ghost" href="{_yearly_url(code)}">Yearly papers</a>'
-            + (f'<a class="cat-btn cat-btn-ghost" href="{_mcq_url(code)}">MCQ practice</a>'
-               if st["has_mcq"] else "")
-            + f'<a class="cat-btn cat-btn-ghost" href="/topical-progress.html?syllabus={code}">My progress</a>')
+    if chapter:
+        return (f'<a class="cat-btn" href="{subject_url(code)}?pick={_e(quote(chapter))}#builder">'
+                f'Practise this chapter</a>'
+                f'<a class="cat-btn cat-btn-ghost" href="{subject_url(code)}?mode=test&amp;pick={_e(quote(chapter))}#builder">'
+                f'Mock test on it</a>')
+    return (f'<a class="cat-btn" href="#builder">{"Build a mock test" if test else "Build a topical paper"}</a>'
+            f'<a class="cat-btn cat-btn-ghost" href="/topical-progress.html?syllabus={code}">My progress</a>'
+            f'<a class="cat-btn cat-btn-ghost" href="/my-papers?syllabus={code}">Papers I built</a>')
 
 
 @router.get("/papers/{board}/{subject}", response_class=HTMLResponse)
-def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.maybe_user)):
+def page_subject(board: str, subject: str, mode: str = "",
+                 user: dict | None = Depends(_auth.maybe_user)):
+    import ui
     s = _subject_or_404(board, subject)
     state = _student_state(user)
+    test = mode == "test"
     code, st = s["code"], subject_stats(s["code"])
     chs = chapters(code)
     base = subject_url(code)
+
     def ch_item(ch):
         subs = "".join(f"<li>{_e(x['name'])}</li>" for x in ch["subtopics"])
         return f"""
@@ -620,29 +875,40 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
     lede = (f"Every Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) past-paper question"
             f"{f' from {yrs}' if yrs else ''}, sorted into {st['chapters']} syllabus chapters"
             f" and their subtopics, with the official mark schemes.")
+    how = "" if not can_build else ui.steps([
+        ("Choose chapters", "Up to four, from any paper. Tap subtopic chips to take only part of a chapter."),
+        ("Set the filters", "Years, paper and how many questions - the live count shows what is available."),
+        ("Build", "Practice booklet = mark scheme after each question. Mock test = timed, scheme unlocks at the end."),
+    ], "", "ui-steps-row ui-steps-mini")
     body = f"""
+    {ui.subject_tabs(code, "test" if test else "topical")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
-      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · {code}</p>
-      <h1>{_e(s['plain'])} topical past papers</h1>
+      <p class="cat-eyebrow">Cambridge {BOARD_SHORT[board]} · {code} · {"Mock test" if test else "Topical"}</p>
+      <h1>{_e(s['plain'])} {"mock tests" if test else "topical past papers"}</h1>
       <p class="cat-lede">{_e(lede)}</p>
       <dl class="cat-stats">
         <div><dt>Questions</dt><dd>{st['questions']:,}</dd></div>
         <div><dt>Chapters</dt><dd>{st['chapters']}</dd></div>
         <div><dt>Years</dt><dd>{yrs or '–'}</dd></div>
       </dl>
-      <div class="cat-actions">{_subject_actions(s, state)}</div>
+      <div class="cat-actions">{_subject_actions(s, state, test=test)}</div>
     </header>
+    {how}
     {builder}"""
     ld = [{"@context": "https://schema.org", "@type": "Course",
            "name": f"Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) topical past papers",
-           "description": lede,
+           "description": lede, "courseCode": code,
+           "educationalLevel": f"Cambridge {BOARD_SHORT[board]}",
+           "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online",
+                                 "courseWorkload": "PT1H"},
+           "offers": {"@type": "Offer", "price": 0, "priceCurrency": "USD", "category": "Free"},
            "provider": {"@type": "Organization", "name": "PrepWithTee", "sameAs": SITE_ORIGIN}}]
     return _respond(_shell(
-        title=f"{s['plain']} {code} Topical Past Papers | Cambridge {BOARD_SHORT[board]} — PrepWithTee",
+        title=f"{s['plain']} {code} Topical Past Papers | Cambridge {BOARD_SHORT[board]} - PrepWithTee",
         desc=lede[:300], path=base, body=body, state=state, ld=ld,
         scripts=(f"/builder.js?v={CSS_V}",) if can_build else (),
         styles=(f"/builder.css?v={CSS_V}",) if can_build else (),
-        crumbs=[("Home", "/"), ("Past papers", "/papers"),
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("Topical", "/papers/topical"),
                 (BOARD_SHORT[board], f"/papers/{board}"), (f"{s['plain']} {code}", base)]),
         bool(user))
 
@@ -650,6 +916,8 @@ def page_subject(board: str, subject: str, user: dict | None = Depends(_auth.may
 @router.get("/papers/{board}/{subject}/{chapter}", response_class=HTMLResponse)
 def page_chapter(board: str, subject: str, chapter: str,
                  user: dict | None = Depends(_auth.maybe_user)):
+    import notes as _notes
+    import ui
     s = _subject_or_404(board, subject)
     ch = next((c for c in chapters(s["code"]) if c["slug"] == chapter), None)
     if ch is None:
@@ -657,25 +925,38 @@ def page_chapter(board: str, subject: str, chapter: str,
     state = _student_state(user)
     code, base = s["code"], subject_url(s["code"])
     subs = "".join(
-        f'<li><span>{_e(x["name"])}</span><span class="cat-ch-count">{x["count"]:,}</span></li>'
+        f'<li><span>{_e(x["name"])}</span><span class="cat-ch-count">{x["count"]:,} questions</span></li>'
         for x in ch["subtopics"])
     lede = (f"{ch['count']:,} Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) past-paper "
             f"questions on {ch['display']}"
             + (f", across {len(ch['subtopics'])} subtopics" if ch["subtopics"] else "")
             + ", with official mark schemes.")
+    has_notes = bool(_notes.index().get(code, {}).get(ch["slug"]))
+    all_chs = chapters(code)
+    i = next((k for k, c in enumerate(all_chs) if c["slug"] == ch["slug"]), 0)
+    prev_c = all_chs[i - 1] if i > 0 else None
+    next_c = all_chs[i + 1] if i + 1 < len(all_chs) else None
+    pn = ('<nav class="ui-pn">'
+          + (f'<a href="{base}/{prev_c["slug"]}"><small>Previous chapter</small>{_e(prev_c["display"])}</a>'
+             if prev_c else "<span></span>")
+          + (f'<a class="ui-pn-next" href="{base}/{next_c["slug"]}"><small>Next chapter</small>{_e(next_c["display"])}</a>'
+             if next_c else "<span></span>")
+          + "</nav>")
     body = f"""
+    {ui.subject_tabs(code, "topical")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
-      <p class="cat-eyebrow">{_e(s['plain'])} {code} · Chapter</p>
+      <p class="cat-eyebrow">{_e(s['plain'])} {code} · Chapter {i + 1} of {len(all_chs)}</p>
       <h1>{_e(ch['display'])}</h1>
       <p class="cat-lede">{_e(lede)}</p>
-      <div class="cat-actions">{_subject_actions(s, state, ch['name'])}</div>
+      <div class="cat-actions">{_subject_actions(s, state, ch['name'])}
+        {f'<a class="cat-btn cat-btn-ghost" href="{_notes.notes_url(code, ch["slug"])}">Read the notes</a>' if has_notes else ''}</div>
     </header>
     {f'<h2 class="cat-group">Subtopics</h2><ul class="cat-sublist">{subs}</ul>' if subs else ''}
-    <p class="cat-note"><a href="{base}">← All {_e(s['plain'])} chapters</a></p>"""
+    {pn}"""
     return _respond(_shell(
-        title=f"{ch['display']} — {s['plain']} {code} Topical Questions | PrepWithTee",
+        title=f"{ch['display']} - {s['plain']} {code} Topical Questions | PrepWithTee",
         desc=lede[:300], path=f"{base}/{ch['slug']}", body=body, state=state,
-        crumbs=[("Home", "/"), ("Past papers", "/papers"),
+        crumbs=[("Home", "/"), ("Past papers", "/papers"), ("Topical", "/papers/topical"),
                 (BOARD_SHORT[board], f"/papers/{board}"), (f"{s['plain']} {code}", base),
                 (ch["display"], f"{base}/{ch['slug']}")]), bool(user))
 
@@ -702,12 +983,12 @@ def legacy_papers(tab: str = "", mode: str = "", syllabus: str = "", s: str = ""
         first = next((t.strip() for t in re.split(r"[,|]", topics or topic) if t.strip()), "")
         query = "&".join(x for x in (f"pick={quote(first)}" if first else "", test) if x)
         return RedirectResponse(f"{subject_url(syllabus)}{'?' + query if query else ''}#builder", 301)
-    return RedirectResponse("/papers" + (f"?{test}" if test else ""), 301)
+    return RedirectResponse("/papers/mock-tests" if test else "/papers", 301)
 
 
 def sitemap_paths() -> list[str]:
     """Every public catalogue URL, for app.py's sitemap.xml."""
-    paths = ["/papers"] + [f"/papers/{b}" for b in BOARD_SHORT]
+    paths = ["/papers", "/papers/topical", "/papers/mock-tests"] + [f"/papers/{b}" for b in BOARD_SHORT]
     for code in SUBJECTS:
         base = subject_url(code)
         paths.append(base)

@@ -179,6 +179,18 @@ def notes_hub(user: dict | None = Depends(_auth.maybe_user)):
     total = sum(_count(c) for c in SUBJECTS)
     sections = "".join(f'<h2 class="cat-group"><a href="/notes/{b}">{BOARD_SHORT[b]}</a></h2>{_board_grid(b)}'
                        for b in BOARD_SHORT)
+    import ui
+    faq_html, faq_ld = ui.faq([
+        ("Who writes PrepWithTee notes?",
+         "Our tutors, point by point against the current Cambridge syllabus - the same chapters the "
+         "topical past papers use, so a note always leads straight to real questions on it."),
+        ("Where are other teachers' notes?",
+         'In <a href="/resources">Resources</a>: PDF notes from well-known teachers, textbooks, solved '
+         'worksheets, official syllabuses and study planners, sorted by subject.'),
+        ("A chapter says Coming soon - what now?",
+         'Use a teacher\'s notes from Resources for that chapter, then practise it with a topical paper. '
+         'New notes are added every week.'),
+    ])
     body = f"""
     <header class="cat-hero cat-hero-sm">
       <p class="cat-eyebrow">Revision notes</p>
@@ -186,12 +198,29 @@ def notes_hub(user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-lede">Clear notes written against the official syllabus - definitions,
         worked examples, common mistakes - each one linked to the past-paper questions on the
         same chapter. {total} notes so far, with more added every week.</p>
+      <div class="cat-actions"><a class="cat-btn" href="#boards">Find your subject</a>
+        <a class="cat-btn cat-btn-ghost" href="/resources">Teachers' notes &amp; books</a></div>
     </header>
-    {sections}"""
+    <section class="ui-compare">
+      <article class="is-here"><h3>{ui.icon("notes")} PrepWithTee notes <small>you are here</small></h3>
+        <p>Written by us, chapter by chapter against the syllabus. Every note links to the past-paper
+          questions on the same chapter.</p><a href="#boards">Browse notes {ui.icon("arrow")}</a></article>
+      <article><h3>{ui.icon("resources")} Resources</h3><p>Famous teachers' PDF notes (Sir Hamiz,
+        Zainematics, Mathlete by Saad ...), textbooks, solved worksheets, syllabuses and planners.</p>
+        <a href="/resources">Open resources {ui.icon("arrow")}</a></article>
+    </section>
+    {ui.steps([
+        ("Read one note", "Start with the chapter you are studying in class. Each note is 5-10 minutes."),
+        ("Make it yours", "Use the pen to annotate, or save key lines to My notes and flashcards."),
+        ("Practise straight away", "Every note ends with <b>Practise this chapter</b> - real past-paper questions."),
+        ("Come back before the exam", "The chapter page lists what you need to know; tick it off."),
+    ], "How to study with notes", "ui-steps-row")}
+    <div id="boards">{sections}</div>
+    {faq_html}"""
     return _page(title="Cambridge Revision Notes | O Level, IGCSE & A Level — PrepWithTee",
                  desc="Free Cambridge O Level, IGCSE and A Level revision notes, organised by syllabus "
                       "chapter, each linked to the matching past-paper questions.",
-                 path="/notes", body=body, user=user, crumbs=[("Home", "/"), ("Notes", "/notes")])
+                 path="/notes", body=body, user=user, ld=[faq_ld], crumbs=[("Home", "/"), ("Notes", "/notes")])
 
 
 @router.get("/notes/{board}", response_class=HTMLResponse)
@@ -203,6 +232,7 @@ def notes_board(board: str, user: dict | None = Depends(_auth.maybe_user)):
       <p class="cat-eyebrow">Revision notes · Cambridge {BOARD_SHORT[board]}</p>
       <h1>{BOARD_SHORT[board]} revision notes</h1>
       <p class="cat-lede">Pick a subject to see its syllabus chapters and the notes for each.</p>
+      <div class="cat-actions"><a class="cat-btn cat-btn-ghost" href="/resources/{board}">{BOARD_SHORT[board]} teachers' notes &amp; books</a></div>
     </header>
     {_board_grid(board)}"""
     return _page(title=f"Cambridge {BOARD_SHORT[board]} Revision Notes — PrepWithTee",
@@ -264,7 +294,12 @@ def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.ma
         f"official syllabus chapters.")
     guide = "".join(f"<li>{_e(x)}</li>" for x in meta.get("study_guide", []))
     first = next(iter(_ordered_notes(code)), None)
+    import resources as _res
+    import ui
+    res_link = (f'<a class="cat-btn cat-btn-ghost" href="{_res.subject_url(code)}">Teachers\' notes &amp; books</a>'
+                if _res.has_subject(code) else "")
     body = f"""
+    {ui.subject_tabs(code, "notes")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
       <p class="cat-eyebrow">Revision notes · Cambridge {BOARD_SHORT[board]} · {code}</p>
       <h1>{_e(s['plain'])} {code} revision notes</h1>
@@ -275,7 +310,7 @@ def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.ma
       </dl>
       <div class="cat-actions">
         {f'<a class="cat-btn" href="{notes_url(code, first["chapter"], first["slug"])}">Start reading</a>' if first else ''}
-        <a class="cat-btn cat-btn-ghost" href="{_catalog.subject_url(code)}">Topical past papers</a>
+        {res_link}
       </div>
     </header>
     {f'<details class="nt-guide"><summary>How to use these notes</summary><ul>{guide}</ul></details>' if guide else ''}
@@ -322,9 +357,14 @@ def notes_chapter(board: str, subject: str, chapter: str, user: dict | None = De
     lede = (f"{len(notes)} revision note{'s' if len(notes) != 1 else ''} on {ch['display']} for Cambridge "
             f"{BOARD_SHORT[board]} {s['plain']} ({code})" if notes else
             f"Notes on {ch['display']} for Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) are coming soon")
+    import ui
+    soon = ui.callout("Our notes for this chapter are being written. Meanwhile, read a teacher's notes in "
+                      '<a href="/resources">Resources</a> and practise its past-paper questions.',
+                      tone="blue", icon_name="notes")
     body = f"""
+    {ui.subject_tabs(code, "notes")}
     <header class="cat-hero cat-hero-sm cat-tone-{s['tone']}">
-      <p class="cat-eyebrow">{_e(s['plain'])} {code} · Chapter</p>
+      <p class="cat-eyebrow">{_e(s['plain'])} {code} · Chapter {i + 1} of {len(chs)}</p>
       <h1>{_e(ch['display'])}</h1>
       <p class="cat-lede">{_e(lede)}. {ch['count']:,} past-paper questions on this chapter to practise.</p>
       {f'<dl class="cat-stats">{facts}</dl>' if facts else ''}
@@ -332,7 +372,7 @@ def notes_chapter(board: str, subject: str, chapter: str, user: dict | None = De
         <a class="cat-btn cat-btn-ghost" href="{notes_url(code)}">All {_e(s['plain'])} notes</a></div>
     </header>
     {f'<h2 class="cat-group">Notes</h2><div class="nt-note-cards">{cards}</div>' if notes else
-     '<p class="nt-empty">Notes for this chapter are being written. Meanwhile, practise its past-paper questions.</p>'}
+     soon}
     {f'<h2 class="cat-group">What you need to know</h2><ul class="nt-outcomes">{outcomes}</ul>' if outcomes else ''}
     {f'<h2 class="cat-group">Syllabus subtopics</h2><ul class="nt-sublist">{subs}</ul>' if subs else ''}
     <nav class="nt-pn">
@@ -441,6 +481,12 @@ def legacy_chapter(code: str = "", ch: str = ""):
         return RedirectResponse("/notes", 301)
     c = _redirects().get(code, {}).get("chapters", {}).get(ch)
     return RedirectResponse(notes_url(code, c) if c else notes_url(code), 301)
+
+
+@router.get("/notes-view.html", include_in_schema=False)
+def legacy_notes_view():
+    """The old interactive-notes hub, superseded by /notes (2026-09-27)."""
+    return RedirectResponse("/notes", 301)
 
 
 @router.get("/subject.html", include_in_schema=False)

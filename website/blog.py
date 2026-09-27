@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260928a"  # keep in sync with styles.css version pin
+_CSS_V = "20260928b"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -184,7 +184,7 @@ _NAV_FALLBACK = """<header class="site-header">
     <nav class="header-nav" style="gap:.5rem">
       <a href="/blog" class="nav-link" style="font-weight:600">Blog</a>
       <a href="/papers" class="nav-link">Past Papers</a>
-      <a href="/resources.html" class="nav-link">Notes</a>
+      <a href="/resources" class="nav-link">Notes</a>
       <a href="/pricing.html" class="nav-link">Pricing</a>
       <a href="/#contact" class="btn btn-dark"
          style="padding:.45rem .9rem;font-size:.875rem">Book a demo</a>
@@ -399,7 +399,7 @@ def blog_list():
             'In the meantime, dive straight into the good stuff:</p>'
             '<div class="bempty-links">'
             '<a class="primary" href="/papers">Topical Past Papers →</a>'
-            '<a href="/resources.html">Revision Notes →</a>'
+            '<a href="/resources">Revision Notes →</a>'
             '<a href="/#contact">Book a free demo →</a>'
             '</div></div>'
         )

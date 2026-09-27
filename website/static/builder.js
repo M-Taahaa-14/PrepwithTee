@@ -48,8 +48,10 @@ async function init() {
   st.tree.chapters.forEach((c) => st.byName.set(c.name, c));
   st.y0 = st.tree.year_min; st.y1 = st.tree.year_max;
   const q = new URLSearchParams(location.search);
-  const want = q.get("pick");
-  if (want && st.byName.has(want)) st.picks.set(want, null);
+  // ?pick=A&pick=B (or A|B): pre-tick chapters - chapter pages, notes, "Build it again"
+  const wants = q.getAll("pick").flatMap((x) => x.split("|")).filter((x) => st.byName.has(x));
+  wants.slice(0, st.tree.max_chapters || 4).forEach((w) => st.picks.set(w, null));
+  const want = wants.length > 0;
   if (q.get("mode") === "test") st.kind = "test";
   render();
   if (want || q.get("mode")) requestAnimationFrame(() => root.scrollIntoView({ block: "start" }));

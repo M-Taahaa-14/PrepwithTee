@@ -27,6 +27,7 @@ blog._foot().
 """
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -40,6 +41,108 @@ BLOCKS = [
     ("nav.html", "NAV", re.compile(r'<header class="site-header">.*?</header>', re.S)),
     ("footer.html", "FOOT", re.compile(r'<footer class="site-footer".*?</footer>', re.S)),
 ]
+
+
+# ── Breadcrumb bar ───────────────────────────────────────────────────────────
+# Every static page gets a "← Back to <parent>" pill + breadcrumb trail right
+# under the header (plus BreadcrumbList JSON-LD), stamped between CRUMB
+# markers. The trail is (label, url) pairs AFTER "Home", ending with the page
+# itself. Pages not listed (home, sign-in pages, the full-screen tutor) get no
+# bar. The server-rendered sections build the same bar in catalog._shell().
+_DASH = ("Dashboard", "/dashboard.html")
+_TOOLS = ("Tools", "/tools.html")
+_PAPERS = ("Past papers", "/papers")
+_NOTES = ("Notes", "/notes")
+_HUB = ("Study hub", "/study-hub.html")
+CRUMBS: dict[str, list[tuple[str, str]]] = {
+    "dashboard.html": [_DASH],
+    "achievements.html": [_DASH, ("Achievements", "/achievements.html")],
+    "analytics.html": [_DASH, ("Analytics", "/analytics.html")],
+    "calendar.html": [_DASH, ("Calendar", "/calendar.html")],
+    "homework.html": [_DASH, ("Homework", "/homework.html")],
+    "profile.html": [_DASH, ("Profile", "/profile.html")],
+    "notes.html": [_DASH, ("My notes", "/notes.html")],
+    "study-hub.html": [_DASH, _HUB],
+    "study.html": [_DASH, _HUB, ("Study session", "/study.html")],
+    "quiz.html": [_DASH, _HUB, ("Quiz", "/quiz.html")],
+    "flashcards.html": [_DASH, ("Flashcards", "/flashcards.html")],
+    "fc-progress.html": [_DASH, ("Flashcards", "/flashcards.html"), ("Progress", "/fc-progress.html")],
+    "topical-progress.html": [_PAPERS, ("Topical progress", "/topical-progress.html")],
+    "yearly-progress.html": [_PAPERS, ("Yearly progress", "/yearly-progress.html")],
+    "tools.html": [_TOOLS],
+    "calculator.html": [_TOOLS, ("Calculator", "/calculator.html")],
+    "graph.html": [_TOOLS, ("Graph plotter", "/graph.html")],
+    "grade-calculator.html": [_TOOLS, ("Grade calculator", "/grade-calculator.html")],
+    "grade-trends.html": [_TOOLS, ("Grade trends", "/grade-trends.html")],
+    "bases-logic.html": [_TOOLS, ("Number bases & logic", "/bases-logic.html")],
+    "pseudocode.html": [_TOOLS, ("Pseudocode runner", "/pseudocode.html")],
+    "periodic-table.html": [_TOOLS, ("Periodic table", "/periodic-table.html")],
+    "formulas.html": [_TOOLS, ("Formula sheets", "/formulas.html")],
+    "command-words.html": [_TOOLS, ("Command words", "/command-words.html")],
+    "graphs-guide.html": [_TOOLS, ("Graph guide", "/graphs-guide.html")],
+    "definitions.html": [_NOTES, ("Definitions", "/definitions.html")],
+    "islamiat-references.html": [_NOTES, ("Islamiyat references", "/islamiat-references.html")],
+    "solver.html": [("AI Tutor", "/tutor.html"), ("Photo Solver", "/solver")],
+    "subjects.html": [("Subjects", "/subjects.html")],
+    "course.html": [("Subjects", "/subjects.html"), ("Course", "/course.html")],
+    "guide.html": [("Guide", "/guide.html")],
+    "walkthrough.html": [("Guide", "/guide.html"), ("Walkthrough", "/walkthrough.html")],
+    "pricing.html": [("Pricing", "/pricing.html")],
+    "teachers.html": [("Our teachers", "/teachers.html")],
+    "teacher-apply.html": [("Our teachers", "/teachers.html"), ("Teach with us", "/teacher-apply.html")],
+    "contact.html": [("Contact", "/contact.html")],
+    "terms.html": [("Terms", "/terms.html")],
+    "privacy.html": [("Privacy", "/privacy.html")],
+}
+SITE = "https://prepwithtee.com"
+_CRUMB_RE = re.compile(r"<!--CRUMB:START.*?<!--CRUMB:END-->\n?", re.S)
+# the single-link bars this replaces: <div class="page-back-bar"><a ...>Dashboard</a></div>
+_OLD_BACK_RE = re.compile(r'\s*<div class="page-back-bar">\s*<a[^>]*>.*?</a>\s*</div>[ \t]*\n?', re.S)
+
+
+def _esc(s: str) -> str:
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace('"', "&quot;")
+
+
+def crumb_block(page: str) -> str | None:
+    trail = CRUMBS.get(page)
+    if not trail:
+        return None
+    full = [("Home", "/")] + trail
+    parent = full[-2]
+    links = " ".join(
+        (f'<a href="{u}">{_esc(n)}</a><span aria-hidden="true">›</span>' if i < len(full) - 1
+         else f'<span aria-current="page">{_esc(n)}</span>')
+        for i, (n, u) in enumerate(full))
+    ld = json.dumps({"@context": "https://schema.org", "@type": "BreadcrumbList",
+                     "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n,
+                                          "item": f"{SITE}{u}"} for i, (n, u) in enumerate(full)]},
+                    ensure_ascii=False)
+    return ("<!--CRUMB:START — breadcrumb bar. Do not edit here; edit CRUMBS in website/sync_nav.py "
+            "then run: python sync_nav.py -->\n"
+            '<div class="pg-crumbbar"><div class="container pg-crumbbar-in">'
+            f'<a class="pg-back" href="{parent[1]}"><svg viewBox="0 0 24 24" aria-hidden="true">'
+            '<path d="M15 5l-7 7 7 7"/></svg><span>' + _esc(parent[0]) + "</span></a>"
+            f'<nav class="pg-crumbs" aria-label="Breadcrumb">{links}</nav></div></div>\n'
+            f'<script type="application/ld+json">{ld}</script>\n'
+            "<!--CRUMB:END-->\n")
+
+
+def stamp_crumbs(page: str, html: str) -> str:
+    """Put (or refresh) the bar right after the navbar, dropping any old back bar."""
+    html = _CRUMB_RE.sub("", html)
+    block = crumb_block(page)
+    end = html.find("<!--NAV:END-->")
+    if end < 0:
+        return html
+    end += len("<!--NAV:END-->")
+    nl = html.find("\n", end)
+    end = nl + 1 if nl >= 0 else end
+    rest = html[end:]
+    m = _OLD_BACK_RE.match(rest)
+    if m and block:
+        rest = rest[m.end():]
+    return html[:end] + (block or "") + rest
 
 
 def _markers(name: str, partial: str):
@@ -73,6 +176,7 @@ def main() -> int:
                 new = marker_re.sub(lambda _: block, new, count=1)
             elif bare.search(new):
                 new = bare.sub(lambda _: block, new, count=1)
+        new = stamp_crumbs(page.name, new)
         if new != src:
             stale.append(page.name)
             if not args.check:

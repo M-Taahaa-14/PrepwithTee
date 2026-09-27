@@ -489,7 +489,7 @@ html[data-theme="dark"] .pwt-cb-escalate { background: #1e1208; border-color: #5
     {
       keys: ['resource', 'formula', 'definition', 'periodic table', 'calculator', 'command word', 'tools'],
       answer: '**Free study tools include:**\n- Formula sheets (Physics, Maths, CS)\n- Definitions glossary\n- Periodic table\n- Scientific calculator\n- Command words guide (Cambridge marking)\n- Graph tools & pseudocode editor',
-      links: [{ label: '📁 Open Resources', href: 'resources.html' }, { label: '🔧 Tools Hub', href: 'tools.html' }]
+      links: [{ label: '📁 Open Resources', href: '/resources' }, { label: '🔧 Tools Hub', href: 'tools.html' }]
     },
     {
       keys: ['note', 'flashcard', 'revision card', 'study card', 'fc'],
