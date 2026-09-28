@@ -2,6 +2,7 @@
 
 import { requireProfile, api, teeLoader, UpgradeRequiredError } from "/auth.js";
 import { showUpgradeModal, setPlan, setRole, initUsageMeter } from "/upgrade-modal.js";
+import { enrol, gateOnLoad } from "/profile-gate.js?v=20260928c";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g,
   c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -70,6 +71,8 @@ async function init() {
   renderEnrol();
   renderBoardSwitch();
   renderSetupBanner();
+  // New sign-ups: name, WhatsApp and board come first (enrolling needs them).
+  if (!(await gateOnLoad())) return;       // required form shown; page reloads after
   // If coming from profile setup without subjects, scroll straight to the enrol section
   if (new URLSearchParams(location.search).has("needs-subjects")) {
     history.replaceState({}, "", location.pathname); // clean the URL
@@ -546,8 +549,13 @@ async function toggleEnrol(btn) {
   try {
     if (on) {
       await api(`/api/enrollments/${encodeURIComponent(syllabus)}`, { method: "DELETE" });
-    } else {
-      await api("/api/enrollments", { method: "POST", body: { syllabus } });
+    } else if (!(await enrol(syllabus, { subjectName: btn.dataset.subjectName || "" }))) {
+      btn.disabled = false;             // closed the "Finish your profile" form
+      btn.textContent = "Add subject";
+      return;
+    } else if (!boards.includes(meta.subjects.find(x => x.syllabus === syllabus)?.board)) {
+      location.reload();                // a board was added on the way
+      return;
     }
     // Refetch rather than patch — the rings depend on the same data.
     dash = await api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || ""));
@@ -647,7 +655,11 @@ function renderArchived() {
       btn.disabled = true;
       btn.textContent = "Reactivating…";
       try {
-        await api("/api/enrollments", { method: "POST", body: { syllabus } });
+        if (!(await enrol(syllabus))) {
+          btn.disabled = false;
+          btn.textContent = "Reactivate";
+          return;
+        }
         // Refetch and re-render
         dash = await api("/api/dashboard?tz=" + encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone || ""));
         renderRings();

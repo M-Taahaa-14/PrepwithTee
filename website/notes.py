@@ -522,3 +522,34 @@ def sitemap_paths() -> list[str]:
             paths.append(notes_url(code, ch))
             paths += [notes_url(code, ch, n["slug"]) for n in notes]
     return paths
+
+
+def sitemap_lastmod() -> dict[str, float]:
+    """{url: newest file mtime} for every sitemap page - a note's own file, a
+    chapter/subject/board/hub the newest note (or _chapter/_subject.json) under it."""
+    out: dict[str, float] = {}
+
+    def bump(url: str, t: float) -> None:
+        out[url] = max(out.get(url, 0.0), t)
+
+    def mtime(p: Path) -> float:
+        try:
+            return p.stat().st_mtime
+        except OSError:
+            return 0.0
+
+    for code, chs in index().items():
+        if code not in SUBJECTS:
+            continue
+        up = [notes_url(code), f"/notes/{SUBJECTS[code]['board_slug']}", "/notes"]
+        for u in up:
+            bump(u, mtime(NOTES_DIR / code / "_subject.json"))
+        for ch, notes in chs.items():
+            t_ch = mtime(NOTES_DIR / code / ch / "_chapter.json")
+            for n in notes:
+                t = mtime(n["path"])
+                out[notes_url(code, ch, n["slug"])] = t
+                t_ch = max(t_ch, t)
+            for u in [notes_url(code, ch)] + up:
+                bump(u, t_ch)
+    return {u: t for u, t in out.items() if t}

@@ -1,0 +1,47 @@
+:root {
+  /* ---- surfaces ---------------------------------------------------- */
+  --page: #FDF9F3;          /* warm cream, the whole-site canvas */
+  --cream: #F7F0E4;         /* alternating band */
+  --white: #fff;
+  --line: #E8DFCE;
+
+  /* ---- type -------------------------------------------------------- */
+  --ink: #1A1A2E;           /* near-black, high contrast on cream */
+  --grey: #5A5A72;
+  --purple: #4C2E72;        /* display headings */
+  --purple-bright: #6B3FA0;
+
+  --navy: #4C2E72;          /* legacy aliases, kept so older rules still */
+  --navy-deep: #2E1B4A;     /* resolve to the new palette */
+  --gold: #E8913A;
+
+  /* filled buttons / selected states: a real accent in both themes */
+  --accent: #4C2E72;
+  --accent-hover: #5d3a8a;
+  --on-accent: #fff;
+  --accent-soft: #EEE8F8;
+
+  --radius: 18px;
+  --radius-lg: 26px;
+
+  /* ---- pastel card system ----------------------------------------- */
+  /* Each pair is a soft fill plus a bold, AA-contrast ink for its text. */
+  --lav: #E4DEF9;      --lav-ink: #4A2E8F;    --lav-line: #C9BDF0;
+  --pink: #FBDCE8;     --pink-ink: #B0326E;   --pink-line: #F3BDD3;
+  --green: #D4F0E0;    --green-ink: #16704A;  --green-line: #A9E0C3;
+  --orange: #FBE2CC;   --orange-ink: #B0541C; --orange-line: #F2C69E;
+  --yellow: #FBF2D2;   --yellow-ink: #866312; --yellow-line: #F0E0A8;
+  --blue: #D9EBFB;     --blue-ink: #14568C;   --blue-line: #AFD5F2;
+  --teal: #D2EFEC;     --teal-ink: #12706A;   --teal-line: #A5DFD9;
+
+  /* subject accents, re-pointed at the pastel system */
+  --maths: #4A2E8F;
+  --physics: #16704A;
+  --cs: #B0326E;
+  --maths-light: var(--lav);
+  --physics-light: var(--green);
+  --cs-light: var(--pink);
+  --maths-glow: rgba(74,46,143,.22);
+  --physics-glow: rgba(22,112,74,.22);
+  --cs-glow: rgba(176,50,110,.22);
+}

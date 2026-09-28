@@ -55,6 +55,8 @@ def student(browser, base_url):
     r = ctx.request.post("/auth/register", data={
         "email": email, "password": "Passw0rd!23", "name": "E2E Student"})
     assert r.ok, r.text()
+    ctx.request.post("/api/me/setup", data={          # enrolment gate
+        "name": "E2E Student", "phone": "+92 3001234567", "boards": ["igcse", "o-level", "a-level"]})
     ctx.request.put("/api/me/boards", data={"boards": ["igcse", "o-level"]})
     yield ctx
     ctx.close()

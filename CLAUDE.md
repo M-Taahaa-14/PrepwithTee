@@ -652,6 +652,15 @@ linked), not agreement with any external file.
     "See it in action" section (demos/how-it-works deleted). **Re-capture after UI changes**:
     `.venv\Scripts\python scripts\capture_demo_shots.py --base http://localhost:8017`.
 
+32. **SEO pass (2026-09-28, local).** Share images: `website/og_image.py` serves
+    `/og/{section}[/{board}[/{subject}]].png` (1200x630, PyMuPDF, cached in data/og/v{VERSION};
+    bump VERSION to redraw); `catalog._shell` picks it from the page path (chapter/year pages
+    use their subject's). Only real sections/boards/subjects render - no free text. Sitemap
+    `<lastmod>` = real file mtimes (static pages, notes via `notes.sitemap_lastmod()`,
+    resources via `resources.sitemap_lastmod()`); papers/yearly pages have no trustworthy
+    date, so they carry none. robots.txt must NOT disallow redirect stubs (Google then never
+    sees the redirect) - /notes.html stays disallowed because it is the private "My notes".
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop

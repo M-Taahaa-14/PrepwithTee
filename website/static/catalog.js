@@ -5,6 +5,7 @@
  * Page state is embedded by catalog.py as JSON in #cat-state.
  */
 import { api } from "/auth.js?v=20260929a";
+import { enrol, gateOnLoad } from "/profile-gate.js?v=20260928c";
 
 const state = JSON.parse(document.getElementById("cat-state")?.textContent || "{}");
 
@@ -20,7 +21,12 @@ document.addEventListener("click", async (e) => {
   const label = btn.textContent;
   btn.textContent = "Enrolling…";
   try {
-    await api("/api/enrollments", { method: "POST", body: { syllabus: btn.dataset.enrol } });
+    // Asks for name / WhatsApp / board first when the profile is unfinished.
+    if (!(await enrol(btn.dataset.enrol, { subjectName: btn.dataset.enrolName || "" }))) {
+      btn.disabled = false;
+      btn.textContent = label;
+      return;
+    }
     location.reload();
   } catch (err) {
     btn.disabled = false;
@@ -103,7 +109,11 @@ function openBoards({ required = false } = {}) {
 document.addEventListener("click", (e) => {
   if (e.target.closest("[data-open-boards]")) openBoards();
 });
-if (state.signedIn && state.needsBoards) openBoards({ required: true });
+// Unfinished profile (no WhatsApp / board yet): the full required form first
+// (profile-gate.gateOnLoad, shared with the header hook); otherwise just boards.
+if (state.signedIn) {
+  gateOnLoad().then((ok) => { if (ok && state.needsBoards) openBoards({ required: true }); });
+}
 
 // ── Board + subject picker (ui.picker) ─────────────────────────────────────
 // Board tabs filter the bands in place; the search box filters tiles by name

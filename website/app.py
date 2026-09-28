@@ -100,6 +100,8 @@ import explore as _explore_mod
 app.include_router(_explore_mod.router)
 import search as _search_mod
 app.include_router(_search_mod.router)
+import og_image as _og_mod
+app.include_router(_og_mod.router)
 
 
 @app.get("/solver", include_in_schema=False)
@@ -3808,7 +3810,8 @@ app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 _PUBLIC_PATHS = [
     "/", "/subjects.html", "/explore",
     "/pricing.html", "/teachers.html", "/tools.html",
-    "/teacher-apply.html", "/contact.html", "/guide.html", "/blog",
+    "/teacher-apply.html", "/contact.html", "/guide.html", "/walkthrough.html", "/blog",
+    "/solver",
     # Study tools — each has a distinct meta description and real student value
     "/formulas.html", "/definitions.html",
     "/command-words.html", "/calculator.html", "/periodic-table.html",
@@ -3826,8 +3829,8 @@ _NOINDEX_PATHS = {
     "/topical-progress.html", "/yearly-progress.html",
     "/achievements.html", "/notes.html",
     "/analytics.html", "/calendar.html", "/my-papers",
-    # Redirect stubs — no content, should never be indexed
-    "/revise.html", "/ask.html", "/walkthrough.html",
+    # Redirect stubs (/ask.html -> /solver, revise.html -> progress) are NOT listed:
+    # a disallowed URL is never fetched, so Google would never see the redirect.
 }
 
 
@@ -3862,45 +3865,57 @@ def sitemap_xml():
         "/grade-calculator.html": "0.70",
         "/grade-trends.html": "0.70",
     }
+    static_dir = Path(__file__).parent / "static"
+    _static_file = {"/": "index.html", "/solver": "solver.html"}
+    lastmod: dict[str, float] = {}
+    for p in _PUBLIC_PATHS:
+        f = static_dir / _static_file.get(p, p.lstrip("/"))
+        if f.suffix == ".html" and f.is_file():
+            lastmod[p] = f.stat().st_mtime
+    for mod in (_notes_mod, _resources_mod):
+        try:
+            lastmod.update(mod.sitemap_lastmod())
+        except Exception:
+            pass
+
+    def _url(p: str, freq: str, pri: str) -> str:
+        t = lastmod.get(p)
+        mod_tag = (f"<lastmod>{time.strftime('%Y-%m-%d', time.gmtime(t))}</lastmod>"
+                   if t else "")
+        return (f"  <url><loc>{origin}{p}</loc>{mod_tag}"
+                f"<changefreq>{freq}</changefreq><priority>{pri}</priority></url>")
+
     entries = []
     for p in _PUBLIC_PATHS:
         pri = _priority.get(p, "0.60")
         freq = "weekly" if p in ("/", "/blog") else "monthly"
-        entries.append(
-            f"  <url><loc>{origin}{p}</loc>"
-            f"<changefreq>{freq}</changefreq>"
-            f"<priority>{pri}</priority></url>"
-        )
+        entries.append(_url(p, freq, pri))
     # Catalogue pages: boards, every subject, every chapter
     try:
         for p in _catalog_mod.sitemap_paths():
             depth = p.count("/")
             pri = {1: "0.95", 2: "0.90", 3: "0.85"}.get(depth, "0.70")
-            entries.append(f"  <url><loc>{origin}{p}</loc>"
-                           f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
+            entries.append(_url(p, "weekly", pri))
     except Exception:
         pass
     # Yearly papers (subject + year pages) and MCQ practice pages
     try:
         for p in _yearly_mod.sitemap_paths():
             pri = "0.80" if p.count("/") <= 3 else "0.70"
-            entries.append(f"  <url><loc>{origin}{p}</loc>"
-                           f"<changefreq>monthly</changefreq><priority>{pri}</priority></url>")
+            entries.append(_url(p, "monthly", pri))
     except Exception:
         pass
     # Revision notes (only pages with real notes)
     try:
         for p in _notes_mod.sitemap_paths():
             pri = "0.80" if p.count("/") <= 3 else "0.75"
-            entries.append(f"  <url><loc>{origin}{p}</loc>"
-                           f"<changefreq>weekly</changefreq><priority>{pri}</priority></url>")
+            entries.append(_url(p, "weekly", pri))
     except Exception:
         pass
     # Resources (hub, boards, subjects, shelves - folder pages are noindex)
     try:
         for p in _resources_mod.sitemap_paths():
-            entries.append(f"  <url><loc>{origin}{p}</loc>"
-                           f"<changefreq>monthly</changefreq><priority>0.70</priority></url>")
+            entries.append(_url(p, "monthly", "0.70"))
     except Exception:
         pass
     try:

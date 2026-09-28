@@ -39,7 +39,7 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260929c"       # bump with catalog.css / catalog.js (immutable caching)
+CSS_V = "20260929g"       # bump with catalog.css / catalog.js (immutable caching)
 STYLES_V = "20260929e"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
@@ -383,9 +383,12 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
     needs_boards = bool(state["user"]) and (not state["boards"] or state.get("boards_inferred"))
     page_state = {"signedIn": bool(state["user"]), "boards": state["boards"],
                   "needsBoards": needs_boards,
+                  "student": bool(state["user"]) and state["user"].get("role", "student") == "student",
                   "enrolled": sorted(state["enrolled"]),
                   "boardNames": BOARD_SHORT}
     robots = '<meta name="robots" content="noindex">' if noindex else ""
+    import og_image                           # per-section/board/subject share image
+    og_img = og_image.og_url(path)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -398,13 +401,14 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
   {robots}
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PrepWithTee">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="{'summary' if og_img.endswith('/logo.png') else 'summary_large_image'}">
   <meta name="theme-color" content="#4C2E72" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f1117" media="(prefers-color-scheme: dark)">
   <meta property="og:title" content="{_e(title)}">
   <meta property="og:description" content="{_e(desc)}">
   <meta property="og:url" content="{_e(canonical)}">
-  <meta property="og:image" content="{SITE_ORIGIN}/logo.png">
+  <meta property="og:image" content="{_e(og_img)}">
+  <meta name="twitter:image" content="{_e(og_img)}">
   {ld_html}
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">

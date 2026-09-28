@@ -18,7 +18,7 @@ def test_boards_api_lists_every_board_and_subject(client):
 
 
 def test_my_boards_round_trip(client, new_student):
-    new_student()
+    new_student(setup=False)
     assert client.get("/api/me/boards").json()["boards"] == []
     r = client.put("/api/me/boards", json={"boards": ["igcse", "o-level", "bogus"], "primary": "igcse"})
     assert r.status_code == 200
@@ -33,8 +33,10 @@ def test_boards_must_not_be_empty(client, new_student):
 
 
 def test_boards_inferred_from_enrolments_until_saved(client, new_student):
-    new_student()
-    client.post("/api/enrollments", json={"syllabus": "9702"})
+    # legacy accounts enrolled before boards existed (the API now needs a board first)
+    import users_db
+    u = new_student(setup=False)
+    users_db.enroll(u["id"], "9702")
     got = client.get("/api/me/boards").json()
     assert got["boards"] == ["a-level"] and got["saved"] is False
 
@@ -68,7 +70,8 @@ def test_subject_page_is_readable_without_js(client):
     assert '"@type": "BreadcrumbList"' in html
     # chapter names are in the HTML itself (the SEO value), no question images
     assert "Motion" in _text(html)
-    assert "/api/question/" not in html and ".png" not in html.replace("logo.png", "").replace("favicon-32.png", "").replace("apple-touch-icon.png", "")
+    no_og = re.sub(r"/og/[\w/-]+\.png", "", html)       # the share image is allowed
+    assert "/api/question/" not in html and ".png" not in no_og.replace("logo.png", "").replace("favicon-32.png", "").replace("apple-touch-icon.png", "")
     assert r.headers["cache-control"].startswith("public")
 
 
@@ -110,7 +113,7 @@ def test_board_page_personalised_and_not_cached(client, new_student):
 
 
 def test_board_prompt_flag_for_student_without_boards(client, new_student):
-    new_student()
+    new_student(setup=False)
     state = re.search(r'id="cat-state" type="application/json">(.*?)</script>',
                       client.get("/papers/igcse").text).group(1)
     assert '"needsBoards": true' in state
@@ -224,3 +227,27 @@ def test_static_pages_have_a_breadcrumb_bar(client):
         assert f'<a class="pg-back" href="{parent[1]}">' in html, page
         assert '"@type": "BreadcrumbList"' in html and "page-back-bar" not in html, page
     assert "pg-crumbbar" not in client.get("/").text               # home has none
+
+
+def test_share_images_per_section_board_subject(client):
+    html = client.get("/papers/igcse/physics-0625").text
+    assert 'og:image" content="https://prepwithtee.com/og/papers/igcse/physics-0625.png' in html
+    assert 'twitter:card" content="summary_large_image"' in html
+    for url in ("/og/papers.png", "/og/yearly/o-level.png", "/og/notes/igcse/physics-0625.png"):
+        r = client.get(url)
+        assert r.status_code == 200 and r.content[:8] == b"\x89PNG\r\n\x1a\n", url
+    # only real sections / boards / subjects - no arbitrary text
+    for url in ("/og/hack.png", "/og/papers/mars.png", "/og/papers/igcse/nope-1234.png", "/og/papers"):
+        assert client.get(url).status_code == 404, url
+
+
+def test_sitemap_and_robots_seo_gaps(client):
+    xml = client.get("/sitemap.xml").text
+    assert "https://prepwithtee.com/solver<" in xml
+    assert "https://prepwithtee.com/walkthrough.html<" in xml
+    assert re.search(r"/formulas\.html</loc><lastmod>\d{4}-\d\d-\d\d</lastmod>", xml)
+    robots = client.get("/robots.txt").text
+    # redirect stubs and the public walkthrough must stay crawlable
+    for path in ("/ask.html", "/revise.html", "/walkthrough.html"):
+        assert f"Disallow: {path}\n" not in robots
+    assert "Disallow: /notes.html\n" in robots          # private "My notes"

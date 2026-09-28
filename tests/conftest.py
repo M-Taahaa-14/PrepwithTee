@@ -88,10 +88,15 @@ def client(app):
 @pytest.fixture()
 def new_student(client):
     """Register a brand-new student and leave the client logged in as them."""
-    def _make(role: str = "student", password: str = "Passw0rd!23"):
+    def _make(role: str = "student", password: str = "Passw0rd!23", setup: bool = True):
         email = f"t_{uuid.uuid4().hex[:10]}@test.local"
         r = client.post("/auth/register", json={
             "email": email, "password": password, "name": "Test Student", "role": role})
         assert r.status_code == 200, r.text
+        if setup:   # the enrolment gate needs name + WhatsApp + boards
+            s = client.post("/api/me/setup", json={
+                "name": "Test Student", "phone": "+92 3001234567",
+                "boards": ["o-level", "igcse", "a-level"]})
+            assert s.status_code == 200, s.text
         return {**r.json(), "password": password}
     return _make

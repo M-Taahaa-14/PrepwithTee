@@ -468,3 +468,29 @@ def sitemap_paths() -> list[str]:
     paths += [subject_url(c) for c in idx["subjects"]]
     paths += [f"/resources/library/{s}" for s in idx["shelves"]]
     return paths
+
+
+def sitemap_lastmod() -> dict[str, float]:
+    """{url: newest file mtime} for the hub, boards, subjects and shelves."""
+    def newest(node: dict) -> float:
+        t = 0.0
+        for f in _all_files(node):
+            try:
+                t = max(t, (RES_DIR / f["rel"]).stat().st_mtime)
+            except OSError:
+                pass
+        return t
+
+    idx = index()
+    out: dict[str, float] = {}
+    for code, tree in idx["subjects"].items():
+        t = newest(tree)
+        board = f"/resources/{SUBJECTS[code]['board_slug']}"
+        out[subject_url(code)] = t
+        out[board] = max(out.get(board, 0.0), t)
+        out["/resources"] = max(out.get("/resources", 0.0), t)
+    for slug, tree in idx["shelves"].items():
+        t = newest(tree)
+        out[f"/resources/library/{slug}"] = t
+        out["/resources"] = max(out.get("/resources", 0.0), t)
+    return {u: t for u, t in out.items() if t}

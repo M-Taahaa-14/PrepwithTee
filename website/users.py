@@ -224,6 +224,114 @@ def list_archived_enrollments(user: _CurrentUser):
     }
 
 
+# ── Enrolment gate ────────────────────────────────────────────────────────────
+# Nobody enrols in a subject until their profile has a name, a WhatsApp number
+# and at least one board - and the subject must be on one of those boards. The
+# pop-up in static/profile-gate.js collects exactly these fields.
+
+_BOARD_ORDER = ["o-level", "igcse", "a-level"]
+_BOARD_BY_NAME = {"Cambridge O Level": "o-level", "Cambridge IGCSE": "igcse",
+                  "Cambridge A Level": "a-level"}
+_BOARD_GRADE = {"o-level": "O Level", "igcse": "IGCSE", "a-level": "A Level"}
+_GRADE_BOARD = {v: k for k, v in _BOARD_GRADE.items()}
+
+
+def syllabus_board(syllabus: str) -> str | None:
+    return _BOARD_BY_NAME.get(_udb.BOARDS_MAP.get(syllabus, ("", ""))[0])
+
+
+def _phone_ok(phone: str | None) -> bool:
+    return len(re.sub(r"\D", "", phone or "")) >= 8
+
+
+def setup_state(user_id: str) -> dict:
+    """What the enrolment gate knows about a user (read fresh - the JWT lags)."""
+    row = _udb.get_user(user_id) or {}
+    try:
+        boards, primary = _udb.get_boards(user_id)
+    except Exception:
+        boards, primary = [], None
+    boards = list(boards)
+    legacy = _GRADE_BOARD.get(_normalize_grade(row.get("grade")))
+    if legacy and legacy not in boards:        # students from before student_boards
+        boards.append(legacy)
+    boards.sort(key=_BOARD_ORDER.index)
+    missing = []
+    if not (row.get("name") or "").strip():
+        missing.append("name")
+    if not _phone_ok(row.get("phone")):
+        missing.append("phone")
+    if not boards:
+        missing.append("boards")
+    return {"complete": not missing, "missing": missing, "role": row.get("role") or "student",
+            "enrolled": bool(_udb.get_enrollments(user_id)),
+            "name": row.get("name") or "", "phone": row.get("phone") or "",
+            "boards": boards, "primary": primary or (boards[0] if boards else None)}
+
+
+_MISSING_LABEL = {"name": "your name", "phone": "your WhatsApp number", "boards": "your board"}
+
+
+def require_setup(user_id: str, syllabus: str) -> None:
+    """409 unless this user may enrol in `syllabus` right now."""
+    st = setup_state(user_id)
+    board = syllabus_board(syllabus)
+    if not st["complete"]:
+        need = ", ".join(_MISSING_LABEL[m] for m in st["missing"])
+        raise HTTPException(409, {"code": "profile_incomplete", "missing": st["missing"],
+                                  "board": board,
+                                  "message": f"Complete your profile first - add {need}."})
+    if board and board not in st["boards"]:
+        raise HTTPException(409, {"code": "board_not_chosen", "missing": ["boards"],
+                                  "board": board,
+                                  "message": f"Add Cambridge {_BOARD_GRADE[board]} to your boards "
+                                             f"before enrolling in its subjects."})
+
+
+class SetupReq(BaseModel):
+    name: str
+    phone: str
+    boards: list[str]
+
+
+@router.get("/api/me/setup")
+def get_setup(user: _MaybeUser):
+    # Guests get a plain 200 (the header asks on every page - no 401 noise).
+    if not user:
+        return {"signed_in": False, "complete": True, "role": None}
+    return {"signed_in": True, **setup_state(user["id"])}
+
+
+@router.post("/api/me/setup")
+def save_setup(req: SetupReq, user: _CurrentUser, response: Response):
+    name = req.name.strip()
+    phone = re.sub(r"\s+", " ", req.phone.strip())
+    boards = sorted({b for b in req.boards if b in _BOARD_GRADE}, key=_BOARD_ORDER.index)
+    if len(name) < 2:
+        raise HTTPException(422, "Please enter your full name.")
+    if not _phone_ok(phone) or not re.fullmatch(r"\+?[\d\s\-()]{8,24}", phone):
+        raise HTTPException(422, "Please enter a valid WhatsApp number with country code.")
+    if not boards:
+        raise HTTPException(422, "Pick at least one board.")
+    row = _udb.get_user(user["id"]) or {}
+    try:
+        _saved, primary = _udb.get_boards(user["id"])
+    except Exception:
+        primary = None
+    main = _GRADE_BOARD.get(_normalize_grade(row.get("grade")))
+    primary = next((b for b in (primary, main) if b in boards), boards[0])
+    _udb.set_boards(user["id"], boards, primary)
+    updates: dict = {"name": name, "phone": phone}
+    if main not in boards:                     # `grade` = the main board
+        updates["grade"] = _BOARD_GRADE[primary]
+    if not row.get("profile_complete") and _udb.get_enrollments(user["id"]):
+        updates["profile_complete"] = 1
+    updated = _udb.update_profile(user["id"], updates)
+    import auth as _auth_mod
+    _auth_mod._set_cookie(response, updated["id"], updated)
+    return setup_state(user["id"])
+
+
 class EnrollReq(BaseModel):
     syllabus: str
 
@@ -231,6 +339,7 @@ class EnrollReq(BaseModel):
 def enroll(req: EnrollReq, user: _CurrentUser, response: Response):
     if not re.match(r"^[0-9A-Za-z]{4,6}$", req.syllabus):
         raise HTTPException(400, "Invalid syllabus code")
+    require_setup(user["id"], req.syllabus)
     _udb.enroll(user["id"], req.syllabus)
     # If this is the first enrollment and the user already has a grade, complete their profile now.
     if user.get("grade") and not user.get("profile_complete"):
@@ -246,6 +355,7 @@ def restore_enrollment_route(user: _CurrentUser, req: EnrollReq | None = None, s
     code = (syllabus or (req.syllabus if req else "")).strip()
     if not code:
         raise HTTPException(400, "Syllabus code required")
+    require_setup(user["id"], code)
     _udb.restore_enrollment(user["id"], code)
     return {"status": "restored", "syllabus": code}
 
