@@ -35,7 +35,7 @@ from pipeline import config as _pcfg
 
 router = APIRouter()
 
-SESSION_V = "20260929a"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20260930a"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,
@@ -467,6 +467,8 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
     import yearly as _yearly
     esc = _catalog._e
     subj = _catalog.SUBJECTS.get(s["syllabus"])
+    import ui as _ui
+    _dock = _ui.tools_dock(s["syllabus"])
     state = {"id": s["id"], "title": s["title"],
              "backUrl": _yearly.mcq_url(s["syllabus"]) if subj else "/mcq"}
     return HTMLResponse(f"""<!DOCTYPE html>
@@ -488,7 +490,7 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
   <link rel="stylesheet" href="/annotate.css?v={SESSION_V}">
   <link rel="stylesheet" href="/mcq-session.css?v={SESSION_V}">
 </head>
-<body class="vw-page mq-page">
+<body class="vw-page mq-page"{_dock[0]}>
 {_blog._nav()}
 <main id="mq" class="vw mq" data-state="loading">
   <section class="vw-load"><div class="vw-load-card"><p class="vw-eyebrow">MCQ practice</p>
@@ -499,9 +501,10 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260928a"></script>
+<script src="/main.js?v=20260930a"></script>
 <script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/mcq-session.js?v={SESSION_V}"></script>
+{_dock[1]}
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
 

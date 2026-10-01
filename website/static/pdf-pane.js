@@ -50,7 +50,12 @@ export class PdfPane {
 
   /** `src` is a URL, or a document (promise) the caller already started loading. */
   async load(src) {
-    const lazy = this.ranged ? { disableAutoFetch: true, disableStream: true, rangeChunkSize: 262144 } : {};
+    // Ranged: page 1 is drawn from the byte ranges it needs, while the rest of
+    // the file keeps downloading in the background (auto-fetch), so later pages
+    // are already there when the student scrolls. Big chunks: every request
+    // costs ~1 s of round trip from Pakistan, and 256 KB chunks fetched only on
+    // scroll made a 10 MB booklet take a minute or two (feedback 2026-09-30).
+    const lazy = this.ranged ? { rangeChunkSize: 1 << 20 } : {};
     this.doc = await (typeof src === "string"
       ? pdfjsLib.getDocument({ url: src, withCredentials: true, ...PDF_OPTS, ...lazy }).promise : src);
     // Pages can differ: Cambridge mark schemes are a portrait cover followed by
@@ -102,6 +107,8 @@ export class PdfPane {
   layout() {
     this.on.zoom?.(this.zoomLabel);
     this.obs?.disconnect();
+    for (const p of this.pages) this._release(p);
+    this.queue = new Set();
     this.stage.innerHTML = "";
     this.stage.classList.toggle("has-chips", this.chips);
     this.pages = [];
@@ -127,23 +134,63 @@ export class PdfPane {
         pg.appendChild(chips);
       }
       this.stage.appendChild(pg);
-      this.pages.push({ el: pg, rendered: false });
+      this.pages.push({ el: pg, n, rendered: false, token: 0 });
       this.on.pageEl?.(pg, n);
     }
+    // Only pages near the screen hold a canvas. A booklet can be 150+ pages and
+    // each drawn page is ~10-15 MB of pixels on a high-DPI screen; keeping them
+    // all is what made Chrome crawl. Pages that scroll far away are released
+    // and redrawn if the student comes back.
     this.obs = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) this._render(+e.target.dataset.n);
-    }, { root: this.stage, rootMargin: "900px 0px" });
+      for (const e of entries) {
+        const slot = this.pages[+e.target.dataset.n - 1];
+        if (!slot) continue;
+        if (e.isIntersecting) { this.queue.add(slot); } else { this.queue.delete(slot); this._release(slot); }
+      }
+      this._pump();
+    }, { root: this.stage, rootMargin: "1200px 0px" });
     this.pages.forEach((p) => this.obs.observe(p.el));
     this._onScroll();
   }
 
-  async _render(n) {
-    const slot = this.pages[n - 1];
-    if (!slot || slot.rendered) return;
+  /** Draw queued pages, nearest to the one being read first, two at a time. */
+  _pump() {
+    this.busy ||= 0;
+    while (this.busy < 2 && this.queue.size) {
+      let best = null;
+      for (const s of this.queue) if (!best || Math.abs(s.n - this.pageNo) < Math.abs(best.n - this.pageNo)) best = s;
+      this.queue.delete(best);
+      if (best.rendered) continue;
+      this.busy++;
+      this._render(best).catch(() => {}).finally(() => { this.busy--; this._pump(); });
+    }
+  }
+
+  _release(slot) {
+    if (!slot.rendered) return;
+    slot.rendered = false;
+    slot.token++;
+    slot.task?.cancel();
+    slot.task = null;
+    for (const c of slot.el.querySelectorAll(":scope > canvas.vw-pdf")) { c.width = 0; c.height = 0; c.remove(); }
+    slot.el.querySelector(":scope > .annotationLayer")?.remove();
+    slot.page?.cleanup();
+    slot.page = null;
+  }
+
+  async _render(slot) {
+    if (slot.rendered) return;
     slot.rendered = true;
-    const page = await this.doc.getPage(n);
+    const token = ++slot.token;
+    const page = await this.doc.getPage(slot.n);
+    if (token !== slot.token) return;
+    slot.page = page;
     const vp = page.getViewport({ scale: this.scale });
-    const dpr = window.devicePixelRatio || 1;
+    // Sharp on retina, but capped: 3x phones and big zooms would otherwise
+    // allocate 30+ MB per page.
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const MAX_PX = 12e6;
+    if (vp.width * vp.height * dpr * dpr > MAX_PX) dpr = Math.max(1, Math.sqrt(MAX_PX / (vp.width * vp.height)));
     const canvas = document.createElement("canvas");
     canvas.className = "vw-pdf";                 // viewer.css inverts only this for dark paper
     canvas.width = Math.floor(vp.width * dpr);
@@ -151,17 +198,22 @@ export class PdfPane {
     canvas.style.width = `${vp.width}px`;
     canvas.style.height = `${vp.height}px`;
     slot.el.prepend(canvas);
-    await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp,
-                        transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
-                        annotationMode: pdfjsLib.AnnotationMode.ENABLE_FORMS }).promise;
+    slot.task = page.render({ canvasContext: canvas.getContext("2d"), viewport: vp,
+                              transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
+                              annotationMode: pdfjsLib.AnnotationMode.ENABLE_FORMS });
+    try { await slot.task.promise; } catch { return; }          // cancelled: released meanwhile
+    slot.task = null;
+    if (token !== slot.token) return;
     const layer = document.createElement("div");
     layer.className = "annotationLayer";
     slot.el.style.setProperty("--scale-factor", vp.scale);
     slot.el.insertBefore(layer, canvas.nextSibling);
     const view = vp.clone({ dontFlip: true });
+    const annotations = await page.getAnnotations();
+    if (token !== slot.token) return;
     await new pdfjsLib.AnnotationLayer({ div: layer, page, viewport: view,
                                          accessibilityManager: null, annotationCanvasMap: null })
-      .render({ annotations: await page.getAnnotations(), viewport: view, div: layer, page,
+      .render({ annotations, viewport: view, div: layer, page,
                 linkService: this.links, annotationStorage: this.doc.annotationStorage,
                 renderForms: true });
   }
@@ -218,6 +270,7 @@ export class PdfPane {
 
   destroy() {
     this.obs?.disconnect();
+    for (const p of this.pages) this._release(p);
     this.doc?.destroy();
     this.stage.innerHTML = "";
   }

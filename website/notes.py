@@ -285,6 +285,22 @@ def _chapter_card(code: str, ch: dict, n: int = 0) -> str:
     </article>"""
 
 
+def _subject_subtree(code: str, chs: list[dict]) -> list[dict]:
+    """Page search on a subject: every chapter, its subtopics and its notes."""
+    import ui
+    out, notes = [], index().get(code, {})
+    for c in chs:
+        url = notes_url(code, c["slug"])
+        out.append(ui.deep_entry(c["display"], url, "Chapter", [],
+                                 extra=" ".join(x["name"] for x in c["subtopics"])))
+        for x in c["subtopics"]:
+            out.append(ui.deep_entry(x["name"], url, "Topic", [c["display"]]))
+        for n in notes.get(c["slug"], []):
+            out.append(ui.deep_entry(n["title"], notes_url(code, c["slug"], n["slug"]), "Note",
+                                     [c["display"]], extra=n.get("subtopic") or ""))
+    return out
+
+
 @router.get("/notes/{board}/{subject}", response_class=HTMLResponse)
 def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.maybe_user)):
     s = _subject_or_404(board, subject)
@@ -330,8 +346,9 @@ def notes_subject(board: str, subject: str, user: dict | None = Depends(_auth.ma
       </div>
     </header>
     {f'<details class="nt-guide"><summary>How to use these notes</summary><ul>{guide}</ul></details>' if guide else ''}
-    {ui.page_search("Search chapters and subtopics, e.g. " + (chs[0]["display"] if chs else "forces"), ".nt-ch")}
-    <div class="nt-tree">{tree}</div>"""
+    {ui.page_search("Search chapters, subtopics and notes, e.g. " + (chs[0]["display"] if chs else "forces"),
+                    ".nt-ch", deep=_subject_subtree(code, chs), scope=f"{s['plain']} notes")}
+    <div class="nt-tree" data-ps-browse>{tree}</div>"""
     ld = [{"@context": "https://schema.org", "@type": "Course",
            "name": f"Cambridge {BOARD_SHORT[board]} {s['plain']} ({code}) revision notes",
            "description": lede[:300],

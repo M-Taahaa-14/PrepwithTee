@@ -10,9 +10,9 @@
  */
 import { api } from "/auth.js?v=20260929a";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260928a";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20260930a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20260928a";
+import { createAnnotator } from "/annotate.js?v=20260930a";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");

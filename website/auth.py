@@ -249,7 +249,7 @@ def auth_callback(request: Request, code: str = "", state: str = "", error: str 
 
     role = user.get("role", "student")
     if role == "admin":
-        dest = "/admin.html"
+        dest = "/admin"
     elif role == "teacher":
         dest = "/teacher-dashboard.html"
     elif role == "parent":

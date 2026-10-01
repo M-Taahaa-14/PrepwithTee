@@ -7,6 +7,7 @@ connection string is needed.  Falls back to a local SQLite file
 
 import json
 import os
+import re
 import sqlite3
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -239,6 +240,7 @@ else:
         rating  INTEGER,
         message TEXT,
         name    TEXT,
+        email   TEXT,
         page    TEXT,
         type    TEXT,
         ts      TEXT DEFAULT (datetime('now'))
@@ -437,6 +439,82 @@ else:
         read_at      TEXT,
         created_at   TEXT NOT NULL DEFAULT (datetime('now'))
     );
+    -- Admin console v2 (migrations/025_admin_v2.sql)
+    CREATE TABLE IF NOT EXISTS admin_audit (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        admin_id     TEXT,
+        admin_email  TEXT,
+        via          TEXT,
+        action       TEXT NOT NULL,
+        target       TEXT,
+        details_json TEXT NOT NULL DEFAULT '{}',
+        ok           INTEGER NOT NULL DEFAULT 1,
+        created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS admin_audit_created ON admin_audit (created_at);
+    CREATE TABLE IF NOT EXISTS admin_views (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        admin_id    TEXT,
+        section     TEXT NOT NULL,
+        name        TEXT NOT NULL,
+        params_json TEXT NOT NULL DEFAULT '{}',
+        created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS admin_notes (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id  TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        admin_id    TEXT,
+        admin_name  TEXT,
+        body        TEXT NOT NULL,
+        created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS admin_notes_student ON admin_notes (student_id, created_at);
+    CREATE TABLE IF NOT EXISTS inbox_status (
+        source       TEXT NOT NULL,
+        item_id      TEXT NOT NULL,
+        status       TEXT NOT NULL DEFAULT 'new',
+        handled_by   TEXT,
+        note         TEXT,
+        replies_json TEXT NOT NULL DEFAULT '[]',
+        updated_at   TEXT NOT NULL DEFAULT (datetime('now')),
+        PRIMARY KEY (source, item_id)
+    );
+    CREATE TABLE IF NOT EXISTS newsletter_broadcasts (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        subject       TEXT NOT NULL,
+        body_markdown TEXT NOT NULL,
+        cta_label     TEXT,
+        cta_url       TEXT,
+        status        TEXT NOT NULL DEFAULT 'queued',
+        scheduled_at  TEXT,
+        total         INTEGER NOT NULL DEFAULT 0,
+        sent          INTEGER NOT NULL DEFAULT 0,
+        failed        INTEGER NOT NULL DEFAULT 0,
+        created_by    TEXT,
+        created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+        started_at    TEXT,
+        finished_at   TEXT,
+        error         TEXT,
+        worker        TEXT,
+        heartbeat_at  TEXT
+    );
+    CREATE TABLE IF NOT EXISTS newsletter_sends (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        broadcast_id INTEGER NOT NULL REFERENCES newsletter_broadcasts(id) ON DELETE CASCADE,
+        email        TEXT NOT NULL,
+        ok           INTEGER NOT NULL DEFAULT 0,
+        error        TEXT,
+        sent_at      TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE (broadcast_id, email)
+    );
+    CREATE TABLE IF NOT EXISTS email_log (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        template_id TEXT NOT NULL,
+        sent_at     TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS email_log_user_template
+        ON email_log (user_id, template_id, sent_at);
     CREATE TABLE IF NOT EXISTS contacts (
         id         INTEGER PRIMARY KEY AUTOINCREMENT,
         name       TEXT,
@@ -588,6 +666,7 @@ else:
         # Safe migrations for existing databases
         _safe_alters = [
             "ALTER TABLE assignments ADD COLUMN student_submissions_json TEXT DEFAULT '[]'",
+            "ALTER TABLE feedback ADD COLUMN email TEXT",
             "ALTER TABLE assignments ADD COLUMN assigned_by TEXT",
             "ALTER TABLE profiles ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'",
             "ALTER TABLE profiles ADD COLUMN plan_expires_at TEXT",
@@ -608,6 +687,15 @@ else:
             "ALTER TABLE tutor_sessions ADD COLUMN mode TEXT DEFAULT 'normal'",
             "ALTER TABLE profiles ADD COLUMN plan_started_at TEXT",
             "ALTER TABLE profiles ADD COLUMN plan_trial INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE payment_proofs ADD COLUMN reviewer_note TEXT",
+            "ALTER TABLE payment_proofs ADD COLUMN subjects_json TEXT",
+            "ALTER TABLE usage_events ADD COLUMN syllabus TEXT",
+            "ALTER TABLE profiles ADD COLUMN last_seen_at TEXT",
+            "ALTER TABLE payment_proofs ADD COLUMN period TEXT",
+            "ALTER TABLE payment_proofs ADD COLUMN expected_pkr INTEGER",
+            "ALTER TABLE payment_proofs ADD COLUMN screenshot_sha256 TEXT",
+            "ALTER TABLE courses ADD COLUMN faq_json TEXT",
+            "ALTER TABLE profiles ADD COLUMN plan_subjects_json TEXT NOT NULL DEFAULT '[]'",
         ]
         for stmt in _safe_alters:
             try:
@@ -742,27 +830,43 @@ def _row_or_none(result) -> dict | None:
 
 def get_user(user_id: str) -> dict | None:
     if _USE_SUPABASE:
+        # .limit(1), not .single(): postgrest-py raises on zero rows with .single(),
+        # which turned "no such user" into a 500 instead of None.
         r = (_client().table("profiles")
              .select("*")
              .eq("id", user_id)
-             .single()
+             .limit(1)
              .execute())
-        return r.data if r.data else None
+        return r.data[0] if r.data else None
     with _local() as c:
         row = c.execute("SELECT * FROM profiles WHERE id=?", (user_id,)).fetchone()
         return dict(row) if row else None
 
 
 def get_user_by_email(email: str) -> dict | None:
+    """Case-insensitive: accounts were saved with whatever case the form had."""
+    email = (email or "").strip()
+    if not email:
+        return None
     if _USE_SUPABASE:
         r = (_client().table("profiles")
              .select("*")
-             .eq("email", email)
+             .eq("email", email.lower())
+             .limit(1)
+             .execute())
+        if r.data:
+            return r.data[0]
+        # ilike wildcards (% _) are escaped so they only match themselves.
+        pat = email.replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
+        r = (_client().table("profiles")
+             .select("*")
+             .ilike("email", pat)
              .limit(1)
              .execute())
         return r.data[0] if r.data else None
     with _local() as c:
-        row = c.execute("SELECT * FROM profiles WHERE email=?", (email,)).fetchone()
+        row = c.execute("SELECT * FROM profiles WHERE lower(email)=lower(?)",
+                        (email,)).fetchone()
         return dict(row) if row else None
 
 
@@ -920,21 +1024,6 @@ def get_teacher_students(teacher_id: str) -> list[dict]:
         return [dict(r) for r in rows]
 
 
-def remove_teacher_student(teacher_id: str, student_id: str) -> None:
-    """Remove all allocation rows linking this teacher to this student."""
-    if _USE_SUPABASE:
-        (_client().table("teacher_students")
-         .delete()
-         .eq("teacher_id", teacher_id)
-         .eq("student_id", student_id)
-         .execute())
-    else:
-        with _local() as c:
-            c.execute(
-                "DELETE FROM teacher_students WHERE teacher_id=? AND student_id=?",
-                (teacher_id, student_id))
-
-
 def get_student_teachers(student_id: str) -> list[dict]:
     """Teachers assigned to a specific student (unique by teacher_id)."""
     if _USE_SUPABASE:
@@ -982,58 +1071,82 @@ def assign_teacher_student(teacher_id: str, student_id: str, syllabus: str) -> N
         c.commit()
 
 
-def remove_teacher_student(teacher_id: str, student_id: str, syllabus: str) -> None:
-    """Soft-remove a teacher-student link by setting status='removed'."""
+def remove_teacher_student(teacher_id: str, student_id: str,
+                           syllabus: str | None = None) -> int:
+    """Soft-remove teacher-student links (status='removed'); returns rows changed.
+
+    syllabus=None drops every subject the pair shares (a teacher dropping a
+    student from their roster). Soft removal is the one style used everywhere,
+    so re-assigning re-activates the same row instead of hitting the unique key.
+    """
     if _USE_SUPABASE:
-        (_client().table("teacher_students")
-         .update({"status": "removed"})
-         .eq("teacher_id", teacher_id)
-         .eq("student_id", student_id)
-         .eq("syllabus", syllabus)
-         .execute())
-        return
+        q = (_client().table("teacher_students")
+             .update({"status": "removed"})
+             .eq("teacher_id", teacher_id)
+             .eq("student_id", student_id)
+             .eq("status", "active"))
+        if syllabus:
+            q = q.eq("syllabus", syllabus)
+        return len(q.execute().data or [])
     with _local() as c:
-        c.execute(
-            "UPDATE teacher_students SET status='removed' "
-            "WHERE teacher_id=? AND student_id=? AND syllabus=?",
-            (teacher_id, student_id, syllabus))
+        sql = ("UPDATE teacher_students SET status='removed' "
+               "WHERE teacher_id=? AND student_id=? AND status='active'")
+        vals: list = [teacher_id, student_id]
+        if syllabus:
+            sql += " AND syllabus=?"
+            vals.append(syllabus)
+        n = c.execute(sql, vals).rowcount
         c.commit()
+        return n
 
 
 # ── Usage quota ──────────────────────────────────────────────────────────────
 
-def count_usage_this_month(user_id: str, event_type: str, period_start: str | None = None) -> int:
+def count_usage_this_month(user_id: str, event_type: str, period_start: str | None = None,
+                           exclude_syllabi: list[str] | None = None) -> int:
     """Count events of this type since period_start (ISO string).
 
     If period_start is None, falls back to the start of the current calendar month.
     Pass the billing-cycle start from access.billing_period_start() for accurate per-plan resets.
+    exclude_syllabi skips events recorded against those subjects (a subject-limited
+    plan's own subjects, when counting the free allowance for the other subjects);
+    events with no subject recorded are always counted.
     """
     if not period_start:
         period_start = datetime.now(timezone.utc).strftime("%Y-%m-01")
+    excl = [x for x in (exclude_syllabi or []) if re.fullmatch(r"[0-9A-Za-z]+", x or "")]
     if _USE_SUPABASE:
-        r = (_client().table("usage_events")
+        q = (_client().table("usage_events")
              .select("id", count="exact")
              .eq("user_id", user_id)
              .eq("event_type", event_type)
-             .gte("created_at", period_start)
-             .execute())
-        return r.count or 0
+             .gte("created_at", period_start))
+        if excl:
+            q = q.or_(f"syllabus.is.null,syllabus.not.in.({','.join(excl)})")
+        return q.execute().count or 0
     with _local() as c:
-        row = c.execute(
-            "SELECT COUNT(*) FROM usage_events WHERE user_id=? AND event_type=?"
-            " AND created_at >= ?",
-            (user_id, event_type, period_start)).fetchone()
+        sql = ("SELECT COUNT(*) FROM usage_events WHERE user_id=? AND event_type=?"
+               " AND created_at >= ?")
+        vals: list = [user_id, event_type, period_start]
+        if excl:
+            marks = ",".join("?" for _ in excl)
+            sql += f" AND (syllabus IS NULL OR syllabus NOT IN ({marks}))"
+            vals += excl
+        row = c.execute(sql, vals).fetchone()
         return row[0] if row else 0
 
 
-def record_usage(user_id: str, event_type: str):
+def record_usage(user_id: str, event_type: str, syllabus: str | None = None):
     payload = {"user_id": user_id, "event_type": event_type, "created_at": _now()}
+    if syllabus:
+        payload["syllabus"] = syllabus
     if _USE_SUPABASE:
         _client().table("usage_events").insert(payload).execute()
     else:
         with _local() as c:
-            c.execute("INSERT INTO usage_events (user_id, event_type, created_at) VALUES (?,?,?)",
-                      (user_id, event_type, _now()))
+            c.execute("INSERT INTO usage_events (user_id, event_type, created_at, syllabus)"
+                      " VALUES (?,?,?,?)",
+                      (user_id, event_type, payload["created_at"], syllabus))
             c.commit()
 
 
@@ -1173,7 +1286,9 @@ def update_user_plan(
     expires_at: str | None,
     started_at: str | None = None,
     trial: bool = False,
+    subjects: list[str] | None = None,
 ) -> dict:
+    """subjects=None leaves plan_subjects_json alone; a list replaces it."""
     now = _now()
     fields: dict = {
         "plan": plan,
@@ -1182,6 +1297,8 @@ def update_user_plan(
         "plan_trial": 1 if trial else 0,
         "updated_at": now,
     }
+    if subjects is not None:
+        fields["plan_subjects_json"] = json.dumps(list(subjects))
     if _USE_SUPABASE:
         _client().table("profiles").update(fields).eq("id", user_id).execute()
         # Record in subscriptions table (history log + current plan)
@@ -1201,12 +1318,22 @@ def update_user_plan(
     else:
         with _local() as c:
             c.execute(
-                "UPDATE profiles SET plan=?, plan_expires_at=?, plan_started_at=?,"
-                " plan_trial=?, updated_at=? WHERE id=?",
-                (plan, expires_at, started_at or now, 1 if trial else 0, now, user_id),
+                f"UPDATE profiles SET {', '.join(f'{k}=?' for k in fields)} WHERE id=?",
+                (*fields.values(), user_id),
             )
             c.commit()
     return get_user(user_id)
+
+
+def set_plan_subjects(user_id: str, subjects: list[str]) -> None:
+    fields = {"plan_subjects_json": json.dumps(list(subjects))}
+    if _USE_SUPABASE:
+        _client().table("profiles").update(fields).eq("id", user_id).execute()
+        return
+    with _local() as c:
+        c.execute("UPDATE profiles SET plan_subjects_json=? WHERE id=?",
+                  (fields["plan_subjects_json"], user_id))
+        c.commit()
 
 
 def delete_user(user_id: str) -> None:
@@ -1227,11 +1354,13 @@ def get_enrollments(user_id: str) -> list[str]:
              .select("syllabus")
              .eq("user_id", user_id)
              .eq("status", "active")
+             .order("enrolled_at")
              .execute())
         return [row["syllabus"] for row in (r.data or [])]
     with _local() as c:
         rows = c.execute(
-            "SELECT syllabus FROM enrollments WHERE user_id=? AND status='active'",
+            "SELECT syllabus FROM enrollments WHERE user_id=? AND status='active' "
+            "ORDER BY enrolled_at, rowid",
             (user_id,)).fetchall()
         return [r["syllabus"] for r in rows]
 
@@ -1964,8 +2093,17 @@ def get_leads(limit: int = 1000) -> list[dict]:
 
 def save_feedback(payload: dict) -> dict:
     payload["ts"] = _now()
-    return _insert("feedback", payload,
-                   ["rating", "message", "name", "page", "type", "ts"])
+    try:
+        return _insert("feedback", payload,
+                       ["rating", "message", "name", "email", "page", "type", "ts"])
+    except Exception:
+        # Supabase without migration 024 (no email column): keep the address in
+        # the message rather than lose the feedback.
+        if not _USE_SUPABASE or "email" not in payload:
+            raise
+        rest = {k: v for k, v in payload.items() if k != "email"}
+        rest["message"] = f"{rest.get('message') or ''}\n\n(email: {payload['email']})"
+        return _insert("feedback", rest, ["rating", "message", "name", "page", "type", "ts"])
 
 
 def get_feedback(limit: int = 1000) -> list[dict]:
@@ -2437,7 +2575,7 @@ _COURSE_COLS = [
     'syllabus_code', 'slug', 'title', 'level', 'subject', 'tagline',
     'overview_html', 'approach_html', 'what_you_get_json', 'teacher_id',
     'meta_title', 'meta_description', 'published', 'sort_order',
-    'created_at', 'updated_at',
+    'created_at', 'updated_at', 'faq_json',
 ]
 
 
@@ -2660,13 +2798,22 @@ def get_group_sessions(group_id: int, limit: int = 200) -> list[dict]:
 # ── Payment proofs ────────────────────────────────────────────────────────────
 
 _PROOF_COLS = ["user_id", "plan", "amount_pkr", "method", "transaction_id",
-               "screenshot_url", "note", "status", "created_at"]
+               "screenshot_url", "note", "status", "created_at", "subjects_json",
+               "period", "expected_pkr", "screenshot_sha256"]
 
 
 def create_payment_proof(payload: dict) -> dict:
     payload.setdefault("created_at", _now())
     payload.setdefault("status", "pending")
     return _insert("payment_proofs", payload, _PROOF_COLS)
+
+
+def _flatten_proof(row: dict) -> dict:
+    """Supabase nests the join under 'profiles'; SQLite returns name/email flat."""
+    p = row.pop("profiles", None) or {}
+    row.setdefault("name", p.get("name"))
+    row.setdefault("email", p.get("email"))
+    return row
 
 
 def get_payment_proofs(status: str | None = None, limit: int = 200) -> list[dict]:
@@ -2676,7 +2823,7 @@ def get_payment_proofs(status: str | None = None, limit: int = 200) -> list[dict
              .order("created_at", desc=True).limit(limit))
         if status:
             q = q.eq("status", status)
-        return q.execute().data or []
+        return [_flatten_proof(r) for r in (q.execute().data or [])]
     with _local() as c:
         sql = ("SELECT pp.*, p.name, p.email FROM payment_proofs pp "
                "JOIN profiles p ON p.id=pp.user_id")
@@ -2694,7 +2841,7 @@ def get_payment_proof(proof_id: int) -> dict | None:
     if _USE_SUPABASE:
         r = (_client().table("payment_proofs").select("*, profiles(id, name, email)")
              .eq("id", proof_id).limit(1).execute())
-        return r.data[0] if r.data else None
+        return _flatten_proof(r.data[0]) if r.data else None
     with _local() as c:
         row = c.execute(
             "SELECT pp.*, p.name, p.email FROM payment_proofs pp "
@@ -3049,12 +3196,16 @@ def list_teacher_profiles() -> list[dict]:
 
 
 def get_allocations(teacher_id: str | None = None,
-                    student_id: str | None = None) -> list[dict]:
+                    student_id: str | None = None,
+                    status: str | None = "active") -> list[dict]:
+    """Teacher-student links; status=None lists removed ones too."""
     if _USE_SUPABASE:
         q = (_client().table("teacher_students")
              .select("*, "
                      "teacher:profiles!teacher_id(id,name,email),"
                      "student:profiles!student_id(id,name,email,grade)"))
+        if status:
+            q = q.eq("status", status)
         if teacher_id:
             q = q.eq("teacher_id", teacher_id)
         if student_id:
@@ -3072,6 +3223,8 @@ def get_allocations(teacher_id: str | None = None,
         return rows
     with _local() as c:
         wheres, vals = [], []
+        if status:
+            wheres.append("ts.status=?"); vals.append(status)
         if teacher_id:
             wheres.append("ts.teacher_id=?"); vals.append(teacher_id)
         if student_id:
@@ -3088,19 +3241,24 @@ def get_allocations(teacher_id: str | None = None,
 
 
 def create_allocation(teacher_id: str, student_id: str, syllabus: str) -> dict:
-    payload = {"teacher_id": teacher_id, "student_id": student_id,
-               "syllabus": syllabus, "allocated_at": _now(), "status": "active"}
-    return _insert("teacher_students", payload,
-                   ["teacher_id", "student_id", "syllabus", "allocated_at", "status"])
+    """Same upsert as the Teachers drawer: re-assigning re-activates the old row."""
+    assign_teacher_student(teacher_id, student_id, syllabus)
+    rows = [r for r in get_allocations(teacher_id=teacher_id, student_id=student_id)
+            if r.get("syllabus") == syllabus]
+    return rows[0] if rows else {}
 
 
-def delete_allocation(allocation_id: int) -> None:
+def delete_allocation(allocation_id: int) -> int:
+    """Soft-remove one link by id (same style as remove_teacher_student)."""
     if _USE_SUPABASE:
-        _client().table("teacher_students").delete().eq("id", allocation_id).execute()
-    else:
-        with _local() as c:
-            c.execute("DELETE FROM teacher_students WHERE id=?", (allocation_id,))
-            c.commit()
+        r = (_client().table("teacher_students").update({"status": "removed"})
+             .eq("id", allocation_id).eq("status", "active").execute())
+        return len(r.data or [])
+    with _local() as c:
+        n = c.execute("UPDATE teacher_students SET status='removed' "
+                      "WHERE id=? AND status='active'", (allocation_id,)).rowcount
+        c.commit()
+        return n
 
 
 # ── Contacts ──────────────────────────────────────────────────────────────────
@@ -3123,30 +3281,47 @@ def get_contacts(limit: int = 200) -> list[dict]:
 # ── Newsletter subscribers ────────────────────────────────────────────────────
 
 def create_newsletter_subscriber(email: str, token: str | None = None) -> tuple[bool, str]:
-    """Returns (is_new, token)."""
+    """Returns (is_new, token). An unsubscribed address that signs up again is
+    subscribed again (and counts as new, so it gets the welcome email)."""
     import secrets
+    email = (email or "").strip().lower()
     tok = token or secrets.token_urlsafe(24)
     now = _now()
+    row = get_newsletter_subscriber(email)
+    if row:
+        fields: dict = {}
+        if not row.get("unsubscribe_token"):
+            fields["unsubscribe_token"] = tok
+        resub = row.get("status") == "unsubscribed"
+        if resub:
+            fields.update(status="subscribed", unsubscribed_at=None, subscribed_at=now)
+        if fields:
+            update_newsletter_subscriber(row["id"], fields)
+        return resub, fields.get("unsubscribe_token") or row.get("unsubscribe_token") or tok
+    payload = {"email": email, "subscribed_at": now, "unsubscribe_token": tok, "status": "subscribed"}
+    _insert("newsletter_subscribers", payload, ["email", "subscribed_at", "unsubscribe_token", "status"])
+    return True, tok
+
+
+def get_newsletter_subscriber(email: str) -> dict | None:
     if _USE_SUPABASE:
-        try:
-            _client().table("newsletter_subscribers").insert(
-                {"email": email, "subscribed_at": now, "unsubscribe_token": tok, "status": "subscribed"}).execute()
-            return True, tok
-        except Exception:
-            # If already exists, return existing row
-            res = _client().table("newsletter_subscribers").select("*").eq("email", email).execute()
-            row = res.data[0] if res.data else {}
-            return False, row.get("unsubscribe_token") or tok
+        r = (_client().table("newsletter_subscribers").select("*")
+             .ilike("email", email.replace("%", r"\%").replace("_", r"\_")).limit(1).execute())
+        return r.data[0] if r.data else None
     with _local() as c:
-        try:
-            c.execute("INSERT INTO newsletter_subscribers(email,subscribed_at,unsubscribe_token,status) VALUES(?,?,?,'subscribed')",
-                      (email, now, tok))
-            c.commit()
-            return True, tok
-        except Exception:
-            row = c.execute("SELECT * FROM newsletter_subscribers WHERE email=?", (email,)).fetchone()
-            existing_tok = row["unsubscribe_token"] if row and "unsubscribe_token" in row.keys() and row["unsubscribe_token"] else tok
-            return False, existing_tok
+        row = c.execute("SELECT * FROM newsletter_subscribers WHERE lower(email)=lower(?)",
+                        (email,)).fetchone()
+        return dict(row) if row else None
+
+
+def update_newsletter_subscriber(sub_id: int, fields: dict) -> None:
+    if _USE_SUPABASE:
+        _client().table("newsletter_subscribers").update(fields).eq("id", sub_id).execute()
+        return
+    with _local() as c:
+        c.execute(f"UPDATE newsletter_subscribers SET {', '.join(f'{k}=?' for k in fields)} WHERE id=?",
+                  (*fields.values(), sub_id))
+        c.commit()
 
 
 def unsubscribe_newsletter(token: str) -> bool:
@@ -3163,17 +3338,18 @@ def unsubscribe_newsletter(token: str) -> bool:
 
 
 def get_newsletter_subscribers(limit: int = 500, active_only: bool = False) -> list[dict]:
-    if _USE_SUPABASE:
-        q = _client().table("newsletter_subscribers").select("*")
-        if active_only:
-            q = q.neq("status", "unsubscribed")
-        return q.order("subscribed_at", desc=True).limit(limit).execute().data or []
-    with _local() as c:
-        sql = "SELECT * FROM newsletter_subscribers"
-        if active_only:
-            sql += " WHERE status IS NULL OR status!='unsubscribed'"
-        sql += " ORDER BY subscribed_at DESC LIMIT ?"
-        return [dict(r) for r in c.execute(sql, (limit,))]
+    """Newest first. Rows with no status (signed up before the column existed)
+    are subscribed - a SQL `status != 'unsubscribed'` would silently drop them."""
+    import secrets
+    rows = fetch_all("newsletter_subscribers", order="subscribed_at", desc=True)
+    if active_only:
+        rows = [r for r in rows if (r.get("status") or "subscribed") != "unsubscribed"]
+    for r in rows:                     # legacy rows get a real unsubscribe token
+        if not r.get("unsubscribe_token"):
+            r["unsubscribe_token"] = secrets.token_urlsafe(24)
+            update_newsletter_subscriber(r["id"], {"unsubscribe_token": r["unsubscribe_token"]})
+        r["status"] = r.get("status") or "subscribed"
+    return rows[:limit]
 
 
 
@@ -3875,3 +4051,211 @@ def update_password(user_id: str, password_hash: str) -> None:
                 (password_hash, now, user_id)
             )
             c.commit()
+
+
+
+# ── Admin console v2: audit log, saved views, admin notes ────────────────────
+
+def fetch_all(table: str, columns: str = "*", eq: dict | None = None,
+              order: str | None = None, desc: bool = False,
+              gte: tuple[str, str] | None = None) -> list[dict]:
+    """Every matching row. On Supabase this pages in 1000-row blocks: PostgREST
+    silently caps an unpaged select at 1000 rows, which truncated counts."""
+    eq = eq or {}
+    if _USE_SUPABASE:
+        out: list[dict] = []
+        step, start = 1000, 0
+        while True:
+            q = _client().table(table).select(columns)
+            for k, v in eq.items():
+                q = q.eq(k, v)
+            if gte:
+                q = q.gte(gte[0], gte[1])
+            if order:
+                q = q.order(order, desc=desc)
+            rows = q.range(start, start + step - 1).execute().data or []
+            out.extend(rows)
+            if len(rows) < step:
+                return out
+            start += step
+    if not re.fullmatch(r"[a-z_]+", table) or not re.fullmatch(r"[a-z_,* ]+", columns):
+        raise ValueError("bad table or column list")
+    sql = f"SELECT {columns} FROM {table}"
+    wheres, vals = [], []
+    for k, v in eq.items():
+        if not re.fullmatch(r"[a-z_]+", k):
+            raise ValueError("bad column")
+        wheres.append(f"{k}=?"); vals.append(v)
+    if gte:
+        if not re.fullmatch(r"[a-z_]+", gte[0]):
+            raise ValueError("bad column")
+        wheres.append(f"{gte[0]}>=?"); vals.append(gte[1])
+    if wheres:
+        sql += " WHERE " + " AND ".join(wheres)
+    if order:
+        if not re.fullmatch(r"[a-z_]+", order):
+            raise ValueError("bad column")
+        sql += f" ORDER BY {order}{' DESC' if desc else ''}"
+    with _local() as c:
+        return [dict(r) for r in c.execute(sql, vals)]
+
+
+def add_admin_audit(row: dict) -> None:
+    _insert("admin_audit", row, ["admin_id", "admin_email", "via", "action", "target",
+                                 "details_json", "ok", "created_at"])
+
+
+def list_admin_audit(limit: int = 100, offset: int = 0) -> list[dict]:
+    if _USE_SUPABASE:
+        r = (_client().table("admin_audit").select("*")
+             .order("created_at", desc=True).range(offset, offset + limit - 1).execute())
+        return r.data or []
+    with _local() as c:
+        return [dict(r) for r in c.execute(
+            "SELECT * FROM admin_audit ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?",
+            (limit, offset))]
+
+
+def list_admin_views(section: str) -> list[dict]:
+    return fetch_all("admin_views", eq={"section": section}, order="created_at")
+
+
+def create_admin_view(admin_id: str | None, section: str, name: str, params_json: str) -> dict:
+    return _insert("admin_views", {"admin_id": admin_id, "section": section, "name": name,
+                                   "params_json": params_json, "created_at": _now()},
+                   ["admin_id", "section", "name", "params_json", "created_at"])
+
+
+def delete_admin_view(view_id: int) -> int:
+    if _USE_SUPABASE:
+        return len(_client().table("admin_views").delete().eq("id", view_id).execute().data or [])
+    with _local() as c:
+        n = c.execute("DELETE FROM admin_views WHERE id=?", (view_id,)).rowcount
+        c.commit()
+        return n
+
+
+def list_admin_notes(student_id: str) -> list[dict]:
+    return fetch_all("admin_notes", eq={"student_id": student_id}, order="created_at", desc=True)
+
+
+def add_admin_note(student_id: str, admin: dict, body: str) -> dict:
+    return _insert("admin_notes", {"student_id": student_id, "admin_id": admin.get("id"),
+                                   "admin_name": admin.get("name") or admin.get("email"),
+                                   "body": body, "created_at": _now()},
+                   ["student_id", "admin_id", "admin_name", "body", "created_at"])
+
+
+def delete_admin_note(note_id: int, student_id: str) -> int:
+    if _USE_SUPABASE:
+        r = (_client().table("admin_notes").delete().eq("id", note_id)
+             .eq("student_id", student_id).execute())
+        return len(r.data or [])
+    with _local() as c:
+        n = c.execute("DELETE FROM admin_notes WHERE id=? AND student_id=?",
+                      (note_id, student_id)).rowcount
+        c.commit()
+        return n
+
+
+def touch_last_seen(user_id: str) -> None:
+    """Cheap presence stamp from the time-spent beacon (real 'last active')."""
+    now = _now()
+    if _USE_SUPABASE:
+        _client().table("profiles").update({"last_seen_at": now}).eq("id", user_id).execute()
+        return
+    with _local() as c:
+        c.execute("UPDATE profiles SET last_seen_at=? WHERE id=?", (now, user_id))
+        c.commit()
+
+
+
+# ── Admin inbox status (one row per handled form submission) ─────────────────
+
+def list_inbox_status() -> dict[tuple[str, str], dict]:
+    return {(r["source"], str(r["item_id"])): r for r in fetch_all("inbox_status")}
+
+
+def upsert_inbox_status(source: str, item_id: str, fields: dict) -> dict:
+    row = {"source": source, "item_id": str(item_id), "updated_at": _now(), **fields}
+    if _USE_SUPABASE:
+        _client().table("inbox_status").upsert(row, on_conflict="source,item_id").execute()
+    else:
+        cols = list(row)
+        with _local() as c:
+            c.execute(f"INSERT INTO inbox_status ({','.join(cols)}) VALUES ({','.join('?' * len(cols))}) "
+                      f"ON CONFLICT(source, item_id) DO UPDATE SET "
+                      + ", ".join(f"{k}=excluded.{k}" for k in cols if k not in ("source", "item_id")),
+                      [row[k] for k in cols])
+            c.commit()
+    return list_inbox_status().get((source, str(item_id)), row)
+
+
+# ── Newsletter broadcasts (sent in the background, logged per recipient) ─────
+
+_BROADCAST_COLS = ["subject", "body_markdown", "cta_label", "cta_url", "status", "scheduled_at",
+                   "total", "sent", "failed", "created_by", "created_at", "started_at",
+                   "finished_at", "error", "worker", "heartbeat_at"]
+
+
+def claim_broadcast(bid: int, worker: str, stale_before: str) -> bool:
+    """Atomically take a broadcast to send: queued, or 'sending' with a dead
+    heartbeat (its worker crashed). Several web workers each run the scheduler;
+    only the one whose UPDATE matched may send, so nobody gets it twice."""
+    now = _now()
+    fields = {"status": "sending", "worker": worker, "heartbeat_at": now}
+    if _USE_SUPABASE:
+        r = (_client().table("newsletter_broadcasts").update(fields)
+             .eq("id", bid).eq("status", "queued").execute())
+        if r.data:
+            return True
+        r = (_client().table("newsletter_broadcasts").update(fields)
+             .eq("id", bid).eq("status", "sending").lt("heartbeat_at", stale_before).execute())
+        return bool(r.data)
+    with _local() as c:
+        n = c.execute("UPDATE newsletter_broadcasts SET status='sending', worker=?, heartbeat_at=? "
+                      "WHERE id=? AND (status='queued' OR (status='sending' AND "
+                      "(heartbeat_at IS NULL OR heartbeat_at < ?)))",
+                      (worker, now, bid, stale_before)).rowcount
+        c.commit()
+        return n == 1
+
+
+def create_broadcast(fields: dict) -> dict:
+    fields.setdefault("created_at", _now())
+    fields.setdefault("status", "queued")
+    return _insert("newsletter_broadcasts", fields, _BROADCAST_COLS)
+
+
+def get_broadcast(bid: int) -> dict | None:
+    rows = fetch_all("newsletter_broadcasts", eq={"id": bid})
+    return rows[0] if rows else None
+
+
+def list_broadcasts() -> list[dict]:
+    return fetch_all("newsletter_broadcasts", order="created_at", desc=True)
+
+
+def update_broadcast(bid: int, fields: dict) -> None:
+    if _USE_SUPABASE:
+        _client().table("newsletter_broadcasts").update(fields).eq("id", bid).execute()
+        return
+    with _local() as c:
+        c.execute(f"UPDATE newsletter_broadcasts SET {', '.join(f'{k}=?' for k in fields)} WHERE id=?",
+                  (*fields.values(), bid))
+        c.commit()
+
+
+def broadcast_sent_emails(bid: int) -> set[str]:
+    return {r["email"] for r in fetch_all("newsletter_sends", "email", eq={"broadcast_id": bid})}
+
+
+def log_broadcast_send(bid: int, email: str, ok: bool, error: str | None = None) -> None:
+    row = {"broadcast_id": bid, "email": email, "ok": 1 if ok else 0, "error": error, "sent_at": _now()}
+    if _USE_SUPABASE:
+        _client().table("newsletter_sends").upsert(row, on_conflict="broadcast_id,email").execute()
+        return
+    with _local() as c:
+        c.execute("INSERT OR REPLACE INTO newsletter_sends (broadcast_id,email,ok,error,sent_at) "
+                  "VALUES (?,?,?,?,?)", (bid, email, row["ok"], error, row["sent_at"]))
+        c.commit()

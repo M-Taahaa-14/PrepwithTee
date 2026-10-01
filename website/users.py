@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from auth import get_current_user, maybe_user
 import users_db as _udb
-from access import check_quota, require_plan, _plan_active, MONTHLY_QUOTAS
+from access import check_quota, require_plan, MONTHLY_QUOTAS
 
 router = APIRouter()
 
@@ -404,25 +404,7 @@ def update_progress(req: ProgressUpdate, user: _CurrentUser):
     if req.status is None and req.papers_status is None:
         raise HTTPException(400, "Send status, papers_status, or both")
 
-    # Free plan: allow tracking for exactly 1 subject (the first enrolled one).
-    # Pro+ can track all subjects.
-    if _plan_active(user) == "free":
-        enrolled = _udb.get_enrollments(user["id"])
-        first = enrolled[0] if enrolled else req.syllabus
-        if req.syllabus != first:
-            raise HTTPException(
-                403,
-                detail={
-                    "code": "upgrade_required",
-                    "current_plan": "free",
-                    "min_plan": "pro",
-                    "message": (
-                        "Free plan includes chapter tracking for 1 subject. "
-                        "Upgrade to Pro to track all your subjects."
-                    ),
-                },
-            )
-
+    # Progress tracking is free for every subject (tutor, 2026-09-28) - no plan gate.
     return _udb.upsert_progress(
         user["id"], req.syllabus, req.topic, req.subtopic,
         req.status, req.papers_status,
@@ -530,7 +512,7 @@ class QuizGenReq(BaseModel):
 @router.post("/api/quiz/generate")
 def quiz_generate(req: QuizGenReq, user: _CurrentUser,
                   _plan: dict = Depends(require_plan("pro"))):
-    check_quota(user, "ai_quiz")
+    check_quota(user, "ai_quiz", req.syllabus)
     subject = _SUBJECT_FULL.get(req.syllabus, req.syllabus)
     topic_label = req.topic + (f" — {req.subtopic}" if req.subtopic else "")
 
@@ -1524,6 +1506,8 @@ class PaymentProofReq(BaseModel):
     transaction_id: str | None = None
     screenshot_url: str | None = None
     note: str | None = None
+    subjects: list[str] | None = None   # the subjects a subject-limited plan covers
+    period: str = "monthly"             # monthly | octnov | mayjun | yearly (billing.PERIODS)
 
 
 VALID_PAYMENT_PLANS = {"solo", "three", "all"}
@@ -1640,6 +1624,11 @@ async def upload_avatar(user: _CurrentUser, file: UploadFile = File(...)):
 def submit_payment_proof(req: PaymentProofReq, user: _CurrentUser):
     if req.plan not in VALID_PAYMENT_PLANS:
         raise HTTPException(400, f"plan must be one of: {', '.join(sorted(VALID_PAYMENT_PLANS))}")
+    from access import clean_plan_subjects
+    import billing as _billing
+    subjects = clean_plan_subjects(req.plan, req.subjects)
+    if req.period not in _billing.PERIODS:
+        raise HTTPException(400, f"period must be one of: {', '.join(_billing.PERIODS)}")
     proof = _udb.create_payment_proof({
         "user_id": user["id"],
         "plan": req.plan,
@@ -1648,6 +1637,10 @@ def submit_payment_proof(req: PaymentProofReq, user: _CurrentUser):
         "transaction_id": req.transaction_id,
         "screenshot_url": req.screenshot_url,
         "note": req.note,
+        "subjects_json": json.dumps(subjects) if subjects is not None else None,
+        "period": req.period,
+        "expected_pkr": _billing.expected_amount(req.plan, req.period),
+        "screenshot_sha256": _billing.file_hash(req.screenshot_url),
     })
     threading.Thread(
         target=_notify_admin_new_proof, args=(user, proof), daemon=True
@@ -1954,6 +1947,10 @@ def record_time_spent(req: TimeSpentReq, user: _CurrentUser):
     sec = min(max(req.seconds, 1), 300)
     import streaks as _streaks
     _udb.add_time_spent(user["id"], sec, _streaks.valid_client_day(req.day))
+    try:
+        _udb.touch_last_seen(user["id"])        # admin "last active" (migration 025)
+    except Exception as exc:
+        print(f"[time-spent] last_seen_at not updated: {exc}", flush=True)
     return {"ok": True}
 
 

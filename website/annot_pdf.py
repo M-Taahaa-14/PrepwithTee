@@ -7,6 +7,8 @@ LIGHT palette, because a downloaded PDF is white paper. Keep PALETTE in step
 with annotate.js.
 """
 
+import re
+
 import fitz  # PyMuPDF
 
 # token -> (light, dark). annotate.js has the same table.
@@ -29,6 +31,69 @@ def _rgb(c: str | None) -> tuple[float, float, float]:
         return tuple(int(c[i:i + 2], 16) / 255 for i in (0, 2, 4))
     except ValueError:
         return (0.11, 0.3, 0.85)
+
+
+# Text box fonts (annotate.js FONTS) -> base-14 PDF fonts: (regular, bold, italic, bold italic).
+# Handwriting has no base-14 twin; Helvetica oblique is the nearest in spirit.
+_FONTS = {"sans": ("helv", "hebo", "heit", "hebi"), "serif": ("tiro", "tibo", "tiit", "tibi"),
+          "mono": ("cour", "cobo", "coit", "cobi"), "hand": ("heit", "hebi", "heit", "hebi")}
+LH = 1.25                                        # line height, as on screen
+
+
+def _wrap(txt: str, fs: float, width: float, font: str = "helv") -> list[str]:
+    """A text box's lines: its own line breaks, then word-wrapped to its box
+    width (annotate.js textLayout does the same on screen). width 0 = no wrap."""
+    if width <= 0:
+        return txt.split("\n")
+    out = []
+    for para in txt.split("\n"):
+        line = ""
+        for word in re.split(r"(?<=\s)", para):
+            if line and fitz.get_text_length((line + word).rstrip(), font, fs) > width:
+                out.append(line.rstrip())
+                line = word
+            else:
+                line += word
+        out.append(line)
+    return out
+
+
+def _draw_text(page: fitz.Page, s: dict, col, P) -> None:
+    """A text box: fill, border, then the lines - aligned, underlined - with
+    the same box geometry annotate.js drawText uses."""
+    W, H = page.rect.width, page.rect.height
+    fs = max(3.0, float(s.get("s") or 0.02) * W)
+    regular, bold, italic, both = _FONTS.get(s.get("f") or "sans", _FONTS["sans"])
+    font = both if s.get("b") and s.get("i") else bold if s.get("b") else italic if s.get("i") else regular
+    lines = _wrap(str(s["txt"]), fs, float(s.get("bw") or 0) * W, font)
+    widths = [fitz.get_text_length(line, font, fs) for line in lines]
+    box_w = float(s.get("bw") or 0) * W or max(widths or [0])
+    lh = fs * LH
+    x, y = float(s.get("x") or 0) * W, float(s.get("y") or 0) * H
+    pad = round(fs * 0.35) if (s.get("bg") or s.get("bd")) else 0
+    rect = fitz.Rect(P((x - pad) / W, (y - pad) / H), P((x + box_w + pad) / W, (y + len(lines) * lh + pad) / H))
+    if s.get("bg") or s.get("bd"):
+        shape = page.new_shape()
+        shape.draw_rect(rect.normalize())
+        bg = s.get("bg")
+        shape.finish(color=col if s.get("bd") else None, width=max(0.6, fs * 0.07) if s.get("bd") else 0,
+                     fill=(1, 1, 1) if bg == "paper" else _rgb(bg) if bg else None,
+                     fill_opacity=1 if bg == "paper" else 0.26)
+        shape.commit(overlay=True)
+    f = fitz.Font(font)
+    base = (lh - (f.ascender - f.descender) * fs) / 2 + f.ascender * fs      # baseline in a line box
+    m = page.derotation_matrix
+    for i, (line, lw_) in enumerate(zip(lines, widths)):
+        off = (box_w - lw_) / 2 if s.get("al") == "c" else (box_w - lw_) if s.get("al") == "r" else 0
+        by = y + i * lh + base
+        if line:
+            page.insert_text(fitz.Point(x + off, by) * m, line, fontsize=fs, fontname=font,
+                             color=col, rotate=page.rotation)
+        if s.get("u") and lw_:
+            shape = page.new_shape()
+            shape.draw_line(P((x + off) / W, (by + fs * 0.12) / H), P((x + off + lw_) / W, (by + fs * 0.12) / H))
+            shape.finish(color=col, width=max(0.5, fs * 0.07))
+            shape.commit(overlay=True)
 
 
 def _draw(page: fitz.Page, s: dict) -> None:
@@ -75,11 +140,7 @@ def _draw(page: fitz.Page, s: dict) -> None:
         (shape.draw_rect if t == "rect" else shape.draw_oval)(r)
         shape.finish(color=col, width=lw)
     elif t == "text" and s.get("txt"):
-        fs = max(7.5, float(s.get("s") or 0.02) * W)
-        x, y = float(s.get("x") or 0) * W, float(s.get("y") or 0) * H
-        for i, line in enumerate(str(s["txt"]).split("\n")):
-            page.insert_text(fitz.Point(x, y + fs * (0.9 + i * 1.25)) * m, line, fontsize=fs,
-                             fontname="helv", color=col, rotate=page.rotation)
+        _draw_text(page, s, col, P)
         return
     else:
         return

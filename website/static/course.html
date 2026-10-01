@@ -12,7 +12,7 @@
     rel="preload" as="style" onload="this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet"></noscript>
   <script>try{var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
-  <link rel="stylesheet" href="styles.css?v=20260929e">
+  <link rel="stylesheet" href="styles.css?v=20260930b">
   <link rel="stylesheet" href="dashboard-hub.css?v=20260927b">
   <style>
     .course-hero { padding:64px 0 40px; }
@@ -189,6 +189,10 @@
           <h2>How we teach</h2>
           <div id="course-approach"></div>
         </section>
+        <section class="course-section" id="section-faq" hidden>
+          <h2>Questions parents and students ask</h2>
+          <div id="course-faq"></div>
+        </section>
       </div>
 
     </div>
@@ -350,6 +354,15 @@
       if (c.approach_html) {
         document.getElementById('course-approach').innerHTML = c.approach_html;
         document.getElementById('section-approach').hidden = false;
+      }
+
+      var faq = [];
+      try { faq = JSON.parse(c.faq_json || '[]'); } catch (e) {}
+      if (faq.length) {
+        document.getElementById('course-faq').innerHTML = faq.map(function (f) {
+          return '<details class="course-faq"><summary>' + _esc(f.q) + '</summary><p>' + _esc(f.a) + '</p></details>';
+        }).join('');
+        document.getElementById('section-faq').hidden = false;
       }
 
       // Show content

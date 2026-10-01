@@ -1,4 +1,4 @@
-/* PrepWithTee — the practice dock.
+﻿/* PrepWithTee — the practice dock.
  *
  * Tools have to be reachable WHILE a student is working, not one navigation
  * away: leaving a half-finished revise session to look up a formula is how
@@ -17,12 +17,30 @@
  *     revision session lands on 0625 without being asked.
  *
  * Include on any page with:  <script src="tools-dock.js"></script>
+ *
+ * Paper viewers (booklets, papers by year, MCQ) include it through
+ * ui.tools_dock(): <body data-syllabus="0625" data-dock="push">. There the
+ * dock shows the tools that subject's exam needs (calculator + periodic
+ * table for chemistry, bases + pseudocode for CS...), and on a wide screen
+ * the paper moves over instead of being covered, so the question and the
+ * calculator are side by side.
  */
 (function () {
   "use strict";
 
   var KEY_TOOL = "pwt_dock_tool", KEY_OPEN = "pwt_dock_open", KEY_W = "pwt_dock_w";
   var MIN_W = 320, MAX_W = 760;
+  // The tools a paper in each subject is sat with, most used first.
+  var SUBJECT_KIND = { "4024": "maths", "0580": "maths", "9709": "maths", "5054": "physics", "0625": "physics",
+    "9702": "physics", "5070": "chemistry", "0620": "chemistry", "9701": "chemistry", "2210": "cs", "0478": "cs",
+    "9618": "cs" };
+  var SUBJECT_TOOLS = {
+    maths: ["calculator", "graph", "formulas", "command"],
+    physics: ["calculator", "formulas", "graph", "command"],
+    chemistry: ["calculator", "periodic", "formulas", "command"],
+    cs: ["logic", "pseudocode", "calculator", "command"],
+  };
+  var PUSH_MIN = 1100;                     // below this the panel overlays the page
 
   function store(k, v) { try { v === undefined ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
   function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -36,13 +54,17 @@
     if (!document.querySelector('link[href*="tools.css"]')) {
       var link = document.createElement("link");
       link.rel = "stylesheet";
-      link.href = "tools.css?v=" + (PWTx.version || "20260827");
+      link.href = "/tools.css?v=" + (PWTx.version || "20260827");
       document.head.appendChild(link);
     }
 
-    var tools = PWTx.catalogue.filter(function (t) { return t.id !== "graphs-guide"; });
-    var current = read(KEY_TOOL) || "calculator";
-    if (!tools.some(function (t) { return t.id === current; })) current = "calculator";
+    var all = PWTx.catalogue.filter(function (t) { return t.id !== "graphs-guide"; });
+    var pageSyl = document.body.dataset.syllabus || "";
+    var wanted = SUBJECT_TOOLS[SUBJECT_KIND[pageSyl]];
+    var tools = wanted ? wanted.map(function (id) { return all.find(function (t) { return t.id === id; }); }).filter(Boolean) : all;
+    var push = document.body.dataset.dock === "push";
+    var current = read(KEY_TOOL) || tools[0].id;
+    if (!tools.some(function (t) { return t.id === current; })) current = tools[0].id;
 
     var dock = document.createElement("div");
     dock.className = "pwt-dock";
@@ -104,7 +126,7 @@
         t.setAttribute("aria-selected", on ? "true" : "false");
       });
       var meta = tools.find(function (t) { return t.id === id; });
-      popLink.href = meta ? meta.href : "tools.html";
+      popLink.href = "/" + (meta ? meta.href : "tools.html");
       body.innerHTML = '<p class="pwt-loading">Opening ' +
         (meta ? PWTx.esc(meta.name.toLowerCase()) : "tool") + "…</p>";
       PWTx.mount(id, body, { mode: "dock" }).then(function (fn) { teardown = fn; });
@@ -120,6 +142,7 @@
       dock.classList.add("open");
       fab.setAttribute("aria-expanded", "true");
       store(KEY_OPEN, "1");
+      layout();
       var cm = dock.querySelector("[data-coach]");
       if (cm && !cm.hidden) { cm.hidden = true; store("pwt_dock_coached", "1"); }
       if (id !== current || !teardown) setTool(id || current);
@@ -129,6 +152,7 @@
       dock.classList.remove("open");
       fab.setAttribute("aria-expanded", "false");
       store(KEY_OPEN, undefined);
+      layout();
       // Keep the tool mounted through the slide-out so it does not flicker,
       // then hide it from assistive tech once it is off screen.
       setTimeout(function () { if (!dock.classList.contains("open")) panel.hidden = true; }, 240);
@@ -145,7 +169,11 @@
     });
 
     document.addEventListener("keydown", function (ev) {
-      if (ev.key === "Escape" && dock.classList.contains("open")) { close(); return; }
+      // Esc inside a tool belongs to the tool (the calculator's AC); outside it closes the dock
+      if (ev.key === "Escape" && dock.classList.contains("open")) {
+        if (!panel.contains(document.activeElement)) close();
+        return;
+      }
       // Alt+T toggles, so it never collides with a student typing an answer.
       if (ev.altKey && (ev.key === "t" || ev.key === "T")) {
         ev.preventDefault();
@@ -170,6 +198,32 @@
       dragging = null;
       document.body.classList.remove("pwt-resizing");
       store(KEY_W, String(Math.round(panel.getBoundingClientRect().width)));
+      layout();
+    });
+
+    // ── Side by side (paper viewers) ─────────────────────────────────────
+    // The page gives up the panel's width; a resize event makes the PDF
+    // viewer fit its pages to the narrower column.
+    var laidOut = null;
+    function layout() {
+      var isOpen = dock.classList.contains("open");
+      document.body.classList.toggle("pwt-dock-open", isOpen);
+      document.body.style.setProperty("--pwt-dock-w", (Math.round(panel.getBoundingClientRect().width) || 440) + "px");
+      if (!push) return;
+      var on = dock.classList.contains("open") && window.innerWidth >= PUSH_MIN;
+      var w = Math.round(panel.getBoundingClientRect().width) || 440;
+      var key = on ? w : 0;
+      if (key === laidOut) return;
+      laidOut = key;
+      document.body.classList.toggle("pwt-docked", on);
+      document.body.style.setProperty("--pwt-dock-w", w + "px");
+      setTimeout(function () { window.dispatchEvent(new Event("resize")); }, 260);
+    }
+    window.addEventListener("resize", function () {
+      if (push && !dragging) {
+        var on = dock.classList.contains("open") && window.innerWidth >= PUSH_MIN;
+        if (on !== document.body.classList.contains("pwt-docked")) layout();
+      }
     });
 
     // ── Page context ──────────────────────────────────────────────────────

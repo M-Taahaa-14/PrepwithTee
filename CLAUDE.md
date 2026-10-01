@@ -661,6 +661,66 @@ linked), not agreement with any external file.
     date, so they carry none. robots.txt must NOT disallow redirect stubs (Google then never
     sees the redirect) - /notes.html stays disallowed because it is the private "My notes".
 
+33. **Student feedback fixes (2026-09-30, local, not yet deployed).**
+    - **Viewer lag / slow booklets**: `pdf-pane.js` now draws at most 2 pages at a time
+      (nearest first), releases the canvas of any page >1200 px off screen (a 167-page
+      booklet used to keep every drawn page, ~14 MB each at DPR 2), caps DPR at 2 and a
+      page at 12 MP. Ranged loads use 1 MB chunks WITH auto-fetch (was 256 KB, fetched only
+      on scroll: ~1.7 s per request from Pakistan = the "minute or two"). `booklets.py`
+      caches a ready booklet's row 5 min so range requests skip the Supabase lookup.
+      `annotate.js` ink canvases hold pixels only while the page is near the screen AND has
+      ink / is being drawn on (were two full-page canvases on every page).
+    - **Text tool v2 (PDF-editor style)**: text object = `{t:"text", x, y, s, c, txt, bw?,
+      f? (sans|serif|hand|mono), b? i? u?, al? (c|r), bg? ("paper" = cover, or an ink token =
+      tint), bd?}`; boxes WITHOUT `f` are pre-v2 and keep their semi-bold look. The editing
+      box is a textarea styled exactly like the canvas text (same font metrics/baseline via
+      fontBoundingBox), with side handles for the wrap width and a formatting bar (`.an-tb`:
+      move grip, font, size in pt = s*595, B/I/U, align, colour, fill, border, duplicate,
+      delete, Done). **Enter = new line; Esc / Ctrl+Enter / click outside = done** (a click
+      outside only ends the edit - `A.swallow`). Text tool: drag a box = move, click = edit.
+      Selected objects get handles (text: 4 corners scale, 2 sides wrap width; rect/ellipse 8;
+      line/arrow ends), arrows nudge (Shift 10 px), Ctrl+C/X/V/D, Enter/F2 edits. Last-used
+      text style lives in localStorage `pwt-annot-text`. `annot_pdf._draw_text` burns the same
+      (base-14 fonts; handwriting -> Helvetica oblique).
+    - **Search**: builder.js re-rendered its search box on every keystroke and refocused a
+      fresh copy with the caret at 0 ("circles" -> "selcric"); render() now moves the SAME
+      input element across. `ui.page_search(..., deep=[ui.deep_entry...])` = search covers the
+      whole subtree BELOW the current folder (never outside it): results list with paths,
+      ranked, highlighted, ?q= in the URL, arrows/Enter. Used on resources subject/folder/shelf
+      pages (`resources._subtree`) and the notes subject page (chapters, subtopics, notes).
+      Wrap the normal listing in `data-ps-browse`. Tests: tests/e2e/test_search.py.
+    - **Feedback**: `/api/feedback` requires name + email (format + the domain must resolve;
+      the signed-in account's own email skips the lookup); both forms prefill from the
+      account, editable; typo hint (gmial.com). **Run `website/migrations/024_feedback_email.sql`
+      on Supabase before deploying** (save_feedback falls back to putting the email in the
+      message if the column is missing). Admin feedback table shows Email (mailto).
+
+34. **fx-991ES-style calculator + Tools tab on papers (2026-09-30, local, not deployed).**
+    - `static/calc-engine.js` = the maths, no DOM, UMD (browser `PWTCalcEngine`, Node for
+      tests/unit/test_calc_engine.py). Input is a TREE (items + templates frac/mixed/sqrt/root/
+      pow/logab/abs/integ/deriv/sum with slots) edited by `Editor` (cursor = path into slots).
+      Casio precedence (implicit × binds tighter than ÷: 1÷2π = 1/(2π); (−)2² = −4). `evaluate`
+      returns {v, ex}; `exact()` finds 5/6, a√b/c, (p+q√b)/d, nπ/d - tolerances matter: an
+      irrational must never pass for a fraction (fraction() uses 1e-13 with d<=1e5). Also SOLVE,
+      ∫ (adaptive Simpson), d/dx, Σ, stats1/stats2, linear/quadratic/cubic, BASE-N (32-bit).
+      Errors carry the Casio names (Math/Syntax ERROR) + a hint.
+    - `static/tools-calculator.js` = the keypad (fx-991ES layout: SHIFT gold / ALPHA red labels,
+      replay pad), LCD (natural display, S⇔D, SHIFT = decimal, ENG, °′″), MODE (COMP, STAT,
+      BASE-N, EQN, TABLE; CMPLX/MATRIX/VECTOR deliberately off - not on the syllabuses), SETUP,
+      CONST (Cambridge data-sheet values), CONV, FUNC (SHIFT 6: GCD/LCM/Int/Intg/RanInt/Rnd),
+      CLR, CALC, SOLVE, STO/RCL into A-F X Y M (M = the memory). `/api/calc` vars now allow X, Y.
+      Keyboard: digits, + - * ^, / = fraction, s c t l n r p, x y m, Enter, Esc, arrows.
+    - `tools-core.js` loads tools by ABSOLUTE path (they open on /papers/view/... too) and the
+      calculator as [calc-engine.js, tools-calculator.js]; VERSION 20260930c = `ui.TOOLS_V`.
+    - **Tools tab on paper viewers**: `ui.tools_dock(syllabus)` -> `<body data-syllabus
+      data-dock="push">` + tools-core/tools-dock scripts, on the booklet, yearly and MCQ
+      viewers. The dock shows the subject's tools (maths: calculator, graph, formulas; physics:
+      calculator, formulas, graph; chemistry: calculator, periodic table; CS: bases/logic,
+      pseudocode) and, >= 1100 px wide, moves the paper over (`body.pwt-docked`, a resize event
+      refits the PDF) instead of covering it. In the dock the calculator only takes keys while it
+      has focus; annotate.js ignores keys inside `.pwt-dock`. Phone: the Tools tab sits above
+      the quick-note button (they used to overlap on every page).
+
 ## Ground rules for future sessions
 
 - Never extract-and-retypeset question text for output PDFs; always crop
@@ -676,3 +736,136 @@ linked), not agreement with any external file.
   taxonomy, MS linked. The only xlsx the project consumes is the tutor's
   *syllabus breakdown* for Maths (`OL JAN-MAR 2025.xlsx`), which builds the
   4024/0580 taxonomies.
+
+35. **Admin console v2 (plan approved 2026-10-01: `~/.claude/plans/can-you-see-the-gentle-flute.md`).**
+    Full redesign of the admin side (Google + role=admin sign-in, shared DataTable with
+    sort/filter/saved views/bulk, full student activity timeline, payment verification with
+    automatic checks, one Inbox, background newsletter, AI blog/course/newsletter drafting on
+    the free providers). **Phase 1 (audit bug fixes) done, local, not deployed:**
+    - admin.js is a `type=module`: inline `onclick="fn()"` can never reach module functions -
+      that is why Allocations Remove, proof Approve/Reject and group Publish did nothing. Use
+      `data-*` + addEventListener (tests/api/test_admin_fixes.py enforces it).
+    - teacher_students has ONE removal style: soft (`status='removed'`). `get_allocations`
+      lists active only by default, `create_allocation` = the same upsert as the drawer
+      (re-assign re-activates the row), `remove_teacher_student(t, s, syllabus=None)` drops
+      every subject (the old 2-arg duplicate was shadowed -> teacher drop 500'd).
+    - `_teacher_profile_id` uses teachers.profile_id, else a case-insensitive email match
+      (then saves profile_id); approval saves profile_id. `get_user_by_email` is
+      case-insensitive; `get_user` uses `.limit(1)` (`.single()` raised -> 500 not 404).
+    - admin paper write passed `note` positionally into the `grade` slot - use keywords.
+    - payment_proofs.reviewer_note (own column); Supabase proof rows flattened (name/email).
+    - **Migration `025_admin_v2.sql` must run on Supabase before deploying** (grows with
+      each phase).
+    - Deferred to phase 2 auth: removing the hard-coded ADMIN_KEY fallback (.env.local has
+      no key; the current key-gated UI would lock out locally).
+    - **"3 Subjects" plan enforced strictly (tutor, 2026-10-01).** `access.PLAN_SUBJECT_LIMITS
+      = {"three": 3}`; `profiles.plan_subjects_json` holds the set. The pricing picker sends
+      `subjects` with the proof (exactly 3 known codes, `clean_plan_subjects`), approval
+      applies them, only the admin can change them (plan editor ticks exactly 3).
+      `_plan_active(user, syllabus)` = 'free' for a subject outside the set; every quota call
+      passes the subject (`check_quota[_gate]/record_quota(user, event, syllabus)`), and
+      `usage_events.syllabus` lets the free allowance for outside subjects count only outside
+      usage. Pre-existing 'three' accounts with no set get their first 3 enrolments (saved).
+      **Solo is enforced the same way (exactly 1 subject)** - `{"solo": 1, "three": 3}`;
+      legacy Solo accounts get their first enrolment. The pricing pickers list every
+      catalog subject (all 13, incl. Chemistry, Islamiyat, Pak Studies, 9709, 9618 - a test
+      compares them with `catalog.BOARDS`). The free-plan "track 1 subject" gate in
+      `/api/progress` is gone: progress tracking is free for every subject.
+      Tests: tests/api/test_plan_subjects.py.
+    - **Phase 2 done (local, not deployed): the new console lives at `/admin`**
+      (`static/admin/`: index.html + app.js shell/router/Ctrl K palette, core.js, datatable.js,
+      sections/overview|students|student|audit.js). Sections not rebuilt yet open the classic
+      page (`/admin.html?tab=<name>`, `?student=<id>`), marked "classic" in the sidebar.
+      - **Sign-in = site session of a role='admin' account, role read from the DB on every
+        request** (`website/admin_auth.py`). ADMIN_KEY: env only, `X-Admin-Key` header only
+        (no `?key=`, no cookie, no built-in default) - for scripts and the classic page's key
+        gate. Give an account the role with `scripts/set_admin.py <email> --apply`.
+        **Before deploying, run it for the tutor's production account** or /admin shows the
+        sign-in card. Admin Google login now lands on /admin.
+      - Every admin POST/PUT/PATCH/DELETE writes `admin_audit` (a route that logs its own,
+        more specific row sets `request.state.audited`). `admin_views` = saved table views,
+        `admin_notes` = private notes on a student, `profiles.last_seen_at` stamped by the
+        time-spent beacon. All in migration 025.
+      - `website/admin_students.py`: `/students/table` (filters, WHITELISTED sorts, paging,
+        facets; enriched rows cached 60 s, cleared by any admin mutation), `/students/export.csv`,
+        `/students/bulk` (plan incl. the subject rule, assign/unassign teacher, email with
+        {first_name}), `/students/{id}/activity` (one timeline from 12 tables + streak/time
+        summary), notes, `/views`, `/me`, `/audit`, `/overview/stats`. Its router is
+        included BEFORE admin.router (else `/students/{user_id}` swallows `/students/table`).
+      - `users_db.fetch_all()` pages Supabase reads in 1000-row blocks - **PostgREST silently
+        caps an unpaged select at 1000 rows**; the old `list_students` counts were truncated.
+      - Front-end rules (tests/api/test_admin_assets.py): colours only as tokens in admin.css
+        (light + dimmed-slate dark), no inline `style=""`/`onclick=""`, and **every admin ES
+        module is listed in index.html's import map at ONE version** (static JS is immutable
+        for a year on Caddy; an unversioned `import "./core.js"` would never update). Bump the
+        version string in index.html (css link, import map, app.js) on every change.
+      - Tests: tests/api/test_admin_console.py, tests/e2e/test_admin_console.py (admin fixture
+        promotes a fresh account in data/users.db).
+    - **Phase 3 done (local, not deployed): every classic section except Blog is rebuilt in
+      /admin** - Inbox (+ Calendly), Payments, Teachers (cards / applications / who teaches
+      whom), Homework, Groups, Courses, Newsletter, Emails, and a Manage card on the student
+      page (chapter progress, past-paper marks, class log, homework). Only Blog still opens
+      the classic page (Phase 4 = AI blog/course/newsletter writing).
+      - `website/billing.py` = periods + prices (monthly / octnov / mayjun / yearly; a test
+        checks pricing.html shows the same numbers - yearly sends the YEAR total now), expiry
+        maths (`new_expiry`: renewing early adds to the current end date; session packages run
+        to their fixed date), automatic checks (amount vs plan+period, duplicate transaction id,
+        duplicate screenshot by sha256, subjects for Solo/3 Subjects), student emails, and
+        `reminder_due` (EXP7/EXP3/EXP1/EXPIRED ids carry the expiry date) used by the daily
+        `website/scripts/email_lifecycle.py`. Proofs store `period`, `expected_pkr`,
+        `screenshot_sha256`. Approval REQUIRES `received: true` ("I've seen the money").
+      - **Payment screenshots are private**: `/uploads/payments/*` is only served to an admin
+        or the student who sent it (route registered before the /uploads mount); the console
+        reads them via `/api/admin/payments/{id}/screenshot`.
+      - `website/admin_ops.py`: `/inbox` (leads, contacts, feedback, subject requests; status
+        new/replied/handled/archived in `inbox_status`, reply-by-email logged on the item),
+        `/payments` (+ approve/reject/screenshot/expiring), `/students/{id}/renewal-reminder`,
+        newsletter subscribers + broadcasts. The classic page's review and broadcast buttons
+        call the same functions (`approve_proof`, `reject_proof`, `nl_create`).
+      - **Newsletter broadcasts are a background job** (`newsletter_broadcasts` +
+        `newsletter_sends`): batches of NEWSLETTER_BATCH with NEWSLETTER_PAUSE_S between,
+        branded HTML + working unsubscribe link, resumable, cancellable, schedulable. Each web
+        worker runs a 60 s scheduler, so a broadcast is taken with an atomic
+        `claim_broadcast` (queued, or 'sending' with a heartbeat older than 5 min).
+        Newsletter fixes: resubscribing works; rows with NULL status count as subscribed
+        (Supabase `status != 'unsubscribed'` dropped them); missing tokens are backfilled.
+      - More unpaged Supabase reads fixed with `fetch_all`: email-activity (+ time limited to
+        90 days) and the lifecycle cron's student list.
+      - Admin front end: after ANY change under static/admin/ run
+        `.venv\Scripts\python scripts\bump_admin_assets.py` (rebuilds the import map, bumps
+        the one version). Tests: tests/api/test_admin_ops.py, tests/e2e/test_admin_phase3.py
+        (the `admin_page` fixture now lives in tests/e2e/conftest.py; register test students
+        over a SEPARATE http session - doing it in the admin's browser context swaps its cookie).
+    - **Phase 4 done (local, not deployed): Blog studio + AI writing.** `website/content_ai.py`
+      = one `generate()` over the free providers (`configured("site")` order, never `groq`
+      vision, `groq_text` LAST - its daily cap is shared with the live follow-up chat; a short
+      per-minute limit is waited out once, otherwise the next provider), JSON validated with one
+      retry, prompts grounded in `site_facts()` (prices from billing.PERIODS, subjects, features)
+      and `internal_links()` (real URLs from the site search index). Tasks: blog outline ->
+      draft (markdown, excerpt, slug, meta, FAQ), inline edits (rewrite/simplify/shorten/expand/
+      add example/continue), idea polish, course page fields (`clean_html` keeps p/strong/em/
+      ul/ol/li/a/br/h3 only), newsletter draft. `website/admin_blog.py` = posts CRUD with
+      `blog_revisions` on every save/AI write (restore), publish/schedule/unpublish
+      (`blog.publish_due()` thread every 60 s), `/blog/ideas` from site data (subject requests,
+      weak AI-quiz topics, most-built booklet chapters), `/courses/ai`, `/newsletter/ai`.
+      Blog posts and course pages carry FAQ + FAQPage JSON-LD; `/course.html?slug=` now gets
+      its title/description/canonical/OG/Course JSON-LD written in on the server.
+      Verified live locally: outline in 6 s, ~530-word draft with 6 real internal links.
+    - **Admin theme (tutor, 2026-10-01)**: light = cool white with violet/sky glow; dark =
+      GRAPHITE (#121317 / #1b1c22), not navy ("the dark blue made it dull"). Violet->indigo
+      gradient for the active nav item and primary buttons, tone tokens (--t-violet/teal/amber/
+      rose/sky) for KPI icon badges. Tokens only - see admin.css.
+    - **Deploy guide: `deploy/ADMIN_V2_DEPLOY.md`** (migrations 023/024/025, set_admin.py,
+      code-only tar via /tmp/stage with `compileall` on the server's Python 3.10 first).
+    - **Forms + homework + marks round (tutor feedback 2026-10-01):** `modal({size})` = md 600 /
+      lg 860 / xl 1100; the body scrolls and the footer stays (`.modal-form` is a flex column with
+      `min-height: 0`). The old `wide` reused `.palette` (borderless inputs) - never style modals with
+      it. Homework form: drag-and-drop file upload (server checks file CONTENT matches the
+      extension: `admin.content_matches`), Resources search, and "Topical paper built for each
+      student" -> `POST /api/admin/students/{id}/booklets` builds a booklet OWNED by the student
+      (no quota, no enrolment needed) and the assignment gets `{"type": "paper", booklet_id}`;
+      static/homework.js shows it as "Open your paper" (/papers/view/{id}). Student page "Past
+      papers and marks" now mirrors the student Yearly page: rings (completion / average / best /
+      touched), per-paper filter, years grouped by paper, Not done / Started / Done, marks modal
+      with the sitting's official thresholds (`/api/grade-thresholds`) and the grade worked out
+      live (`core.gradeFor`, same rule as static/progress-shared.js).

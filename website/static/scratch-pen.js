@@ -6,7 +6,7 @@
  * annotator that saves per page, so this stays out of their way.
  * Loaded by auth.js and main.js; the flag makes sure it starts once.
  */
-const V = "20260928a";
+const V = "20260930a";
 
 function start() {
   if (window.__pwtScratchPen) return;

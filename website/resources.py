@@ -35,7 +35,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 RES_DIR = ROOT / "data" / "resources"
-RES_V = "20260929b"                        # bump with resource-viewer.js / catalog.css
+RES_V = "20260930a"                        # bump with resource-viewer.js / catalog.css
 EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".webp", ".docx", ".pptx", ".xlsx", ".zip", ".txt"}
 INLINE = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
 _e = _catalog._e
@@ -171,12 +171,41 @@ def _file_rows(files: list[dict]) -> str:
     rows = []
     for f in files:
         kind = _KIND_ICON.get(f["ext"], "FILE")
-        href = view_url(f["rel"]) if f["ext"] in INLINE else f"/api/resources/file?rel={quote(f['rel'])}"
+        href = _file_href(f)
         rows.append(f'<li data-q="{_e(f["title"].lower())}"><a class="rs-file" href="{_e(href)}"{" download" if f["ext"] not in INLINE else ""}>'
                     f'<i class="rs-kind rs-kind-{kind.lower()}">{kind}</i>'
                     f'<span class="rs-file-name">{_e(f["title"])}</span>'
                     f'<small>{_size(f["size"])}</small></a></li>')
     return f'<ul class="rs-files">{"".join(rows)}</ul>' if rows else ""
+
+
+def _file_href(f: dict) -> str:
+    return view_url(f["rel"]) if f["ext"] in INLINE else f"/api/resources/file?rel={quote(f['rel'])}"
+
+
+def _subtree(node: dict, url: str, path: list[str] | None = None) -> list[dict]:
+    """Every folder and file BELOW `node` (not beside or above it), for the
+    page search: a search inside a folder covers its subfolders too."""
+    import ui
+    path = path or []
+    out = []
+    for d in node["dirs"]:
+        href = f"{url}/{d['slug']}"
+        out.append(ui.deep_entry(d["title"], href, "Folder", path,
+                                 extra=f"{d['count']} files"))
+        out += _subtree(d, href, path + [d["title"]])
+    for f in node["files"]:
+        out.append(ui.deep_entry(f["title"], _file_href(f), _KIND_ICON.get(f["ext"], "FILE"), path,
+                                 extra=f["ext"].lstrip("."), download=f["ext"] not in INLINE))
+    return out
+
+
+def _search(node: dict, url: str, placeholder: str, scope: str) -> str:
+    import ui
+    if not (node["dirs"] or len(node["files"]) > 6):
+        return ""
+    return ui.page_search(placeholder, ".rs-folder, .rs-files li", "section",
+                          deep=_subtree(node, url), scope=scope)
 
 
 _FOLDER_TONES = ["lav", "blue", "green", "orange", "pink", "teal", "yellow"]
@@ -347,7 +376,7 @@ def resource_viewer(f: str, user: dict | None = Depends(_auth.maybe_user)):
 <main id="vw" class="vw" data-state="loading"></main>
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="/main.js?v=20260928a"></script>
+<script src="/main.js?v=20260930a"></script>
 <script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/resource-viewer.js?v={RES_V}"></script>
 </body>
@@ -376,8 +405,12 @@ def shelf_page(slug: str, folder: str = "", user: dict | None = Depends(_auth.ma
       <h1>{_e(h1)}</h1>
       <p class="cat-lede">{_e(tree['meta'].get('description', '')) if not trail else f'{node["count"]} files'}</p>
     </header>
+    {_search(node, url, "Search " + ("this folder and everything inside it" if trail else "this shelf"),
+             f"“{h1}”")}
+    <div data-ps-browse>
     {_folder_cards(node['dirs'], url)}
-    {_file_rows(node['files'])}"""
+    {_file_rows(node['files'])}
+    </div>"""
     return _page(title=f"{h1} - Resources | PrepWithTee", desc=tree["meta"].get("description", title)[:300],
                  path=url, body=body, user=user, crumbs=crumbs, noindex=bool(trail))
 
@@ -447,10 +480,13 @@ def resources_subject(board: str, subject: str, folder: str = "",
       <p class="cat-lede">{_e(lede)}</p>
     </header>
     {tip}
-    {ui.page_search("Search " + ("these folders and files" if trail else s["plain"] + " resources") + ", e.g. a teacher or topic",
-                    ".rs-folder, .rs-files li", "section") if (node["dirs"] or len(node["files"]) > 6) else ""}
+    {_search(node, url, "Search " + ("this folder and everything inside it" if trail
+                                     else f"all {s['plain']} resources") + ", e.g. a teacher or topic",
+             f"“{h1}”" if trail else f"{s['plain']} resources")}
+    <div data-ps-browse>
     {folders}
-    {loose}"""
+    {loose}
+    </div>"""
     return _page(title=(f"{h1} - {s['plain']} {code} Resources | PrepWithTee" if trail else
                         f"{s['plain']} {code} Notes, Books & Worksheets | Cambridge {BOARD_SHORT[board]} - PrepWithTee"),
                  desc=lede[:300], path=url, body=body, user=user, crumbs=crumbs, noindex=bool(trail))

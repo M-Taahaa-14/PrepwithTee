@@ -23,7 +23,7 @@ import db as _db
 router = APIRouter()
 
 _SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-_CSS_V = "20260928b"  # keep in sync with styles.css version pin
+_CSS_V = "20260930b"  # keep in sync with styles.css version pin
 
 
 # ── Markdown ──────────────────────────────────────────────────────────────────
@@ -102,10 +102,69 @@ def ensure_table():
                     updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
                 )
             """)
+        # Admin console v2 (migration 025): scheduling, FAQ, keywords, revisions.
+        if _db.USE_PG:
+            for stmt in ("ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS publish_at TEXT",
+                         "ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS faq_json TEXT",
+                         "ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS keywords TEXT",
+                         """CREATE TABLE IF NOT EXISTS blog_revisions (
+                                id BIGSERIAL PRIMARY KEY, post_id BIGINT NOT NULL,
+                                title TEXT, body_markdown TEXT, excerpt TEXT, meta_title TEXT,
+                                meta_desc TEXT, source TEXT, created_by TEXT,
+                                created_at TEXT NOT NULL DEFAULT (now()::text))"""):
+                con.execute(stmt)
+        else:
+            for stmt in ("ALTER TABLE blog_posts ADD COLUMN publish_at TEXT",
+                         "ALTER TABLE blog_posts ADD COLUMN faq_json TEXT",
+                         "ALTER TABLE blog_posts ADD COLUMN keywords TEXT"):
+                try:
+                    con.execute(stmt)
+                except Exception:
+                    pass                          # already there
+            con.execute("""CREATE TABLE IF NOT EXISTS blog_revisions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, post_id INTEGER NOT NULL,
+                title TEXT, body_markdown TEXT, excerpt TEXT, meta_title TEXT,
+                meta_desc TEXT, source TEXT, created_by TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')))""")
         con.commit()
         _TABLE_ENSURED = True
     finally:
         con.close()
+
+
+def publish_due(now: str | None = None) -> int:
+    """Publish scheduled posts whose time has come. Returns how many."""
+    ensure_table()
+    now = now or _now_iso()
+    con = _con()
+    try:
+        rows = con.execute("SELECT id, publish_at FROM blog_posts WHERE NOT published "
+                           "AND publish_at IS NOT NULL AND publish_at <= ?", (now,)).fetchall()
+        for r in rows:
+            con.execute("UPDATE blog_posts SET published = ?, published_at = ?, publish_at = NULL, "
+                        "updated_at = ? WHERE id = ?",
+                        (True if _db.USE_PG else 1, dict(r)["publish_at"], now, dict(r)["id"]))
+        con.commit()
+        return len(rows)
+    finally:
+        con.close()
+
+
+def _publisher() -> None:
+    import time as _time
+    while True:
+        _time.sleep(60)
+        try:
+            n = publish_due()
+            if n:
+                print(f"[blog] published {n} scheduled post(s)", flush=True)
+        except Exception as exc:                 # never let the loop die
+            print(f"[blog] scheduled publishing failed: {exc}", flush=True)
+
+
+if os.environ.get("APP_ENV") != "test":
+    import threading as _threading
+    _threading.Thread(target=_publisher, name="blog-publisher", daemon=True).start()
 
 
 def get_published_posts() -> list[dict]:
@@ -142,8 +201,8 @@ def get_all_posts_admin() -> list[dict]:
     try:
         rows = con.execute(
             """SELECT id, title, slug, excerpt, cover_url, author,
-                      published, published_at, meta_title, meta_desc,
-                      body_markdown, created_at, updated_at
+                      published, published_at, publish_at, meta_title, meta_desc,
+                      body_markdown, faq_json, keywords, created_at, updated_at
                FROM blog_posts
                ORDER BY COALESCE(updated_at, created_at) DESC"""
         ).fetchall()
@@ -341,8 +400,8 @@ def _page(*, title: str, desc: str, path: str, body: str,
 {_nav()}
 <main class="{main_class}">{body}</main>
 {_foot()}
-<script src="/main.js?v=20260928a"></script>
-<script src="/tools-core.js?v=20260927j"></script>
+<script src="/main.js?v=20260930a"></script>
+<script src="/tools-core.js?v=20260930c"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
 <script type="module" src="/auth.js?v=20260929a"></script>
 </body>
@@ -414,6 +473,14 @@ def blog_list():
     )
 
 
+def _faq_html(faq: list[dict]) -> str:
+    if not faq:
+        return ""
+    items = "".join(f"<details><summary>{_html.escape(f['q'])}</summary><p>{_html.escape(f['a'])}</p></details>"
+                    for f in faq)
+    return f'<h2>Frequently asked questions</h2><div class="pfaq">{items}</div>'
+
+
 @router.get("/blog/{slug}", response_class=HTMLResponse)
 def blog_post(slug: str):
     if not re.match(r"^[a-z0-9-]{1,120}$", slug):
@@ -423,6 +490,10 @@ def blog_post(slug: str):
         raise HTTPException(404, "post not found")
 
     content_html = _md(post.get("body_markdown") or "")
+    try:
+        faq = [f for f in json.loads(post.get("faq_json") or "[]") if f.get("q") and f.get("a")]
+    except (TypeError, ValueError, AttributeError):
+        faq = []
     date  = _fmt_date(post.get("published_at") or post.get("created_at"))
     cover = (
         f'<img class="pcover" src="{_html.escape(post["cover_url"])}" '
@@ -457,8 +528,13 @@ def blog_post(slug: str):
         f' &middot; {_html.escape(post.get("author") or "Muhammad Taahaa")}</p>'
         '</header>'
         f'{cover}'
-        f'<div class="pbody">{content_html}</div>'
+        f'<div class="pbody">{content_html}{_faq_html(faq)}</div>'
     )
+
+    if faq:
+        ld = [ld, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+            {"@type": "Question", "name": f["q"],
+             "acceptedAnswer": {"@type": "Answer", "text": f["a"]}} for f in faq]}]
 
     return _page(
         title=post.get("meta_title") or f"{post['title']} | PrepWithTee",

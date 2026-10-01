@@ -260,14 +260,59 @@ def dash_tabs(current: str) -> str:
     return sync_nav.dash_tabs_html(current).replace('class="dtabs"', 'class="dtabs dtabs-inline"', 1)
 
 
-def page_search(placeholder: str, items: str, groups: str = "section, .nt-group") -> str:
+TOOLS_V = "20260930c"          # = VERSION in static/tools-core.js
+
+
+def tools_dock(syllabus: str | None) -> tuple[str, str]:
+    """The Tools tab (calculator, periodic table, formulas...) for a paper
+    viewer: (<body> attributes, <script> tags). The dock picks the tools that
+    subject's exam needs and moves the paper over on a wide screen."""
+    attrs = f' data-syllabus="{_e(syllabus or "")}" data-dock="push"'
+    scripts = (f'<script src="/tools-core.js?v={TOOLS_V}"></script>'
+               f'<script src="/tools-dock.js?v={TOOLS_V}"></script>')
+    return attrs, scripts
+
+
+def page_search(placeholder: str, items: str, groups: str = "section, .nt-group",
+                 deep: list[dict] | None = None, scope: str = "this page") -> str:
     """A filter box for long pages (a subject's chapters, a resources folder):
     hides every `items` element whose data-q (or text) misses a typed word, and
-    any `groups` container left empty. Behaviour: catalog.js ([data-ps])."""
-    return (f'<div class="ps" data-ps data-ps-items="{_e(items)}" data-ps-groups="{_e(groups)}">'
-            f'<label class="pk-search ps-box">{icon("search")}<span class="sr-only">Search this page</span>'
-            f'<input type="search" data-ps-q placeholder="{_e(placeholder)}" autocomplete="off"></label>'
-            f'<span class="ps-count" data-ps-count aria-live="polite"></span></div>')
+    any `groups` container left empty. Behaviour: catalog.js ([data-ps]).
+
+    deep = every folder and file BELOW the current one (see deep_entry): while
+    something is typed, the page's own listing is swapped for a flat list of
+    matches from the whole subtree, each with the path it sits at - never
+    anything outside the current folder (tutor, 2026-09-30). Wrap the normal
+    listing in <div data-ps-browse> on those pages."""
+    results = ""
+    if deep is not None:
+        rows = []
+        for d in deep:
+            where = f'<small>{_e(" › ".join(d["path"]))}</small>' if d["path"] else ""
+            rows.append(
+                f'<li data-q="{_e(d["q"])}" data-t="{_e(d["title"])}">'
+                f'<a href="{_e(d["href"])}"{" download" if d.get("download") else ""}>'
+                f'<i class="ps-kind ps-kind-{_e(d["kind"].lower())}" aria-hidden="true">{_e(d["kind"])}</i>'
+                f'<span class="ps-hit"><b>{_e(d["title"])}</b>{where}</span></a></li>')
+        rows = "".join(rows)
+        results = (f'<section class="ps-results" data-ps-results hidden>'
+                   f'<ol class="ps-list">{rows}</ol>'
+                   f'<p class="ps-empty" hidden>Nothing called that in {_e(scope)} or the folders inside it.</p>'
+                   f'</section>')
+    return (f'<div class="ps" data-ps data-ps-items="{_e(items)}" data-ps-groups="{_e(groups)}"'
+            f'{" data-ps-deep" if deep is not None else ""}>'
+            f'<label class="pk-search ps-box">{icon("search")}<span class="sr-only">Search {_e(scope)}</span>'
+            f'<input type="search" data-ps-q placeholder="{_e(placeholder)}" autocomplete="off" '
+            f'spellcheck="false" enterkeyhint="search"></label>'
+            f'<span class="ps-count" data-ps-count aria-live="polite"></span></div>{results}')
+
+
+def deep_entry(title: str, href: str, kind: str, path: list[str], extra: str = "",
+               download: bool = False) -> dict:
+    """One row for page_search(deep=...). `path` = the folders between the
+    current page and the item (shown under the title, and searchable)."""
+    return {"title": title, "href": href, "kind": kind, "path": path, "download": download,
+            "q": " ".join([title, *path, extra]).lower()}
 
 
 def board_order(state: dict | None) -> list[str]:

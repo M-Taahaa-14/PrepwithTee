@@ -34,7 +34,7 @@ import users_db as _udb
 
 router = APIRouter()
 
-VIEWER_V = "20260928a"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
+VIEWER_V = "20260930a"      # bump with paper-viewer.js / yearly.css / pdf-pane.js
 SESSION_NAMES = {"m": "Feb/March", "s": "May/June", "w": "Oct/Nov"}
 SESSION_SHORT = {"m": "F/M", "s": "M/J", "w": "O/N"}
 SESSION_ORDER = {"m": 0, "s": 1, "w": 2}                # calendar order in a year
@@ -440,6 +440,8 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
     e = {"year": p["year"], "session": p["session"], "paper": p["paper"],
          "variant": p["variant"] or "", "code": f"{p['paper']}{p['variant'] or ''}"}
     title = _sitting_title(code, e)
+    import ui as _ui
+    _dock = _ui.tools_dock(code)
     state = {"title": title, "short": f"{code}/{e['code']} {SESSION_SHORT.get(p['session'], '')} {p['year']}",
              "syllabus": code, "year": p["year"], "session": p["session"], "paper": p["paper"],
              "variant": e["variant"], "sessionName": SESSION_NAMES.get(p["session"], p["session"]),
@@ -468,7 +470,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
   <link rel="stylesheet" href="/annotate.css?v={VIEWER_V}">
   <link rel="stylesheet" href="/yearly.css?v={VIEWER_V}">
 </head>
-<body class="vw-page">
+<body class="vw-page"{_dock[0]}>
 {_blog._nav()}
 <main id="vw" class="vw" data-state="loading">
   <section class="vw-load"><div class="vw-load-card"><p class="vw-eyebrow">Opening</p>
@@ -479,9 +481,10 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260928a"></script>
+<script src="/main.js?v=20260930a"></script>
 <script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
+{_dock[1]}
 </body>
 </html>""", headers={"Cache-Control": "private, no-store" if user else "public, max-age=300"})
 

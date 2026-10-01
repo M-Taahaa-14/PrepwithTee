@@ -1,4 +1,4 @@
-/* PrepWithTee study tools — calculator, formula sheet, tools hub.
+﻿/* PrepWithTee study tools — calculator, formula sheet, tools hub.
    Loaded only on the tool pages, so styles.css stays the size it is. */
 
 /* ── Tools hub ─────────────────────────────────────────────────────────── */
@@ -85,80 +85,191 @@
 /* ── Calculator ────────────────────────────────────────────────────────── */
 .calc-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 22px;
+  grid-template-columns: minmax(0, 460px) minmax(260px, 1fr);
+  gap: 26px;
   align-items: start;
   margin-bottom: 56px;
 }
 
-.calc-body {
-  background: var(--white);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius);
-  padding: 18px;
+/* The calculator itself (tools-calculator.js): an fx-991ES-style body, LCD
+   and keys. It looks like hardware in both site themes, on purpose. */
+.cx-wrap { display: grid; gap: 12px; min-width: 0; }
+.cx-device {
+  --cx-body: #2b2f3b; --cx-key: #444a5a; --cx-key2: #323644; --cx-edge: #151821;
+  --cx-shift: #eab54b; --cx-alpha: #ff7b72; --cx-lcd: #c9d5bf; --cx-lcd-ink: #1b2417;
+  width: 100%; max-width: 440px; margin: 0 auto; box-sizing: border-box;
+  padding: 14px 16px 20px; border-radius: 26px 26px 40px 40px; color: #eef0f6; outline: none;
+  background: radial-gradient(120% 60% at 50% 0%, #3a3f4d 0%, var(--cx-body) 55%, #20232d 100%);
+  box-shadow: 0 18px 40px rgba(15, 17, 26, .35), inset 0 1px 0 rgba(255, 255, 255, .08), inset 0 -3px 0 rgba(0, 0, 0, .3);
+  user-select: none; -webkit-user-select: none; touch-action: manipulation;
 }
+.cx-device:focus-visible { box-shadow: 0 0 0 3px var(--accent), 0 18px 40px rgba(15, 17, 26, .35); }
+.cx-brand { display: flex; align-items: center; gap: 8px; margin: 0 4px 8px; }
+.cx-logo { font: italic 800 .92rem/1 "Archivo", "Hanken Grotesk", sans-serif; letter-spacing: .02em; }
+.cx-model { font: 600 .62rem/1 "Hanken Grotesk", sans-serif; color: #a6abbb; letter-spacing: .06em; text-transform: uppercase; }
+.cx-solar { margin-left: auto; display: flex; gap: 2px; padding: 3px; border-radius: 4px; background: #121419; }
+.cx-solar i { width: 13px; height: 12px; background: linear-gradient(135deg, #3a2b22, #1b1512); border-radius: 1px; }
 
-.calc-screen {
-  background: #2E1B4A;
-  border-radius: 13px;
-  padding: 16px 18px 13px;
-  margin-bottom: 16px;
-  position: relative;
-  min-height: 96px;
-  display: flex; flex-direction: column; justify-content: space-between;
+/* the LCD */
+.cx-lcd {
+  background: var(--cx-lcd); color: var(--cx-lcd-ink); border-radius: 8px; padding: 5px 10px 8px;
+  border: 7px solid #12141b; box-shadow: inset 0 2px 6px rgba(0, 0, 0, .28);
+  min-height: 128px; display: flex; flex-direction: column;
 }
-.calc-flags {
-  display: flex; gap: 9px; align-items: center;
-  font-size: .64rem; font-weight: 800; letter-spacing: .07em;
-  color: #C9BDF0;
-}
-.calc-flag-m {
-  background: rgba(232, 145, 58, .9); color: #fff;
-  padding: 1px 6px; border-radius: 6px;
-}
-.calc-expr {
-  color: #fff; font-size: 1.5rem; font-weight: 600;
-  text-align: right; overflow-x: auto; white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  padding: 6px 0 2px;
-  scrollbar-width: none;
-}
-.calc-expr::-webkit-scrollbar { display: none; }
-.calc-result {
-  text-align: right; font-size: .95rem; min-height: 1.3em;
-  color: rgba(255, 255, 255, .55);
-  font-variant-numeric: tabular-nums;
-}
-.calc-result.ok  { color: #A9E0C3; font-weight: 700; font-size: 1.05rem; }
-.calc-result.err { color: #F3BDD3; font-weight: 600; }
+.cx-status { display: flex; gap: 7px; min-height: 13px; font: 800 .58rem/1.3 "Hanken Grotesk", sans-serif; letter-spacing: .04em; }
+.cx-status b { font-weight: 800; }
+.cx-s-sh, .cx-s-al { background: var(--cx-lcd-ink); color: var(--cx-lcd); padding: 0 3px; border-radius: 2px; }
+.cx-screen { flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-width: 0;
+  font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", Cambria, "Times New Roman", serif; }
+.cx-in { font-size: 21px; line-height: 1.15; white-space: nowrap; overflow-x: auto; overflow-y: hidden; min-height: 36px;
+  padding: 4px 2px; scrollbar-width: none; }
+.cx-in::-webkit-scrollbar { display: none; }
+.cx-in.cx-line { font-family: "Consolas", "SFMono-Regular", monospace; font-size: 17px; }
+.cx-res { text-align: right; font-size: 27px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow-x: auto;
+  scrollbar-width: none; padding: 2px 0; }
+.cx-res::-webkit-scrollbar { display: none; }
+.cx-res-list { display: grid; gap: 2px; font-size: 20px; }
+.cx-res-list > div { display: flex; justify-content: space-between; gap: 10px; }
+.cx-res-list span { font-size: 16px; }
+.cx-x10 { font-size: .78em; margin-left: 3px; }
+.cx-e { font-size: .7em; font-family: "Hanken Grotesk", sans-serif; font-weight: 800; }
+.cx-cur { display: inline-block; width: 2px; height: 1.05em; margin: 0 -1px; background: currentColor; vertical-align: -.18em;
+  animation: cx-blink 1s steps(1) infinite; }
+@keyframes cx-blink { 50% { opacity: 0; } }
+.cx-in sup, .cx-res sup { font-size: .62em; vertical-align: .75em; line-height: 0; }
+.cx-in sub { font-size: .62em; vertical-align: -.3em; line-height: 0; }
+.cx-frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 2px; font-size: .86em; line-height: 1.1; }
+.cx-frac > span { display: block; padding: 0 3px; min-width: .6em; }
+.cx-frac > span:first-child { border-bottom: 1.6px solid currentColor; padding-bottom: 1px; }
+.cx-frac > span:last-child { padding-top: 1px; }
+.cx-sqrt { display: inline-flex; align-items: stretch; vertical-align: middle; }
+.cx-rad { font-size: 1.05em; line-height: 1; padding-right: 1px; }
+.cx-under { border-top: 1.6px solid currentColor; padding: 1px 2px 0; margin-top: .12em; }
+.cx-idx { display: inline-block; font-size: .55em; vertical-align: .75em; margin-right: -3px; }
+.cx-pow { font-size: .62em; }
+.cx-slot { display: inline-block; min-width: .62em; height: .85em; border: 1.3px dashed currentColor; border-radius: 2px;
+  vertical-align: middle; margin: 0 1px; opacity: .55; }
+.cx-abs { border-left: 1.6px solid currentColor; border-right: 1.6px solid currentColor; padding: 0 3px; margin: 0 2px; }
+.cx-big { display: inline-flex; align-items: center; font-size: 1.35em; margin-right: 1px; }
+.cx-big .cx-lim { order: 2; display: inline-flex; flex-direction: column; font-size: .42em; line-height: 1.2; margin-left: 1px; }
+.cx-big .cx-lim sup, .cx-big .cx-lim sub { vertical-align: baseline; font-size: 1em; line-height: 1.2; }
+.cx-dx { font-style: italic; margin-left: 3px; }
+.cx-ddx { font-style: italic; }
+.cx-at { font-size: .9em; }
+.cx-var { font-style: italic; }
+.cx-const { font-style: italic; font-weight: 700; }
+.cx-conv { font-family: "Hanken Grotesk", sans-serif; font-size: .62em; font-weight: 700; margin-left: 2px; }
+.cx-cap { margin: 0; font: 700 .72rem/1.3 "Hanken Grotesk", sans-serif; }
+.cx-cap small { font-weight: 500; opacity: .75; }
+.cx-note, .cx-err, .cx-prompt, .cx-menu, .cx-grid, .cx-stats, .cx-tabs, .cx-est-in, .cx-est, .cx-bases, .cx-screen small {
+  font-family: "Hanken Grotesk", system-ui, sans-serif; }
+.cx-note { margin: auto 0; font-size: .92rem; font-weight: 700; text-align: center; }
+.cx-err { display: grid; gap: 2px; text-align: center; margin: auto 0; }
+.cx-err b { font-size: 1.05rem; }
+.cx-err span { font-size: .78rem; }
+.cx-err small, .cx-screen > small, .cx-prompt small { font-size: .62rem; opacity: .75; }
+.cx-bad { color: #8a1d12; font-weight: 700; }
+.cx-prompt p { margin: 0 0 4px; font-size: .68rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cx-prow { display: flex; align-items: center; gap: 6px; }
+.cx-prow > span { font: 700 1rem "Hanken Grotesk", sans-serif; white-space: nowrap; }
+.cx-prow .cx-in { flex: 1; }
+.cx-menu p { margin: 0 0 4px; font-size: .7rem; font-weight: 800; }
+.cx-menu-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1px 10px;
+  max-height: 150px; overflow-y: auto; }
+.cx-menu-grid.one { grid-template-columns: 1fr; }
+.cx-menu-grid button { width: 100%; text-align: left; border: 0; background: none; color: inherit; font: 600 .82rem/1.35 "Hanken Grotesk", sans-serif;
+  padding: 1px 4px; border-radius: 3px; cursor: pointer; }
+.cx-menu-grid button:hover, .cx-menu-grid button:focus-visible { background: rgba(27, 36, 23, .12); outline: none; }
+.cx-menu-grid button b { margin-right: 4px; }
+.cx-menu-grid button small { opacity: .7; font-size: .68rem; }
+.cx-menu-grid button.off { opacity: .45; }
+.cx-menu > small { display: block; font-size: .62rem; opacity: .7; margin-top: 3px; }
+.cx-grid { width: 100%; border-collapse: collapse; font-size: .8rem; margin: 2px 0; }
+.cx-grid th { font-size: .66rem; font-weight: 800; padding: 1px 4px; text-align: center; }
+.cx-grid td { border: 1px solid rgba(27, 36, 23, .35); padding: 2px 5px; text-align: right; min-width: 3.2em; height: 1.35em; cursor: pointer; }
+.cx-grid tbody { max-height: 110px; }
+.cx-grid td.on { background: var(--cx-lcd-ink); color: var(--cx-lcd); }
+.cx-table td { cursor: default; }
+.cx-screen .cx-grid + small { display: block; margin-top: 2px; }
+.cx-screen:has(.cx-grid) { max-height: 190px; overflow-y: auto; justify-content: flex-start; }
+.cx-tabs { display: flex; gap: 4px; margin-bottom: 3px; }
+.cx-tabs button { border: 1px solid rgba(27, 36, 23, .45); background: none; color: inherit; border-radius: 4px;
+  font: 700 .64rem/1 "Hanken Grotesk", sans-serif; padding: 3px 6px; cursor: pointer; }
+.cx-tabs button.on { background: var(--cx-lcd-ink); color: var(--cx-lcd); }
+.cx-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 12px; margin: 0; font-size: .82rem; }
+.cx-stats > div { display: flex; justify-content: space-between; gap: 6px; border-bottom: 1px dotted rgba(27, 36, 23, .3); }
+.cx-stats dt { font-weight: 800; font-style: italic; }
+.cx-stats dd { margin: 0; font-family: "Cambria Math", Cambria, serif; }
+.cx-sols { grid-template-columns: 1fr; font-size: .95rem; }
+.cx-est-in, .cx-est { font-size: .72rem; margin-top: 3px; }
+.cx-est-in .cx-cell { display: inline-block; min-width: 3em; padding: 0 4px; text-align: right; }
+.cx-est-in .cx-cell.on { background: var(--cx-lcd-ink); color: var(--cx-lcd); }
+.cx-bases { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; font-size: .72rem; }
+.cx-bases span { display: flex; justify-content: space-between; gap: 6px; overflow: hidden; }
+.cx-bases span.on { font-weight: 800; }
+.cx-bases i { font-style: normal; font-weight: 800; opacity: .7; }
 
-.calc-keys {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+/* keys */
+.cx-top { display: grid; grid-template-columns: 1fr 1fr 1.7fr 1fr 1fr; gap: 14px 8px; align-items: end; margin: 12px 2px 4px; }
+.cx-fn { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 15px 7px; margin: 10px 2px 0; }
+.cx-num { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 15px 9px; margin: 18px 2px 0; }
+.cx-k {
+  position: relative; display: grid; place-items: center; min-width: 0; height: 28px; padding: 0; border: 0; border-radius: 8px;
+  background: linear-gradient(#50566a, var(--cx-key2)); color: #fff; cursor: pointer;
+  font: 700 .74rem/1 "Hanken Grotesk", system-ui, sans-serif;
+  box-shadow: 0 3px 0 var(--cx-edge), inset 0 1px 0 rgba(255, 255, 255, .14);
+  transition: transform .05s, box-shadow .05s, filter .1s;
 }
-.calc-keys button {
-  font: inherit; font-size: .95rem; font-weight: 600;
-  padding: 14px 4px; border-radius: 11px; cursor: pointer;
-  border: 1.5px solid var(--line); background: var(--page); color: var(--ink);
-  transition: transform .08s, background .12s, border-color .12s;
-  -webkit-tap-highlight-color: transparent;
+.cx-k:hover { filter: brightness(1.12); }
+.cx-k:active, .cx-k.is-down { transform: translateY(2px); box-shadow: 0 1px 0 var(--cx-edge), inset 0 1px 0 rgba(255, 255, 255, .1); }
+.cx-k:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.cx-main { font-weight: 700; white-space: nowrap; }
+.cx-lab { position: absolute; left: -4px; right: -4px; bottom: calc(100% + 2px); display: flex; justify-content: center; gap: 6px;
+  font: 700 .54rem/1 "Hanken Grotesk", system-ui, sans-serif; white-space: nowrap; pointer-events: none; }
+.cx-lab i { font-style: normal; }
+.cx-sh { color: var(--cx-shift); }
+.cx-al { color: var(--cx-alpha); }
+.cx-num .cx-k { height: 38px; font-size: 1.05rem; border-radius: 9px; }
+.cx-k-num { background: linear-gradient(#f2f3f6, #cfd2da); color: #151821; box-shadow: 0 3px 0 #7d8290, inset 0 1px 0 #fff; }
+.cx-k-num:active { box-shadow: 0 1px 0 #7d8290; }
+.cx-k-del, .cx-k-ac { background: linear-gradient(#f5a34a, #d9761a); box-shadow: 0 3px 0 #8a4508, inset 0 1px 0 rgba(255, 255, 255, .3); }
+.cx-k-eq { background: linear-gradient(#8a73f5, #6a4fe0); box-shadow: 0 3px 0 #3b2596, inset 0 1px 0 rgba(255, 255, 255, .3); }
+.cx-k-shift { background: linear-gradient(#f5c865, #d9a133); color: #2d1f00; box-shadow: 0 3px 0 #7a5608, inset 0 1px 0 rgba(255, 255, 255, .4); }
+.cx-k-alpha { background: linear-gradient(#ea5f55, #c23b31); box-shadow: 0 3px 0 #6d1a14, inset 0 1px 0 rgba(255, 255, 255, .3); }
+.cx-k-sm { font-size: .66rem; }
+.cx-device.is-shift .cx-k-shift, .cx-device.is-alpha .cx-k-alpha { outline: 2px solid #fff; outline-offset: 2px; }
+.cx-device.is-shift .cx-sh { color: #ffe08a; text-shadow: 0 0 6px rgba(255, 210, 110, .8); }
+.cx-device.is-alpha .cx-al { color: #ffb0a8; text-shadow: 0 0 6px rgba(255, 120, 110, .8); }
+.cx-device.is-shift .cx-main, .cx-device.is-alpha .cx-main { opacity: .55; }
+.cx-device.is-shift .cx-k-shift .cx-main, .cx-device.is-alpha .cx-k-alpha .cx-main { opacity: 1; }
+.cx-device.is-locked .cx-top, .cx-device.is-locked .cx-fn, .cx-device.is-locked .cx-num { opacity: .3; pointer-events: none; }
+/* the replay pad */
+.cx-pad { grid-row: span 2; position: relative; align-self: stretch; min-height: 78px; border-radius: 50% / 46%;
+  background: radial-gradient(circle at 50% 40%, #4c5264, #2a2e39 70%); box-shadow: 0 3px 0 var(--cx-edge), inset 0 1px 0 rgba(255, 255, 255, .12); }
+.cx-pad-c { position: absolute; inset: 34% 30%; display: grid; place-items: center; border-radius: 50%; background: #262a34;
+  font: 800 .42rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; color: #9da3b4; }
+.cx-pad-b { position: absolute; border: 0; background: none; color: #dfe2ea; font-size: .7rem; cursor: pointer; padding: 0; border-radius: 8px; }
+.cx-pad-b:hover { background: rgba(255, 255, 255, .08); }
+.cx-pad-b:active { background: rgba(255, 255, 255, .16); }
+.cx-pad-up { top: 0; left: 30%; right: 30%; height: 34%; }
+.cx-pad-down { bottom: 0; left: 30%; right: 30%; height: 34%; }
+.cx-pad-left { left: 0; top: 30%; bottom: 30%; width: 30%; }
+.cx-pad-right { right: 0; top: 30%; bottom: 30%; width: 30%; }
+.cx-help { font-size: .78rem; color: var(--grey); max-width: 440px; margin: 0 auto; width: 100%; }
+.cx-help summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.cx-help dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 8px 0 0; }
+.cx-help dt { font-weight: 800; color: var(--ink); font-family: "Consolas", monospace; font-size: .74rem; }
+.cx-help dd { margin: 0; }
+/* the dock: a narrower panel */
+.pwt-panel .cx-device { max-width: 100%; padding: 10px 12px 16px; border-radius: 20px 20px 30px 30px; }
+.pwt-panel .cx-lcd { min-height: 118px; }
+@media (max-width: 420px) {
+  .cx-device { padding: 12px 10px 16px; border-radius: 20px 20px 30px 30px; }
+  .cx-fn { gap: 14px 5px; }
+  .cx-num { gap: 14px 6px; }
+  .cx-lab { font-size: .5rem; gap: 3px; }
+  .cx-k { font-size: .68rem; }
 }
-.calc-keys button:hover  { background: var(--cream); border-color: var(--lav-line); }
-.calc-keys button:active { transform: scale(.95); }
-.calc-keys .k-fn   { background: var(--lav); border-color: var(--lav-line); color: var(--lav-ink); font-size: .85rem; }
-.calc-keys .k-op   { background: var(--cream); font-weight: 700; }
-.calc-keys .k-eq   { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 800; }
-.calc-keys .k-eq:hover { background: var(--purple-bright); }
-.calc-keys .k-clear{ background: var(--pink); border-color: var(--pink-line); color: var(--pink-ink); }
-.calc-keys .k-mode.on { background: var(--gold); border-color: var(--gold); color: #fff; }
-
-/* SHIFT swaps the visible label to the alternate function. */
-.calc-keys button .alt { display: none; }
-.calc-keys.shifted button[data-shift] .main { display: none; }
-.calc-keys.shifted button[data-shift] .alt  { display: inline; }
-.calc-keys.shifted button[data-shift] { background: var(--yellow); border-color: var(--yellow-line); color: var(--yellow-ink); }
-.calc-keys.locked { opacity: .4; pointer-events: none; }
 
 .calc-side {
   background: var(--white);
@@ -193,7 +304,7 @@
 .calc-hist-empty { font-size: .82rem; color: var(--grey); opacity: .8; line-height: 1.5; }
 
 /* variables A-F + STO, under the screen */
-.calc-vars { display: grid; grid-template-columns: auto repeat(6, minmax(0, 1fr)); gap: 5px; margin: 8px 0 10px; }
+.calc-vars { display: grid; grid-template-columns: auto repeat(9, minmax(0, 1fr)); gap: 4px; margin: 0 auto; max-width: 440px; width: 100%; }
 .calc-vars button { border: 1px solid var(--line); background: var(--white); color: var(--ink); border-radius: 9px;
   cursor: pointer; padding: 5px 4px; display: grid; gap: 1px; justify-items: center; min-width: 0; font: inherit; }
 .calc-vars button b { font-size: .8rem; }
@@ -748,9 +859,6 @@ body.fs-modal-open { overflow: hidden; }
   .calc-side { order: 2; }
 }
 @media (max-width: 480px) {
-  .calc-keys { gap: 6px; }
-  .calc-keys button { padding: 13px 2px; font-size: .88rem; }
-  .calc-keys .k-fn { font-size: .74rem; }
   .fs-list { grid-template-columns: 1fr; }
 }
 
@@ -1060,7 +1168,6 @@ body.pwt-resizing { user-select: none; cursor: col-resize; }
 
 /* Tools inside the dock are narrower - drop the sidebar, shrink the keys. */
 .pwt-panel .calc-layout.compact { grid-template-columns: 1fr; }
-.pwt-panel .calc-keys button { padding: 11px 2px; font-size: .88rem; }
 .pwt-panel .fs-list { grid-template-columns: 1fr; }
 .pwt-panel .gp-wrap { grid-template-columns: 1fr; }
 .pwt-panel .cw-head { grid-template-columns: 1fr; gap: 4px; }
@@ -1357,7 +1464,7 @@ body.tool-page > main.container { max-width: 1280px; }
 
 @media (max-width: 900px) {
   .pwt-fab {
-    top: auto; bottom: 88px;            /* clear of the chat launcher */
+    top: auto; bottom: 166px;           /* above the chat launcher AND the quick-note button (6rem) */
     right: 0; left: auto;
     transform: none; flex-direction: row; gap: 6px;
     padding: 11px 13px; border-radius: 12px 0 0 12px;
@@ -1365,7 +1472,7 @@ body.tool-page > main.container { max-width: 1280px; }
   .pwt-fab-label { writing-mode: horizontal-tb; transform: none; }
   .pwt-dock.open .pwt-fab { transform: translateX(100%); }
   .pwt-coach {
-    right: 12px; left: 12px; top: auto; bottom: 148px;
+    right: 12px; left: 12px; top: auto; bottom: 222px;
     max-width: none; transform: none; animation: none;
   }
   .pwt-coach::after { display: none; }
@@ -2224,3 +2331,28 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
 .lib-th-note { color: var(--grey); font-size: .76rem; line-height: 1.5;
   margin: 10px 0 0; }
 .lib-th-note a { color: var(--gold); font-weight: 700; }
+
+/* Paper viewers (body[data-dock=push]): with the tools open on a wide screen
+   the paper moves over, so the question and the calculator sit side by side. */
+body.pwt-docked .vw { margin-right: var(--pwt-dock-w, 440px); transition: margin-right .22s ease; }
+body.pwt-docked .an-bar { left: calc((100vw - var(--pwt-dock-w, 440px)) / 2); }
+body[data-dock="push"] .pwt-panel { top: var(--vw-top, 0px); }
+/* the paper column is narrower with the tools open: icon-only toolbar buttons */
+body.pwt-docked .vw-tbtn span, body.pwt-docked .vw-dl span, body.pwt-docked .vw-paper span,
+body.pwt-docked .pv-long, body.pwt-docked .vw-title { display: none; }
+body.pwt-docked .pv-abbr { display: inline; }
+body.pwt-docked .vw-tools { gap: .35rem; }
+/* the chat and note buttons step out from under the open panel */
+body.pwt-dock-open #pwt-chatbot-wrap, body.pwt-dock-open #global-note-fab {
+  right: calc(var(--pwt-dock-w, 440px) + 16px) !important; transition: right .22s ease; }
+@media (max-width: 900px) {
+  body.pwt-dock-open #pwt-chatbot-wrap, body.pwt-dock-open #global-note-fab, body.pwt-dock-open .fb-tab { display: none !important; }
+}
+/* over a paper they would sit on the annotation bar: hide them while the tools are open */
+body[data-dock="push"].pwt-dock-open #pwt-chatbot-wrap, body[data-dock="push"].pwt-dock-open #global-note-fab { display: none !important; }
+@media (max-width: 900px) {
+  body.pwt-dock-open .an-fab, body.pwt-dock-open .an-bar { display: none !important; }
+  .pwt-panel .calc-banner { padding: 8px 12px; font-size: .78rem; margin-bottom: 8px; }
+  .pwt-panel .cx-num .cx-k { height: 34px; }
+  .pwt-panel .cx-lcd { min-height: 104px; }
+}

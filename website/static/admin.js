@@ -1,4 +1,4 @@
-/* PrepWithTee admin dashboard.
+﻿/* PrepWithTee admin dashboard.
  *
  * Sidebar shell: one page, one data load, sections swap in place. The admin
  * key lives in sessionStorage and travels as X-Admin-Key, never in the URL.
@@ -43,6 +43,9 @@ const PAGES = {
   groups:       ["Groups", "Small-group tutoring sessions created by teachers."],
   payments:     ["Payment Proofs", "Screenshots uploaded by students — approve to upgrade their plan."],
   feedback:     ["Feedback & Issues", "Ratings, comments and reported problems."],
+  allocations:  ["Allocations", "Which teacher looks after which student, per subject."],
+  contacts:     ["Contact Messages", "Messages sent through the contact form."],
+  newsletter:   ["Newsletter", "Footer sign-ups, and broadcasts to them."],
   student:      ["Student", "Full progress log."],
 };
 
@@ -369,6 +372,15 @@ function setCount(name, n) {
 
 /* ---- Load ---------------------------------------------------------------- */
 
+// The new console (/admin) links here as /admin.html?tab=<name> for sections
+// it hasn't taken over yet.
+function openTabFromUrl() {
+  const q = new URLSearchParams(location.search);
+  const tab = q.get("tab");
+  if (q.get("student")) openStudent(q.get("student"));
+  else if (tab && $("view-" + tab)) go(tab);
+}
+
 async function loadAll(isRefresh = false) {
   try {
     setLoaderStatus("Loading submissions…");
@@ -411,6 +423,7 @@ async function loadAll(isRefresh = false) {
 
     setLoaderStatus("Building your dashboard…");
     renderAll();
+    if (!isRefresh) openTabFromUrl();
     if (isRefresh && state.calendly) loadCalendly(true);
   } catch (ex) {
     setLoaderStatus("Couldn't load data.");
@@ -582,6 +595,7 @@ function renderFeedback() {
           ${isIssue ? "🔧" : "💬"} ${esc(type)}</span></td>
         <td class="${r >= 4 ? "stars-hi" : r ? "stars-lo" : ""}">${stars}</td>
         <td>${esc(f.name || "—")}</td>
+        <td>${f.email ? `<a href="mailto:${esc(f.email)}">${esc(f.email)}</a>` : "—"}</td>
         <td>${esc(f.page || "—")}</td>
         <td>${esc(f.message || "—")}</td>
       </tr>`;
@@ -589,7 +603,7 @@ function renderFeedback() {
 
   $("view-feedback").innerHTML = state.feedback.length
     ? panel(`${state.feedback.length} submissions`,
-        table(["Time", "Type", "Stars", "Name", "Page", "Message"], rows))
+        table(["Time", "Type", "Stars", "Name", "Email", "Page", "Message"], rows))
     : panel("Feedback & issues", empty("💬", "Nothing submitted yet."));
 }
 
@@ -800,8 +814,8 @@ async function openStudent(userId) {
     const PLAN_PRICES  = { free: "No charge", solo: "PKR 1,000/mo", three: "PKR 2,000/mo", all: "PKR 3,000/mo" };
     const PLAN_DESC    = {
       free:  "Preview only — minimal quotas",
-      solo:  "1 subject, unlimited practice tools",
-      three: "Up to 3 subjects, unlimited access",
+      solo:  "Exactly 1 chosen subject, unlimited",
+      three: "Exactly 3 chosen subjects, unlimited",
       all:   "All subjects, full platform access",
     };
     const PLAN_COLORS  = { free: "", solo: "badge-lav", three: "badge-ok", all: "badge-issue" };
@@ -810,6 +824,12 @@ async function openStudent(userId) {
     const planBadge    = `<span class="badge ${PLAN_COLORS[currentPlan] || ""}">${PLAN_LABELS[currentPlan] || currentPlan}${isTrial ? " · trial" : ""}</span>`;
 
     const fmtIso = iso => iso ? iso.slice(0,10) : "—";
+    const PLAN_SUBJECT_LIMITS = { solo: 1, three: 3 };   // must match access.py
+    const planSubjectsHint = pl => PLAN_SUBJECT_LIMITS[pl]
+      ? `The ${PLAN_SUBJECT_LIMITS[pl] === 1 ? "subject" : PLAN_SUBJECT_LIMITS[pl] + " subjects"} this plan covers `
+        + "(every other subject gets free-plan limits):" : "";
+    let planSubjects = [];
+    try { planSubjects = JSON.parse(p.plan_subjects_json || "[]"); } catch (_) { /* legacy row */ }
     const planMeta = currentPlan !== "free"
       ? `<span style="font-size:11px;color:var(--grey);display:block;margin-top:2px;">
            Started ${fmtIso(p.plan_started_at)} · Expires ${fmtIso(p.plan_expires_at)}
@@ -837,6 +857,18 @@ async function openStudent(userId) {
           </div>
           <div class="plan-cards" id="plan-cards-${esc(p.id)}" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%;">
             ${planCards}
+          </div>
+          <div class="plan-subjects" id="plan-subjects-${esc(p.id)}" ${PLAN_SUBJECT_LIMITS[currentPlan] ? "" : "hidden"}>
+            <span class="plan-subjects-hint" style="font-size:.72rem;color:var(--grey);display:block;margin-bottom:4px;">
+              ${planSubjectsHint(currentPlan)}
+            </span>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              ${(state.subjectOptions || []).map(o => `
+                <label class="pill" style="cursor:pointer;">
+                  <input type="checkbox" value="${esc(o.code)}"${planSubjects.includes(o.code) ? " checked" : ""}>
+                  ${esc(o.name)} (${esc(o.code)})
+                </label>`).join("")}
+            </div>
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <button class="btn btn-xs" id="plan-save-${esc(p.id)}">Grant 30 days</button>
@@ -872,18 +904,43 @@ async function openStudent(userId) {
     StudentConsole.mount(d, $("view-student"));
     StudentConsole.wireTabs($("view-student"));
 
-    // Highlight selected plan card on click
+    // Highlight selected plan card on click; the 3-subject plan shows its subject picker
+    const subjBox = $(`plan-subjects-${p.id}`);
     $(`plan-cards-${p.id}`)?.querySelectorAll("label.plan-card").forEach(card => {
       card.addEventListener("click", () => {
         $(`plan-cards-${p.id}`).querySelectorAll("label.plan-card").forEach(c => c.classList.remove("selected"));
         card.classList.add("selected");
+        const pl = card.querySelector("input").value;
+        if (subjBox) {
+          subjBox.hidden = !PLAN_SUBJECT_LIMITS[pl];
+          subjBox.querySelector(".plan-subjects-hint").textContent = planSubjectsHint(pl);
+        }
       });
+    });
+    const pickedPlan = () =>
+      $(`plan-cards-${p.id}`)?.querySelector("input[type=radio]:checked")?.value || "free";
+    subjBox?.addEventListener("change", e => {
+      const max = PLAN_SUBJECT_LIMITS[pickedPlan()] || 0;
+      const ticked = subjBox.querySelectorAll("input:checked");
+      if (max === 1 && e.target.checked) {          // Solo: ticking one swaps the other out
+        ticked.forEach(i => { if (i !== e.target) i.checked = false; });
+      } else if (ticked.length > max) {
+        e.target.checked = false;
+        toast(`This plan covers exactly ${max} subjects`, true);
+      }
     });
 
     // Wire plan buttons — plan_started_at and plan_expires_at auto-set server-side from now
     const _doPlanSave = async (trial) => {
       const checked = $(`plan-cards-${p.id}`)?.querySelector("input[type=radio]:checked");
       const newPlan = checked ? checked.value : "free";
+      const body = { plan: newPlan, trial };
+      const need = PLAN_SUBJECT_LIMITS[newPlan];
+      if (need) {
+        body.subjects = [...(subjBox?.querySelectorAll("input:checked") || [])].map(i => i.value);
+        if (body.subjects.length !== need)
+          return toast(`Tick exactly ${need} subject${need === 1 ? "" : "s"} for this plan`, true);
+      }
       const saveBtn = $(`plan-save-${p.id}`);
       const trialBtn = $(`plan-trial-${p.id}`);
       const activeBtn = trial ? trialBtn : saveBtn;
@@ -891,7 +948,7 @@ async function openStudent(userId) {
       try {
         await api(`/api/admin/students/${encodeURIComponent(p.id)}/plan`, {
           method: "PATCH",
-          body: { plan: newPlan, trial },
+          body,
         });
         const label = trial ? `${PLAN_LABELS[newPlan] || newPlan} · trial` : (PLAN_LABELS[newPlan] || newPlan);
         toast(`Plan set to ${label} — started from now`);
@@ -2161,11 +2218,11 @@ function renderGroups() {
       <td><span class="badge ${GROUP_STATUS_COLORS[g.status] || ""}">${GROUP_STATUS_LABELS[g.status] || g.status}</span></td>
       <td style="white-space:nowrap">
         ${g.status !== "active"
-          ? `<button class="btn btn-xs" onclick="setGroupStatus(${g.id},'active')">Publish</button> ` : ""}
+          ? `<button class="btn btn-xs" data-group="${g.id}" data-status="active">Publish</button> ` : ""}
         ${g.status === "active"
-          ? `<button class="btn btn-xs" onclick="setGroupStatus(${g.id},'closed')">Close</button> ` : ""}
+          ? `<button class="btn btn-xs" data-group="${g.id}" data-status="closed">Close</button> ` : ""}
         ${g.status !== "draft"
-          ? `<button class="btn btn-xs" onclick="setGroupStatus(${g.id},'draft')">Draft</button>` : ""}
+          ? `<button class="btn btn-xs" data-group="${g.id}" data-status="draft">Draft</button>` : ""}
       </td>
     </tr>`).join("");
 
@@ -2175,6 +2232,8 @@ function renderGroups() {
     </tr></thead><tbody>${rows}</tbody></table>`
     : empty("👥", "No groups yet.", "Teachers create groups from their dashboard.")}
   </div>`);
+  box.querySelectorAll("[data-group]").forEach(b => b.addEventListener("click",
+    () => setGroupStatus(Number(b.dataset.group), b.dataset.status)));
 }
 
 async function setGroupStatus(groupId, status) {
@@ -2190,7 +2249,7 @@ async function setGroupStatus(groupId, status) {
 
 /* ---- Payments ------------------------------------------------------------- */
 
-const PROOF_PLAN_LABELS = { free: "Free", solo: "1-on-1", three: "Group of 3", all: "All Access" };
+const PROOF_PLAN_LABELS = { free: "Free", solo: "Solo", three: "3 Subjects", all: "All Subjects" };
 const PROOF_STATUS_COLORS = { pending: "badge-lav", approved: "badge-ok", rejected: "badge-issue" };
 
 function renderPayments() {
@@ -2200,7 +2259,10 @@ function renderPayments() {
   const rows = proofs.map(p => `
     <tr>
       <td>${esc(p.name || p.email || "—")}</td>
-      <td>${esc(PROOF_PLAN_LABELS[p.plan] || p.plan)}</td>
+      <td>${esc(PROOF_PLAN_LABELS[p.plan] || p.plan)}${(() => {
+        try { const s = JSON.parse(p.subjects_json || "[]");
+              return s.length ? `<br><small>${s.map(esc).join(", ")}</small>` : ""; }
+        catch (_) { return ""; } })()}</td>
       <td>${p.amount_pkr ? `PKR ${p.amount_pkr.toLocaleString()}` : "—"}</td>
       <td>${esc(p.method || "—")}</td>
       <td>${esc(p.transaction_id || "—")}</td>
@@ -2208,8 +2270,8 @@ function renderPayments() {
         ? `<a href="${esc(p.screenshot_url)}" target="_blank" rel="noopener">View</a>` : "—"}</td>
       <td><span class="badge ${PROOF_STATUS_COLORS[p.status] || ""}">${esc(p.status)}</span></td>
       <td style="white-space:nowrap">${p.status === "pending" ? `
-        <button class="btn btn-xs" onclick="reviewProof(${p.id},'approved')">✓ Approve</button>
-        <button class="btn btn-xs btn-danger" onclick="reviewProof(${p.id},'rejected')">✗ Reject</button>
+        <button class="btn btn-xs" data-proof="${p.id}" data-status="approved">✓ Approve</button>
+        <button class="btn btn-xs btn-danger" data-proof="${p.id}" data-status="rejected">✗ Reject</button>
       ` : "—"}</td>
     </tr>`).join("");
 
@@ -2224,6 +2286,8 @@ function renderPayments() {
     </tr></thead><tbody>${rows}</tbody></table></div>`
     : empty("💳", "No payment proofs yet.", "Students submit proofs from the pricing page.")}
     </div>`);
+  box.querySelectorAll("[data-proof]").forEach(b => b.addEventListener("click",
+    () => reviewProof(Number(b.dataset.proof), b.dataset.status)));
 }
 
 async function reviewProof(proofId, status) {
@@ -2562,7 +2626,7 @@ function renderAllocations() {
     <td>${esc(a.student_name || a.student_id)}<br><small>${esc(a.student_email||"")}</small></td>
     <td>${esc(SUBJECT_LABELS_ALLOC[a.syllabus] || a.syllabus)}</td>
     <td>${esc(a.status || "active")}</td>
-    <td><button class="btn btn-xs btn-danger" onclick="removeAllocation(${a.id})">Remove</button></td>
+    <td><button class="btn btn-xs btn-danger" data-alloc="${a.id}">Remove</button></td>
   </tr>`).join("");
 
   box.innerHTML = panel("Teacher ↔ Student Allocations",
@@ -2590,6 +2654,8 @@ function renderAllocations() {
     </tr></thead><tbody>${rows}</tbody></table></div>`
     : empty("🔗", "No allocations yet.", "Use the form above to assign a teacher to a student.")}
     </div>`);
+  box.querySelectorAll("[data-alloc]").forEach(b => b.addEventListener("click",
+    () => removeAllocation(Number(b.dataset.alloc))));
 
   document.getElementById("alloc-form")?.addEventListener("submit", async e => {
     e.preventDefault();
@@ -2707,7 +2773,9 @@ function renderNewsletter() {
         method: "POST",
         body: { subject: subj, body },
       });
-      if (status) status.textContent = `✓ Sent to ${res.sent || subs.length} subscribers.`;
+      if (status) status.textContent = res.queued
+        ? `✓ Queued for ${res.total} subscribers - it sends in the background; follow it in the new console (/admin).`
+        : `✓ Sent to ${res.sent ?? 0} of ${res.total ?? subs.length} subscribers.`;
       $("nl-subj").value = ""; $("nl-body").value = "";
     } catch (ex) {
       if (status) status.textContent = `Error: ${ex.message}`;

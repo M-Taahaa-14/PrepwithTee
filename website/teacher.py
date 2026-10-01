@@ -135,7 +135,7 @@ def teacher_student_detail(student_id: str, user: _Teacher):
 
 @router.delete("/student/{student_id}/allocation")
 def drop_student(student_id: str, user: _Teacher):
-    """Remove a student from this teacher's roster (soft drop — deletes the allocation row)."""
+    """Remove a student from this teacher's roster (soft drop: every subject's link)."""
     _assert_owns_student(user["id"], student_id)
     _udb.remove_teacher_student(user["id"], student_id)
     return {"ok": True}

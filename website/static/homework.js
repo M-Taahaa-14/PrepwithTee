@@ -128,6 +128,12 @@ function attachmentHtml(a) {
                 <span class="hw-file-ic">📄</span>
                 <span>${esc(t.name || t.rel)}<em>Read these notes</em></span></a>`;
     }
+    if (t.type === "paper") {
+      return `<a class="hw-file" href="/papers/view/${encodeURIComponent(t.booklet_id || "")}"
+                 target="_blank" rel="noopener">
+                <span class="hw-file-ic">📝</span>
+                <span>${esc(t.name || "Topical paper")}<em>Open your paper</em></span></a>`;
+    }
     if (t.type === "booklet") {
       return `<button type="button" class="hw-file hw-file-btn"
                       data-booklet="${a.id}" data-idx="${t.idx}">

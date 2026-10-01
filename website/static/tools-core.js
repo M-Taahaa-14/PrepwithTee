@@ -21,7 +21,7 @@
   // Tool id -> script file(s), loaded in order. Kept here so the dock can
   // lazy-load without every page hard-coding a script tag for all six tools.
   var SOURCES = {
-    calculator: "tools-calculator.js",
+    calculator: ["calc-engine.js", "tools-calculator.js"],   // the maths engine first
     formulas: "tools-formulas.js",
     graph: ["math-expr.js", "tools-graph.js"],      // the safe expression parser first
     command: "tools-commandwords.js",
@@ -51,7 +51,7 @@
       href: "pseudocode.html", blurb: "Run it, trace it, fix it" }
   ];
 
-  var VERSION = "20260927j";
+  var VERSION = "20260930c";
 
   // ── Small shared helpers ────────────────────────────────────────────────
   function esc(s) {
@@ -71,7 +71,7 @@
   var dataCache = {};
   function data(name) {
     if (!dataCache[name]) {
-      dataCache[name] = fetch("data/" + name + ".json?v=" + VERSION)
+      dataCache[name] = fetch("/data/" + name + ".json?v=" + VERSION)
         .then(function (r) {
           if (!r.ok) throw new Error(name + ": HTTP " + r.status);
           return r.json();
@@ -138,7 +138,7 @@
     if (!scripts[file]) {
       scripts[file] = new Promise(function (resolve, reject) {
         var s = document.createElement("script");
-        s.src = file + "?v=" + VERSION;
+        s.src = "/" + file + "?v=" + VERSION;
         s.onload = resolve;
         s.onerror = function () { delete scripts[file]; reject(new Error("could not load " + file)); };
         document.head.appendChild(s);

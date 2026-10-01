@@ -60,3 +60,25 @@ def student(browser, base_url):
     ctx.request.put("/api/me/boards", data={"boards": ["igcse", "o-level"]})
     yield ctx
     ctx.close()
+
+
+USERS_DB = Path(__file__).resolve().parents[2] / "data" / "users.db"
+
+
+@pytest.fixture()
+def admin_page(browser, base_url):
+    ctx = browser.new_context(viewport={"width": 1440, "height": 900}, base_url=base_url)
+    email = f"e2e_admin_{uuid.uuid4().hex[:8]}@test.local"
+    r = ctx.request.post("/auth/register", data={
+        "email": email, "password": f"{uuid.uuid4().hex}Aa1!", "name": "E2E Admin"})
+    assert r.ok, r.text()
+    import sqlite3
+    con = sqlite3.connect(USERS_DB)
+    con.execute("UPDATE profiles SET role='admin' WHERE email=?", (email,))
+    con.commit()
+    con.close()
+    page = ctx.new_page()
+    yield page
+    ctx.close()
+
+

@@ -53,11 +53,22 @@ def _upgrade(message: str) -> HTTPException:
                                "message": message, "url": UPGRADE_URL})
 
 
-def _plan_state(user: dict) -> tuple[dict, str, bool]:
+def _plan_state(user: dict, syllabus: str | None = None) -> tuple[dict, str, bool]:
     fresh = _udb.get_user(user["id"]) or user
-    plan = _access._plan_active(fresh)
+    plan = _access._plan_active(fresh, syllabus)
     trial = bool(fresh.get("plan_trial")) and plan != "free"
     return fresh, plan, trial
+
+
+def _outside_plan(fresh: dict, syllabus: str | None) -> str | None:
+    """A message when a subject-limited plan is used outside its subjects, else None."""
+    base = _access._plan_active(fresh)
+    if base in _access.PLAN_SUBJECT_LIMITS and not _access.covers_subject(fresh, base, syllabus):
+        subs = ", ".join(_access.plan_subjects(fresh))
+        return (f"{syllabus} isn't covered by your {_access.PLAN_LABELS.get(base, base)} plan "
+                f"({subs}). Upgrade to {_access._upgrade_suggestion(base)} to get full AI help "
+                f"here too.")
+    return None
 
 
 def _used(user: dict, kind: str) -> int:
@@ -65,32 +76,34 @@ def _used(user: dict, kind: str) -> int:
     return _udb.count_usage_this_month(user["id"], kind, start)
 
 
-def check_explain(user: dict, qid: int) -> None:
+def check_explain(user: dict, qid: int, syllabus: str | None = None) -> None:
     """Raise if this student may not open this explanation (records nothing)."""
     if user.get("role") in ("teacher", "admin"):
         return
     unlocked = _udb.unlocked_explanations(user["id"])
     if qid in unlocked:
         return
-    fresh, plan, trial = _plan_state(user)
+    fresh, plan, trial = _plan_state(user, syllabus)
     if plan == "free" and len(unlocked) >= 1:
-        raise _upgrade("You've used your free worked solution. Take a plan to unlock "
+        raise _upgrade(_outside_plan(fresh, syllabus) or
+                       "You've used your free worked solution. Take a plan to unlock "
                        "explanations for every question, step-by-step hints and follow-up help.")
     if trial and len(unlocked) >= TRIAL_LIMITS["ai_explain"]:
         raise _upgrade("You've used the worked solutions included in your trial. "
                        "Subscribe to keep going.")
 
 
-def gate_explain(user: dict, qid: int) -> None:
+def gate_explain(user: dict, qid: int, syllabus: str | None = None) -> None:
     """Free students get one explanation (reopenable); trial five; paid all."""
     if user.get("role") in ("teacher", "admin"):
         return
     unlocked = _udb.unlocked_explanations(user["id"])
     if qid in unlocked:
         return
-    fresh, plan, trial = _plan_state(user)
+    fresh, plan, trial = _plan_state(user, syllabus)
     if plan == "free" and len(unlocked) >= 1:
-        raise _upgrade("You've used your free worked solution. Take a plan to unlock "
+        raise _upgrade(_outside_plan(fresh, syllabus) or
+                       "You've used your free worked solution. Take a plan to unlock "
                        "explanations for every question, step-by-step hints and follow-up help.")
     if trial and len(unlocked) >= TRIAL_LIMITS["ai_explain"]:
         raise _upgrade("You've used the worked solutions included in your trial. "
@@ -98,14 +111,15 @@ def gate_explain(user: dict, qid: int) -> None:
     _udb.unlock_explanation(user["id"], qid)
 
 
-def gate_usage(user: dict, kind: str) -> None:
+def gate_usage(user: dict, kind: str, syllabus: str | None = None) -> None:
     """Hints and follow-ups: a plan is required; trials and follow-ups are capped."""
     if user.get("role") in ("teacher", "admin"):
         return
-    fresh, plan, trial = _plan_state(user)
+    fresh, plan, trial = _plan_state(user, syllabus)
     what = "step-by-step hints" if kind == "ai_hint" else "follow-up questions"
     if plan == "free":
-        raise _upgrade(f"Take a plan to use {what} on every question.")
+        raise _upgrade(_outside_plan(fresh, syllabus) or
+                       f"Take a plan to use {what} on every question.")
     limit = TRIAL_LIMITS[kind] if trial else (
         FOLLOWUP_MONTHLY_CAP if kind == "ai_followup" else None)
     if limit is not None and _used(fresh, kind) >= limit:
@@ -198,9 +212,9 @@ def explain(qid: int, user: dict = Depends(_auth.get_current_user)):
     q = _question(qid)
     # Check the plan BEFORE spending a generation; record the unlock only once
     # the student actually receives an explanation.
-    check_explain(user, qid)
+    check_explain(user, qid, q["syllabus"])
     data = q["explanation"] or _generate_now(qid, q)
-    gate_explain(user, qid)
+    gate_explain(user, qid, q["syllabus"])
     out = {k: data.get(k) for k in ("summary", "parts", "mcq_options",
                                     "common_mistakes", "confidence")}
     out["mcq_answer"] = q["mcq_answer"]
@@ -213,9 +227,9 @@ def hints(qid: int, level: int = 1, user: dict = Depends(_auth.get_current_user)
     if not 1 <= level <= 3:
         raise HTTPException(422, "level must be 1, 2 or 3")
     q = _question(qid)
-    gate_usage(user, "ai_hint")
+    gate_usage(user, "ai_hint", q["syllabus"])
     data = q["explanation"] or _generate_now(qid, q)
-    _access.record_quota(user, "ai_hint")
+    _access.record_quota(user, "ai_hint", q["syllabus"])
     return {"level": level, "hints": (data.get("hints") or [])[:level]}
 
 
@@ -305,7 +319,7 @@ def _stream_chat(messages: list[dict], key: str):
 @router.post("/api/questions/{qid}/ask")
 def ask(qid: int, req: AskReq, user: dict = Depends(_auth.get_current_user)):
     q = _question(qid)
-    gate_usage(user, "ai_followup")
+    gate_usage(user, "ai_followup", q["syllabus"])
     key = _followup_key()
     history = _udb.thread_messages(user["id"], qid)[-MAX_HISTORY:]
     msgs = [{"role": "system", "content": ASK_SYSTEM + "\n\n" + _context_text(q)}]
@@ -325,7 +339,7 @@ def ask(qid: int, req: AskReq, user: dict = Depends(_auth.get_current_user)):
             answer = "".join(parts).strip()
             if answer:
                 _udb.add_thread_message(user["id"], qid, "assistant", answer)
-                _access.record_quota(user, "ai_followup")
+                _access.record_quota(user, "ai_followup", q["syllabus"])
         except Exception as exc:                  # show it, never hang the panel
             print(f"[ask q{qid}] {exc}", flush=True)
             yield ("\n\n_Our free AI is busy - please try again in a minute._"

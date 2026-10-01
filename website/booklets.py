@@ -67,7 +67,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260929a"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20260930a"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -205,6 +205,29 @@ def _owned(booklet_id: str, user: dict) -> dict:
     return b
 
 
+# PDF.js asks for a booklet in many byte-range requests; looking the row up in
+# Supabase for every one of them added ~0.3 s each. A ready booklet's owner and
+# kind never change, so remember them briefly.
+_READY: dict[str, tuple[float, dict]] = {}
+_READY_TTL = 300
+
+
+def _owned_ready(booklet_id: str, user: dict) -> dict:
+    hit = _READY.get(booklet_id)
+    if hit and time.time() - hit[0] < _READY_TTL:
+        b = hit[1]
+        if b["user_id"] != user["id"] and not _staff(user):
+            raise HTTPException(404, "Booklet not found")
+        return b
+    b = _owned(booklet_id, user)
+    if b["status"] != "ready":
+        raise HTTPException(409, "This booklet is still being built.")
+    if len(_READY) > 2000:
+        _READY.clear()
+    _READY[booklet_id] = (time.time(), b)
+    return b
+
+
 # ── Pool ──────────────────────────────────────────────────────────────────────
 
 def _validate_chapters(sel: Selection) -> dict[str, dict]:
@@ -303,7 +326,7 @@ def booklet_count(sel: Selection, user: dict = Depends(_auth.get_current_user)):
 def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)):
     require_enrolled(user, req.syllabus)
     known = _validate_chapters(req)
-    _access.check_quota_gate(user, _event(req.kind))
+    _access.check_quota_gate(user, _event(req.kind), req.syllabus)
     pool = question_pool(req)
     if not pool:
         raise HTTPException(400, "No questions match that selection. Widen the year "
@@ -360,9 +383,7 @@ def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)
 @router.get("/api/booklets/{booklet_id}/pdf")
 def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", annotated: bool = False,
                 user: dict = Depends(_auth.get_current_user)):
-    b = _owned(booklet_id, user)
-    if b["status"] != "ready":
-        raise HTTPException(409, "This booklet is still being built.")
+    b = _owned_ready(booklet_id, user)
     if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
         raise HTTPException(404, "No such part")
     pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
@@ -480,7 +501,7 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
                                          "stage": "Ready", "page_map_json": page_map,
                                          "error": None})
         if record:
-            _access.record_quota(user, _event(_kind(b)))   # only successful builds count
+            _access.record_quota(user, _event(_kind(b)), b.get("syllabus"))   # only successful builds count
     except Exception as exc:                              # surface, never hang the loader
         print(f"[booklet {booklet_id}] build failed: {exc}", flush=True)
         for leftover in BOOKLET_DIR.glob(f"{booklet_id}{tag}*"):
@@ -502,6 +523,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
     import blog as _blog
     esc = _catalog._e
     subj = _catalog.SUBJECTS.get(b["syllabus"], {})
+    import ui as _ui
+    _dock = _ui.tools_dock(b["syllabus"])
     state = {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"], "kind": _kind(b),
              "totalMarks": (b.get("params_json") or {}).get("total_marks"),
              "subjectUrl": _catalog.subject_url(b["syllabus"]) if subj else "/papers"}
@@ -523,7 +546,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
   <link rel="stylesheet" href="/ai-panel.css?v={VIEWER_V}">
   <link rel="stylesheet" href="/annotate.css?v={VIEWER_V}">
 </head>
-<body class="vw-page">
+<body class="vw-page"{_dock[0]}>
 {_blog._nav()}
 <main id="vw" class="vw" data-state="loading"></main>
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
@@ -531,9 +554,10 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260928a"></script>
+<script src="/main.js?v=20260930a"></script>
 <script type="module" src="/auth.js?v=20260929a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
+{_dock[1]}
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})
 

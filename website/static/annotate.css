@@ -1,4 +1,4 @@
-/* annotate.css — the floating annotation pill (annotate.js). styles.css tokens. */
+﻿/* annotate.css — the floating annotation pill (annotate.js). styles.css tokens. */
 .an-bar { position: fixed; left: 50%; transform: translateX(-50%); z-index: 70;
   display: flex; align-items: center; gap: 2px; padding: 5px 8px; max-width: calc(100vw - 24px);
   background: var(--white); border: 1px solid var(--line); border-radius: 999px;
@@ -69,9 +69,74 @@
 .an-layer.is-active[data-tool="text"] { cursor: text; }
 .an-layer.is-active[data-tool="select"] { cursor: default; }
 .an-drawing .vw-stage, .an-drawing .mq-stage { overscroll-behavior: contain; }
-.an-text { position: absolute; z-index: 6; min-width: 8rem; border: 1.5px dashed currentColor; border-radius: 6px;
-  background: rgba(255, 255, 255, .92); font: 600 14px/1.25 "Hanken Grotesk", system-ui, sans-serif;
-  padding: 2px 6px; resize: none; outline: none; }
+/* text box being typed in (annotate.js openEditor): styled like the finished
+   text, so what you see while typing is what stays on the page */
+.an-textwrap { position: absolute; z-index: 6; }
+.an-text { display: block; box-sizing: border-box; min-width: 0; max-width: none; margin: 0; border: 0;
+  border-radius: 2px; overflow: hidden; resize: none; background: transparent; caret-color: currentColor;
+  outline: 1.5px dashed #7c5cf0; outline-offset: 3px; overflow-wrap: break-word; tab-size: 4; }
+.an-text::placeholder { color: color-mix(in srgb, currentColor 45%, transparent); }
+.an-text:focus { outline-style: solid; }
+/* side handles: drag to set the wrap width */
+.an-tx-h { position: absolute; top: 50%; width: 10px; height: 22px; margin-top: -11px; border-radius: 4px;
+  background: #fff; border: 1.5px solid #7c5cf0; cursor: ew-resize; touch-action: none; }
+.an-tx-h[data-h="w"] { left: -9px; }
+.an-tx-h[data-h="e"] { right: -9px; }
+.an-tx-h::before { content: ""; position: absolute; inset: -10px -8px; }      /* a bigger target */
+
+/* the formatting bar over a text box */
+.an-tb { position: absolute; z-index: 8; display: flex; flex-wrap: nowrap; align-items: center; gap: 2px;
+  width: max-content; max-width: calc(100vw - 16px); padding: 4px; border-radius: 12px; background: #fff; color: #1f2433;
+  border: 1px solid #e3e1ee; box-shadow: 0 10px 28px rgba(20, 20, 50, .18), 0 2px 6px rgba(20, 20, 50, .08);
+  font: 600 13px/1 "Hanken Grotesk", system-ui, sans-serif; user-select: none; -webkit-user-select: none;
+  touch-action: manipulation; }
+.an-tb button { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px;
+  border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.an-tb button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; }
+.an-tb button:hover { background: #f1eefb; }
+.an-tb button:focus-visible, .an-tb select:focus-visible, .an-tb input:focus-visible { outline: 2px solid #7c5cf0; outline-offset: 1px; }
+.an-tb button[aria-pressed="true"], .an-tb button[aria-expanded="true"] { background: #ebe5ff; color: #4b2aa8; }
+.an-tb b, .an-tb i, .an-tb u { font-size: 15px; }
+.an-tb b { font-weight: 800; }
+.an-tb i { font-family: Georgia, serif; }
+.an-tb-grip { cursor: grab !important; color: #8a87a0 !important; }
+.an-tb-grip:active { cursor: grabbing !important; }
+.an-tb select { height: 30px; max-width: 118px; padding: 0 6px; border: 1px solid #e3e1ee; border-radius: 8px;
+  background: #fff; color: inherit; font: inherit; cursor: pointer; }
+.an-tb-size { display: inline-flex; align-items: center; border: 1px solid #e3e1ee; border-radius: 8px; overflow: hidden; }
+.an-tb-size button { border-radius: 0; min-width: 26px; font-size: 16px; }
+.an-tb-size input { width: 44px; height: 30px; border: 0; border-left: 1px solid #e3e1ee; border-right: 1px solid #e3e1ee;
+  text-align: center; font: inherit; color: inherit; background: #fff; -moz-appearance: textfield; appearance: textfield; }
+.an-tb-size input::-webkit-inner-spin-button, .an-tb-size input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.an-tb-sep { width: 1px; height: 20px; margin: 0 3px; background: #e3e1ee; }
+.an-tb-dot { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d6d3e3; }
+.an-tb [data-tb="fill"] { position: relative; }
+.an-tb-bar { position: absolute; left: 7px; right: 7px; bottom: 4px; height: 3px; border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+.an-tb-done { margin-left: 4px; padding: 0 12px !important; background: #7c5cf0 !important; color: #fff !important; }
+.an-tb-done:hover { background: #6a48e6 !important; }
+.an-tb-pop { position: absolute; top: calc(100% + 6px); right: 0; display: grid; grid-template-columns: repeat(6, 28px);
+  gap: 6px; padding: 8px; border-radius: 12px; background: #fff; border: 1px solid #e3e1ee;
+  box-shadow: 0 10px 28px rgba(20, 20, 50, .18); }
+.an-tb-pop[hidden] { display: none; }
+.an-tb-pop button { width: 28px; min-width: 28px; height: 28px; padding: 0; border-radius: 50%; background: var(--c) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.an-tb-pop button.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #7c5cf0; }
+.an-tb-pop button.is-none { background: #fff linear-gradient(135deg, transparent 45%, #dc2626 45%, #dc2626 55%, transparent 55%) !important; }
+.an-tb[data-paper="dark"], .an-tb[data-paper="dark"] .an-tb-pop,
+.an-tb[data-paper="dark"] select, .an-tb[data-paper="dark"] .an-tb-size input { background: #232838; color: #eceaf6; border-color: #3a4054; }
+.an-tb[data-paper="dark"] .an-tb-size, .an-tb[data-paper="dark"] .an-tb-sep { border-color: #3a4054; background-color: #3a4054; }
+.an-tb[data-paper="dark"] .an-tb-size { background: transparent; }
+.an-tb[data-paper="dark"] button:hover { background: #30364a; }
+.an-tb[data-paper="dark"] button[aria-pressed="true"], .an-tb[data-paper="dark"] button[aria-expanded="true"] { background: #3b3263; color: #d9ceff; }
+@media (max-width: 760px) { .an-tb { flex-wrap: wrap; width: auto; } }
+@media (max-width: 560px) {
+  .an-tb { gap: 1px; padding: 3px; }
+  .an-tb button { min-width: 28px; height: 28px; padding: 0 4px; }
+  .an-tb-sep { display: none; }
+}
+@media print { .an-tb, .an-textwrap { display: none !important; } }
 /* while drawing, links and form fields on the page must not steal the pen */
 .an-drawing .vw-pg .annotationLayer { pointer-events: none; }
 
@@ -130,5 +195,3 @@
 .an-custom input::-moz-color-swatch { border: 0; border-radius: 50%; }
 .an-custom.is-on { color: var(--ink); }
 .an-custom.is-on input::-webkit-color-swatch { box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--ink); }
-/* the text-box editor follows the paper */
-html[data-paper="dark"] .vw-pg .an-text, html[data-paper="dark"] .an-text { background: rgba(16, 18, 24, .92); }

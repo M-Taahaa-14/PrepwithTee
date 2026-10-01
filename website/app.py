@@ -44,7 +44,8 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 from urllib.parse import quote
 
 from fastapi import FastAPI, File, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse, RedirectResponse,
+                               StreamingResponse)
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, field_validator
 from starlette.background import BackgroundTask
@@ -75,6 +76,13 @@ from auth import get_current_user as _get_current_user
 from fastapi import Depends as _Depends
 app.include_router(_auth_mod.router)
 app.include_router(_users_mod.router)
+import admin_students as _admin_students_mod  # noqa: E402
+import admin_ops as _admin_ops_mod  # noqa: E402
+import admin_blog as _admin_blog_mod  # noqa: E402
+# Before admin.router: its /students/{user_id} would swallow /students/table.
+app.include_router(_admin_students_mod.router)
+app.include_router(_admin_ops_mod.router)
+app.include_router(_admin_blog_mod.router)
 app.include_router(_admin_mod.router)
 app.include_router(_teacher_mod.router)
 app.include_router(_blog_mod.router)
@@ -125,6 +133,45 @@ def public_courses():
     """Published courses for the public course page and pricing catalog."""
     import users_db as _udb
     return {"courses": _udb.get_all_courses(published_only=True)}
+
+
+@app.get("/course.html")
+def course_page(slug: str = ""):
+    """The course page, with its real title, description, social tags and
+    Course/FAQ structured data written in on the server (the body still
+    renders client-side), so search engines and link previews see them."""
+    import html as _h
+    import users_db as _udb
+    page = (Path(__file__).parent / "static" / "course.html").read_text(encoding="utf-8-sig")
+    c = _udb.get_course_by_slug(slug) if re.fullmatch(r"[a-z0-9-]{1,120}", slug or "") else None
+    if not c or not c.get("published"):
+        return HTMLResponse(page)
+    title = c.get("meta_title") or f"{c['title']} | PrepWithTee"
+    desc = c.get("meta_description") or c.get("tagline") or c["title"]
+    origin = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
+    url = f"{origin}/course.html?slug={c['slug']}"
+    try:
+        faq = [f for f in json.loads(c.get("faq_json") or "[]") if f.get("q") and f.get("a")]
+    except (TypeError, ValueError, AttributeError):
+        faq = []
+    ld = [{"@context": "https://schema.org", "@type": "Course", "name": c["title"], "description": desc,
+           "url": url, "provider": {"@type": "Organization", "name": "PrepWithTee", "sameAs": origin}}]
+    if faq:
+        ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+            {"@type": "Question", "name": f["q"], "acceptedAnswer": {"@type": "Answer", "text": f["a"]}}
+            for f in faq]})
+    # Built outside the f-string: the server runs Python 3.10 (no backslash in f-string braces).
+    ld_json = json.dumps(ld, ensure_ascii=False).replace("</", r"<\/")
+    head = (f'<link rel="canonical" href="{_h.escape(url)}">'
+            f'<meta property="og:title" content="{_h.escape(title)}">'
+            f'<meta property="og:description" content="{_h.escape(desc)}">'
+            f'<meta property="og:url" content="{_h.escape(url)}"><meta property="og:type" content="website">'
+            f'<script type="application/ld+json">{ld_json}</script>')
+    page = re.sub(r"<title id=\"page-title\">.*?</title>",
+                  lambda m: f'<title id="page-title">{_h.escape(title)}</title>', page, count=1)
+    page = re.sub(r'<meta name="description" id="page-desc" content="[^"]*">',
+                  lambda m: f'<meta name="description" id="page-desc" content="{_h.escape(desc)}">', page, count=1)
+    return HTMLResponse(page.replace("</head>", head + "</head>", 1))
 
 
 @app.get("/api/courses/{slug}")
@@ -1579,7 +1626,7 @@ def generate(req: GenerateReq,
     if not req.topics:
         raise HTTPException(400, "pick at least one topic")
     event = "topic_test" if req.mode == "test" else "topical_paper"
-    _access_mod.check_quota_gate(user, event)  # raises 429 but does NOT record yet
+    _access_mod.check_quota_gate(user, event, req.syllabus)  # raises 429 but does NOT record yet
 
     tmp = Path(tempfile.mkdtemp(prefix="pwt_"))
     cleanup = BackgroundTask(shutil.rmtree, tmp, ignore_errors=True)
@@ -1628,7 +1675,7 @@ def generate(req: GenerateReq,
         if not req.include_ms:
             cmd.append("--no-ms")
         _run(cmd)
-        _access_mod.record_quota(user, event)  # only count successful generations
+        _access_mod.record_quota(user, event, req.syllabus)  # only count successful generations
         return FileResponse(out, media_type="application/pdf",
                             filename=out.name, background=cleanup)
 
@@ -1647,7 +1694,7 @@ def generate(req: GenerateReq,
         if req.seed is not None:
             cmd += ["--seed", str(req.seed)]
     _run(cmd)
-    _access_mod.record_quota(user, event)  # only count successful test generations
+    _access_mod.record_quota(user, event, req.syllabus)  # only count successful test generations
 
     zpath = tmp / f"{stem}_{slug}_test.zip"
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
@@ -2841,7 +2888,7 @@ def ask(req: AskReq, request: Request):
     
     if user:
         from access import check_quota
-        check_quota(user, "ai_tutor")
+        check_quota(user, "ai_tutor", req.syllabus)
         if not session_id:
             session_id = str(uuid.uuid4())
             _udb.create_tutor_session(user["id"], session_id, req.syllabus, req.topic)
@@ -2999,7 +3046,7 @@ def tutor_stream(req: AskReq, request: Request):
     
     if user:
         from access import check_quota
-        check_quota(user, "ai_tutor")
+        check_quota(user, "ai_tutor", req.syllabus)
         existing_session = _udb.get_tutor_session(session_id, user["id"]) if session_id else None
         if not existing_session:
             session_id = str(uuid.uuid4())
@@ -3415,6 +3462,7 @@ class FeedbackReq(BaseModel):
     rating: int | None = None       # 1–5 stars
     message: str
     name: str | None = None
+    email: str | None = None        # required: so the tutor can write back
     page: str | None = None         # which page the feedback came from
     type: str | None = None         # "feedback" or "issue"
 
@@ -3575,8 +3623,49 @@ def _notify(subject: str, body: str, rows: list | None = None,
         return False
 
 
+_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+'-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,24}$")
+
+
+def _email_domain_exists(domain: str) -> bool:
+    """Does the address's domain resolve at all? Catches "gmial.com"-style typos
+    that would leave the tutor unable to reply. A slow or failing resolver is
+    not the student's fault, so anything but a definite "no such name" passes."""
+    import socket
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as _Timeout
+
+    def look() -> bool:
+        try:
+            socket.getaddrinfo(domain, None)
+            return True
+        except socket.gaierror as e:
+            return e.errno not in (socket.EAI_NONAME, getattr(socket, "EAI_NODATA", -5), 11001)
+        except OSError:
+            return True
+    ex = ThreadPoolExecutor(1)
+    try:
+        return ex.submit(look).result(timeout=3)
+    except _Timeout:
+        return True
+    finally:
+        ex.shutdown(wait=False)
+
+
+def _valid_email(email: str | None, known: str | None = None) -> str:
+    email = (email or "").strip()
+    if not email:
+        raise HTTPException(400, "Please enter your email so we can reply.")
+    if len(email) > 254 or ".." in email or not _EMAIL_RE.match(email):
+        raise HTTPException(400, "That email address doesn't look right - please check it.")
+    if known and email.lower() == known.strip().lower():
+        return email                      # the signed-in account's own address
+    domain = email.rsplit("@", 1)[1]
+    if not _email_domain_exists(domain):
+        raise HTTPException(400, f'We couldn\'t find the email domain "{domain}" - is there a typo?')
+    return email
+
+
 @app.post("/api/feedback")
-def submit_feedback(req: FeedbackReq):
+def submit_feedback(req: FeedbackReq, user: dict | None = _Depends(_auth_mod.maybe_user)):
     msg = (req.message or "").strip()
     if not msg:
         raise HTTPException(400, "Message is required")
@@ -3584,28 +3673,41 @@ def submit_feedback(req: FeedbackReq):
         raise HTTPException(400, "Message too long")
     if req.rating is not None and not (1 <= req.rating <= 5):
         raise HTTPException(400, "Rating must be 1–5")
+    # Name + email are required (tutor, 2026-09-30): feedback kept arriving with
+    # no way to tell the student it had been fixed.
+    name = (req.name or "").strip()[:120]
+    if len(name) < 2:
+        raise HTTPException(400, "Please enter your name.")
+    email = _valid_email(req.email, (user or {}).get("email"))
 
     import users_db as _udb
     fb_type = req.type or "feedback"
     _udb.save_feedback({
         "rating": req.rating,
         "message": msg,
-        "name": (req.name or "").strip() or None,
+        "name": name,
+        "email": email,
         "page": req.page,
         "type": fb_type,
     })
 
     stars = f"{req.rating}/5 ★" if req.rating else "—"
+    account = f"signed in as {user.get('email')}" if user else "not signed in"
     _notify(
-        f"[PrepWithTee] New {fb_type.title()} — {req.page or 'site'}",
-        f"Type:    {fb_type}\nStars:   {stars}\nName:    {req.name or '—'}\nPage:    {req.page or '—'}\n\n{msg}",
+        f"[PrepWithTee] New {fb_type.title()} from {name} — {req.page or 'site'}",
+        f"Type:    {fb_type}\nStars:   {stars}\nName:    {name}\nEmail:   {email}\n"
+        f"Account: {account}\nPage:    {req.page or '—'}\n\n{msg}",
         rows=[
             ("Type", fb_type.title()),
             ("Stars", stars),
-            ("Name", req.name or "—"),
+            ("Name", name),
+            ("Email", email),
+            ("Account", account),
             ("Page", req.page or "—"),
             ("Message", msg),
         ],
+        cta=(f"Reply to {name.split()[0]}",
+             f"mailto:{email}?subject=" + quote(f"Re: your PrepWithTee {fb_type}")),
     )
     return {"status": "success"}
 
@@ -3648,9 +3750,10 @@ def _esc(s: str) -> str:
 
 
 @app.get("/admin")
-def admin_redirect(key: str = ""):
-    """Legacy entry point — the dashboard is now the static admin.html SPA."""
-    return RedirectResponse(f"/admin.html?key={quote(key)}" if key else "/admin.html")
+def admin_console():
+    """Admin console v2 (static/admin/). Sign-in is checked by the API, not here."""
+    return FileResponse(Path(__file__).parent / "static" / "admin" / "index.html",
+                        headers={"X-Robots-Tag": "noindex, nofollow", "Cache-Control": "no-cache"})
 
 
 def _crop_files_for_key(q_key: str):
@@ -3802,6 +3905,27 @@ def question_ms_preview(question_id: int):
 
 _UPLOADS_DIR = ROOT / "data" / "uploads"
 _UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+@app.get("/uploads/payments/{name}")
+def payment_screenshot_file(name: str, request: Request):
+    """Payment screenshots are private: only an admin or the student who sent it.
+
+    Registered before the /uploads mount, which serves everything else there.
+    """
+    import admin_auth as _aa
+    import billing as _billing
+    import users_db as _udb
+    url = f"/uploads/payments/{name}"
+    path = _billing.screenshot_path(url)
+    session = request.cookies.get("session")
+    user = _auth_mod.maybe_user(session)
+    if path and user and (_aa._session_admin(session) or any(
+            p.get("screenshot_url") == url
+            for p in _udb.fetch_all("payment_proofs", "user_id,screenshot_url",
+                                    eq={"user_id": user["id"]}))):
+        return FileResponse(path, headers={"Cache-Control": "private, no-store"})
+    raise HTTPException(404, "Not found")
+
+
 app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 
 
@@ -4021,7 +4145,7 @@ def quiz_eval_stream(req: QuizEvalReq, request: Request):
     user = _auth_mod.maybe_user(request.cookies.get("session"))
     if user:
         from access import check_quota
-        check_quota(user, "ai_tutor")
+        check_quota(user, "ai_tutor", req.syllabus)
     else:
         client_ip = _client_ip(request)
         wait = _tutor_rate_limited(client_ip)

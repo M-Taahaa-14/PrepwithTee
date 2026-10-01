@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   /* ---- surfaces ---------------------------------------------------- */
   --page: #FDF9F3;          /* warm cream, the whole-site canvas */
   --cream: #F7F0E4;         /* alternating band */
@@ -2415,14 +2415,16 @@ a.res-cat .tag { background: rgba(255,255,255,.55); }
 .fb-field { margin-bottom: 14px; }
 .fb-field label { display: block; font-size: .8rem; font-weight: 600; color: var(--grey);
   margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
-.fb-field textarea, .fb-field input[type="text"] {
+.fb-field textarea, .fb-field input[type="text"], .fb-field input[type="email"] {
   width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
   padding: 10px 13px; font: .9rem "Hanken Grotesk", sans-serif;
-  color: var(--ink); background: #fff; resize: none; transition: border-color .15s;
+  color: var(--ink); background: var(--white); resize: none; transition: border-color .15s;
   box-sizing: border-box;
 }
-.fb-field textarea:focus, .fb-field input[type="text"]:focus {
+.fb-field textarea:focus, .fb-field input[type="text"]:focus, .fb-field input[type="email"]:focus {
   outline: none; border-color: var(--purple-bright); }
+.fb-error { margin: -4px 0 12px; padding: 8px 11px; border-radius: 8px; font-size: .82rem; line-height: 1.35;
+  color: #9b1c1c; background: #fdecec; }
 .fb-submit { width: 100%; padding: 11px; background: var(--accent); color: #fff;
   border: none; border-radius: 10px; font: 600 .9rem "Hanken Grotesk", sans-serif;
   cursor: pointer; transition: background .2s; }
@@ -9079,7 +9081,8 @@ html[data-theme="dark"] .sc2-cta { color: var(--page); }
 .sc2-imgs img.is-on { opacity: 1; transform: scale(1); }
 @media (max-width: 900px) {
   .sc2-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sc2-card { grid-template-columns: 1fr; padding: 22px; gap: 22px; }
+  /* minmax(0, ...) - a bare 1fr lets the nowrap URL bar's min-content widen the column past the screen */
+  .sc2-card { grid-template-columns: minmax(0, 1fr); padding: 22px; gap: 22px; }
 }
 @media (max-width: 480px) { .sc2-tab { font-size: .86rem; padding: 12px 12px 16px; } .sc2-num { width: 26px; height: 26px; } }
 @media (prefers-reduced-motion: reduce) { .sc2-imgs img, .sc2-tab, .sc2-cta { transition: none; } }

@@ -14,6 +14,7 @@ effective plan falls back to 'free' automatically.
 Billing cycle: quotas reset from plan_started_at, not the calendar month.
 """
 
+import json
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException
 
@@ -48,6 +49,61 @@ PLAN_PRICES: dict[str, str] = {
 TRIAL_DAYS = 7
 BILLING_CYCLE_DAYS = 30
 
+# Plans that cover a fixed set of subjects (tutor, 2026-10-01: enforce Solo = 1 and
+# 3 Subjects = 3 strictly). The student picks them when paying; paid access applies
+# ONLY to those subjects, every other subject behaves exactly like the free plan.
+# Only the admin can change the set.
+PLAN_SUBJECT_LIMITS: dict[str, int] = {"solo": 1, "three": 3}
+
+
+def plan_subjects(user: dict) -> list[str]:
+    """The subjects a subject-limited plan covers.
+
+    Accounts that bought the plan before subjects were recorded get their
+    first N enrolled subjects (oldest first), saved so the set never drifts.
+    """
+    try:
+        subs = json.loads(user.get("plan_subjects_json") or "[]")
+    except (TypeError, ValueError):
+        subs = []
+    subs = [str(s) for s in subs if s]
+    limit = PLAN_SUBJECT_LIMITS.get(user.get("plan") or "")
+    if limit and not subs and user.get("id"):
+        subs = _udb.get_enrollments(user["id"])[:limit]
+        if subs:
+            _udb.set_plan_subjects(user["id"], subs)
+    return subs[:limit] if limit else subs
+
+
+def clean_plan_subjects(plan: str, subjects: list[str] | None) -> list[str] | None:
+    """Validate the subjects sent with a subject-limited plan.
+
+    Returns the cleaned list (exactly N distinct known subject codes), None for
+    plans without a subject limit, and raises 400 otherwise.
+    """
+    limit = PLAN_SUBJECT_LIMITS.get(plan)
+    if not limit:
+        return None
+    clean: list[str] = []
+    for code in subjects or []:
+        code = str(code).strip()
+        if code and code not in clean:
+            clean.append(code)
+    unknown = [c for c in clean if c not in _udb.BOARDS_MAP]
+    if unknown:
+        raise HTTPException(400, f"Unknown subject code(s): {', '.join(unknown)}")
+    if len(clean) != limit:
+        raise HTTPException(400, f"The {PLAN_LABELS.get(plan, plan)} plan covers exactly "
+                                 f"{limit} subjects - choose {limit} (got {len(clean)}).")
+    return clean
+
+
+def covers_subject(user: dict, plan: str, syllabus: str | None) -> bool:
+    """False when a subject-limited plan is used for a subject outside its set."""
+    if not syllabus or plan not in PLAN_SUBJECT_LIMITS:
+        return True
+    return syllabus in plan_subjects(user)
+
 
 def billing_period_start(plan_started_at: str | None) -> str:
     """Return ISO datetime of the current billing period's start.
@@ -68,8 +124,12 @@ def billing_period_start(plan_started_at: str | None) -> str:
         return now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
 
 
-def _plan_active(user: dict) -> str:
-    """Return the user's effective plan, downgrading to 'free' if expired."""
+def _plan_active(user: dict, syllabus: str | None = None) -> str:
+    """Return the user's effective plan, downgrading to 'free' if expired.
+
+    With a syllabus, a subject-limited plan ('three') counts as 'free' for any
+    subject outside the ones it was bought for.
+    """
     if user.get("role") in ("teacher", "admin"):
         return "all"
 
@@ -89,6 +149,8 @@ def _plan_active(user: dict) -> str:
                 return "free"
         except (ValueError, AttributeError):
             pass
+    if not covers_subject(user, plan, syllabus):
+        return "free"
     return plan
 
 
@@ -136,6 +198,8 @@ def plan_info(user: dict) -> dict:
         "started_at": started,
         "expired": expired,
         "period_start": billing_period_start(started),
+        "subject_limit": PLAN_SUBJECT_LIMITS.get(plan),
+        "plan_subjects": plan_subjects(user) if plan in PLAN_SUBJECT_LIMITS else [],
     }
 
 
@@ -191,7 +255,8 @@ TRIAL_QUOTAS: dict[str, int] = {
 }
 
 
-def _resolve_limit(user: dict, event_type: str) -> tuple[dict, int | None, bool]:
+def _resolve_limit(user: dict, event_type: str,
+                   syllabus: str | None = None) -> tuple[dict, int | None, bool]:
     """Return (fresh_user, limit, is_trial). Internal helper."""
     try:
         fresh = _udb.get_user(user["id"])
@@ -199,13 +264,62 @@ def _resolve_limit(user: dict, event_type: str) -> tuple[dict, int | None, bool]
             user = fresh
     except Exception:
         pass
-    effective = _plan_active(user)
+    effective = _plan_active(user, syllabus)
     trial = bool(user.get("plan_trial")) and effective != "free"
     limit: int | None = TRIAL_QUOTAS.get(event_type) if trial else MONTHLY_QUOTAS.get(event_type, {}).get(effective)
     return user, limit, trial
 
 
-def check_quota(user: dict, event_type: str):
+def _quota_detail(user: dict, event_type: str, used: int, limit: int, trial: bool,
+                  syllabus: str | None) -> dict:
+    plan = _plan_active(user)
+    outside = plan in PLAN_SUBJECT_LIMITS and not covers_subject(user, plan, syllabus)
+    if outside:
+        subs = ", ".join(plan_subjects(user))
+        tail = (f"{syllabus} isn't covered by your {PLAN_LABELS.get(plan, plan)} plan "
+                f"({subs}), so the free allowance applies to it. "
+                f"Upgrade to {_upgrade_suggestion(plan)} to cover more subjects.")
+    elif trial:
+        tail = "Subscribe to a plan after your trial for unlimited access."
+    else:
+        tail = f"Upgrade to {_upgrade_suggestion(plan)} for more."
+    suffix = "trial period" if trial else "this billing period"
+    return {
+        "code": "quota_exceeded",
+        "event_type": event_type,
+        "used": used,
+        "limit": limit,
+        "plan": plan,
+        "trial": trial,
+        "outside_plan_subjects": outside,
+        "message": f"You've used {used}/{limit} {event_type.replace('_', ' ')}s {suffix}. {tail}",
+    }
+
+
+def check_quota_gate(user: dict, event_type: str, syllabus: str | None = None):
+    """Check quota only - does NOT record usage.
+
+    Call this before an expensive operation. If it passes, call record_quota()
+    after success so a failure doesn't consume the user's allowance.
+    Pass the subject: a subject-limited plan is only unlimited for its own
+    subjects, and the free allowance for the others counts only their usage.
+    """
+    if user.get("role") in ("teacher", "admin"):
+        return
+    user, limit, trial = _resolve_limit(user, event_type, syllabus)
+    if limit is None:
+        return
+    base = _plan_active(user)
+    exclude = plan_subjects(user) if base in PLAN_SUBJECT_LIMITS else None
+    used = _udb.count_usage_this_month(
+        user["id"], event_type, billing_period_start(user.get("plan_started_at")),
+        exclude_syllabi=exclude)
+    if used >= limit:
+        raise HTTPException(429, detail=_quota_detail(user, event_type, used, limit,
+                                                      trial, syllabus))
+
+
+def check_quota(user: dict, event_type: str, syllabus: str | None = None):
     """Check the billing-cycle quota and record usage atomically.
 
     Raises HTTP 429 if the quota is exhausted.
@@ -214,76 +328,15 @@ def check_quota(user: dict, event_type: str):
     """
     if user.get("role") in ("teacher", "admin"):
         return
-    user, limit, trial = _resolve_limit(user, event_type)
-    period_start = billing_period_start(user.get("plan_started_at"))
-    if limit is not None:
-        used = _udb.count_usage_this_month(user["id"], event_type, period_start)
-        if used >= limit:
-            suffix = "trial period" if trial else "this billing period"
-            raise HTTPException(
-                429,
-                detail={
-                    "code": "quota_exceeded",
-                    "event_type": event_type,
-                    "used": used,
-                    "limit": limit,
-                    "plan": _plan_active(user),
-                    "trial": trial,
-                    "message": (
-                        f"You've used {used}/{limit} {event_type.replace('_', ' ')}s "
-                        f"{suffix}. "
-                        + (
-                            "Subscribe to a plan after your trial for unlimited access."
-                            if trial
-                            else f"Upgrade to {_upgrade_suggestion(_plan_active(user))} for more."
-                        )
-                    ),
-                },
-            )
-    _udb.record_usage(user["id"], event_type)
+    check_quota_gate(user, event_type, syllabus)
+    _udb.record_usage(user["id"], event_type, syllabus)
 
 
-def check_quota_gate(user: dict, event_type: str):
-    """Check quota only — does NOT record usage.
-
-    Call this before an expensive operation. If it passes, call record_quota()
-    after success so a failure doesn't consume the user's allowance.
-    """
-    if user.get("role") in ("teacher", "admin"):
-        return
-    user, limit, trial = _resolve_limit(user, event_type)
-    period_start = billing_period_start(user.get("plan_started_at"))
-    if limit is not None:
-        used = _udb.count_usage_this_month(user["id"], event_type, period_start)
-        if used >= limit:
-            suffix = "trial period" if trial else "this billing period"
-            raise HTTPException(
-                429,
-                detail={
-                    "code": "quota_exceeded",
-                    "event_type": event_type,
-                    "used": used,
-                    "limit": limit,
-                    "plan": _plan_active(user),
-                    "trial": trial,
-                    "message": (
-                        f"You've used {used}/{limit} {event_type.replace('_', ' ')}s "
-                        f"{suffix}. "
-                        + (
-                            "Subscribe to a plan after your trial for unlimited access."
-                            if trial
-                            else f"Upgrade to {_upgrade_suggestion(_plan_active(user))} for more."
-                        )
-                    ),
-                },
-            )
-
-
-def record_quota(user: dict, event_type: str):
+def record_quota(user: dict, event_type: str, syllabus: str | None = None):
     """Record one usage event. Call after a successful expensive operation."""
     if user.get("role") in ("teacher", "admin"):
         return
-    _udb.record_usage(user["id"], event_type)
+    _udb.record_usage(user["id"], event_type, syllabus)
 
 
 def _upgrade_suggestion(current_plan: str) -> str:

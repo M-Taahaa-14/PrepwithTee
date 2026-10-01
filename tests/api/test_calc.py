@@ -47,3 +47,10 @@ def test_rejects_junk(client, new_student):
     new_student()
     assert client.post("/api/calc/history", json={"q": "", "a": "1"}).status_code == 422
     assert client.post("/api/calc/history", json={"q": "x" * 301, "a": "1"}).status_code == 422
+
+
+def test_x_and_y_are_kept_too(client, new_student):
+    """The fx-991-style keypad stores into X and Y as well as A-F (M is the memory)."""
+    new_student()
+    r = client.put("/api/calc/state", json={"vars": {"X": 1.5, "Y": -2, "M": 7, "Q": 1}}).json()
+    assert r["vars"] == {"X": 1.5, "Y": -2.0}

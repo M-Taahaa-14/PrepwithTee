@@ -127,7 +127,8 @@ def test_phone_layout_uses_the_drawer(browser, base_url, shots):
     import uuid
     ctx.request.post("/auth/register", data={"email": f"e2e_{uuid.uuid4().hex[:8]}@test.local",
                                              "password": "Passw0rd!23", "name": "Phone"})
-    ctx.request.put("/api/me/boards", data={"boards": ["o-level"]})
+    ctx.request.post("/api/me/setup", data={"name": "Phone", "phone": "+92 3001234567",
+                                            "boards": ["o-level"]})      # the enrolment gate
     _enrol(ctx)
     topics = ctx.request.get("/api/mcq/topics?syllabus=5054").json()["topics"]
     s = ctx.request.post("/api/mcq/sessions", data={"syllabus": "5054", "topics": [topics[1]["name"]],

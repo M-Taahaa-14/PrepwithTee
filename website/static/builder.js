@@ -1,4 +1,4 @@
-/* builder.js — the topical paper builder on /papers/{board}/{subject}.
+﻿/* builder.js — the topical paper builder on /papers/{board}/{subject}.
  *
  * Chapters are grouped by the paper that examines them when a subject's papers
  * cover different content (A Level Maths P1/P3/P4/P5, Physics AS vs A2, 9618
@@ -170,6 +170,12 @@ function render() {
   const test = st.kind === "test";
 
   const focusId = document.activeElement?.id;   // keep keyboard users in place
+  // A text box being typed in is carried over as the SAME element: a fresh copy
+  // + focus() put the caret at the start, so "circle" typed as "c" + "ircle"
+  // came out "ircle" + "c" (feedback 2026-09-30).
+  const typing = document.activeElement?.matches?.("input[type=search], input[type=text]") &&
+    root.contains(document.activeElement) ? document.activeElement : null;
+  const caret = typing ? [typing.selectionStart, typing.selectionEnd, typing.selectionDirection] : null;
   root.innerHTML = `
   <div class="bld-grid">
     <div class="bld-main">
@@ -240,7 +246,12 @@ function render() {
     <a href="#bld-side" class="bld-mbar-opt">Options</a>
     <button type="button" class="cat-btn" data-build ${canBuild ? "" : "disabled"}>Build ↗</button>
   </div>`;
-  if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
+  const fresh = typing && document.getElementById(typing.id);
+  if (fresh && fresh !== typing) {
+    fresh.replaceWith(typing);
+    typing.focus({ preventScroll: true });
+    try { typing.setSelectionRange(...caret); } catch { /* not a text field */ }
+  } else if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
   document.body.classList.toggle("has-dock", st.picks.size > 0);
   root.querySelectorAll("input[data-partial]").forEach((i) => (i.indeterminate = true));
   renderRecent();

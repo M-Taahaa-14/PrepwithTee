@@ -23,7 +23,7 @@ import users_db as _udb
 router = APIRouter()
 
 MAX = _udb.CALC_HISTORY_MAX
-VAR_NAMES = ("A", "B", "C", "D", "E", "F")
+VAR_NAMES = ("A", "B", "C", "D", "E", "F", "X", "Y")     # M is the separate memory
 
 
 def _num(v) -> float:

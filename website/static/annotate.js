@@ -1,4 +1,4 @@
-/* annotate.js — the floating annotation bar + a drawing layer on every page.
+﻿/* annotate.js — the floating annotation bar + a drawing layer on every page.
  *
  *   const ann = createAnnotator({ mount: document.body });
  *   ann.attach(pageEl, "paper:123", 4);   // any positioned element = one "page"
@@ -72,6 +72,33 @@ const SHAPES = [["line", "Line"], ["arrow", "Arrow"], ["rect", "Rectangle"],
   ["ellipse", "Ellipse"], ["text", "Text (T)"]];
 const DRAWS = new Set(["select", "pen", "marker", "eraser", "line", "arrow", "rect", "ellipse", "text"]);
 const clamp = (v) => Math.min(1, Math.max(0, v));
+
+// Text boxes (feedback 2026-09-30: "make it like real PDF editors"). A text
+// object: {t:"text", x, y (top-left of the text), s (font size, fraction of the
+// page width), c, txt, bw? (wrap width), f? font, b? i? u?, al? "c"|"r",
+// bg? fill ("paper" = covers what is under it, or an ink token = a tint),
+// bd? border}. website/annot_pdf.py draws the same thing into downloads.
+const FONTS = {
+  sans: ["Sans", '"Hanken Grotesk", system-ui, sans-serif'],
+  serif: ["Serif", 'Georgia, "Times New Roman", serif'],
+  hand: ["Handwriting", '"Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", cursive'],
+  mono: ["Mono", 'Consolas, "SFMono-Regular", Menlo, "Courier New", monospace'],
+};
+const FILLS = [["", "No fill"], ["paper", "Cover (paper colour)"], ["@yellow", "Yellow"],
+  ["@green", "Green"], ["@sky", "Blue"], ["@pink", "Pink"], ["@grey", "Grey"]];
+const PT_PER_W = 595;                 // A4 width in points: font size <-> "pt"
+const LH = 1.25;                      // line height, as in the editing box
+const TEXT_DEFAULTS = { f: "sans", pt: 12, b: false, i: false, u: false, al: "l", bg: "", bd: false };
+const TICON = {
+  grip: ICON.grip,
+  alL: '<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>',
+  alC: '<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>',
+  alR: '<path d="M4 6h16M10 10h10M4 14h16M10 18h10"/>',
+  fill: '<path d="M5 12l6-7 7 7-6 6z"/><path d="M19 15s2 2.3 2 3.5a2 2 0 01-4 0c0-1.2 2-3.5 2-3.5z"/>',
+  border: '<rect x="4" y="4" width="16" height="16" rx="2"/>',
+  dup: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+  trash: ICON.trash,
+};
 
 async function req(method, url, body) {
   const r = await fetch(url, { method, credentials: "same-origin",
@@ -213,6 +240,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     bar.querySelector('[data-an="undo"]').disabled = !A.undo.length;
     bar.querySelector('[data-an="redo"]').disabled = !A.redo.length;
     bar.querySelector('[data-an="delete"]').hidden = !A.sel;
+    placeTextBar();
     const drawing = DRAWS.has(A.tool);
     document.documentElement.classList.toggle("an-drawing", drawing);
     document.documentElement.dataset.anTool = A.tool;
@@ -221,7 +249,8 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   }
 
   function setTool(t) {
-    if (t !== "select") A.sel = null;
+    closeEditor(true);
+    if (t !== "select" && !(t === "text" && selected()?.t === "text")) A.sel = null;
     A.tool = t;
     closePops();
     paintBar();
@@ -250,6 +279,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
 
   function pickColor(c) {
     A.color = c; persist();
+    if (TX.ed) { setTextStyle({ c }); return paintBar(); }
     const s = selected();
     if (s) { mutate(A.sel.key, (list) => { list[A.sel.i] = { ...s, c: A.color }; }); return paintBar(); }
     if (!DRAWS.has(A.tool) || A.tool === "eraser" || A.tool === "select") A.tool = "pen";
@@ -276,7 +306,12 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     if (c) { closePops(); return pickColor(c.dataset.color); }
     if (e.target.closest(".an-custom")) return;          // the colour input handles itself
     const s = e.target.closest("[data-size]");
-    if (s) { A.size = +s.dataset.size; persist(); closePops(); return paintBar(); }
+    if (s) {
+      A.size = +s.dataset.size; persist(); closePops();
+      const o = selected();
+      if (o) mutate(A.sel.key, (list) => { list[A.sel.i] = resized(o, A.size); });
+      return paintBar();
+    }
     const act = e.target.closest("[data-an]")?.dataset.an;
     if (act === "colors" || act === "sizes") {
       const pop = bar.querySelector(`[data-pop="${act}"]`);
@@ -322,6 +357,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
 
   document.addEventListener("keydown", (e) => {
     if (e.target.matches?.("input, textarea, [contenteditable]")) return;
+    if (e.target.closest?.(".pwt-dock, .an-tb")) return;          // the calculator etc. have their own keys
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey) {
       if (A.undo.length) { e.preventDefault(); doUndo(); }
       return;
@@ -331,6 +367,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       return;
     }
     if (A.sel && (e.key === "Delete" || e.key === "Backspace")) { e.preventDefault(); deleteSelected(); return; }
+    if (objectKeys(e)) return;
     if (e.ctrlKey || e.metaKey || e.altKey || A.collapsed) return;
     const k = { v: "pointer", s: "select", p: "pen", h: "marker", e: "eraser", t: "text" }[e.key.toLowerCase()];
     if (k && A.hotkeys !== false) { setTool(k); }
@@ -347,14 +384,31 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     return A.docs.get(doc);
   }
 
+  // A page's ink layer only holds pixels while the page is near the screen AND
+  // has ink (or is being drawn on). Two full-page canvases on every page of a
+  // 150-page booklet were gigabytes of memory - the "Chrome lags" feedback.
+  const byEl = new WeakMap();
+  const near = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const p = byEl.get(e.target);
+      if (!p || p.near === e.isIntersecting) continue;
+      p.near = e.isIntersecting;
+      paintLayer(p);
+    }
+  }, { rootMargin: "800px 0px" });
+
   async function attach(el, doc, page) {
     const key = `${doc}|${page}`;
     const prev = A.pages.get(key);
+    if (TX.ed?.p.key === key) closeEditor(true);       // zoom / re-layout: finish the edit first
+    if (prev && prev.el !== el) near.unobserve(prev.el);
     const canvas = document.createElement("canvas");
     canvas.className = "an-layer";
     el.appendChild(canvas);
-    const p = { el, canvas, doc, page, key, strokes: prev ? prev.strokes : null };
+    const p = { el, canvas, doc, page, key, strokes: prev ? prev.strokes : null, near: false };
     A.pages.set(key, p);
+    byEl.set(el, p);
+    near.observe(el);
     bind(p);
     if (!p.strokes) {
       const pages = await load(doc);
@@ -366,20 +420,24 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   }
 
   function detachWithin(root) {
-    for (const [k, p] of A.pages) if (root.contains(p.el) || !p.el.isConnected) A.pages.delete(k);
+    for (const [k, p] of A.pages) {
+      if (root.contains(p.el) || !p.el.isConnected) { near.unobserve(p.el); A.pages.delete(k); }
+    }
   }
 
   function size(p) {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     // Whole-page layer: the canvas is the viewport; coordinates are fractions of
     // the page WIDTH on both axes (y can pass 1), so ink stays put when the
     // page grows, and scrolling just shifts the view.
     const cw = p.el.clientWidth, ch = p.el.clientHeight;
     const w = cw, h = p.view ? cw : ch;
+    const on = p.view || (p.near && (p.strokes?.length || p.live || p.drag || p.eraserAt));
+    const tw = on ? Math.round(cw * dpr) : 0, th = on ? Math.round(ch * dpr) : 0;
     let changed = false;
-    if (p.canvas.width !== Math.round(cw * dpr) || p.canvas.height !== Math.round(ch * dpr)) {
-      p.canvas.width = Math.round(cw * dpr);
-      p.canvas.height = Math.round(ch * dpr);
+    if (p.canvas.width !== tw || p.canvas.height !== th) {
+      p.canvas.width = tw;
+      p.canvas.height = th;
       changed = true;
     }
     return { w, h, dpr, changed, ox: p.view ? window.scrollX : 0, oy: p.view ? window.scrollY : 0 };
@@ -389,6 +447,12 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   function paintLayer(p) {
     if (!p.strokes) return;
     const { w, h, dpr, ox, oy } = size(p);
+    p.canvas.classList.toggle("is-active", DRAWS.has(A.tool));
+    p.canvas.dataset.tool = A.tool === "eraser" ? `eraser-${A.eraseMode}` : A.tool;
+    if (!p.canvas.width) {                         // nothing to show: hold no pixels
+      if (p.base) { p.base.width = 0; p.base.height = 0; p.base = null; }
+      return;
+    }
     if (!p.base) p.base = document.createElement("canvas");
     p.base.width = p.canvas.width;
     p.base.height = p.canvas.height;
@@ -396,15 +460,14 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     b.setTransform(1, 0, 0, 1, 0, 0);
     b.clearRect(0, 0, p.base.width, p.base.height);
     b.setTransform(dpr, 0, 0, dpr, -ox * dpr, -oy * dpr);
-    for (const s of p.strokes) draw(b, s, w, h);
+    p.strokes.forEach((s, i) => { if (i !== p.hideIndex) draw(b, s, w, h); });
     blit(p);
-    p.canvas.classList.toggle("is-active", DRAWS.has(A.tool));
-    p.canvas.dataset.tool = A.tool === "eraser" ? `eraser-${A.eraseMode}` : A.tool;
   }
 
   /** Cheap per-frame paint: cached strokes + the stroke being drawn + selection. */
   function blit(p) {
     const { w, h, dpr, changed, ox, oy } = size(p);
+    if (!p.canvas.width) return changed ? paintLayer(p) : undefined;
     if (changed || !p.base) return paintLayer(p);
     const ctx = p.canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -412,7 +475,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     ctx.drawImage(p.base, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, -ox * dpr, -oy * dpr);
     if (p.live) draw(ctx, p.live, w, h);
-    if (A.sel?.key === p.key && p.strokes[A.sel.i]) drawSelection(ctx, p.strokes[A.sel.i], w, h);
+    if (A.sel?.key === p.key && p.strokes[A.sel.i] && p.hideIndex !== A.sel.i) drawSelection(ctx, p.strokes[A.sel.i], w, h);
     if (p.eraserAt && A.tool === "eraser") {
       ctx.beginPath();
       ctx.arc(p.eraserAt[0] * w, p.eraserAt[1] * h, ERASER_R[A.eraseSize] * w, 0, Math.PI * 2);
@@ -432,8 +495,68 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   }
 
   function textFont(s, w) {
-    const fs = Math.max(10, s.s * w);
-    return { fs, font: `600 ${fs}px "Hanken Grotesk", system-ui, sans-serif` };
+    const fs = Math.max(4, s.s * w);
+    const weight = s.b ? 700 : s.f ? 400 : 600;         // boxes from before fonts were semi-bold
+    return { fs, font: `${s.i ? "italic " : ""}${weight} ${fs}px ${(FONTS[s.f] || FONTS.sans)[1]}` };
+  }
+
+  /** How a text box lays out at page width w: its lines (own line breaks, then
+   *  word-wrapped at bw), each line's width, the box and its padding (a box
+   *  with a fill or border gets breathing room around the text). */
+  function textLayout(s, w) {
+    const { fs, font } = textFont(s, w);
+    measure.font = font;
+    const max = s.bw ? s.bw * w : Infinity;
+    const lines = [];
+    for (const para of String(s.txt || "").split("\n")) {
+      if (max === Infinity) { lines.push(para); continue; }
+      let line = "";
+      for (const word of para.split(/(?<=\s)/)) {
+        if (line && measure.measureText((line + word).trimEnd()).width > max) { lines.push(line.trimEnd()); line = word; }
+        else line += word;
+      }
+      lines.push(line);
+    }
+    const widths = lines.map((l) => measure.measureText(l).width);
+    const m = measure.measureText("Hg");
+    const asc = m.fontBoundingBoxAscent ?? fs * 0.8, desc = m.fontBoundingBoxDescent ?? fs * 0.2;
+    const lh = fs * LH;
+    return { lines, widths, fs, font, lh, boxW: s.bw ? s.bw * w : Math.max(0, ...widths),
+             boxH: lines.length * lh, pad: s.bg || s.bd ? Math.round(fs * 0.35) : 0,
+             // baseline inside a line box, exactly where CSS puts it in the editing box
+             base: (lh - (asc + desc)) / 2 + asc };
+  }
+
+  const fillColour = (bg) => (bg === "paper" ? (dark() ? "#0e0e0e" : "#ffffff") : ink(bg));
+
+  function drawText(ctx, s, w, h) {
+    const L = textLayout(s, w);
+    const x = s.x * w, y = s.y * h;
+    if (s.bg) {
+      ctx.globalAlpha = s.bg === "paper" ? 1 : dark() ? 0.32 : 0.26;
+      ctx.fillStyle = fillColour(s.bg);
+      ctx.fillRect(x - L.pad, y - L.pad, L.boxW + 2 * L.pad, L.boxH + 2 * L.pad);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = ink(s.c);                       // the text keeps its own colour
+    }
+    if (s.bd) {
+      ctx.lineWidth = Math.max(1, L.fs * 0.07);
+      ctx.strokeRect(x - L.pad, y - L.pad, L.boxW + 2 * L.pad, L.boxH + 2 * L.pad);
+    }
+    ctx.font = L.font;
+    ctx.textBaseline = "alphabetic";
+    L.lines.forEach((line, i) => {
+      const off = s.al === "c" ? (L.boxW - L.widths[i]) / 2 : s.al === "r" ? L.boxW - L.widths[i] : 0;
+      const by = y + i * L.lh + L.base;
+      ctx.fillText(line, x + off, by);
+      if (s.u && L.widths[i]) ctx.fillRect(x + off, by + L.fs * 0.12, L.widths[i], Math.max(1, L.fs * 0.07));
+    });
+  }
+
+  /** The object at picker size i: text gets that font size, strokes that width. */
+  function resized(o, i) {
+    if (o.t === "text") return o;                       // text has its own size control
+    return o.w != null ? { ...o, w: SIZES[i] } : o;
   }
 
   function draw(ctx, s, w, h) {
@@ -502,10 +625,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       else ctx.ellipse(x + rw / 2, y + rh / 2, rw / 2, rh / 2, 0, 0, Math.PI * 2);
       ctx.stroke();
     } else if (s.t === "text") {
-      const { fs, font } = textFont(s, w);
-      ctx.font = font;
-      ctx.textBaseline = "top";
-      String(s.txt || "").split("\n").forEach((line, i) => ctx.fillText(line, s.x * w, s.y * h + i * fs * 1.25));
+      drawText(ctx, s, w, h);
     }
     ctx.restore();
   }
@@ -516,11 +636,9 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   /** Bounding box of an object, in page fractions. */
   function bbox(s, w, h) {
     if (s.t === "text") {
-      const { fs, font } = textFont(s, w);
-      measure.font = font;
-      const lines = String(s.txt || "").split("\n");
-      const tw = Math.max(...lines.map((l) => measure.measureText(l).width));
-      return [s.x, s.y, s.x + tw / w, s.y + (lines.length * fs * 1.25) / h];
+      const L = textLayout(s, w);
+      const bw = Math.max(L.boxW, L.fs * 0.6);             // an empty line still has a caret's width
+      return [s.x - L.pad / w, s.y - L.pad / h, s.x + (bw + L.pad) / w, s.y + (Math.max(L.boxH, L.lh) + L.pad) / h];
     }
     const xs = s.pts ? s.pts.map((q) => q[0]) : [s.a[0], s.b[0]];
     const ys = s.pts ? s.pts.map((q) => q[1]) : [s.a[1], s.b[1]];
@@ -528,13 +646,48 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     return [Math.min(...xs) - pad, Math.min(...ys) - pad * (w / h), Math.max(...xs) + pad, Math.max(...ys) + pad * (w / h)];
   }
 
-  function drawSelection(ctx, s, w, h) {
+  const HANDLE = 10;                                   // px, the square resize handles
+  const CURSOR = { nw: "nwse-resize", se: "nwse-resize", ne: "nesw-resize", sw: "nesw-resize",
+                   n: "ns-resize", s: "ns-resize", e: "ew-resize", w: "ew-resize", a: "move", b: "move" };
+  /** The selected object's handles in page px: text = 4 corners (scale) + the
+   *  two sides (wrap width); rectangles / ellipses = 8; lines / arrows = ends. */
+  function handles(s, w, h) {
+    if (s.t === "line" || s.t === "arrow") return [["a", s.a[0] * w, s.a[1] * h], ["b", s.b[0] * w, s.b[1] * h]];
+    if (s.t !== "text" && s.t !== "rect" && s.t !== "ellipse") return [];
     const [x0, y0, x1, y1] = bbox(s, w, h);
+    const X0 = x0 * w - 5, Y0 = y0 * h - 5, X1 = x1 * w + 5, Y1 = y1 * h + 5, XM = (X0 + X1) / 2, YM = (Y0 + Y1) / 2;
+    const out = [["nw", X0, Y0], ["ne", X1, Y0], ["sw", X0, Y1], ["se", X1, Y1], ["w", X0, YM], ["e", X1, YM]];
+    return s.t === "text" ? out : [...out, ["n", XM, Y0], ["s", XM, Y1]];
+  }
+
+  /** Which handle of s is under q (page fractions), or null. */
+  function onHandle(s, q, w, h) {
+    const r = HANDLE / 2 + 7;                           // bigger than drawn: fingers and pens
+    for (const [id, x, y] of handles(s, w, h)) {
+      if (Math.abs(q[0] * w - x) < r && Math.abs(q[1] * h - y) < r) return id;
+    }
+    return null;
+  }
+
+  function drawSelection(ctx, s, w, h) {
     ctx.save();
-    ctx.setLineDash([5, 4]);
     ctx.strokeStyle = "#7c5cf0";
+    if (s.t !== "line" && s.t !== "arrow") {
+      const [x0, y0, x1, y1] = bbox(s, w, h);
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x0 * w - 5, y0 * h - 5, (x1 - x0) * w + 10, (y1 - y0) * h + 10);
+      ctx.setLineDash([]);
+    }
+    ctx.fillStyle = "#fff";
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(x0 * w - 5, y0 * h - 5, (x1 - x0) * w + 10, (y1 - y0) * h + 10);
+    for (const [id, x, y] of handles(s, w, h)) {
+      ctx.beginPath();
+      if (id === "a" || id === "b") ctx.arc(x, y, HANDLE / 2 + 1, 0, Math.PI * 2);
+      else ctx.rect(x - HANDLE / 2, y - HANDLE / 2, HANDLE, HANDLE);
+      ctx.fill();
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -624,6 +777,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
     // Windows' pen press-and-hold would open the context menu mid-stroke.
     c.addEventListener("contextmenu", (e) => { if (DRAWS.has(A.tool)) e.preventDefault(); });
     c.addEventListener("pointerdown", (e) => {
+      if (A.swallow) { A.swallow = false; return; }     // this press only ended a text edit
       if (!DRAWS.has(A.tool) || e.button > 0 || !p.strokes) return;
       if (e.pointerType === "pen") { A.penSeen = true; document.documentElement.classList.add("an-pen"); }
       e.preventDefault();
@@ -658,7 +812,17 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
         p.eraserAt = pt(p, e);
         return schedule(p);
       }
-      if (!p.live && !p.erasing && !p.drag) return;
+      if (!p.live && !p.erasing && !p.drag) {
+        if ((A.tool === "select" || A.tool === "text") && p.strokes) {   // resize / move cursors
+          const cur = A.sel?.key === p.key ? p.strokes[A.sel.i] : null;
+          const { w, h } = size(p);
+          const q = pt(p, e);
+          const hd = cur && onHandle(cur, q, w, h);
+          c.style.cursor = hd ? CURSOR[hd]
+            : A.tool === "text" && topmost(p, q, w, h, (x) => x.t === "text") >= 0 ? "move" : "";
+        }
+        return;
+      }
       e.preventDefault();
       const co = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
       const events = co.length ? co : [e];
@@ -682,8 +846,10 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
         if (p.erasing.before) commit(p, p.erasing.before);
         p.erasing = null;
       } else if (p.drag) {
-        if (p.drag.moved) commit(p, p.drag.before);
+        const d = p.drag;
         p.drag = null;
+        if (d.moved) commit(p, d.before);
+        else if (d.editOnClick && A.sel?.key === p.key) { paintLayer(p); return openEditor(p, A.sel.i); }
       } else if (p.live) {
         const s = p.live;
         p.live = null;
@@ -705,7 +871,7 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
       const q = pt(p, e);
       const { w, h } = size(p);
       const i = topmost(p, q, w, h, (s) => s.t === "text");
-      if (i >= 0) editText(p, i);
+      if (i >= 0) openEditor(p, i);
     });
   }
 
@@ -721,13 +887,24 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   }
 
   function startSelect(p, q, w, h) {
+    const cur = A.sel?.key === p.key ? p.strokes[A.sel.i] : null;
+    const hd = cur && onHandle(cur, q, w, h);
+    if (hd) {
+      const b = bbox(cur, w, h);
+      p.drag = { start: q, orig: cur, before: p.strokes.slice(), moved: false, handle: hd, w, h,
+                 px: [b[0] * w, b[1] * h, b[2] * w, b[3] * h] };
+      return;
+    }
     const i = topmost(p, q, w, h);
+    const again = cur && i === A.sel.i;                 // a second press on the same object
     const prevKey = A.sel?.key;
     A.sel = i >= 0 ? { key: p.key, i } : null;
     if (prevKey && prevKey !== p.key) { const o = A.pages.get(prevKey); if (o) blit(o); }
     if (i >= 0) {
       const s = p.strokes[i];
-      p.drag = { start: q, orig: s, before: p.strokes.slice(), moved: false };
+      // pressing an already selected text box and letting go = edit it
+      p.drag = { start: q, orig: s, before: p.strokes.slice(), moved: false,
+                 editOnClick: again && s.t === "text" };
       if (s.c) { A.color = LEGACY[s.c.toLowerCase()] || s.c; }
     }
     paintBar();
@@ -736,9 +913,45 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   function moveSelect(p, q) {
     const d = p.drag;
     const dx = q[0] - d.start[0], dy = q[1] - d.start[1];
-    if (!d.moved && Math.hypot(dx, dy) < 0.002) return;
+    if (!d.moved && Math.hypot(dx, dy) < 0.003) return;
     d.moved = true;
-    p.strokes[A.sel.i] = translate(d.orig, dx, dy, !!p.view);
+    p.strokes[A.sel.i] = d.handle ? resizeTo(d, q) : translate(d.orig, dx, dy, !!p.view);
+    placeTextBar();
+  }
+
+  /** Dragging a handle. Text: the corners scale the text about the opposite
+   *  corner, the sides set the wrap width. Shapes: the grabbed edges move.
+   *  Lines / arrows: the grabbed end moves. */
+  function resizeTo(d, q) {
+    const o = d.orig, H = d.handle, { w, h } = d;
+    const qx = q[0] * w, qy = q[1] * h;
+    if (o.t === "line" || o.t === "arrow") return { ...o, [H]: [clamp(q[0]), Math.max(0, q[1])] };
+    if (o.t === "text") {
+      const L = textLayout(o, w);
+      const minW = Math.max(L.fs * 2, 24);
+      if (H === "e") return { ...o, bw: +(Math.max(minW, qx - L.pad - o.x * w) / w).toFixed(4) };
+      if (H === "w") {
+        const right = o.x * w + L.boxW;
+        const nx = Math.min(right - minW, qx + L.pad);
+        return { ...o, x: clamp(nx / w), bw: +((right - nx) / w).toFixed(4) };
+      }
+      const [bx0, by0, bx1, by1] = d.px;
+      const ax = H.includes("w") ? bx1 : bx0, ay = H.includes("n") ? by1 : by0;
+      const k = Math.max(Math.abs(qx - ax) / Math.max(4, bx1 - bx0), Math.abs(qy - ay) / Math.max(4, by1 - by0));
+      const fsz = Math.min(0.16, Math.max(0.006, o.s * Math.max(0.15, Math.min(12, k))));
+      const kk = fsz / o.s;
+      const W2 = (bx1 - bx0) * kk, H2 = (by1 - by0) * kk, pad2 = L.pad * kk;
+      const nx0 = H.includes("w") ? ax - W2 : ax, ny0 = H.includes("n") ? ay - H2 : ay;
+      return { ...o, s: +fsz.toFixed(5), x: clamp((nx0 + pad2) / w), y: Math.max(0, (ny0 + pad2) / h),
+               ...(o.bw ? { bw: +(o.bw * kk).toFixed(4) } : {}) };
+    }
+    let x0 = Math.min(o.a[0], o.b[0]), y0 = Math.min(o.a[1], o.b[1]);
+    let x1 = Math.max(o.a[0], o.b[0]), y1 = Math.max(o.a[1], o.b[1]);
+    if (H.includes("w")) x0 = Math.min(q[0], x1 - 0.005);
+    if (H.includes("e")) x1 = Math.max(q[0], x0 + 0.005);
+    if (H.includes("n")) y0 = Math.min(q[1], y1 - 0.005);
+    if (H.includes("s")) y1 = Math.max(q[1], y0 + 0.005);
+    return { ...o, a: [clamp(x0), Math.max(0, y0)], b: [clamp(x1), y1] };
   }
 
   function deleteSelected() {
@@ -799,66 +1012,441 @@ export function createAnnotator({ mount = document.body, position = "bottom", pe
   }
 
   // ── text ───────────────────────────────────────────────────────────────────
+  // ── text boxes ─────────────────────────────────────────────────────────────
+  // Like the text box in a PDF editor: click to place one (or drag an existing
+  // one to move it, click it to type in it), a formatting bar above it (font,
+  // size in pt, bold / italic / underline, alignment, colour, fill, border,
+  // duplicate, delete), side handles for the wrap width, corner handles to
+  // scale it once it is selected. Enter = new line; Esc, Ctrl+Enter or a click
+  // outside = done. The editing box is styled exactly like the finished text,
+  // which is drawn on the canvas once the edit ends.
+  const TX = { ed: null };        // ed = the box being typed in: { p, index, orig, s, wrap, box }
+  try {
+    const t = JSON.parse(localStorage.getItem("pwt-annot-text") || "{}");
+    A.textStyle = { ...TEXT_DEFAULTS, ...(t && typeof t === "object" ? t : {}) };
+  } catch { A.textStyle = { ...TEXT_DEFAULTS }; }
+  if (!FONTS[A.textStyle.f]) A.textStyle.f = "sans";
+  A.textStyle.pt = Math.min(96, Math.max(6, Math.round(+A.textStyle.pt) || 12));
+  const PT_STEPS = [6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 96];
+  const stepPt = (s, dir) => {
+    const pt = Math.round(s * PT_PER_W);
+    return dir > 0 ? PT_STEPS.find((v) => v > pt) ?? 96 : [...PT_STEPS].reverse().find((v) => v < pt) ?? 6;
+  };
+
+  /** What gets stored: defaults are left out to keep saves small. */
+  function cleanText(o) {
+    const out = { t: "text", x: +(+o.x).toFixed(4), y: +(+o.y).toFixed(4), s: +(+o.s).toFixed(5), c: o.c, txt: o.txt || "" };
+    if (o.f) out.f = FONTS[o.f] ? o.f : "sans";          // boxes from before fonts keep their look
+    if (o.bw) out.bw = +(+o.bw).toFixed(4);
+    for (const k of ["b", "i", "u", "bd"]) if (o[k]) out[k] = 1;
+    if (o.al === "c" || o.al === "r") out.al = o.al;
+    if (o.bg) out.bg = o.bg;
+    return out;
+  }
+
   function startText(p, e, q) {
     const { w, h } = size(p);
-    const i = topmost(p, q, w, h, (s) => s.t === "text");
-    if (i >= 0) return editText(p, i);                 // clicking existing text edits it
-    textBox(p, { x: q[0], y: q[1], c: A.color, s: SIZES[A.size] * 5, txt: "" }, null);
-  }
-
-  function editText(p, i) {
-    const s = p.strokes[i];
-    textBox(p, s, i);
-  }
-
-  function textBox(p, s, index) {
-    const box = document.createElement("textarea");
-    box.className = "an-text";
-    box.rows = Math.max(1, String(s.txt || "").split("\n").length);
-    box.placeholder = "Type · Enter to finish · Shift+Enter new line";
-    box.value = s.txt || "";
-    const fs = Math.max(12, s.s * p.el.clientWidth);
-    Object.assign(box.style, p.view
-      ? { position: "absolute", left: `${s.x * p.el.clientWidth}px`, top: `${s.y * p.el.clientWidth}px`,
-          color: ink(s.c), fontSize: `${fs}px`, zIndex: 66 }
-      : { left: `${s.x * 100}%`, top: `${s.y * 100}%`, color: ink(s.c), fontSize: `${fs}px` });
-    // hide the canvas copy while it is being edited
-    let hidden = null;
-    if (index != null) {
-      hidden = p.strokes[index];
-      p.strokes = p.strokes.map((x, j) => (j === index ? { ...x, txt: "" } : x));
-      paintLayer(p);
-      p.strokes = p.strokes.map((x, j) => (j === index ? hidden : x));
+    const cur = A.sel?.key === p.key ? p.strokes[A.sel.i] : null;
+    if (cur && onHandle(cur, q, w, h)) return startSelect(p, q, w, h);
+    const i = topmost(p, q, w, h, (x) => x.t === "text");
+    if (i >= 0) {                                 // on a text box: drag = move it, click = type in it
+      const prevKey = A.sel?.key;
+      A.sel = { key: p.key, i };
+      if (prevKey && prevKey !== p.key) { const o = A.pages.get(prevKey); if (o) blit(o); }
+      p.drag = { start: q, orig: p.strokes[i], before: p.strokes.slice(), moved: false, editOnClick: true };
+      paintBar();
+      return;
     }
-    (p.view ? document.body : p.el).appendChild(box);
-    // focus now, not on a timer: the first key typed must not reach the tool hotkeys
-    box.focus({ preventScroll: true });
-    box.select();
-    setTimeout(() => { if (document.activeElement !== box) box.focus({ preventScroll: true }); });
-    let finished = false;
-    const done = (save) => {
-      if (finished) return;
-      finished = true;
-      const txt = box.value.replace(/\s+$/, "");
-      box.remove();
-      const before = p.strokes.slice();
-      if (index == null) {
-        if (save && txt) { p.strokes.push({ t: "text", c: s.c, s: s.s, x: s.x, y: s.y, txt: txt.slice(0, 500) }); commit(p, before); }
-      } else if (save && txt !== hidden.txt) {
-        if (txt) p.strokes[index] = { ...hidden, txt: txt.slice(0, 500) };
-        else { p.strokes.splice(index, 1); A.sel = null; }
-        commit(p, before);
+    if (A.sel) { const o = A.pages.get(A.sel.key); A.sel = null; if (o) blit(o); }
+    const d = A.textStyle;
+    openEditor(p, null, { t: "text", x: q[0], y: q[1], c: A.color, s: d.pt / PT_PER_W, f: d.f,
+                          b: d.b, i: d.i, u: d.u, al: d.al, bg: d.bg, bd: d.bd, txt: "" });
+  }
+
+  function openEditor(p, index, fresh) {
+    closeEditor(true);
+    const orig = index == null ? null : p.strokes[index];
+    if (index != null && orig?.t !== "text") return;
+    const ed = { p, index, orig, s: { ...(orig || fresh) } };
+    const wrap = document.createElement("div");
+    wrap.className = "an-textwrap";
+    wrap.innerHTML = `
+      <textarea class="an-text" rows="1" aria-label="Text box" placeholder="Type here"></textarea>
+      <span class="an-tx-h" data-h="w" title="Drag to change the width" aria-hidden="true"></span>
+      <span class="an-tx-h" data-h="e" title="Drag to change the width" aria-hidden="true"></span>`;
+    ed.wrap = wrap;
+    ed.box = wrap.querySelector("textarea");
+    ed.box.value = ed.s.txt || "";
+    (p.view ? document.body : p.el).appendChild(wrap);
+    TX.ed = ed;
+    A.sel = index == null ? null : { key: p.key, i: index };
+    p.hideIndex = index;                              // the box shows it while it is edited
+    paintLayer(p);
+    styleBox();
+    ed.box.focus({ preventScroll: true });
+    const n = ed.box.value.length;
+    ed.box.setSelectionRange(n, n);
+    ed.box.addEventListener("input", () => { ed.s.txt = ed.box.value; styleBox(); placeTextBar(); });
+    ed.box.addEventListener("keydown", (ev) => {
+      ev.stopPropagation();                           // letters are text, not tool hotkeys
+      const mod = ev.ctrlKey || ev.metaKey;
+      if (ev.key === "Escape" || (mod && ev.key === "Enter")) { ev.preventDefault(); closeEditor(true); }
+      else if (mod && /^[biu]$/i.test(ev.key)) {
+        ev.preventDefault();
+        const k = ev.key.toLowerCase();
+        setTextStyle({ [k]: !ed.s[k] });
       }
-      paintLayer(p);
-    };
-    box.addEventListener("input", () => { box.rows = Math.max(1, box.value.split("\n").length); });
-    box.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); done(true); }
-      if (ev.key === "Escape") done(false);
-      ev.stopPropagation();
     });
-    box.addEventListener("pointerdown", (ev) => ev.stopPropagation());
-    box.addEventListener("blur", () => done(true));
+    wrap.addEventListener("pointerdown", (ev) => {
+      const hnd = ev.target.closest(".an-tx-h");
+      ev.stopPropagation();
+      if (!hnd) return;
+      ev.preventDefault();
+      dragWidth(ev, hnd.dataset.h);
+    });
+    paintBar();
+  }
+
+  /** Style the editing box exactly like the finished text will be drawn. */
+  function styleBox() {
+    const ed = TX.ed;
+    if (!ed) return;
+    const { p, s, box, wrap } = ed;
+    const W = p.el.clientWidth, H = p.view ? W : p.el.clientHeight;
+    let L = textLayout({ ...s, txt: box.value || " " }, W);
+    const room = Math.max(40, W - s.x * W - L.pad - 4);      // up to the page's right edge
+    if (!s.bw && L.boxW > room) { s.bw = room / W; L = textLayout({ ...s, txt: box.value || " " }, W); }
+    measure.font = L.font;
+    const empty = box.value ? 0 : measure.measureText("Type here").width;
+    const contentW = s.bw ? s.bw * W : Math.max(L.boxW, empty) + 2;
+    wrap.style.left = `${s.x * W - L.pad}px`;
+    wrap.style.top = `${s.y * H - L.pad}px`;
+    Object.assign(box.style, {
+      font: L.font, lineHeight: `${L.lh}px`, padding: `${L.pad}px`, color: ink(s.c),
+      width: `${contentW + 2 * L.pad}px`,
+      textAlign: s.al === "c" ? "center" : s.al === "r" ? "right" : "left",
+      textDecoration: s.u ? "underline" : "none",
+      whiteSpace: s.bw ? "pre-wrap" : "pre",
+      background: !s.bg ? "transparent" : s.bg === "paper" ? fillColour("paper")
+        : `color-mix(in srgb, ${ink(s.bg)} ${dark() ? 32 : 26}%, transparent)`,
+      boxShadow: s.bd ? `inset 0 0 0 ${Math.max(1, L.fs * 0.07)}px ${ink(s.c)}` : "none",
+    });
+    box.style.height = "0px";
+    box.style.height = `${Math.max(box.scrollHeight, Math.max(1, L.lines.length) * L.lh + 2 * L.pad)}px`;
+    wrap.classList.toggle("is-wrapped", !!s.bw);
+  }
+
+  /** The side handles of the editing box: drag to set the wrap width. */
+  function dragWidth(ev, side) {
+    const ed = TX.ed;
+    const { p, s } = ed;
+    const W = p.el.clientWidth;
+    const L = textLayout({ ...s, txt: ed.box.value || " " }, W);
+    const start = ev.clientX, x0 = s.x * W, bw0 = s.bw ? s.bw * W : L.boxW, right = x0 + bw0;
+    const minW = Math.max(L.fs * 2, 24);
+    const move = (e) => {
+      const dx = e.clientX - start;
+      if (side === "e") s.bw = Math.min(W - x0, Math.max(minW, bw0 + dx)) / W;
+      else {
+        const nx = Math.max(0, Math.min(right - minW, x0 + dx));
+        s.x = nx / W;
+        s.bw = (right - nx) / W;
+      }
+      styleBox();
+      placeTextBar();
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      ed.box.focus({ preventScroll: true });
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
+
+  /** End the edit: an empty box goes away, anything else is saved (one undo step). */
+  function closeEditor(save = true) {
+    const ed = TX.ed;
+    if (!ed) return;
+    TX.ed = null;
+    ed.wrap.remove();
+    const p = ed.p;
+    p.hideIndex = null;
+    const txt = ed.box.value.replace(/\s+$/, "").slice(0, 5000);
+    const before = p.strokes.slice();
+    const at = ed.index != null && p.strokes[ed.index] === ed.orig ? ed.index : null;   // undo may have moved it
+    const obj = cleanText({ ...ed.s, txt });
+    if (at == null) {
+      if (save && txt) { p.strokes.push(obj); A.sel = { key: p.key, i: p.strokes.length - 1 }; commit(p, before); }
+    } else if (!txt) {
+      p.strokes.splice(at, 1);
+      A.sel = null;
+      commit(p, before);
+    } else if (save && JSON.stringify(obj) !== JSON.stringify(ed.orig)) {
+      p.strokes[at] = obj;
+      A.sel = { key: p.key, i: at };
+      commit(p, before);
+    }
+    paintLayer(p);
+    paintBar();
+  }
+
+  // A press anywhere else ends the edit - and only that: it does not also
+  // start a new text box where you clicked.
+  document.addEventListener("pointerdown", (e) => {
+    const ed = TX.ed;
+    if (!ed || ed.wrap.contains(e.target) || tb.contains(e.target)) return;
+    closeEditor(true);
+    if (e.target.classList?.contains("an-layer")) A.swallow = true;
+  }, true);
+  window.addEventListener("resize", () => { styleBox(); placeTextBar(); });
+
+  // ── the formatting bar ─────────────────────────────────────────────────────
+  const tb = document.createElement("div");
+  tb.className = "an-tb";
+  tb.setAttribute("role", "toolbar");
+  tb.setAttribute("aria-label", "Text box formatting");
+  const ti = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${TICON[k]}</svg>`;
+  tb.innerHTML = `
+    <button type="button" class="an-tb-grip" data-tb="move" title="Drag to move the text box"
+            aria-label="Move the text box">${ti("grip")}</button>
+    <select data-tb="font" aria-label="Font" title="Font">${Object.entries(FONTS).map(([k, [n, css]]) =>
+      `<option value="${k}" style="font-family:${css.replace(/"/g, "&quot;")}">${n}</option>`).join("")}</select>
+    <span class="an-tb-size">
+      <button type="button" data-tb="smaller" aria-label="Smaller text" title="Smaller">−</button>
+      <input data-tb="pt" type="number" min="6" max="96" step="1" inputmode="numeric"
+             aria-label="Font size in points" title="Font size (pt)">
+      <button type="button" data-tb="bigger" aria-label="Bigger text" title="Bigger">+</button>
+    </span>
+    <span class="an-tb-sep"></span>
+    <button type="button" data-tb="b" aria-pressed="false" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
+    <button type="button" data-tb="i" aria-pressed="false" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
+    <button type="button" data-tb="u" aria-pressed="false" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button>
+    <span class="an-tb-sep"></span>
+    ${[["l", "alL", "Align left"], ["c", "alC", "Centre"], ["r", "alR", "Align right"]].map(([v, k, n]) =>
+      `<button type="button" data-tb="al" data-v="${v}" aria-pressed="false" title="${n}" aria-label="${n}">${ti(k)}</button>`).join("")}
+    <span class="an-tb-sep"></span>
+    <button type="button" data-tb="color" aria-haspopup="true" aria-expanded="false" title="Text colour"
+            aria-label="Text colour"><i class="an-tb-dot"></i></button>
+    <button type="button" data-tb="fill" aria-haspopup="true" aria-expanded="false" title="Box fill"
+            aria-label="Box fill">${ti("fill")}<i class="an-tb-bar"></i></button>
+    <button type="button" data-tb="bd" aria-pressed="false" title="Border" aria-label="Border">${ti("border")}</button>
+    <span class="an-tb-sep"></span>
+    <button type="button" data-tb="dup" title="Duplicate (Ctrl+D)" aria-label="Duplicate">${ti("dup")}</button>
+    <button type="button" data-tb="del" title="Delete (Del)" aria-label="Delete">${ti("trash")}</button>
+    <button type="button" class="an-tb-done" data-tb="done" title="Finish (Esc)">Done</button>
+    <div class="an-tb-pop" data-tbpop="color" hidden>${PALETTE.map(([k, , , n]) =>
+      `<button type="button" data-tbc="@${k}" title="${n}" aria-label="${n}"></button>`).join("")}</div>
+    <div class="an-tb-pop" data-tbpop="fill" hidden>${FILLS.map(([v, n]) =>
+      `<button type="button" data-tbf="${v}" title="${n}" aria-label="${n}"></button>`).join("")}</div>`;
+
+  function paintTextBar(s) {
+    tb.querySelector('[data-tb="font"]').value = FONTS[s.f] ? s.f : "sans";
+    const pt = tb.querySelector('[data-tb="pt"]');
+    if (document.activeElement !== pt) pt.value = Math.round(s.s * PT_PER_W);
+    for (const k of ["b", "i", "u", "bd"]) tb.querySelector(`[data-tb="${k}"]`).setAttribute("aria-pressed", String(!!s[k]));
+    tb.querySelectorAll('[data-tb="al"]').forEach((b) =>
+      b.setAttribute("aria-pressed", String((s.al || "l") === b.dataset.v)));
+    tb.querySelector(".an-tb-dot").style.background = ink(s.c);
+    tb.querySelector(".an-tb-bar").style.background = s.bg ? fillColour(s.bg) : "transparent";
+    tb.querySelectorAll("[data-tbc]").forEach((b) => {
+      b.style.setProperty("--c", ink(b.dataset.tbc));
+      b.classList.toggle("is-on", b.dataset.tbc === s.c);
+    });
+    tb.querySelectorAll("[data-tbf]").forEach((b) => {
+      const v = b.dataset.tbf;
+      b.style.setProperty("--c", v ? fillColour(v) : "transparent");
+      b.classList.toggle("is-none", !v);
+      b.classList.toggle("is-on", (s.bg || "") === v);
+    });
+    tb.querySelector('[data-tb="done"]').hidden = !TX.ed;
+    tb.dataset.paper = dark() ? "dark" : "light";
+  }
+
+  /** Show the bar over the box being edited, or the selected text box. */
+  function placeTextBar() {
+    let p, s, top0, bottom0;
+    if (TX.ed) {
+      ({ p, s } = TX.ed);
+      top0 = parseFloat(TX.ed.wrap.style.top) || 0;
+      bottom0 = top0 + TX.ed.wrap.offsetHeight;
+    } else {
+      const o = selected();
+      p = A.sel && A.pages.get(A.sel.key);
+      if (o?.t !== "text" || !p?.el.isConnected || A.collapsed || !(A.tool === "select" || A.tool === "text")) {
+        closeTbPops();
+        tb.remove();
+        return;
+      }
+      s = o;
+      const W0 = p.el.clientWidth, H0 = p.view ? W0 : p.el.clientHeight;
+      const b = bbox(s, W0, H0);
+      top0 = b[1] * H0 - 5;
+      bottom0 = b[3] * H0 + 5;
+    }
+    const host = p.view ? document.body : p.el;
+    if (tb.parentNode !== host) host.appendChild(tb);
+    paintTextBar(s);
+    const W = p.el.clientWidth, H = p.view ? W : p.el.clientHeight;
+    const pad = textLayout(s, W).pad;
+    const bw = tb.offsetWidth, bh = tb.offsetHeight;
+    const maxLeft = Math.max(0, (p.view ? document.documentElement.clientWidth + window.scrollX : W) - bw - 4);
+    const left = Math.min(Math.max(p.view ? window.scrollX + 4 : 0, s.x * W - pad - 6), maxLeft);
+    let top = top0 - bh - 10;
+    // no room above (top of the page, or above the visible area): put it below
+    const onScreen = p.view ? top - window.scrollY : p.el.getBoundingClientRect().top + top;
+    if (top < 0 || onScreen < 8) top = bottom0 + 10;
+    tb.style.left = `${left}px`;
+    tb.style.top = `${Math.min(top, Math.max(0, H - bh))}px`;
+  }
+
+  function closeTbPops() {
+    tb.querySelectorAll("[data-tbpop]").forEach((x) => { x.hidden = true; });
+    tb.querySelectorAll("[aria-haspopup]").forEach((x) => x.setAttribute("aria-expanded", "false"));
+  }
+
+  function refocus() {
+    if (TX.ed && !tb.contains(document.activeElement)) TX.ed.box.focus({ preventScroll: true });
+  }
+
+  /** Apply a style to the box being edited, or to the selected text box, and
+   *  remember it (not the colour - that is the main bar's) for the next box. */
+  function setTextStyle(patch) {
+    const keep = {};
+    for (const k of ["f", "b", "i", "u", "al", "bg", "bd"]) if (k in patch) keep[k] = patch[k];
+    if ("s" in patch) keep.pt = Math.round(patch.s * PT_PER_W);
+    if (Object.keys(keep).length) {
+      A.textStyle = { ...A.textStyle, ...keep };
+      try { localStorage.setItem("pwt-annot-text", JSON.stringify(A.textStyle)); } catch { /* ignore */ }
+    }
+    if (TX.ed) { Object.assign(TX.ed.s, patch); styleBox(); placeTextBar(); return; }
+    const o = selected();
+    if (o?.t !== "text") return;
+    mutate(A.sel.key, (list) => { list[A.sel.i] = cleanText({ ...o, ...patch }); });
+    paintBar();
+  }
+
+  tb.addEventListener("pointerdown", (e) => {
+    if (!e.target.closest("select, input")) e.preventDefault();      // keep the caret in the box
+    e.stopPropagation();
+    if (e.target.closest('[data-tb="move"]')) dragTextBox(e);
+  });
+  tb.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tb], [data-tbc], [data-tbf]");
+    if (!b) return;
+    const src = TX.ed?.s || selected();
+    if (!src) return;
+    if (b.dataset.tbc) { A.color = b.dataset.tbc; persist(); setTextStyle({ c: b.dataset.tbc }); closeTbPops(); return refocus(); }
+    if ("tbf" in b.dataset) { setTextStyle({ bg: b.dataset.tbf }); closeTbPops(); return refocus(); }
+    const k = b.dataset.tb;
+    if (k === "b" || k === "i" || k === "u" || k === "bd") setTextStyle({ [k]: !src[k] });
+    else if (k === "al") setTextStyle({ al: b.dataset.v });
+    else if (k === "smaller" || k === "bigger") setTextStyle({ s: stepPt(src.s, k === "bigger" ? 1 : -1) / PT_PER_W });
+    else if (k === "color" || k === "fill") {
+      const pop = tb.querySelector(`[data-tbpop="${k}"]`);
+      const open = pop.hidden;
+      closeTbPops();
+      pop.hidden = !open;
+      b.setAttribute("aria-expanded", String(open));
+    } else if (k === "dup") duplicateSelected();
+    else if (k === "del") {
+      if (TX.ed) { TX.ed.box.value = ""; closeEditor(true); } else deleteSelected();
+    } else if (k === "done") closeEditor(true);
+    refocus();
+  });
+  const setPt = (el) => {
+    const v = Math.min(96, Math.max(6, Math.round(+el.value || 12)));
+    el.value = v;
+    setTextStyle({ s: v / PT_PER_W });
+  };
+  tb.addEventListener("change", (e) => {
+    if (e.target.dataset.tb === "font") setTextStyle({ f: e.target.value });
+    if (e.target.dataset.tb === "pt") setPt(e.target);
+    refocus();
+  });
+  tb.addEventListener("keydown", (e) => {
+    e.stopPropagation();                               // typing a size is not a tool hotkey
+    if (e.key === "Escape") { closeTbPops(); refocus(); }
+    if (e.key === "Enter" && e.target.dataset.tb === "pt") { e.preventDefault(); setPt(e.target); refocus(); }
+  });
+
+  /** The grip on the bar: move the box (while editing or selected). */
+  function dragTextBox(e) {
+    const ed = TX.ed;
+    const p = ed ? ed.p : A.sel && A.pages.get(A.sel.key);
+    const o = ed ? ed.s : selected();
+    if (!p || !o) return;
+    const W = p.el.clientWidth, H = p.view ? W : p.el.clientHeight;
+    const sx = e.clientX, sy = e.clientY, x0 = o.x, y0 = o.y;
+    const before = p.strokes.slice(), orig = o, i = A.sel?.i;
+    const move = (ev) => {
+      const nx = clamp(x0 + (ev.clientX - sx) / W), ny = Math.max(0, y0 + (ev.clientY - sy) / H);
+      if (ed) { ed.s.x = nx; ed.s.y = ny; styleBox(); }
+      else { p.strokes[i] = { ...orig, x: nx, y: p.view ? ny : Math.min(1, ny) }; schedule(p, true); }
+      placeTextBar();
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      if (!ed && p.strokes[i] !== orig) commit(p, before);
+      refocus();
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
+
+  function duplicateSelected() {
+    closeEditor(true);
+    const o = selected(), p = A.sel && A.pages.get(A.sel.key);
+    if (!o || !p) return;
+    const { w, h } = size(p);
+    const before = p.strokes.slice();
+    p.strokes.push(translate(o, 14 / w, 14 / h, !!p.view));
+    A.sel = { key: p.key, i: p.strokes.length - 1 };
+    commit(p, before);
+    paintLayer(p);
+  }
+
+  function paste() {
+    const p = (A.sel && A.pages.get(A.sel.key)) || nearestPage();
+    if (!p?.strokes) return;
+    const { w, h } = size(p);
+    const off = A.clip.from === p.key ? 14 : 0;
+    const copy = translate(A.clip.obj, off / w, off / h, !!p.view);
+    A.clip = { obj: copy, from: p.key };              // the next paste steps on again
+    const before = p.strokes.slice();
+    p.strokes.push(copy);
+    A.sel = { key: p.key, i: p.strokes.length - 1 };
+    commit(p, before);
+    paintLayer(p);
+  }
+
+  /** Keys for the selected object: arrows nudge (Shift = 10 px), Ctrl+C / X /
+   *  V / D, Enter or F2 types in a selected text box. true = handled. */
+  function objectKeys(e) {
+    const mod = e.ctrlKey || e.metaKey, key = e.key.toLowerCase();
+    if (mod && key === "v" && A.clip && !window.getSelection()?.toString()) { e.preventDefault(); paste(); return true; }
+    const o = selected(), p = A.sel && A.pages.get(A.sel.key);
+    if (!o || !p) return false;
+    if (mod && (key === "c" || key === "x")) {
+      e.preventDefault();
+      A.clip = { obj: JSON.parse(JSON.stringify(o)), from: p.key };
+      if (key === "x") deleteSelected(); else flash("Copied");
+      return true;
+    }
+    if (mod && key === "d") { e.preventDefault(); duplicateSelected(); return true; }
+    if (!mod && !e.altKey && e.key.startsWith("Arrow")) {
+      e.preventDefault();
+      const { w, h } = size(p);
+      const st = e.shiftKey ? 10 : 1;
+      const dx = e.key === "ArrowLeft" ? -st : e.key === "ArrowRight" ? st : 0;
+      const dy = e.key === "ArrowUp" ? -st : e.key === "ArrowDown" ? st : 0;
+      mutate(p.key, (list) => { list[A.sel.i] = translate(o, dx / w, dy / h, !!p.view); });
+      placeTextBar();
+      return true;
+    }
+    if (o.t === "text" && (e.key === "Enter" || e.key === "F2")) { e.preventDefault(); openEditor(p, A.sel.i); return true; }
+    return false;
   }
 
   // ── history + saving ───────────────────────────────────────────────────────

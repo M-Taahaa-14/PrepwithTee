@@ -14,6 +14,11 @@ Sequences handled here (all use the `email_log` table to avoid duplicates):
 
   Weekly      F1 Study Tip        — every Sunday (once per week per user)
 
+  Billing     EXP7 / EXP3 / EXP1  — 7, 3 and 1 day(s) before a paid plan ends
+              EXPIRED             — once, within 3 days after it ended
+              (ids carry the expiry date, so a renewal gets fresh reminders;
+               the rules are billing.reminder_due)
+
 Milestone emails (M1/M2/M3) are triggered inline from route handlers,
 not from this cron, because they depend on a specific user action.
 
@@ -821,11 +826,8 @@ def send_M2(user: dict, notify_fn) -> bool:
 
 def _get_students() -> list[dict]:
     if _udb._USE_SUPABASE:
-        res = (_udb._client().table("profiles")
-               .select("*")
-               .eq("role", "student")
-               .execute())
-        return res.data or []
+        # Paged: an unpaged PostgREST select stops at 1000 rows.
+        return _udb.fetch_all("profiles", eq={"role": "student"})
     with _udb._local() as c:
         return [dict(r) for r in c.execute(
             "SELECT * FROM profiles WHERE role = 'student' OR role IS NULL"
@@ -856,7 +858,12 @@ def main() -> int:
 
     last_active = _last_active_map()
 
-    w1 = w2 = w3 = r1 = r2 = r3 = f1 = 0
+    w1 = w2 = w3 = r1 = r2 = r3 = f1 = exp = 0
+    from .. import billing as _billing
+    now = datetime.now(timezone.utc)
+    sent_ids: dict[str, set[str]] = {}
+    for uid_, tid_ in sent_60d:
+        sent_ids.setdefault(uid_, set()).add(tid_)
 
     for u in users:
         uid = u.get("id", "")
@@ -908,6 +915,17 @@ def main() -> int:
                     r3 += 1
                     sent_60d.add((uid, "R3"))
 
+        # ── Plan expiry reminders ─────────────────────────────────────────────
+        due = _billing.reminder_due(u, now, sent_ids.get(uid, set()))
+        if due and u.get("email"):
+            tid, days_left = due
+            subj, text, html_body = _billing.reminder_email(
+                u.get("name"), u["plan"], u["plan_expires_at"], days_left)
+            if _notify(subj, text, to=u["email"], html_override=html_body):
+                _log_sent(uid, tid)
+                sent_ids.setdefault(uid, set()).add(tid)
+                exp += 1
+
         # ── Weekly tip (Sundays only) ─────────────────────────────────────────
         if is_sunday and not _already_sent(sent_7d, uid, "F1"):
             if send_F1(u, today.isocalendar()[1]):
@@ -916,7 +934,7 @@ def main() -> int:
 
     print(
         f"[email_lifecycle] Done. "
-        f"W1={w1} W2={w2} W3={w3} | R1={r1} R2={r2} R3={r3} | F1={f1}",
+        f"W1={w1} W2={w2} W3={w3} | R1={r1} R2={r2} R3={r3} | F1={f1} | expiry={exp}",
         flush=True,
     )
     return 0

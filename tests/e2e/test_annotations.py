@@ -79,13 +79,13 @@ def test_pen_select_text_and_partial_eraser(student, shots):
     tx, ty = box["x"] + 200, box["y"] + 400
     page.mouse.click(tx, ty)
     page.keyboard.type("v = u + at")
-    page.keyboard.press("Enter")
+    page.keyboard.press("Escape")                    # Enter is a new line; Esc finishes
     page.locator('.an-bar [data-tool="select"]').click()
     page.mouse.dblclick(tx + 10, ty + 6)
     ed = page.locator(".an-text")
     expect(ed).to_have_value("v = u + at")
     ed.fill("v = u + at  (a const.)")
-    page.keyboard.press("Enter")
+    page.keyboard.press("Escape")
     page.wait_for_timeout(1200)
     texts = [x for x in _strokes(student, pid) if x["t"] == "text"]
     assert [t["txt"] for t in texts] == ["v = u + at  (a const.)"]

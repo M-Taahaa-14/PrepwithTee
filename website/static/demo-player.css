@@ -74,6 +74,12 @@
 html[data-theme="dark"] .dp-base { background: linear-gradient(180deg, #8d93a1 0%, #5c6170 60%, #3d414d 100%); }
 .dp-laptop .dp-caption p { font-size: 1rem; }
 .dp-laptop .dp-caption { min-height: 2.4em; }
+/* Phones: the base's -7% overhang (and the lid's perspective swing while it opens) would poke
+   past the 16px gutter and scroll the page sideways - tuck the lid in so the base fits. */
+@media (max-width: 640px) {
+  .dp-mac { padding: 0 4%; overflow-x: clip; }
+  .dp-base { height: 12px; margin: 0 -4%; }
+}
 
 /* ── Title cards ("Not sure where to start?", "Talk to Tee") ────────────── */
 .dp-card { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: .7rem;

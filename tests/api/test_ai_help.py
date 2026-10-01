@@ -45,8 +45,10 @@ def qids():
 
 
 def make_paid(user, plan="solo"):
+    # Solo / 3 Subjects only cover their chosen subjects; these questions are 5054.
     users_db.update_profile(user["id"], {
         "plan": plan, "plan_trial": 0,
+        "plan_subjects_json": json.dumps(["5054", "4024", "0625"][:{"solo": 1, "three": 3}.get(plan, 0)]),
         "plan_started_at": datetime.now(timezone.utc).isoformat(),
         "plan_expires_at": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()})
 

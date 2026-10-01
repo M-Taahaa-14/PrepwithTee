@@ -187,15 +187,68 @@ document.querySelectorAll("[data-pk]").forEach(initPicker);
 // ── In-page search (ui.page_search) ─────────────────────────────────────────
 // Filters a long list on the page (chapters, resource folders and files) as
 // you type. Every word must match the item's data-q, or its text.
+// "Newton's 2nd-law" and "newtons 2nd law" are the same search.
+const norm = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+
 function initPageSearch(root) {
   const input = root.querySelector("[data-ps-q]");
   const count = root.querySelector("[data-ps-count]");
   const items = [...document.querySelectorAll(root.dataset.psItems)];
   const groupSel = root.dataset.psGroups;
-  if (!input || !items.length) { root.hidden = true; return; }
-  const hay = items.map((el) => (el.dataset.q || el.textContent).toLowerCase());
+  const deep = root.hasAttribute("data-ps-deep");
+  const results = deep ? root.nextElementSibling : null;          // ui.page_search puts it right after
+  const rows = results ? [...results.querySelectorAll("li")] : [];
+  if (!input || (!items.length && !rows.length)) { root.hidden = true; return; }
+  const hay = items.map((el) => norm(el.dataset.q || el.textContent));
+  const rowHay = rows.map((li) => ({ q: norm(li.dataset.q), t: norm(li.dataset.t), title: li.dataset.t }));
+  const list = results?.querySelector("ol");
+  const browse = [...document.querySelectorAll("[data-ps-browse]")];
+
+  // Title matches first (whole title, then start of title, then a word start),
+  // then matches only in the folder path; shorter paths win ties.
+  const score = (r, words, phrase) => {
+    let s = 0;
+    if (r.t === phrase) s += 100;
+    else if (r.t.startsWith(phrase)) s += 60;
+    else if (r.t.includes(phrase)) s += 40;
+    for (const w of words) {
+      if (new RegExp(`(^| )${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`).test(r.t)) s += 10;
+      else if (r.t.includes(w)) s += 5;
+    }
+    return s - r.q.length / 1000;
+  };
+
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function mark(title, words) {
+    if (!words.length) return esc(title);
+    const re = new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "ig");
+    return esc(title).replace(re, "<mark>$1</mark>");
+  }
+
   function apply() {
-    const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const phrase = norm(input.value);
+    const words = phrase.split(" ").filter(Boolean);
+    if (deep) {
+      const on = words.length > 0;
+      browse.forEach((b) => { b.hidden = on; });
+      results.hidden = !on;
+      if (!on) { count.textContent = ""; return remember(""); }
+      const hits = [];
+      rows.forEach((li, i) => {
+        const hit = words.every((w) => rowHay[i].q.includes(w));
+        li.hidden = !hit;
+        if (hit) hits.push([score(rowHay[i], words, phrase), li, i]);
+      });
+      hits.sort((a, b) => b[0] - a[0]);
+      hits.forEach(([, li, i]) => {
+        li.querySelector("b").innerHTML = mark(rowHay[i].title, words);
+        list.appendChild(li);                                     // re-order: best first
+      });
+      results.querySelector(".ps-empty").hidden = hits.length > 0;
+      count.textContent = `${hits.length} result${hits.length === 1 ? "" : "s"}`;
+      return remember(input.value);
+    }
     let shown = 0;
     items.forEach((el, i) => {
       const hit = !words.length || words.every((w) => hay[i].includes(w));
@@ -207,9 +260,47 @@ function initPageSearch(root) {
       groups.forEach((g) => { g.hidden = words.length > 0 && !g.querySelector(`${root.dataset.psItems}:not([hidden])`); });
     }
     count.textContent = words.length ? `${shown} of ${items.length}` : "";
+    remember(input.value);
   }
+
+  // The search lives in the address bar (?q=), so Back from a file comes back
+  // to the same results. replaceState: typing does not fill the history.
+  let saveT = null;
+  function remember(v) {
+    clearTimeout(saveT);
+    saveT = setTimeout(() => {
+      const u = new URL(location.href);
+      if (v.trim()) u.searchParams.set("q", v.trim()); else u.searchParams.delete("q");
+      history.replaceState(history.state, "", u);
+    }, 300);
+  }
+
+  const visibleLinks = () => (results ? [...results.querySelectorAll("li:not([hidden]) a")] : []);
+
   input.addEventListener("input", apply);
-  input.addEventListener("keydown", (e) => { if (e.key === "Escape") { input.value = ""; apply(); } });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { input.value = ""; apply(); }
+    if (!deep) return;
+    if (e.key === "Enter") {                       // open the best match
+      const first = visibleLinks()[0];
+      if (first) { e.preventDefault(); first.click(); }
+    }
+    if (e.key === "ArrowDown") {
+      const first = visibleLinks()[0];
+      if (first) { e.preventDefault(); first.focus(); }
+    }
+  });
+  results?.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Escape") return;
+    e.preventDefault();
+    if (e.key === "Escape") return input.focus();
+    const links = visibleLinks();
+    const i = links.indexOf(document.activeElement);
+    if (e.key === "ArrowUp" && i <= 0) return input.focus();
+    links[Math.min(links.length - 1, Math.max(0, i + (e.key === "ArrowDown" ? 1 : -1)))]?.focus();
+  });
+  const start = new URLSearchParams(location.search).get("q");
+  if (start) { input.value = start; apply(); }
 }
 document.querySelectorAll("[data-ps]").forEach(initPageSearch);
 

@@ -406,6 +406,27 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ============ Feedback Widget ============
+  // Email checks shared with the profile page's feedback form (window.PWTEmail).
+  window.PWTEmail = window.PWTEmail || {
+    check(email) {
+      if (!email) return "Please enter your email so we can reply.";
+      if (email.length > 254 || email.includes("..") ||
+          !/^[A-Za-z0-9._%+'-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,24}$/.test(email)) {
+        return "That email address doesn't look right - please check it.";
+      }
+      return "";
+    },
+    /** "ali@gmial.com" -> "ali@gmail.com" for the usual slips, else "". */
+    suggest(email) {
+      const [user, dom] = email.toLowerCase().split("@");
+      const FIX = { "gmial.com": "gmail.com", "gmai.com": "gmail.com", "gmal.com": "gmail.com",
+        "gamil.com": "gmail.com", "gmail.co": "gmail.com", "gmail.con": "gmail.com", "gnail.com": "gmail.com",
+        "gmaill.com": "gmail.com", "hotmial.com": "hotmail.com", "hotmail.co": "hotmail.com",
+        "hotmai.com": "hotmail.com", "yaho.com": "yahoo.com", "yahoo.co": "yahoo.com",
+        "outlok.com": "outlook.com", "outlook.co": "outlook.com", "iclod.com": "icloud.com" };
+      return dom && FIX[dom] ? `${user}@${FIX[dom]}` : "";
+    },
+  };
   (function () {
     const tabHTML = `
 <button class="fb-tab-btn" id="fbTabBtn" aria-label="Give feedback">
@@ -433,15 +454,20 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="fb-stars" id="fbStars" role="group" aria-label="Rating">
         ${[1,2,3,4,5].map(n => `<span class="fb-star" data-val="${n}" role="button" tabindex="0" aria-label="${n} star">★</span>`).join("")}
       </div>
-      <form id="fbForm">
+      <form id="fbForm" novalidate>
         <div class="fb-field">
           <label for="fbMessage" id="fbMsgLabel">What should we improve?</label>
           <textarea id="fbMessage" rows="4" placeholder="Your thoughts — features you'd like, things that felt off, anything…" required></textarea>
         </div>
         <div class="fb-field">
-          <label for="fbName">Your name <span style="font-weight:400;text-transform:none">(optional)</span></label>
-          <input type="text" id="fbName" placeholder="e.g. Ahmed">
+          <label for="fbName">Your name</label>
+          <input type="text" id="fbName" placeholder="e.g. Ahmed" autocomplete="name" maxlength="120" required>
         </div>
+        <div class="fb-field">
+          <label for="fbEmail">Your email <span style="font-weight:400;text-transform:none">(so we can tell you when it's fixed)</span></label>
+          <input type="email" id="fbEmail" placeholder="you@example.com" autocomplete="email" maxlength="254" required>
+        </div>
+        <p class="fb-error" id="fbError" role="alert" hidden></p>
         <button type="submit" class="fb-submit" id="fbSubmitBtn">Send feedback</button>
       </form>
     </div>
@@ -513,7 +539,25 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".fb-type-tab").forEach(t =>
       t.addEventListener("click", () => applyMode(t.dataset.type)));
 
+    // Signed in: name + email come from the account (still editable).
+    let prefilled = false;
+    function prefill() {
+      if (prefilled) return;
+      prefilled = true;
+      fetch("/auth/me", { credentials: "same-origin" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((u) => {
+          if (!u) return;
+          const n = document.getElementById("fbName"), em = document.getElementById("fbEmail");
+          const full = u.name || u.full_name || [u.first_name, u.last_name].filter(Boolean).join(" ");
+          if (!n.value && full) n.value = full;
+          if (!em.value && u.email) em.value = u.email;
+        })
+        .catch(() => {});
+    }
+
     function openPanel() {
+      prefill();
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false"); panel.inert = false;
     }
@@ -540,28 +584,57 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    const errEl = document.getElementById("fbError");
+    const showErr = (m, field) => {
+      errEl.textContent = m; errEl.hidden = !m;
+      if (field) field.focus();
+    };
+    let typoOk = "";
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const nameEl = document.getElementById("fbName"), emailEl = document.getElementById("fbEmail");
       const msg  = msgArea.value.trim();
-      const name = document.getElementById("fbName").value.trim();
-      if (!msg) return;
+      const name = nameEl.value.trim();
+      const email = emailEl.value.trim();
+      if (!msg) return showErr("Please write your message first.", msgArea);
+      if (name.length < 2) return showErr("Please enter your name.", nameEl);
+      const bad = window.PWTEmail.check(email);
+      if (bad) return showErr(bad, emailEl);
+      const typo = window.PWTEmail.suggest(email);
+      if (typo && typoOk !== email) {
+        typoOk = email;
+        return showErr(`Did you mean ${typo}? Press send again to keep ${email}.`, emailEl);
+      }
+      showErr("");
+      const label = submitBtn.textContent;
       submitBtn.disabled = true; submitBtn.textContent = "Sending…";
       try {
-        await fetch("/api/feedback", {
+        const r = await fetch("/api/feedback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
           body: JSON.stringify({
             rating: (mode === "feedback" && rating) ? rating : null,
             message: msg,
-            name: name || null,
-            page: location.pathname.split("/").pop() || "index.html",
+            name,
+            email,
+            page: location.pathname || "/",
             type: mode,
           }),
         });
-      } catch (_) { /* best-effort — still show thanks */ }
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          throw new Error(typeof d.detail === "string" ? d.detail : "Could not send - please try again.");
+        }
+      } catch (err) {
+        submitBtn.disabled = false; submitBtn.textContent = label;
+        return showErr(err.message || "Could not send - please try again.");
+      }
+      submitBtn.disabled = false; submitBtn.textContent = label;
+      msgArea.value = "";
       body.hidden = true;
       thanks.hidden = false;
-      setTimeout(closePanel, 3200);
+      setTimeout(() => { closePanel(); body.hidden = false; thanks.hidden = true; }, 3200);
     });
   })();
 });
@@ -817,5 +890,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // The pen button on every non-PDF page (scratch ink, never saved). auth.js loads it too;
 // scratch-pen.js starts only once.
-import("/scratch-pen.js?v=20260927l").catch(function () {});
+import("/scratch-pen.js?v=20260930a").catch(function () {});
 
