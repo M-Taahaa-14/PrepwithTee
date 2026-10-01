@@ -870,7 +870,12 @@ linked), not agreement with any external file.
       with the sitting's official thresholds (`/api/grade-thresholds`) and the grade worked out
       live (`core.gradeFor`, same rule as static/progress-shared.js).
 
-36. **Booklet builds failing silently - root cause + fix (2026-10-01, local, NOT deployed).**
+36. **Booklet builds failing silently - root cause + fix (2026-10-01, DEPLOYED 15:00 UTC,
+    commit 04e3b36; code-only, backup /srv/backup-code-20261001-1458-prefix.tgz).**
+    - **Production DATABASE_URL now uses the TRANSACTION pooler, port 6543** (tutor approved;
+      env backup /etc/prepwithtee.env.bak-20261001-1501). The 248 missing source PDFs below
+      were uploaded the same day (service user = `prepwithtee`; some data/raw year folders
+      are root-owned - extract with sudo + chmod 644).
     - **Root cause**: production logs showed 136 of 252 builds failed in the week since
       the 2026-09-27 DB pool went live; 134 were `EMAXCONNSESSION max clients reached in
       session mode - pool_size: 15`. DATABASE_URL uses Supabase's SESSION pooler (port
