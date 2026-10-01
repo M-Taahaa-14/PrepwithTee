@@ -40,15 +40,26 @@ if USE_PG:
 # (~0.3-1 s each from the server), so a page that asked the DB once per subject
 # (/yearly: 13 subjects) took 14 s and a signed-in /papers much longer. Keep a
 # small pool of open connections per worker instead. A connection idle for a
-# while is pinged before reuse (the pooler drops idle clients). Nobody ever
-# waits: with no idle connection a new one is opened, and at most PG_POOL_MAX
-# idle ones are kept.
+# while is pinged before reuse (the pooler drops idle clients).
+#
+# HARD CAP (2026-10-01): the Supabase pooler runs in SESSION mode with
+# pool_size 15 for the WHOLE project - every open connection is one of 15
+# seats. The first version never waited and kept up to 12 idle per worker
+# (2 workers = 24 > 15), so the pooler filled up and every booklet build (its
+# own subprocess, its own connection) died with EMAXCONNSESSION - 134 of 252
+# builds in a week. Now each worker holds at most PG_POOL_MAX connections in
+# total (idle + in use) and a request waits for a free one; connections idle
+# for PG_IDLE_CLOSE_S are closed so a quiet worker gives its seats back.
+# Budget: 2 workers x 4 + 4 build subprocesses (2 per worker) + scripts <= 15.
 import threading as _threading
 import time as _time
 
 _POOL_LOCK = _threading.Lock()
-_POOL_MAX = int(os.environ.get("PG_POOL_MAX", "12"))   # idle connections kept per worker
+_POOL_MAX = int(os.environ.get("PG_POOL_MAX", "4"))     # open connections per worker
+_POOL_WAIT_S = float(os.environ.get("PG_POOL_WAIT_S", "20"))
+_IDLE_CLOSE_S = float(os.environ.get("PG_IDLE_CLOSE_S", "120"))
 _IDLE_PING_S = 60
+_SEATS = _threading.BoundedSemaphore(_POOL_MAX)
 _idle: list = []                                        # [(conn, last_used)]
 # NOT psycopg2.pool: its pools close every returned connection above `minconn`,
 # so with minconn=0 nothing was ever reused (and a big minconn opens them all
@@ -60,34 +71,75 @@ def _dsn_kwargs() -> dict:
             "keepalives_count": 3, "connect_timeout": 15}
 
 
+def pooler_full(exc: BaseException) -> bool:
+    """The pooler refused us because every seat is taken (worth a short wait)."""
+    s = str(exc)
+    return "EMAXCONN" in s or "max clients reached" in s or "too many clients" in s
+
+
 def _new_conn():
-    conn = psycopg2.connect(os.environ["DATABASE_URL"], **_dsn_kwargs())
-    conn.autocommit = False
-    return conn
+    for delay in (0.5, 1.5, 3, 5, 0):
+        try:
+            conn = psycopg2.connect(os.environ["DATABASE_URL"], **_dsn_kwargs())
+            conn.autocommit = False
+            return conn
+        except psycopg2.OperationalError as exc:
+            if not delay or not pooler_full(exc):
+                raise
+            _time.sleep(delay)
+
+
+def _close_quietly(conn) -> None:
+    try:
+        conn.close()
+    except Exception:
+        pass
+
+
+def _reap_idle() -> None:
+    """Close connections nobody has used for a while (their seats go back)."""
+    now = _time.time()
+    with _POOL_LOCK:
+        stale = [it for it in _idle if now - it[1] > _IDLE_CLOSE_S]
+        _idle[:] = [it for it in _idle if now - it[1] <= _IDLE_CLOSE_S]
+    for conn, _ in stale:
+        _close_quietly(conn)
+        _SEATS.release()
 
 
 def _pg_acquire():
-    """(raw psycopg2 connection, pooled?) - an idle one if there is one."""
+    """(raw psycopg2 connection, pooled?). Pooled connections hold a seat until
+    they are closed; an idle one is reused first."""
+    _reap_idle()
     while True:
         with _POOL_LOCK:
             item = _idle.pop() if _idle else None
         if item is None:
-            return _new_conn(), True
+            break
         conn, last = item
-        if conn.closed:
-            continue
-        if _time.time() - last > _IDLE_PING_S:     # the pooler drops idle clients
+        if not conn.closed and _time.time() - last <= _IDLE_PING_S:
+            return conn, True
+        if not conn.closed:                          # the pooler drops idle clients
             try:
                 with conn.cursor() as cur:
                     cur.execute("SELECT 1")
                 conn.rollback()
+                return conn, True
             except Exception:
-                try:
-                    conn.close()
-                except Exception:
-                    pass
-                continue
-        return conn, True
+                pass
+        _close_quietly(conn)
+        _SEATS.release()
+    if not _SEATS.acquire(timeout=_POOL_WAIT_S):
+        # Every seat busy for 20 s - most likely a leaked connection. Don't hang
+        # the request: open one outside the pool (closed again on release).
+        print(f"[db] pool exhausted ({_POOL_MAX} in use for {_POOL_WAIT_S:.0f}s) - "
+              "opening an unpooled connection", flush=True)
+        return _new_conn(), False
+    try:
+        return _new_conn(), True
+    except BaseException:
+        _SEATS.release()
+        raise
 
 
 def _pg_release(conn, pooled: bool) -> None:
@@ -99,13 +151,11 @@ def _pg_release(conn, pooled: bool) -> None:
             keep = False
     if keep:
         with _POOL_LOCK:
-            if len(_idle) < _POOL_MAX:
-                _idle.append((conn, _time.time()))
-                return
-    try:
-        conn.close()
-    except Exception:
-        pass
+            _idle.append((conn, _time.time()))
+        return
+    _close_quietly(conn)
+    if pooled:
+        _SEATS.release()
 
 
 class _Row(dict):

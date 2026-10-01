@@ -67,7 +67,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20260930a"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20261001a"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -243,6 +243,25 @@ def _validate_chapters(sel: Selection) -> dict[str, dict]:
     return known
 
 
+_SRC_SEEN: dict[str, tuple[float, bool]] = {}
+
+
+def _source_exists(rel_path: str | None) -> bool:
+    """Is this question's original PDF on disk? Booklets are cropped from the
+    originals, so a question whose paper is missing would fail the build.
+    Cached for 10 min per worker (files only appear on a sync)."""
+    if not rel_path:
+        return False
+    hit = _SRC_SEEN.get(rel_path)
+    if hit and time.time() - hit[0] < 600:
+        return hit[1]
+    ok = (ROOT / str(rel_path).replace("\\", "/")).is_file()
+    if len(_SRC_SEEN) > 50000:
+        _SRC_SEEN.clear()
+    _SRC_SEEN[rel_path] = (time.time(), ok)
+    return ok
+
+
 def question_pool(sel: Selection) -> list[dict]:
     """Every question matching the selection, tagged with the bucket it counts
     towards: the subtopic when the student picked subtopics, else the chapter."""
@@ -255,7 +274,7 @@ def question_pool(sel: Selection) -> list[dict]:
     try:
         rows = con.execute(
             f"""SELECT q.id, q.number, q.sub_part, q.marks, c.topic, c.secondary_topic, c.subtopic,
-                       p.year, p.session, p.paper, p.variant
+                       p.year, p.session, p.paper, p.variant, p.rel_path
                 FROM questions q
                 JOIN classifications c ON c.question_id = q.id
                 JOIN papers p ON p.id = q.paper_id
@@ -268,6 +287,8 @@ def question_pool(sel: Selection) -> list[dict]:
         con.close()
     pool = []
     for r in rows:
+        if not _source_exists(r["rel_path"]):
+            continue                  # can't be printed - never offer it
         home = r["topic"] if r["topic"] in picks else r["secondary_topic"]
         subs = picks[home]
         if subs:
@@ -346,7 +367,7 @@ def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)
         "params_json": {**req.model_dump(), "total_marks": sum(q["marks"] or 0 for q in chosen)},
         "question_ids": [q["id"] for q in chosen], "status": "queued",
         "progress": 0, "stage": "Picking questions"})
-    _EXEC.submit(_build, booklet_id, user)
+    _EXEC.submit(_build_safely, booklet_id, user)
     return {"id": booklet_id, "url": f"/papers/view/{booklet_id}",
             "questions": len(chosen), "title": title}
 
@@ -365,7 +386,8 @@ def my_booklets(user: dict = Depends(_auth.get_current_user)):
 def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
     b = _owned(booklet_id, user)
     return {**{k: b.get(k) for k in ("id", "title", "syllabus", "status", "progress", "stage",
-                                     "error", "params_json", "page_map_json", "created_at")},
+                                     "params_json", "page_map_json", "created_at")},
+            "error": failure(b)["message"] if b["status"] == "failed" else None,
             "kind": _kind(b)}
 
 
@@ -376,8 +398,30 @@ def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)
         return {"status": "expired", "progress": 100, "stage": "Kept as a record",
                 "error": f"This paper was last opened more than {RETENTION_DAYS} days ago, so its PDF "
                          "has been removed. It stays on My papers as a record."}
-    return {"status": b["status"], "progress": b["progress"], "stage": b.get("stage"),
-            "error": b.get("error")}
+    b = _fail_if_stuck(b)
+    out = {"status": b["status"], "progress": b["progress"], "stage": b.get("stage"),
+           "error": None}
+    if b["status"] == "failed":
+        e = failure(b)
+        out.update(error=e["message"], error_code=e["code"], error_title=e["title"],
+                   retryable=e["retryable"], attention=e["attention"], skipped=e["skipped"])
+    elif b["status"] == "ready":
+        pm = b.get("page_map_json")
+        out["skipped"] = (pm.get("skipped") or 0) if isinstance(pm, dict) else 0
+    return out
+
+
+@router.post("/api/booklets/{booklet_id}/retry")
+def booklet_retry(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
+    """Build a failed paper again - the same questions, the same order. No new
+    quota: only a successful build is ever counted."""
+    b = _fail_if_stuck(_owned(booklet_id, user))
+    if b["status"] != "failed":
+        raise HTTPException(409, "This paper isn't in a failed state.")
+    _udb.update_booklet(booklet_id, {"status": "queued", "progress": 0,
+                                     "stage": "Trying again", "error": None})
+    _EXEC.submit(_build_safely, booklet_id, user)
+    return {"ok": True}
 
 
 @router.get("/api/booklets/{booklet_id}/pdf")
@@ -415,11 +459,135 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", an
                         headers={"Cache-Control": "private, max-age=3600"})
 
 
+# ── Failures ──────────────────────────────────────────────────────────────────
+# A failed build stores a small JSON object in `error`: {code, detail, skipped}.
+# The student is shown FAILURES[code] (what happened + what to do); `detail` is
+# the technical tail for the tutor (admin, server log). Until 2026-10-01 every
+# failure was the same "We couldn't build this paper", the real cause only went
+# to the server log, and a build that died outside the try (or with the worker)
+# left the loader spinning forever.
+
+FAILURES = {
+    "busy": {
+        "title": "Our server was too busy",
+        "message": "Too many papers were being built at the same moment, so yours couldn't "
+                   "start - we tried three times. Nothing is wrong with your selection: "
+                   "press Try again in a minute.",
+        "retryable": True, "attention": False},
+    "interrupted": {
+        "title": "The build was interrupted",
+        "message": "Our server restarted while your paper was being built. Nothing is "
+                   "wrong with your selection - press Try again.",
+        "retryable": True, "attention": False},
+    "timeout": {
+        "title": "This paper is too big to build in one go",
+        "message": f"It took longer than {BUILD_TIMEOUT_S // 60} minutes. Pick fewer questions "
+                   "(30 or fewer) or fewer chapters, then build again.",
+        "retryable": False, "attention": False},
+    "too_big": {
+        "title": "This paper needed more memory than we had free",
+        "message": "Try again in a few minutes, or pick fewer questions or chapters.",
+        "retryable": True, "attention": False},
+    "missing_source": {
+        "title": "The original papers for these questions are missing",
+        "message": "We crop every question from the original Cambridge paper, and the "
+                   "papers for the questions you picked aren't on our server. Try a "
+                   "different year range or chapters - and please tell us below so Tee "
+                   "can add them.",
+        "retryable": False, "attention": True},
+    "internal": {
+        "title": "Something broke on our side",
+        "message": "This isn't caused by your selection. Press Try again - if it fails "
+                   "again, please tell us below so Tee can fix it.",
+        "retryable": True, "attention": True},
+}
+
+_BUSY_HINTS = ("EMAXCONN", "max clients reached", "too many clients", "could not connect",
+               "timeout expired", "server closed the connection", "Connection refused",
+               "OperationalError", "SSL SYSCALL")
+STUCK_BUILDING_S = BUILD_TIMEOUT_S + 180     # no progress written for this long = dead
+STUCK_QUEUED_S = 15 * 60
+
+
+def failure(b: dict) -> dict:
+    """What to tell the student about a failed booklet."""
+    raw = b.get("error") or ""
+    info: dict = {}
+    if raw.startswith("{"):
+        try:
+            info = json.loads(raw)
+        except ValueError:
+            info = {}
+    code = info.get("code") if info.get("code") in FAILURES else "internal"
+    return {"code": code, **FAILURES[code], "detail": info.get("detail") or raw,
+            "skipped": info.get("skipped") or 0}
+
+
+def classify_failure(rc: int | None, tail: list[str], timed_out: bool) -> str:
+    text = "\n".join(tail)
+    if timed_out:
+        return "timeout"
+    if any(h in text for h in _BUSY_HINTS):
+        return "busy"
+    if rc in (-9, 137) or "MemoryError" in text:          # SIGKILL = the OOM killer
+        return "too_big"
+    if "original papers are missing" in text or "could be loaded" in text:
+        return "missing_source"
+    return "internal"
+
+
+def _write(booklet_id: str, fields: dict) -> bool:
+    """update_booklet, retried - a status write that fails leaves the loader
+    spinning, which is exactly the "nothing happens" students reported."""
+    for delay in (0, 1, 3, 8):
+        time.sleep(delay)
+        try:
+            _udb.update_booklet(booklet_id, fields)
+            return True
+        except Exception as exc:
+            print(f"[booklet {booklet_id}] status write failed: {exc}", flush=True)
+    return False
+
+
+def _mark_failed(booklet_id: str, code: str, detail: str, skipped: int = 0) -> None:
+    print(f"[booklet {booklet_id}] build failed ({code}): {detail}", flush=True)
+    _write(booklet_id, {"status": "failed", "stage": "Failed",
+                        "error": json.dumps({"code": code, "detail": detail[-1500:],
+                                             "skipped": skipped})})
+
+
+def _age_s(ts) -> float:
+    from datetime import datetime, timezone
+    if not ts:
+        return 0.0
+    try:
+        t = ts if isinstance(ts, datetime) else datetime.fromisoformat(
+            str(ts).replace("Z", "+00:00").replace(" ", "T", 1))
+    except ValueError:
+        return 0.0
+    if t.tzinfo is None:
+        t = t.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - t).total_seconds()
+
+
+def _fail_if_stuck(b: dict) -> dict:
+    """A build whose worker died (restart, deploy, crash) never writes again.
+    Spot it from the row's age and fail it with a reason, so the loader stops."""
+    limit = {"building": STUCK_BUILDING_S, "queued": STUCK_QUEUED_S}.get(b["status"])
+    if limit and _age_s(b.get("updated_at") or b.get("created_at")) > limit:
+        _mark_failed(b["id"], "interrupted",
+                     f"no progress for {limit // 60} min while {b['status']} (worker gone?)")
+        return {**b, "status": "failed", "stage": "Failed",
+                "error": json.dumps({"code": "interrupted"})}
+    return b
+
+
 # ── Build job ─────────────────────────────────────────────────────────────────
 
 _STAGES = {"contents": (90, "Building the clickable contents page"),
            "scheme": (70, "Writing the separate mark scheme"),
            "saving": (96, "Finishing your paper")}
+BUSY_RETRIES = (6, 20)        # seconds before the 2nd and 3rd attempt
 
 
 def _kind(b: dict) -> str:
@@ -431,11 +599,23 @@ def _event(kind: str) -> str:
     return "topic_test" if kind == "test" else "topical_paper"
 
 
+def _build_safely(booklet_id: str, user: dict, record: bool = True) -> None:
+    """The executor swallows exceptions, so anything that escapes _build (a
+    Supabase read failing before the first status write, say) would leave the
+    row 'queued' forever. Catch it and say so."""
+    try:
+        _build(booklet_id, user, record)
+    except Exception as exc:
+        import traceback
+        _mark_failed(booklet_id, classify_failure(None, [repr(exc)], False),
+                     traceback.format_exc()[-1500:])
+
+
 def _build(booklet_id: str, user: dict, record: bool = True) -> None:
-    """Run pipeline.compose for a booklet, streaming progress into its row."""
+    """Run pipeline.compose / testgen for a booklet, streaming progress into its row."""
     b = _udb.get_booklet(booklet_id)
-    if b is None:
-        return
+    if b is None or b["status"] not in ("queued", "building"):
+        return                     # already failed as stuck, or built by another worker
     params = b["params_json"] or {}
     BOOKLET_DIR.mkdir(parents=True, exist_ok=True)
     final = BOOKLET_DIR / f"{booklet_id}.pdf"
@@ -460,21 +640,29 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
 
     def push(progress: int, stage: str):
         if stage != last["stage"] or progress - last["progress"] >= 5:
-            _udb.update_booklet(booklet_id, {"status": "building",
-                                             "progress": progress, "stage": stage})
+            _write(booklet_id, {"status": "building", "progress": progress, "stage": stage})
             last.update(progress=progress, stage=stage)
 
-    push(4, "Cropping questions from the original papers")
-    tail: list[str] = []
-    try:
+    def run_once() -> tuple[int | None, list[str], bool, list[str]]:
+        """(exit code, last output lines, timed out?, skipped question lines)"""
+        tail: list[str] = []
+        skipped: list[str] = []
+        timed_out = {"v": False}
         proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT, text=True,
                                 env={**os.environ, "PWT_PROGRESS": "1"})
-        timer = threading.Timer(BUILD_TIMEOUT_S, proc.kill)
+
+        def kill():
+            timed_out["v"] = True
+            proc.kill()
+        timer = threading.Timer(BUILD_TIMEOUT_S, kill)
         timer.start()
         try:
             for line in proc.stdout:
                 line = line.strip()
+                if line.startswith("SKIPPED "):
+                    skipped.append(line)
+                    continue
                 if not line.startswith("PROGRESS "):
                     tail = (tail + [line])[-20:]
                     continue
@@ -488,27 +676,49 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
             rc = proc.wait()
         finally:
             timer.cancel()
-        if rc != 0 or not pdf.exists():
-            raise RuntimeError(" | ".join(tail[-3:]) or f"{cmd[2]} exited {rc}")
-        page_map = json.loads(pmap.read_text("utf-8")) if pmap.exists() else None
-        tmp_ms = pdf.with_name(pdf.stem + "_ms.pdf")          # testgen's companion file
-        if test:
-            os.replace(tmp_ms, final_ms)
-        os.replace(pdf, final)
-        if pmap.exists():
-            os.replace(pmap, final_map)
-        _udb.update_booklet(booklet_id, {"status": "ready", "progress": 100,
-                                         "stage": "Ready", "page_map_json": page_map,
-                                         "error": None})
-        if record:
-            _access.record_quota(user, _event(_kind(b)), b.get("syllabus"))   # only successful builds count
-    except Exception as exc:                              # surface, never hang the loader
-        print(f"[booklet {booklet_id}] build failed: {exc}", flush=True)
+        return rc, tail, timed_out["v"], skipped
+
+    def cleanup():
         for leftover in BOOKLET_DIR.glob(f"{booklet_id}{tag}*"):
             leftover.unlink(missing_ok=True)
-        _udb.update_booklet(booklet_id, {"status": "failed", "stage": "Failed",
-                                         "error": "We couldn't build this paper. "
-                                                  "Please try again."})
+
+    push(4, "Cropping questions from the original papers")
+    attempts = 1 + len(BUSY_RETRIES)
+    for attempt in range(1, attempts + 1):
+        rc, tail, timed_out, skipped = run_once()
+        if rc == 0 and pdf.exists():
+            break
+        cleanup()
+        code = classify_failure(rc, tail, timed_out)
+        detail = f"exit {rc}" + (" (timed out)" if timed_out else "") + ": " + " | ".join(tail[-6:])
+        if code in ("busy", "too_big") and attempt < attempts:
+            print(f"[booklet {booklet_id}] attempt {attempt} failed ({code}), retrying",
+                  flush=True)
+            last["progress"] = -1
+            push(4, f"Our server is busy - trying again ({attempt + 1}/{attempts})")
+            time.sleep(BUSY_RETRIES[attempt - 1])
+            continue
+        _mark_failed(booklet_id, code, detail, len(skipped))
+        return
+
+    page_map = json.loads(pmap.read_text("utf-8")) if pmap.exists() else None
+    if skipped:
+        page_map = {**(page_map or {}), "skipped": len(skipped)}
+        print(f"[booklet {booklet_id}] skipped {len(skipped)} question(s) with missing "
+              f"source PDFs: {'; '.join(skipped[:5])}", flush=True)
+    tmp_ms = pdf.with_name(pdf.stem + "_ms.pdf")          # testgen's companion file
+    if test:
+        os.replace(tmp_ms, final_ms)
+    os.replace(pdf, final)
+    if pmap.exists():
+        os.replace(pmap, final_map)
+    _write(booklet_id, {"status": "ready", "progress": 100, "stage": "Ready",
+                        "page_map_json": page_map, "error": None})
+    if record:
+        try:
+            _access.record_quota(user, _event(_kind(b)), b.get("syllabus"))   # only successful builds count
+        except Exception as exc:                          # never fail a built paper over this
+            print(f"[booklet {booklet_id}] quota record failed: {exc}", flush=True)
 
 
 # ── Viewer page ───────────────────────────────────────────────────────────────
@@ -527,7 +737,12 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
     _dock = _ui.tools_dock(b["syllabus"])
     state = {"id": b["id"], "title": b["title"], "syllabus": b["syllabus"], "kind": _kind(b),
              "totalMarks": (b.get("params_json") or {}).get("total_marks"),
-             "subjectUrl": _catalog.subject_url(b["syllabus"]) if subj else "/papers"}
+             "subjectUrl": _catalog.subject_url(b["syllabus"]) if subj else "/papers",
+             "rebuildUrl": _rebuild_url(b),
+             # prefill for the "Tell us about this problem" form on a failed build
+             "me": {"name": user.get("full_name") or user.get("name") or "",
+                    "email": user.get("email") or ""}}
+    state_json = json.dumps(state).replace("</", "<\\/")
     return HTMLResponse(f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -549,13 +764,13 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <body class="vw-page"{_dock[0]}>
 {_blog._nav()}
 <main id="vw" class="vw" data-state="loading"></main>
-<script id="vw-state" type="application/json">{json.dumps(state)}</script>
+<script id="vw-state" type="application/json">{state_json}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20260929a"></script>
+<script type="module" src="/auth.js?v=20261001a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 {_dock[1]}
 </body>
@@ -612,6 +827,8 @@ def _paper_card(b: dict, inked: set[str]) -> str:
     bid = esc(b["id"])
     if state in ("ready", "building"):
         acts.append(f'<a class="cat-btn" href="/papers/view/{bid}">Open</a>')
+    elif state == "failed":
+        acts.append(f'<a class="cat-btn" href="/papers/view/{bid}">See why · try again</a>')
     if state == "ready":
         acts.append(f'<a class="cat-btn cat-btn-ghost" href="/api/booklets/{bid}/pdf?download=1">'
                     f'{ui.icon("download")} PDF</a>')

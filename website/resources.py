@@ -377,7 +377,7 @@ def resource_viewer(f: str, user: dict | None = Depends(_auth.maybe_user)):
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20260929a"></script>
+<script type="module" src="/auth.js?v=20261001a"></script>
 <script type="module" src="/resource-viewer.js?v={RES_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

@@ -428,7 +428,7 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 <script src="/main.js?v=20260930a"></script>
 <script src="/tools-core.js?v=20260930c"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20260929a"></script>
+<script type="module" src="/auth.js?v=20261001a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>

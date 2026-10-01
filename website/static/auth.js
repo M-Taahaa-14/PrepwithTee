@@ -120,7 +120,15 @@ export async function api(path, { method = "GET", body, timeout = 20000 } = {}) 
           (detail.code === "upgrade_required" || detail.code === "quota_exceeded")) {
         throw new UpgradeRequiredError(detail);
       }
-      throw new Error(data?.detail || data?.message || `Request failed (${res.status})`);
+      // detail can be a string, an object ({code, message}) or FastAPI's list of
+      // validation errors - never let "[object Object]" reach a student.
+      const msg = typeof data?.detail === "string" ? data.detail
+        : detail.message || (Array.isArray(data?.detail) && data.detail[0]?.msg?.replace(/^Value error, /, ""))
+        || data?.message || `Request failed (${res.status})`;
+      const err = new Error(msg);
+      err.status = res.status;
+      err.detail = data?.detail;
+      throw err;
     }
     return data;
   } catch (err) {

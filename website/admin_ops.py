@@ -415,7 +415,7 @@ def booklet_for_student(user_id: str, req: dict, admin=Admin):
         "question_ids": [q["id"] for q in chosen], "status": "queued", "progress": 0,
         "stage": "Picking questions"})
     if os.environ.get("APP_ENV") != "test":
-        _b._EXEC.submit(_b._build, bid, student, False)       # record=False: no quota used
+        _b._EXEC.submit(_b._build_safely, bid, student, False)       # record=False: no quota used
     return {"id": bid, "title": title, "questions": len(chosen), "url": f"/papers/view/{bid}"}
 
 

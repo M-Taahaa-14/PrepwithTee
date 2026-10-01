@@ -658,7 +658,7 @@
   <script src="tools-nav.js?v=20260811d"></script>
 
   <script type="module">
-    import { requireAuth, api, getUser } from "/auth.js?v=20260929a";
+    import { requireAuth, api, getUser } from "/auth.js?v=20261001a";
 
     const root = document.getElementById("profile-root");
 
@@ -2147,7 +2147,7 @@
       const signoutBtn = document.getElementById("pf-signout");
       if (signoutBtn) {
         signoutBtn.addEventListener("click", async () => {
-          const { logout } = await import("/auth.js?v=20260929a");
+          const { logout } = await import("/auth.js?v=20261001a");
           logout();
         });
       }

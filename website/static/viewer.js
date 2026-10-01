@@ -8,7 +8,7 @@
  *   tests    a mock test (kind "test") has no chips: Test / Mark scheme tabs, a
  *            countdown, and the separate mark scheme unlocks on "Finish test"
  */
-import { api } from "/auth.js?v=20260929a";
+import { api } from "/auth.js?v=20261001a";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20260930a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
@@ -74,26 +74,113 @@ function loader(st) {
     </section>`;
 }
 
-function failed(msg) {
+// ── Failure ─────────────────────────────────────────────────────────────────
+// Every failed build says WHAT happened and WHAT to do (the server classifies
+// it: busy, interrupted, timeout, too_big, missing_source, internal). Problems
+// only Tee can fix open the report form straight away.
+function failed(info) {
+  const st = typeof info === "string" ? { error: info } : (info || {});
+  const code = st.error_code || "internal";
+  const retry = st.retryable !== false;
+  const me = S.me || {};
   root.dataset.state = "failed";
   root.innerHTML = `
-    <section class="vw-load"><div class="vw-load-card">
-      <p class="vw-eyebrow">Something went wrong</p>
-      <h1>We couldn't build this paper</h1>
-      <p>${esc(msg || "Please try again.")}</p>
-      <a class="vw-btn" href="${S.subjectUrl}#builder">Back to the builder</a>
+    <section class="vw-load"><div class="vw-load-card vw-fail" role="alert">
+      <p class="vw-eyebrow">Your paper wasn't built</p>
+      <h1>${esc(st.error_title || "We couldn't build this paper")}</h1>
+      <p>${esc(st.error || "Something went wrong on our side. Please try again.")}</p>
+      <div class="vw-fail-acts">
+        ${retry ? `<button type="button" class="vw-btn" data-fail="retry">Try again</button>` : ""}
+        <a class="vw-btn ${retry ? "vw-btn-ghost" : ""}" href="${esc(S.rebuildUrl || S.subjectUrl + "#builder")}">Change my selection</a>
+        <button type="button" class="vw-btn vw-btn-ghost" data-fail="report"
+                aria-expanded="${st.attention ? "true" : "false"}" aria-controls="vw-report">Report this problem</button>
+      </div>
+      <form id="vw-report" class="vw-report" ${st.attention ? "" : "hidden"}>
+        <p class="vw-report-lead">Tell Tee what happened - the technical details of this build are
+          attached automatically, so you only need to add anything else you noticed.</p>
+        <label>Your name <input name="name" required minlength="2" maxlength="120" value="${esc(me.name)}"></label>
+        <label>Email (so we can tell you when it's fixed)
+          <input name="email" type="email" required value="${esc(me.email)}"></label>
+        <label><span>What were you trying to build? <span class="vw-opt">(optional)</span></span>
+          <textarea name="message" rows="3" maxlength="1200"
+            placeholder="e.g. I picked 4 chapters with 40 questions from 2015-2025"></textarea></label>
+        <p class="vw-ref">Reference: <code>${esc(S.id)} · ${esc(code)}</code></p>
+        <div class="vw-fail-acts"><button class="vw-btn" type="submit">Send to Tee</button></div>
+        <p class="vw-report-msg" role="status"></p>
+      </form>
     </div></section>`;
+  root.querySelector('[data-fail="retry"]')?.addEventListener("click", retryBuild);
+  const form = root.querySelector("#vw-report");
+  root.querySelector('[data-fail="report"]').addEventListener("click", (e) => {
+    form.hidden = !form.hidden;
+    e.currentTarget.setAttribute("aria-expanded", String(!form.hidden));
+    if (!form.hidden) form.querySelector("input,textarea")?.focus();
+  });
+  form.addEventListener("submit", (e) => sendReport(e, form, st, code));
 }
 
+async function sendReport(e, form, st, code) {
+  e.preventDefault();
+  const btn = form.querySelector('[type="submit"]');
+  const msg = form.querySelector(".vw-report-msg");
+  const f = new FormData(form);
+  const note = String(f.get("message") || "").trim();
+  btn.disabled = true;
+  msg.textContent = "Sending…";
+  try {
+    await api("/api/feedback", { method: "POST", body: {
+      type: "issue", page: location.pathname,
+      name: String(f.get("name") || "").trim(), email: String(f.get("email") || "").trim(),
+      message: `${note || "(no message)"}\n\n--- Topical paper build failed ---\n` +
+               `Booklet: ${S.id}\nPaper: ${S.title}\nSubject: ${S.syllabus}\n` +
+               `Cause: ${code}${st.skipped ? ` (${st.skipped} question(s) had missing source papers)` : ""}\n` +
+               `Shown to student: ${st.error || "-"}\nBrowser: ${navigator.userAgent}` } });
+    form.innerHTML = `<p class="vw-report-done">Thanks - Tee has your report and will get back to you by email.</p>`;
+  } catch (err) {
+    btn.disabled = false;
+    msg.textContent = err.message || "Couldn't send - please try again.";
+  }
+}
+
+async function retryBuild(e) {
+  e.currentTarget.disabled = true;
+  try {
+    await api(`/api/booklets/${S.id}/retry`, { method: "POST" });
+  } catch (err) {
+    // 409 = it's no longer failed (another tab retried it) - just wait for it.
+    if (!/failed state/.test(err.message || "")) { failed({ error: err.message, error_code: "retry" }); return; }
+  }
+  loader({ progress: 0, stage: "Trying again" });
+  open().catch(lostContact);
+}
+
+function lostContact(e) {
+  failed({ error_title: "We lost contact with the server",
+           error: `${e?.message || "The connection dropped."} Your paper may still be building - ` +
+                  "check your internet connection and press Try again, or open it later from My papers.",
+           error_code: "network", retryable: true });
+}
+
+// A single failed status poll (a blip on mobile data, a worker restarting)
+// used to end the page with a bare error. Keep polling; give up only when the
+// server has been unreachable for ~45 s.
 async function waitReady() {
+  let misses = 0;
   for (;;) {
     let st;
-    try { st = await api(`/api/booklets/${S.id}/status`); }
-    catch (e) { failed(e.message); return false; }
-    if (st.status === "ready") return true;
-    if (st.status === "failed") { failed(st.error); return false; }
+    try { st = await api(`/api/booklets/${S.id}/status`, { timeout: 15000 }); misses = 0; }
+    catch (e) {
+      if (/not found/i.test(e.message || "") || ++misses >= 6) { lostContact(e); return false; }
+      await new Promise((r) => setTimeout(r, 1500 * misses));
+      continue;
+    }
+    if (st.status === "ready") { S.skipped = st.skipped || 0; return true; }
+    if (st.status === "failed" || st.status === "expired") {
+      failed(st.status === "expired" ? { ...st, error_title: "This paper has expired", retryable: false } : st);
+      return false;
+    }
     loader(st);
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((r) => setTimeout(r, 900));
   }
 }
 
@@ -107,6 +194,13 @@ async function open() {
   const meta = await api(`/api/booklets/${S.id}`);
   questions = (meta.page_map_json || { questions: [] }).questions || [];
   shell();
+  if (S.skipped) {
+    const n = S.skipped;
+    root.insertAdjacentHTML("afterbegin", `<p class="vw-note" role="status">${n} question${n === 1 ? " was" : "s were"}
+      left out because ${n === 1 ? "its" : "their"} original paper is missing on our server - the rest of your paper is complete.
+      <button type="button" aria-label="Dismiss">×</button></p>`);
+    root.querySelector(".vw-note button").addEventListener("click", (e) => e.currentTarget.parentElement.remove());
+  }
   const ann = createAnnotator({ mount: document.body });
   pane = new PdfPane(document.getElementById("vw-stage"), {
     questions, ranged: true, uniform: true,      // first page long before the whole file
@@ -304,4 +398,4 @@ document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "-") { e.preventDefault(); pane?.zoomOut(); }
 });
 
-open().catch((e) => failed(e.message));
+open().catch(lostContact);

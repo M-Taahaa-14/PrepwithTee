@@ -18,6 +18,24 @@ if USE_PG:
     from psycopg2.extras import RealDictCursor  # type: ignore
 
 
+def _pg_connect():
+    """Connect, waiting out a full pooler. Supabase's session pooler has 15
+    seats for the whole project; a booklet build that found them all taken used
+    to fail outright. Up to ~60 s of backoff, then the real error."""
+    import time
+    for delay in (1, 2, 4, 8, 15, 30, 0):
+        try:
+            conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=15)
+            conn.autocommit = False
+            return conn
+        except psycopg2.OperationalError as exc:
+            s = str(exc)
+            full = "EMAXCONN" in s or "max clients reached" in s or "too many clients" in s
+            if not delay or not full:
+                raise
+            time.sleep(delay)
+
+
 class _Row(dict):
     """Dict that also supports positional [0] indexing (like sqlite3.Row)."""
     def __getitem__(self, key):
@@ -288,9 +306,7 @@ def _migrate(con: sqlite3.Connection):
 def connect():
     """Return a sqlite3-compatible connection (SQLite locally; Supabase on server)."""
     if USE_PG:
-        conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        conn.autocommit = False
-        return _PgConn(conn)
+        return _PgConn(_pg_connect())
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(config.DB_PATH)
     con.row_factory = sqlite3.Row

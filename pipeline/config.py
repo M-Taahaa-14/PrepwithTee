@@ -145,6 +145,18 @@ def folder_to_session(folder_name: str) -> str | None:
     return None
 
 
+def source_path(rel_path) -> Path:
+    """Absolute path of an original PDF from its papers.rel_path."""
+    return ROOT / str(rel_path).replace("\\", "/")
+
+
+def source_exists(rel_path) -> bool:
+    """compose/testgen crop from the ORIGINAL PDFs, so a question whose paper
+    is missing on this machine cannot be printed (it used to fail the whole
+    booklet: 9709_w19_qp_12 on the server, 2026-09-25)."""
+    return bool(rel_path) and source_path(rel_path).is_file()
+
+
 def session_display(session: str) -> str:
     """Session code -> the form used in Cambridge source references."""
     return {"s": "M/J", "w": "O/N", "m": "F/M"}[session]

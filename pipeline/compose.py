@@ -1244,6 +1244,10 @@ def fetch_by_ids(con, ids: list[int], topics: list[str]):
         r = rows.get(qid)
         if r is None:
             continue
+        if not config.source_exists(r["rel_path"]):
+            # The web builder reads these lines and tells the student.
+            print(f"SKIPPED {qid} missing-source {r['rel_path']}", flush=True)
+            continue
         home = (next((t for t in topics if r["topic"] == t), None)
                 or next((t for t in topics if r["secondary_topic"] == t), None)
                 or r["topic"])
@@ -1378,7 +1382,8 @@ def main(argv=None):
     else:
         sections = fetch_sections(con, args, topics)
     if not sections:
-        raise SystemExit("no classified questions match these filters")
+        raise SystemExit("no classified questions match these filters"
+                         + (" (their original papers are missing)" if args.ids else ""))
 
     booklet = Booklet()
     src_cache: dict[str, fitz.Document] = {}
@@ -1406,7 +1411,7 @@ def main(argv=None):
                 "SELECT rel_path FROM papers "
                 "WHERE syllabus=? AND year=? AND session=? AND paper=? AND kind='in' "
                 "LIMIT 1", (syl, year, session, paper)).fetchone()
-            if row:
+            if row and config.source_exists(row["rel_path"]):
                 idoc = src(row["rel_path"])
                 p2map = _p2_insert_question_pages(idoc) if (syl == "2059" and paper == 2) else None
                 ins_cache[key] = (idoc, p2map)
@@ -1530,7 +1535,7 @@ def main(argv=None):
                     """, (syl, q["year"], q["session"], q["paper"],
                           q["variant"], q["number"],
                           q["sub_part"] or "")).fetchone()
-                if ms is None:
+                if ms is None or not config.source_exists(ms["rel_path"]):
                     n_ms_missing += 1
                     booklet.label(f"Mark scheme for {ref}: not available",
                                   keep_with=0)

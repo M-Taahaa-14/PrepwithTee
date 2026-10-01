@@ -502,7 +502,7 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20260929a"></script>
+<script type="module" src="/auth.js?v=20261001a"></script>
 <script type="module" src="/mcq-session.js?v={SESSION_V}"></script>
 {_dock[1]}
 </body>

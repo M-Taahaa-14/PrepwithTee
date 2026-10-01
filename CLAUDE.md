@@ -869,3 +869,41 @@ linked), not agreement with any external file.
       touched), per-paper filter, years grouped by paper, Not done / Started / Done, marks modal
       with the sitting's official thresholds (`/api/grade-thresholds`) and the grade worked out
       live (`core.gradeFor`, same rule as static/progress-shared.js).
+
+36. **Booklet builds failing silently - root cause + fix (2026-10-01, local, NOT deployed).**
+    - **Root cause**: production logs showed 136 of 252 builds failed in the week since
+      the 2026-09-27 DB pool went live; 134 were `EMAXCONNSESSION max clients reached in
+      session mode - pool_size: 15`. DATABASE_URL uses Supabase's SESSION pooler (port
+      5432) = 15 seats for the whole project; `website/db.py` kept up to 12 idle
+      connections PER worker (2 workers = 24) and never waited, so the compose/testgen
+      subprocess (its own connection) found no seat and died. The student only saw "We
+      couldn't build this paper"; the cause went to journalctl. Other pages hit the same
+      error (~1,400 log lines).
+    - **Pool**: now a HARD cap per worker (`PG_POOL_MAX`, default 4, idle + in use), requests
+      wait up to `PG_POOL_WAIT_S` (20 s) then get an unpooled connection (logged), idle
+      connections close after `PG_IDLE_CLOSE_S` (120 s), `_new_conn` waits out a full
+      pooler. Budget: 2 x 4 + 4 build subprocesses <= 15 - **never raise PG_POOL_MAX
+      without moving to the transaction pooler (port 6543)**. `pipeline/db.connect` backs
+      off up to ~60 s on a full pooler.
+    - **Builds** (`booklets.py`): `_build_safely` wraps everything (the executor swallowed
+      exceptions -> rows stuck 'queued'); busy/out-of-memory failures retry twice
+      (`BUSY_RETRIES`); a failure stores JSON in `error` = {code, detail, skipped}; codes
+      busy / interrupted / timeout / too_big / missing_source / internal map to
+      `FAILURES` (title, message, retryable, attention). The student never sees `detail`.
+      Status writes are retried. A row with no progress for BUILD_TIMEOUT+3 min (building)
+      or 15 min (queued) is failed as `interrupted` when polled. `POST
+      /api/booklets/{id}/retry` rebuilds the same ids (no quota). Questions whose original
+      PDF is missing are never offered (`_source_exists` in question_pool), and
+      compose/testgen print `SKIPPED <id> missing-source` and carry on instead of crashing
+      (`config.source_exists`); the viewer notes how many were left out.
+    - **Viewer**: failure card with cause + Try again / Change my selection (builder
+      `?pick=`) / Report this problem (prefilled name+email, posts /api/feedback type
+      `issue` with booklet id + cause; opens by itself for `attention` codes). A status-poll
+      blip no longer ends the page (gives up after ~45 s). My papers: failed cards link to
+      "See why · try again". `auth.js` `api()` no longer shows "[object Object]" for object /
+      list `detail`s (all 58 references bumped to 20261001a).
+    - **Missing source PDFs on the server** (2026-10-01): 129 QPs / 898 questions in the DB
+      have no file under /srv/prepwithtee/data/raw (mostly 9709, 0625 P3 2010-15, the
+      Feb/March 2026 papers). They are now hidden from the builder; uploading them brings
+      them back automatically (10-min cache).
+    - Tests: tests/api/test_booklet_failures.py, tests/e2e/test_booklet_failure.py.

@@ -267,7 +267,7 @@ def _get_insert(con, cache, syl, year, session, paper):
         "SELECT rel_path FROM papers "
         "WHERE syllabus=? AND year=? AND session=? AND paper=? AND kind='in' "
         "LIMIT 1", (syl, year, session, paper)).fetchone()
-    if not row:
+    if not row or not config.source_exists(row["rel_path"]):
         return None
     idoc = _src(cache, row["rel_path"])
     p2map = _p2_insert_question_pages(idoc) if (syl == "2059" and paper == 2) else None
@@ -404,6 +404,8 @@ def render_ms(con, args, subject, topics, chosen, cache):
                   q["variant"], q["number"], q["sub_part"] or "")).fetchone()
         # No row at all, or a row whose crop is empty - either way there is
         # nothing to show, so say so rather than emitting a silent gap.
+        if ms is not None and not config.source_exists(ms["rel_path"]):
+            ms = None
         ms_rects = json.loads(ms["rects_json"]) if ms is not None else []
         ms_rects = [_fit_rect_to_text(_src(cache, ms["rel_path"]), r) for r in ms_rects]
         if not ms_rects:
@@ -487,9 +489,18 @@ def main():
             """, ids
         ).fetchall()
         by_id = {r["id"]: r for r in rows}
-        chosen = [by_id[i] for i in ids if i in by_id]
+        chosen = []
+        for i in ids:
+            if i not in by_id:
+                continue
+            if not config.source_exists(by_id[i]["rel_path"]):
+                # The web builder reads these lines and tells the student.
+                print(f"SKIPPED {i} missing-source {by_id[i]['rel_path']}", flush=True)
+                continue
+            chosen.append(by_id[i])
         if not chosen:
-            raise SystemExit("--ids: none of the given IDs found in the database")
+            raise SystemExit("--ids: none of the given questions could be loaded "
+                             "(not in the database, or their original papers are missing)")
     else:
         chosen = select(con, args, topics)
     subject = taxonomy.get("subject", args.syllabus)

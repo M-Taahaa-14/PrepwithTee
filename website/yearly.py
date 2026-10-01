@@ -482,7 +482,7 @@ def yearly_viewer(paper_id: int, doc: str = "qp", user: dict | None = Depends(_a
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20260929a"></script>
+<script type="module" src="/auth.js?v=20261001a"></script>
 <script type="module" src="/paper-viewer.js?v={VIEWER_V}"></script>
 {_dock[1]}
 </body>
