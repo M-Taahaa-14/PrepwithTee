@@ -133,6 +133,7 @@ export class DataTable {
       this.rows = out.rows;
       this.total = out.total;
       this.facets = out.facets || this._clientFacets();
+      this.meta = out;                              // whole response: options(counts, meta)
       this._fillFilterOptions();
       this._renderBody();
       this._renderFoot();
@@ -196,7 +197,7 @@ export class DataTable {
       const sel = $(`[data-filter="${f.key}"]`, this.el);
       if (!sel) continue;
       const counts = this.facets?.[f.key] || {};
-      const opts = f.options ? f.options(counts)
+      const opts = f.options ? f.options(counts, this.meta || {})
         : Object.keys(counts).sort().map(v => ({ value: v, label: f.label_for?.(v) || v, count: counts[v] }));
       const cur = this.state.filters[f.key] || "";
       sel.innerHTML = `<option value="">${esc(f.label)}</option>` + opts.map(op =>

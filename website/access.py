@@ -241,7 +241,7 @@ MONTHLY_QUOTAS: dict[str, dict[str, int | None]] = {
     "yearly_paper":  {"free": None, "solo": None, "three": None, "all": None},
     "ai_tutor":      {"free": None, "solo": None, "three": None, "all": None},
     "ai_quiz":       {"free": 1,  "solo": None, "three": None, "all": None},
-    "topic_test":    {"free": 2,  "solo": None, "three": None, "all": None},
+    "topic_test":    {"free": 3,  "solo": None, "three": None, "all": None},
     "mcq_drill":     {"free": 20, "solo": None, "three": None, "all": None},
 }
 
@@ -296,13 +296,17 @@ def _quota_detail(user: dict, event_type: str, used: int, limit: int, trial: boo
     }
 
 
-def check_quota_gate(user: dict, event_type: str, syllabus: str | None = None):
+def check_quota_gate(user: dict, event_type: str, syllabus: str | None = None,
+                     pending=None):
     """Check quota only - does NOT record usage.
 
     Call this before an expensive operation. If it passes, call record_quota()
     after success so a failure doesn't consume the user's allowance.
     Pass the subject: a subject-limited plan is only unlimited for its own
     subjects, and the free allowance for the others counts only their usage.
+    pending(exclude_syllabi) -> int counts work already started but not yet
+    recorded (booklets still building): without it, clicking Build again while
+    earlier builds run slips past the limit.
     """
     if user.get("role") in ("teacher", "admin"):
         return
@@ -314,6 +318,8 @@ def check_quota_gate(user: dict, event_type: str, syllabus: str | None = None):
     used = _udb.count_usage_this_month(
         user["id"], event_type, billing_period_start(user.get("plan_started_at")),
         exclude_syllabi=exclude)
+    if pending is not None:
+        used += pending(exclude)
     if used >= limit:
         raise HTTPException(429, detail=_quota_detail(user, event_type, used, limit,
                                                       trial, syllabus))

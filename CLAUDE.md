@@ -912,3 +912,15 @@ linked), not agreement with any external file.
       Feb/March 2026 papers). They are now hidden from the builder; uploading them brings
       them back automatically (10-min cache).
     - Tests: tests/api/test_booklet_failures.py, tests/e2e/test_booklet_failure.py.
+
+37. **Booklet quota loophole + student countries (2026-10-04).**
+    - Free students got a 4th booklet by clicking Build while earlier builds were still
+      running (a build only counts once it succeeds). `check_quota_gate(..., pending=)` now
+      adds the student's queued/building booklets (`booklets._inflight`; tutor-set papers and
+      dead builds per `_fail_if_stuck`'s rule excluded), gate + insert run under a per-user
+      lock, quota is recorded BEFORE the row says ready, and Retry needs room too.
+      Free = **3 topical booklets + 3 mock tests a month, separate allowances** (tutor).
+      Trial exists only as the admin "7-day trial" tick (nobody has one).
+    - Admin Students table: country from the WhatsApp number (`website/countries.py`, ITU
+      prefix table, local Pakistani formats; unplaceable = unknown, never guessed),
+      "All countries" filter with counts, sortable, CSV column. DataTable `options(counts, meta)`.

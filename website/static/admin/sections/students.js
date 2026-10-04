@@ -9,10 +9,14 @@ const COLUMNS = [
       <div class="who">${avatar(r)}<div><b>${esc(r.name || "—")}</b>
         <span class="small">${esc(r.email || "")}</span>
         ${r.missing_fields?.length ? `<div>${pill(`missing ${r.missing_fields.join(", ")}`, "warn")}</div>` : ""}</div></div>` },
-  { key: "phone", label: "WhatsApp", render: r => {
+  { key: "country", label: "WhatsApp · Country", sort: true, firstDir: "asc", render: r => {
       const wa = waLink(r.phone);
-      return r.phone ? `<span class="nowrap">${esc(r.phone)}</span>${wa
-        ? ` <a class="btn sm icon ghost wa" href="${wa}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.name || "")}">${icon("brand-whatsapp")}</a>` : ""}` : `<span class="faint">—</span>`;
+      if (!r.phone) return `<span class="faint">—</span>`;
+      return `<span class="nowrap">${esc(r.phone)}</span>${wa
+        ? ` <a class="btn sm icon ghost wa" href="${wa}" target="_blank" rel="noopener" aria-label="WhatsApp ${esc(r.name || "")}">${icon("brand-whatsapp")}</a>` : ""}
+        <div class="small country">${r.country
+          ? `<span class="cc">${esc(r.country)}</span> ${esc(r.country_name)}`
+          : `<span class="faint">country unknown</span>`}</div>`;
     } },
   { key: "boards", label: "Boards", render: r => r.boards.map(b => esc(BOARD_LABELS[b] || b)).join(", ") || `<span class="faint">—</span>` },
   { key: "plan", label: "Plan", sort: true, render: r => `${planPill(r)}
@@ -45,6 +49,9 @@ const FILTERS = [
   { key: "board", label: "All boards", options: c => Object.keys(BOARD_LABELS).map(b => ({ value: b, label: BOARD_LABELS[b], count: c[b] || 0 })) },
   { key: "plan", label: "All plans", options: c => ["free", "trial", "solo", "three", "all", "expired"]
       .map(p => ({ value: p, label: PLAN_LABELS[p], count: c[p] || 0 })) },
+  { key: "country", label: "All countries", options: (c, meta) => Object.keys(c)
+      .sort((a, b) => c[b] - c[a] || a.localeCompare(b))      // most students first
+      .map(k => ({ value: k, label: k === "unknown" ? "Unknown country" : (meta.country_names?.[k] || k), count: c[k] })) },
   { key: "subject", label: "All subjects", options: c => Object.keys(c).sort().map(s => ({ value: s, label: s, count: c[s] })) },
   { key: "active", label: "Any activity", options: () => [
       { value: "today", label: "Active today" }, { value: "7", label: "Active in 7 days" },

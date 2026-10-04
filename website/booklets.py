@@ -343,11 +343,48 @@ def booklet_count(sel: Selection, user: dict = Depends(_auth.get_current_user)):
             "per_bucket": per}
 
 
+_USER_LOCKS: dict[str, threading.Lock] = {}
+_USER_LOCKS_GUARD = threading.Lock()
+
+
+def _user_lock(user_id: str) -> threading.Lock:
+    """One Build at a time per student (per worker): the quota check and the new
+    row must not interleave with a second click."""
+    with _USER_LOCKS_GUARD:
+        return _USER_LOCKS.setdefault(user_id, threading.Lock())
+
+
+def _inflight(user_id: str, kind: str, skip_id: str | None = None):
+    """pending() for check_quota_gate: this student's booklets of `kind` still
+    queued/building. A build only counts once it succeeds, so without these a
+    student could click Build again and again while the first ones run.
+    Tutor-set papers (set_by) never count; dead builds (_fail_if_stuck's rule)
+    don't either, so a crashed worker can't lock a student out."""
+    def count(exclude: list[str] | None) -> int:
+        n = 0
+        for b in _udb.list_inflight_booklets(user_id):
+            params = b.get("params_json") or {}
+            limit = {"building": STUCK_BUILDING_S, "queued": STUCK_QUEUED_S}[b["status"]]
+            if (b["id"] == skip_id or _kind(b) != kind or params.get("set_by")
+                    or (exclude and b.get("syllabus") in exclude)
+                    or _age_s(b.get("updated_at") or b.get("created_at")) > limit):
+                continue
+            n += 1
+        return n
+    return count
+
+
 @router.post("/api/booklets")
 def create_booklet(req: BookletReq, user: dict = Depends(_auth.get_current_user)):
     require_enrolled(user, req.syllabus)
     known = _validate_chapters(req)
-    _access.check_quota_gate(user, _event(req.kind), req.syllabus)
+    with _user_lock(user["id"]):
+        return _create_booklet(req, user, known)
+
+
+def _create_booklet(req: BookletReq, user: dict, known: dict) -> dict:
+    _access.check_quota_gate(user, _event(req.kind), req.syllabus,
+                             pending=_inflight(user["id"], req.kind))
     pool = question_pool(req)
     if not pool:
         raise HTTPException(400, "No questions match that selection. Widen the year "
@@ -414,13 +451,20 @@ def booklet_status(booklet_id: str, user: dict = Depends(_auth.get_current_user)
 @router.post("/api/booklets/{booklet_id}/retry")
 def booklet_retry(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
     """Build a failed paper again - the same questions, the same order. No new
-    quota: only a successful build is ever counted."""
+    quota is taken now - only a successful build is ever counted - but the
+    allowance must still have room for it (a failed build never counted, so a
+    retry is a new build as far as the limit goes)."""
     b = _fail_if_stuck(_owned(booklet_id, user))
     if b["status"] != "failed":
         raise HTTPException(409, "This paper isn't in a failed state.")
-    _udb.update_booklet(booklet_id, {"status": "queued", "progress": 0,
-                                     "stage": "Trying again", "error": None})
-    _EXEC.submit(_build_safely, booklet_id, user)
+    counted = not (b.get("params_json") or {}).get("set_by")      # tutor-set papers are free
+    with _user_lock(user["id"]):
+        if counted:
+            _access.check_quota_gate(user, _event(_kind(b)), b["syllabus"],
+                                     pending=_inflight(user["id"], _kind(b), skip_id=booklet_id))
+        _udb.update_booklet(booklet_id, {"status": "queued", "progress": 0,
+                                         "stage": "Trying again", "error": None})
+    _EXEC.submit(_build_safely, booklet_id, user, counted)
     return {"ok": True}
 
 
@@ -712,13 +756,16 @@ def _build(booklet_id: str, user: dict, record: bool = True) -> None:
     os.replace(pdf, final)
     if pmap.exists():
         os.replace(pmap, final_map)
-    _write(booklet_id, {"status": "ready", "progress": 100, "stage": "Ready",
-                        "page_map_json": page_map, "error": None})
     if record:
+        # Before the row says 'ready': the quota check counts recorded use plus
+        # queued/building rows, so recording after would leave a gap where this
+        # build is neither.
         try:
             _access.record_quota(user, _event(_kind(b)), b.get("syllabus"))   # only successful builds count
         except Exception as exc:                          # never fail a built paper over this
             print(f"[booklet {booklet_id}] quota record failed: {exc}", flush=True)
+    _write(booklet_id, {"status": "ready", "progress": 100, "stage": "Ready",
+                        "page_map_json": page_map, "error": None})
 
 
 # ── Viewer page ───────────────────────────────────────────────────────────────

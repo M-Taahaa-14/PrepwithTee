@@ -21,6 +21,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 
 import access as _access
+import countries as _countries
 import streaks as _streaks
 import users_db as _udb
 from admin_auth import Admin, record
@@ -51,6 +52,7 @@ SORTS = {
     "papers_done":     lambda r: r["papers_done"],
     "open_homework":   lambda r: r["open_homework"],
     "subjects":        lambda r: len(r["subjects"]),
+    "country":         lambda r: (r["country_name"] is None, (r["country_name"] or "").lower()),
 }
 PLAN_FILTERS = {"free", "trial", "solo", "three", "all", "expired"}
 ACTIVE_FILTERS = {"today", "7", "30", "inactive7", "inactive30", "never"}
@@ -120,9 +122,12 @@ def _load() -> list[dict]:
         except (TypeError, ValueError):
             plan_subjects = []
         eff, expired = _plan_state(p, now)
+        country = _countries.lookup(p.get("phone"))
         rows[p["id"]] = {
             "id": p["id"], "name": p.get("name"), "email": p.get("email"),
             "phone": p.get("phone"), "picture_url": p.get("picture_url"),
+            "country": country[0] if country else None,
+            "country_name": country[1] if country else None,
             "grade": p.get("grade"), "created_at": p.get("created_at"),
             "plan": p.get("plan") or "free", "plan_effective": eff, "plan_expired": expired,
             "plan_trial": bool(p.get("plan_trial")), "plan_expires_at": p.get("plan_expires_at"),
@@ -236,7 +241,7 @@ def apply_filters(rows: list[dict], f: dict) -> list[dict]:
     q = (f.get("q") or "").strip().lower()
     board, plan, subject = f.get("board"), f.get("plan"), f.get("subject")
     active, profile, teacher = f.get("active"), f.get("profile"), f.get("teacher")
-    expiring = f.get("expiring")
+    expiring, country = f.get("expiring"), f.get("country")
     if plan and plan not in PLAN_FILTERS:
         raise HTTPException(400, f"plan filter must be one of {sorted(PLAN_FILTERS)}")
     if active and active not in ACTIVE_FILTERS:
@@ -251,6 +256,8 @@ def apply_filters(rows: list[dict], f: dict) -> list[dict]:
         if plan and r["plan_effective"] != plan:
             continue
         if subject and subject not in r["subjects"]:
+            continue
+        if country and (r["country"] or "unknown") != country:
             continue
         la = r["last_active"] or ""
         if active == "today" and not la.startswith(today):
@@ -279,8 +286,10 @@ def apply_filters(rows: list[dict], f: dict) -> list[dict]:
 
 
 def facets(rows: list[dict]) -> dict:
-    out = {"board": {}, "plan": {}, "subject": {}}
+    out = {"board": {}, "plan": {}, "subject": {}, "country": {}}
     for r in rows:
+        c = r["country"] or "unknown"
+        out["country"][c] = out["country"].get(c, 0) + 1
         for b in r["boards"]:
             out["board"][b] = out["board"].get(b, 0) + 1
         out["plan"][r["plan_effective"]] = out["plan"].get(r["plan_effective"], 0) + 1
@@ -289,9 +298,11 @@ def facets(rows: list[dict]) -> dict:
     return out
 
 
-def _filters(q, board, plan, subject, active, profile, teacher, expiring) -> dict:
+def _filters(q, board, plan, subject, active, profile, teacher, expiring,
+             country=None) -> dict:
     return {"q": q, "board": board, "plan": plan, "subject": subject, "active": active,
-            "profile": profile, "teacher": teacher, "expiring": expiring}
+            "profile": profile, "teacher": teacher, "expiring": expiring,
+            "country": country}
 
 
 def _sorted(rows: list[dict], sort: str, direction: str) -> list[dict]:
@@ -305,19 +316,20 @@ def students_table(q: str = "", board: str | None = None, plan: str | None = Non
                    subject: str | None = None, active: str | None = None,
                    profile: str | None = None, teacher: str | None = None,
                    expiring: int | None = Query(None, ge=1, le=365),
+                   country: str | None = None,
                    sort: str = "last_active", dir: str = "desc",
                    page: int = Query(1, ge=1), per: int = Query(50, ge=1, le=500),
                    fresh: bool = False, _=Admin):
     all_rows = student_rows(fresh)
     rows = _sorted(apply_filters(all_rows, _filters(q, board, plan, subject, active,
-                                                    profile, teacher, expiring)), sort, dir)
+                                                    profile, teacher, expiring, country)), sort, dir)
     start = (page - 1) * per
     return {"rows": rows[start:start + per], "total": len(rows), "all": len(all_rows),
             "page": page, "per": per, "facets": facets(all_rows),
-            "sorts": sorted(SORTS)}
+            "country_names": _countries.NAMES, "sorts": sorted(SORTS)}
 
 
-CSV_COLS = ["name", "email", "phone", "boards", "subjects", "plan_effective",
+CSV_COLS = ["name", "email", "phone", "country_name", "boards", "subjects", "plan_effective",
             "plan_expires_at", "plan_subjects", "teachers", "streak", "minutes_7",
             "booklets", "mcq_sessions", "mcq_avg", "quiz_count", "quiz_avg",
             "confident_pct", "papers_done", "open_homework", "last_active", "created_at"]
@@ -328,9 +340,11 @@ def students_csv(q: str = "", board: str | None = None, plan: str | None = None,
                  subject: str | None = None, active: str | None = None,
                  profile: str | None = None, teacher: str | None = None,
                  expiring: int | None = Query(None, ge=1, le=365),
+                 country: str | None = None,
                  sort: str = "last_active", dir: str = "desc", _=Admin):
     rows = _sorted(apply_filters(student_rows(), _filters(q, board, plan, subject, active,
-                                                          profile, teacher, expiring)), sort, dir)
+                                                          profile, teacher, expiring, country)),
+                   sort, dir)
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(CSV_COLS)

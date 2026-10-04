@@ -1604,6 +1604,21 @@ def get_booklet(booklet_id: str) -> dict | None:
         return _booklet_out(dict(row) if row else None)
 
 
+def list_inflight_booklets(user_id: str) -> list[dict]:
+    """The user's booklets still queued or building (not yet counted as used)."""
+    cols = "id,syllabus,status,created_at,updated_at,params_json"
+    if _USE_SUPABASE:
+        r = (_client().table("booklets").select(cols).eq("user_id", user_id)
+             .in_("status", ["queued", "building"]).execute())
+        rows = r.data or []
+    else:
+        with _local() as c:
+            rows = [dict(x) for x in c.execute(
+                f"SELECT {cols} FROM booklets WHERE user_id=?"
+                " AND status IN ('queued','building')", (user_id,)).fetchall()]
+    return [_booklet_out(r) for r in rows]
+
+
 def list_booklets(user_id: str, limit: int = 30) -> list[dict]:
     cols = "id,syllabus,title,status,created_at,question_ids,params_json"
     if _USE_SUPABASE:

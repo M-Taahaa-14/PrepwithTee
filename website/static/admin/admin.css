@@ -265,6 +265,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .dt .who { display: flex; align-items: center; gap: 10px; min-width: 200px; }
 .dt .who b { display: block; }
 .dt .who .small { color: var(--faint); }
+.dt .country { color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.dt .country .cc { display: inline-block; min-width: 22px; padding: 0 4px; border-radius: 4px;
+  background: var(--t-sky-soft); color: var(--t-sky); font-weight: 700; font-size: 10.5px;
+  text-align: center; letter-spacing: .03em; }
 .dt.busy tbody { opacity: .55; }
 .dt-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 2px; color: var(--muted); font-size: .84rem; }
 .dt-foot .select { height: 30px; }
