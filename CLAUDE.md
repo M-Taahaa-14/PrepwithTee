@@ -924,3 +924,75 @@ linked), not agreement with any external file.
     - Admin Students table: country from the WhatsApp number (`website/countries.py`, ITU
       prefix table, local Pakistani formats; unplaceable = unknown, never guessed),
       "All countries" filter with counts, sortable, CSV column. DataTable `options(counts, meta)`.
+
+38. **Keyboard shortcuts on every page (2026-10-05, local, not deployed).** `static/shortcuts.js`
+    (+ `shortcuts.css`, injected) is loaded from `partials/nav.html` (stamp with `python sync_nav.py`)
+    and directly on the header-less shells (messages, teacher/parent dashboards, revise - they get a
+    corner ⌨ button). Header ⌨ button or `?` = panel (filterable, every row clickable, plus "On this
+    page" groups for MCQ / paper viewers / pen bar / calculator). `G` then a letter = go to a page
+    (`PAGES` table). `Alt`+C calculator, G graph, S formula sheet, T tools panel, P pen, H highlighter,
+    X eraser - matched by `e.code` (Mac Option types characters). Tools go through
+    `window.pwtDock` (tools-dock.js, now opens ANY catalogue tool; loaded on demand where a page has no
+    dock), ink through `window.pwtInk` (annotate.js, newest annotator). Listener is window CAPTURE, so
+    the second key of a chord never reaches the MCQ answer keys. Single-key shortcuts can be switched
+    off in the panel (localStorage `pwt-keys-single-off`, WCAG 2.1.4); Alt ones stay. Avoid Alt+D/E/F
+    (browser menus on Windows). Pages add rows with `pwtShortcuts.register(title, items)`.
+    Tests: tests/e2e/test_shortcuts.py.
+
+38. **Ink rail v3 + PrepWithTee Board (2026-10-05, local, not deployed).** Plan:
+    `~/.claude/plans/alright-so-i-m-thinking-crispy-barto.md`; deploy steps:
+    `deploy/WHITEBOARD_DEPLOY.md` (**migration 026 + data/ink_assets first**).
+    - **annotate.js** = engine + a LEFT rail (`.an-bar.ink-rail`; pinned = open and pushes `.vw` over at
+      >=1100 px, unpinned = `.an-tab` on the left edge; undo/redo in `.ink-rail-foot`, never scrolled
+      away). Options open in `.ink-fly` beside the rail (tap an active tool again, or hold / right-click).
+      `ink/color.js` (SV field, hue, opacity, hex, eyedropper, Recent + My colours), `ink/shapes.js`
+      (POLY kinds, arcs, shape recognition = hold still at the end of a pen stroke), `ink/stickers.js`
+      reading `ink/stickers.json` (built by `scripts/build_stickers.py`; annot_pdf embeds the same SVGs).
+      New objects: pen `k` (fine/fountain/pencil/dash), `d` dashed, `fl` fill, arrow `two`, rect `rr`,
+      `poly` (box `k` or explicit closed `pts`), `arc` {o, r, a0, sw}, `stk`, `note`, `img` {src}; every
+      object has an `id`. Compass instrument: needle/pencil snap to ends + line/arc intersections, hinge
+      turns relative to the grab point, radius lock. Instruments follow a page that gets re-rendered.
+      Options `store` / `upload` / `pasteText` / `push`; attach(..., {camera:true}) = infinite canvas.
+      Ctrl+V pastes images (uploaded to `/api/ink/assets`, private: owner, their teacher, a share token).
+    - **Whiteboard** (`whiteboard.py`, `wb_store.py`, `static/board/` - NOT /whiteboard/* static paths,
+      the editor route would swallow them): dashboard /whiteboard (guests: SEO product page on the
+      site shell), editor /whiteboard/{id}, share /whiteboard/s/{token}, /whiteboard/new?q=<qid> (the
+      🖊️ Whiteboard chip on every booklet question). Free = 3 live boards + 50 MB images; any paid plan
+      unlimited + PDF import. Pages save with an optimistic `version` (409 -> merged by object id);
+      offline saves retry and keep a localStorage draft. annot_pdf.render_board exports boards.
+    - **Discovery** (tutor: "students mostly only use topical papers"): `/features` (features.py,
+      every feature + one tip, FAQ JSON-LD), `static/whats-new.js` (loaded by auth.js: one spotlight
+      card per announcement, one coach mark beside the rail on viewers; localStorage `pwt-wn`), nav
+      "Whiteboard NEW" + Tools item + Dashboard "All features", footer links. Blog link hides in the
+      header between 1201-1440 px to make room. e2e student fixture pre-marks the nudges as seen.
+    - Tests: tests/api/test_whiteboard.py, tests/unit/test_annot_pdf_v3.py, tests/e2e/test_whiteboard.py,
+      tests/e2e/test_ink_rail.py (+ test_annotations.py updated for the rail).
+
+39. **Free-limit card + self-serve trial + feedback snips (2026-10-05, local, not deployed).**
+    - `static/limit-card.js/.css` (loaded from `partials/nav.html` + the header-less shells) wraps
+      `window.fetch`: ANY same-origin `/api/` 403/429 whose `detail.code` is `quota_exceeded` or
+      `upgrade_required` opens one big card - what ran out (meter, reset date), the 7-day trial if
+      the student can still have it, and the 3 plans (prices from `billing.PERIODS`). New gated
+      features get it for free; send `event_type` (+ `trial`) in the detail (`ai_help._upgrade` does).
+      `PWTLimit.inline(el, detail)` = small copy (builder panel). The old `upgrade-modal.js` is dead
+      code (nothing calls its interceptor).
+    - **Trial (tutor: instant, once per account)**: `website/upgrade.py` - `GET /api/me/offer`,
+      `POST /api/me/trial` -> plan 'all', `plan_trial`, 7 days, `access.TRIAL_QUOTAS`; "once" = a
+      `usage_events` row `trial_started` (no schema change). Only free-plan students.
+    - **Snips**: `static/snip.js` (+ `snip.css`) renders the viewport with modern-screenshot
+      (jsDelivr; NOT html2canvas - it throws on the site's color-mix()), drag-to-select overlay,
+      red "Mark it" pen, JPEG <= 1600 px; falls back to getDisplayMedia, plus "Attach image".
+      `snipField()` is used by the global Feedback/Report panel (main.js) and the booklet viewer's
+      failure report. `/api/feedback` takes `snips` (<= 3 data: URLs, real PNG/JPEG bytes, <= 3 MB),
+      stored in `data/feedback-snips/` (NOT the public /uploads mount; `FEEDBACK_SNIPS_DIR`
+      overrides, tests use their temp dir), served only by `GET /api/admin/feedback/snips/{name}`,
+      shown as thumbnails in the admin Inbox. **Run `website/migrations/027_feedback_attachments.sql`
+      on Supabase before deploying** (save_feedback falls back to the message without it).
+    - Tests: tests/api/test_limits_and_snips.py, tests/e2e/test_limit_card_snip.py.
+    - **Follow-up (same day)**: navbar density pass (styles.css block "Navbar density"; header 60 px,
+      .86rem links, borderless icon buttons; shortcuts button hidden < 1700 px and moved into the account
+      menu; account name hidden < 1600 px; Blog hidden 1201-1520 px; sticky `.dtabs` / `.yr-bar` at 60 px;
+      STYLES_V 20261005b). Broken Google avatar falls back to initials. Instruments rebuilt in one system
+      (`instGeo` / `renderInst` / `edgeSnap` in annotate.js): bolder ruler (30 mm deep, 15/30 cm toggle),
+      protractor (flip), new **set square** (45° or 30°/60°); pens snap to any straight edge; rotation is
+      relative to the grab point; instruments re-render at true scale when the page re-renders.

@@ -9086,3 +9086,198 @@ html[data-theme="dark"] .sc2-cta { color: var(--page); }
 }
 @media (max-width: 480px) { .sc2-tab { font-size: .86rem; padding: 12px 12px 16px; } .sc2-num { width: 26px; height: 26px; } }
 @media (prefers-reduced-motion: reduce) { .sc2-imgs img, .sc2-tab, .sc2-cta { transition: none; } }
+
+/* "New" pill in the navbar (Whiteboard, 2026-10-05) */
+.nav-new-pill { display: inline-block; margin-left: 5px; padding: 2px 6px 1px; border-radius: 999px; vertical-align: 2px;
+  font: 800 .6rem/1.2 "Hanken Grotesk", sans-serif; font-style: normal; letter-spacing: .04em; text-transform: uppercase;
+  color: #fff; background: linear-gradient(135deg, #7c5cf0, #ec4899); }
+.nav-wb { display: inline-flex; align-items: center; }
+
+/* What's new spotlight + rail coach mark (whats-new.js) */
+.wn-card { position: fixed; left: 18px; bottom: 18px; z-index: 80; width: min(380px, calc(100vw - 36px)); display: flex; gap: 14px;
+  padding: 18px 18px 16px; border-radius: 20px; background: var(--white); color: var(--ink); border: 1px solid var(--lav-line);
+  box-shadow: 0 24px 60px rgba(46, 27, 74, .28); transform: translateY(24px); opacity: 0; transition: transform .25s ease, opacity .25s ease; }
+.wn-card.is-on { transform: none; opacity: 1; }
+.wn-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; border-radius: 20px 20px 0 0;
+  background: linear-gradient(90deg, #7c5cf0, #ec4899, #f59e0b); }
+.wn-emoji { flex: none; width: 50px; height: 50px; display: grid; place-items: center; border-radius: 15px; background: var(--lav); font-size: 1.6rem; }
+.wn-body { min-width: 0; }
+.wn-eyebrow { margin: 0 0 3px; font: 800 .66rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #7c5cf0; }
+.wn-body b { display: block; font: 800 1.02rem/1.25 "Hanken Grotesk", sans-serif; color: var(--purple); padding-right: 18px; }
+.wn-body p, .wn-coach p { margin: 6px 0 0; font-size: .86rem; line-height: 1.5; color: var(--grey); }
+.wn-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 12px; }
+.wn-btn { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; cursor: pointer;
+  color: #fff; background: linear-gradient(135deg, #7c5cf0, #4f46e5); font: 800 .84rem/1 "Hanken Grotesk", sans-serif; text-decoration: none; }
+.wn-link { font-size: .82rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+.wn-link:hover { text-decoration: underline; }
+.wn-x { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--grey); font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.wn-x:hover { background: var(--accent-soft); color: var(--accent); }
+.wn-coach { position: fixed; z-index: 76; width: 290px; padding: 14px 16px; border-radius: 16px; background: #1f2433; color: #fff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .3); opacity: 0; transform: translateX(-8px); transition: opacity .2s, transform .2s; }
+.wn-coach.is-on { opacity: 1; transform: none; }
+.wn-coach::before { content: ""; position: absolute; left: -7px; top: 22px; width: 14px; height: 14px; background: #1f2433; transform: rotate(45deg); }
+.wn-coach b { font-size: .95rem; }
+.wn-coach p { color: #d1d5db; }
+.wn-coach .wn-link { color: #c4b5fd; }
+@media (max-width: 600px) { .wn-card { left: 10px; right: 10px; bottom: 80px; width: auto; } .wn-coach { left: 64px !important; width: calc(100vw - 80px); } }
+@media print { .wn-card, .wn-coach { display: none !important; } }
+/* room for the Whiteboard link: Blog (also in the footer) steps out of the bar on mid-width screens */
+@media (min-width: 1201px) and (max-width: 1440px) { .header-nav > .nav-link[href="/blog"] { display: none; } }
+
+/* ════════════════════════════════════════════════════════════════
+   Navbar density (2026-10-05): same links, lighter bar. Smaller type
+   and brand, quiet icon buttons on the right, the shortcuts button and
+   the account name step out on narrower screens (both stay one click
+   away: "?" and the account menu).
+════════════════════════════════════════════════════════════════ */
+.site-header .header-row { height: 60px; }
+.brand img { height: 42px; width: 42px; border-radius: 12px; }
+.brand span { font-size: 1.18rem; }
+.header-nav { gap: 20px; }
+.nav-link { font-size: .86rem; }
+.nav-group-header { gap: 3px; }
+.nav-group-btn .drop-arrow { width: 8px; height: 5px; }
+.nav-new-pill { font-size: .55rem; padding: 1px 5px 0; margin-left: 4px; }
+/* right-hand cluster: borderless 36 px icon buttons, outline on hover */
+.header-end, .header-right { gap: 6px; }
+.dm-toggle, .notif-btn, .nav-search.nav-keys { width: 36px; height: 36px; padding: 0; border-color: transparent;
+  background: transparent; border-radius: 10px; justify-content: center; margin: 0; }
+.dm-toggle:hover, .notif-btn:hover, .nav-search.nav-keys:hover { border-color: var(--line); background: var(--white); box-shadow: none; }
+.nav-search:not(.nav-keys) { padding: .42rem .7rem; font-size: .82rem; }
+.account-trigger { padding: 3px 10px 3px 3px; gap: 7px; font-size: .84rem; }
+.account-avatar { width: 28px; height: 28px; }
+.account-dropdown kbd { margin-left: 6px; font: 700 .66rem/1 ui-monospace, Consolas, monospace; border: 1px solid var(--line);
+  border-radius: 5px; padding: .12rem .32rem; color: var(--grey); }
+@media (max-width: 1699px) {
+  .nav-search kbd { display: none; }
+  .nav-search.nav-keys { display: none; }
+}
+@media (max-width: 1599px) {
+  .account-name { display: none; }
+  .account-trigger { padding-right: 8px; }
+}
+@media (max-width: 1380px) { .header-nav { gap: 16px; } }
+@media (max-width: 1260px) { .header-nav { gap: 12px; } }
+@media (min-width: 1201px) and (max-width: 1520px) { .header-nav > .nav-link[href="/blog"] { display: none; } }
+@media (max-width: 1200px) { .site-header .header-row { height: auto; } .nav-link { font-size: .96rem; } }
+/* things that stick under the header follow its new height */
+body .dtabs, body .yr-bar { top: 60px; }
+
+/* Navbar, round 2 (2026-10-05): links back up (+2 px), shortcuts button always in the bar */
+.nav-link { font-size: .98rem; }
+.nav-search.nav-keys { display: inline-flex; }
+.header-nav { gap: 22px; }
+@media (max-width: 1600px) { .header-nav { gap: 16px; } }
+@media (max-width: 1440px) { .header-nav { gap: 12px; } .nav-link { font-size: .94rem; } }
+@media (min-width: 1201px) and (max-width: 1600px) { .header-nav > .nav-link[href="/blog"] { display: none; } }
+
+/* ── Account menu (auth.js): profile card + grouped items ───────── */
+.account-dropdown { min-width: 0; width: 300px; padding: 0; gap: 0; border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--line); background: var(--white);
+  box-shadow: 0 2px 6px rgba(26, 26, 46, .06), 0 24px 60px rgba(46, 27, 74, .2); transform-origin: top right;
+  animation: am-in .16s ease-out; }
+@keyframes am-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+.account-dropdown[hidden] { display: none; }
+.am-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; padding: 18px 18px 14px;
+  background: linear-gradient(140deg, var(--lav) 0%, color-mix(in srgb, var(--pink) 55%, var(--white)) 100%); }
+.am-avatar { width: 48px; height: 48px; font-size: 1rem; box-shadow: 0 0 0 3px var(--white), 0 4px 12px rgba(46, 27, 74, .18); }
+.am-who { min-width: 0; display: grid; gap: 2px; }
+.am-who b { font: 800 1rem/1.25 "Hanken Grotesk", sans-serif; color: var(--purple); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.am-who span { font-size: .8rem; color: var(--grey); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.am-plan-row { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.am-plan { font: 800 .68rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--lav-ink);
+  background: var(--white); border-radius: 999px; padding: 6px 10px; }
+.am-plan.is-paid { color: #fff; background: linear-gradient(135deg, #7c5cf0, #4f46e5); }
+.account-dropdown .am-up { padding: 6px 10px; font-size: .8rem; font-weight: 800; color: var(--accent); background: transparent; border-radius: 999px; }
+.account-dropdown .am-up:hover, .account-dropdown .am-up:focus-visible { background: var(--white); }
+.am-group { display: grid; gap: 1px; padding: 6px; border-bottom: 1px solid var(--line); }
+.account-dropdown .am-group a, .account-dropdown .am-group button, .account-dropdown .account-logout {
+  display: flex; align-items: center; gap: 11px; width: 100%; padding: 8px 10px; border-radius: 12px;
+  font: 600 .9rem/1.2 "Hanken Grotesk", sans-serif; color: var(--ink); }
+.account-dropdown .am-group a:hover, .account-dropdown .am-group button:hover,
+.account-dropdown [role^="menuitem"]:focus-visible { background: var(--accent-soft); outline: none; }
+.am-group span:not(.am-ic) { flex: 1; text-align: left; }
+.am-ic { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: var(--page);
+  color: var(--purple); transition: background .15s, color .15s; }
+.am-ic svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.account-dropdown a:hover .am-ic, .account-dropdown button:hover .am-ic { background: var(--white); color: var(--accent); }
+.account-dropdown kbd { font: 700 .68rem/1 ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 6px; padding: .22rem .4rem; color: var(--grey); background: var(--white); margin: 0; }
+.am-new { font: 800 .6rem/1 "Hanken Grotesk", sans-serif; font-style: normal; text-transform: uppercase; letter-spacing: .05em;
+  color: #fff; background: linear-gradient(135deg, #7c5cf0, #ec4899); border-radius: 999px; padding: 4px 7px; }
+.am-switch { flex: none; position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--line); transition: background .15s; }
+.am-switch::after { content: ""; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .15s; }
+.am-theme[aria-checked="true"] .am-switch { background: var(--accent); }
+.am-theme[aria-checked="true"] .am-switch::after { transform: translateX(14px); }
+.account-dropdown .account-logout { margin: 6px; width: calc(100% - 12px); padding: 8px 10px !important; border: 0 !important;
+  border-radius: 12px !important; color: #b3261e !important; }
+.account-dropdown .account-logout .am-ic { background: color-mix(in srgb, #b3261e 10%, var(--white)); color: #b3261e; }
+.account-dropdown .account-logout:hover { background: color-mix(in srgb, #b3261e 8%, var(--white)) !important; }
+html[data-theme="dark"] .account-dropdown { background: #252b3b; border-color: #363d53; }
+html[data-theme="dark"] .am-head { background: linear-gradient(140deg, #352d57 0%, #3d2a45 100%); }
+html[data-theme="dark"] .am-who b { color: #ece8ff; }
+html[data-theme="dark"] .am-plan:not(.is-paid) { background: #1e2333; color: #cfc3ff; }
+html[data-theme="dark"] .am-ic { background: #1e2333; color: #cfc3ff; }
+html[data-theme="dark"] .am-avatar { box-shadow: 0 0 0 3px #252b3b; }
+html[data-theme="dark"] .account-dropdown .am-group a:hover, html[data-theme="dark"] .account-dropdown .am-group button:hover { background: #30374b; }
+html[data-theme="dark"] .account-dropdown .account-logout { color: #fca5a5 !important; }
+html[data-theme="dark"] .account-dropdown .account-logout .am-ic { background: #3a2530; color: #fca5a5; }
+html[data-theme="dark"] .account-dropdown .account-logout:hover { background: #33262f !important; }
+@media (max-width: 480px) { .account-dropdown { width: min(300px, calc(100vw - 20px)); } }
+
+/* Instagram in the footer (2026-10-05): https://www.instagram.com/prepwithtee/ */
+.footer-wa-inner { gap: 12px; flex-wrap: wrap; }
+.footer-wa-inner > div:first-child { flex: 1 1 260px; }
+.footer-ig-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; color: #fff;
+  text-decoration: none; font: 700 .86rem/1 "Hanken Grotesk", sans-serif; white-space: nowrap; flex-shrink: 0;
+  background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 45%, #6228d7 100%); box-shadow: 0 6px 18px rgba(238, 42, 123, .3);
+  transition: transform .15s, box-shadow .15s; }
+.footer-ig-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(238, 42, 123, .4); }
+.footer-ig-ic svg { width: 15px; height: 15px; vertical-align: -2px; }
+.site-footer .footer-ig-card { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding: 12px 14px; border-radius: 14px;
+  text-decoration: none; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1);
+  transition: background .15s, border-color .15s; }
+.site-footer .footer-ig-card:hover { background: rgba(255, 255, 255, .09); border-color: rgba(238, 42, 123, .5); }
+.footer-ig-logo { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; color: #fff;
+  background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 45%, #6228d7 100%); }
+.footer-ig-logo svg { width: 20px; height: 20px; }
+.site-footer .footer-ig-card b { display: block; color: #fff; font: 800 .9rem/1.2 "Hanken Grotesk", sans-serif; }
+.site-footer .footer-ig-card small { display: block; margin-top: 3px; color: #8e9bb8; font-size: .76rem; line-height: 1.35; }
+
+/* Navbar, round 3 (2026-10-05): bigger logo, more air between links, a real search field */
+.site-header .header-row { height: 66px; }
+.brand img { height: 50px; width: 50px; border-radius: 14px; }
+.brand span { font-size: 1.32rem; }
+.header-nav { gap: 32px; }
+.nav-search:not(.nav-keys) { justify-content: flex-start; gap: .55rem; height: 40px; padding: 0 .55rem 0 .8rem;
+  border-radius: 12px; background: var(--white); font-size: .88rem; color: var(--grey); }
+.nav-search:not(.nav-keys) kbd { margin-left: auto; }
+.nav-search .ns-short { display: none; }
+.nav-search .ns-long { overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 1700px) { .nav-search:not(.nav-keys) { width: 320px; } .nav-search kbd { display: inline-block; } }
+@media (min-width: 1500px) and (max-width: 1699px) { .nav-search:not(.nav-keys) { width: 272px; } .nav-search kbd { display: inline-block; } }
+@media (max-width: 1499px) {
+  .nav-search .ns-long { display: none; }
+  .nav-search .ns-short { display: inline; }
+  .nav-search:not(.nav-keys) { width: auto; }
+  .nav-search kbd { display: none; }
+}
+@media (max-width: 1800px) { .header-nav { gap: 26px; } }
+@media (max-width: 1600px) { .header-nav { gap: 20px; } }
+@media (max-width: 1440px) { .header-nav { gap: 15px; } .brand img { height: 44px; width: 44px; } .brand span { font-size: 1.2rem; } }
+@media (max-width: 1320px) { .header-nav { gap: 11px; } }
+@media (max-width: 1200px) { .site-header .header-row { height: auto; } .nav-search:not(.nav-keys) { width: auto; } }
+body .dtabs, body .yr-bar { top: 66px; }
+@media (max-width: 1100px) { .nav-search .ns-short { display: none; } .nav-search:not(.nav-keys) { padding: 0 .55rem; } }
+
+/* footer: a clean row of social icons */
+.footer-follow { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+.footer-follow-label { font: 700 .72rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6e7d9b; margin-right: 2px; }
+.site-footer .footer-soc { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; color: #c9d2e6;
+  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); text-decoration: none;
+  transition: background .15s, color .15s, transform .15s, border-color .15s; }
+.site-footer a.footer-soc-ig:hover { color: #fff; border-color: transparent; transform: translateY(-2px);
+  background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 45%, #6228d7 100%); }
+.site-footer .footer-soc-fb { opacity: .45; cursor: default; }

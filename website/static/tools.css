@@ -2335,7 +2335,6 @@ button[data-p="quest"][data-qcount]:not([data-qcount=""])::after {
 /* Paper viewers (body[data-dock=push]): with the tools open on a wide screen
    the paper moves over, so the question and the calculator sit side by side. */
 body.pwt-docked .vw { margin-right: var(--pwt-dock-w, 440px); transition: margin-right .22s ease; }
-body.pwt-docked .an-bar { left: calc((100vw - var(--pwt-dock-w, 440px)) / 2); }
 body[data-dock="push"] .pwt-panel { top: var(--vw-top, 0px); }
 /* the paper column is narrower with the tools open: icon-only toolbar buttons */
 body.pwt-docked .vw-tbtn span, body.pwt-docked .vw-dl span, body.pwt-docked .vw-paper span,
@@ -2351,7 +2350,7 @@ body.pwt-dock-open #pwt-chatbot-wrap, body.pwt-dock-open #global-note-fab {
 /* over a paper they would sit on the annotation bar: hide them while the tools are open */
 body[data-dock="push"].pwt-dock-open #pwt-chatbot-wrap, body[data-dock="push"].pwt-dock-open #global-note-fab { display: none !important; }
 @media (max-width: 900px) {
-  body.pwt-dock-open .an-fab, body.pwt-dock-open .an-bar { display: none !important; }
+  body.pwt-dock-open .an-tab, body.pwt-dock-open .ink-rail, body.pwt-dock-open .ink-fly { display: none !important; }
   .pwt-panel .calc-banner { padding: 8px 12px; font-size: .78rem; margin-bottom: 8px; }
   .pwt-panel .cx-num .cx-k { height: 34px; }
   .pwt-panel .cx-lcd { min-height: 104px; }

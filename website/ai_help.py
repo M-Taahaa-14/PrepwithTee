@@ -48,8 +48,11 @@ UPGRADE_URL = "/pricing.html"
 
 # ── Access ────────────────────────────────────────────────────────────────────
 
-def _upgrade(message: str) -> HTTPException:
+def _upgrade(message: str, feature: str = "ai_explain", trial: bool = False) -> HTTPException:
+    # event_type + trial let the site-wide limit card (static/limit-card.js) say
+    # what ran out and whether a free trial can still be offered.
     return HTTPException(403, {"code": "upgrade_required", "min_plan": "solo",
+                               "event_type": feature, "trial": trial,
                                "message": message, "url": UPGRADE_URL})
 
 
@@ -90,7 +93,7 @@ def check_explain(user: dict, qid: int, syllabus: str | None = None) -> None:
                        "explanations for every question, step-by-step hints and follow-up help.")
     if trial and len(unlocked) >= TRIAL_LIMITS["ai_explain"]:
         raise _upgrade("You've used the worked solutions included in your trial. "
-                       "Subscribe to keep going.")
+                       "Subscribe to keep going.", "ai_explain", True)
 
 
 def gate_explain(user: dict, qid: int, syllabus: str | None = None) -> None:
@@ -107,7 +110,7 @@ def gate_explain(user: dict, qid: int, syllabus: str | None = None) -> None:
                        "explanations for every question, step-by-step hints and follow-up help.")
     if trial and len(unlocked) >= TRIAL_LIMITS["ai_explain"]:
         raise _upgrade("You've used the worked solutions included in your trial. "
-                       "Subscribe to keep going.")
+                       "Subscribe to keep going.", "ai_explain", True)
     _udb.unlock_explanation(user["id"], qid)
 
 
@@ -119,12 +122,12 @@ def gate_usage(user: dict, kind: str, syllabus: str | None = None) -> None:
     what = "step-by-step hints" if kind == "ai_hint" else "follow-up questions"
     if plan == "free":
         raise _upgrade(_outside_plan(fresh, syllabus) or
-                       f"Take a plan to use {what} on every question.")
+                       f"Take a plan to use {what} on every question.", kind)
     limit = TRIAL_LIMITS[kind] if trial else (
         FOLLOWUP_MONTHLY_CAP if kind == "ai_followup" else None)
     if limit is not None and _used(fresh, kind) >= limit:
         raise HTTPException(429, {"code": "quota_exceeded", "event_type": kind,
-                                  "limit": limit, "url": UPGRADE_URL,
+                                  "limit": limit, "url": UPGRADE_URL, "trial": trial,
                                   "message": f"You've reached this month's limit of {limit} "
                                              f"{what}. It resets with your next billing cycle."})
 

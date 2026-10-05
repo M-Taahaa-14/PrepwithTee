@@ -96,7 +96,8 @@ def inbox_items() -> list[dict]:
             email=r.get("email"), phone=None,
             title=f"{(r.get('type') or 'feedback').capitalize()}: {stars}{(r.get('page') or '').strip()}".strip(": "),
             body=r.get("message") or "", meta={"rating": r.get("rating"), "page": r.get("page"),
-                                               "type": r.get("type")})
+                                               "type": r.get("type"),
+                                               "snips": _snips(r.get("attachments"))})
     for r in got["requests"]:
         add("request", r["id"], r.get("ts"), name="Subject request", email=None, phone=None,
             title=f"Add {r.get('subject') or '?'}" + (f" ({r['board']})" if r.get("board") else ""),
@@ -235,6 +236,24 @@ def payment_screenshot(proof_id: int, _=Admin):
     if not path:
         raise HTTPException(404, "No screenshot for this proof")
     return FileResponse(path, headers={"Cache-Control": "private, no-store"})
+
+
+@router.get("/feedback/snips/{name}")
+def feedback_snip(name: str, _=Admin):
+    """A screenshot a student snipped into feedback (stored privately by app._save_snips)."""
+    import app as _app
+    path = _app.snip_path(name)
+    if not path:
+        raise HTTPException(404, "Not found")
+    return FileResponse(path, headers={"Cache-Control": "private, no-store"})
+
+
+def _snips(raw) -> list[str]:
+    try:
+        names = json.loads(raw or "[]")
+    except (TypeError, ValueError):
+        return []
+    return [f"/api/admin/feedback/snips/{n}" for n in names if isinstance(n, str)]
 
 
 class ApproveProof(BaseModel):

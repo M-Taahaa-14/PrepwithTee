@@ -1,11 +1,14 @@
 /* mcq-setup.js — the "Start practice" card on /mcq/{board}/{subject}.
  *   Full past paper: year -> session -> paper/variant
- *   Topical: chapters (with how many marked MCQs each has), how many, years
+ *   Topical: chapters as colour cards with their subtopics as chips (counts per
+ *   chosen paper), search across both; a chapter is whole, partly (some
+ *   subtopics) or off. Then how many, years.
  *   Then: view (paper / one by one), timer (official / none / custom), live check.
  * Also lists sessions to resume and recent results. ?paper=<id> or
- * ?topics=A|B pre-selects (links from the yearly pages and the results screen).
+ * ?topics=A|B pre-selects (links from the yearly pages and the results screen);
+ * &subs=A::x|A::y narrows those chapters to subtopics.
  */
-import { api } from "/auth.js?v=20261001a";
+import { api } from "/auth.js?v=20261005a";
 
 const box = document.getElementById("mq-setup");
 const code = box?.dataset.syllabus;
@@ -18,7 +21,7 @@ const OFFICIAL = { "9702-1": 75, "5054-1": 60, "5070-1": 60, "0625-1": 45, "0625
 const U = {
   tab: "paper", papers: [], topics: [], mcqPapers: [], comps: [],
   year: null, session: null, paperId: null,
-  picked: new Set(), count: 20, yFrom: null, yTo: null,
+  picked: new Map(), q: "", count: 20, yFrom: null, yTo: null,
   view: "paper", timer: "official", minutes: 30, live: false, busy: false,
 };
 
@@ -51,7 +54,14 @@ async function init() {
     Object.assign(U, { tab: "paper", year: x.year, session: x.session, paperId: x.id });
   } else if (pre) {
     U.tab = "topical";
-    pre.split("|").forEach((n) => { if (U.topics.some((x) => x.name === n)) U.picked.add(n); });
+    pre.split("|").forEach((n) => { if (U.topics.some((x) => x.name === n)) U.picked.set(n, new Set()); });
+    (qs.get("subs") || "").split("|").forEach((pair) => {
+      const [ch, sub] = pair.split("::");
+      const t = U.topics.find((x) => x.name === ch);
+      if (!t || !t.subtopics.some((x) => x.name === sub)) return;
+      if (!U.picked.has(ch)) U.picked.set(ch, new Set());
+      U.picked.get(ch).add(sub);
+    });
   }
   if (!U.year && U.papers.length) {
     U.year = U.papers[0].year;
@@ -85,7 +95,150 @@ function officialMins() {
   return Math.max(1, Math.round((OFFICIAL[`${code}-${comp}`] || 45) / 40 * U.count));
 }
 
+// ── Topical picker helpers ───────────────────────────────────────────────────
+const n = (byPaper) => U.comps.reduce((a, c) => a + ((byPaper || {})[c] || 0), 0);
+const live = (t) => t.subtopics.filter((x) => n(x.by_paper) > 0);
+const fold = (s) => s.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+
+/** "all" | "some" | "none" */
+function state(t) {
+  const set = U.picked.get(t.name);
+  if (!set) return "none";
+  return set.size ? "some" : "all";
+}
+
+function poolCount() {
+  let total = 0;
+  U.topics.forEach((t) => {
+    const set = U.picked.get(t.name);
+    if (!set) return;
+    total += set.size ? t.subtopics.filter((x) => set.has(x.name)).reduce((a, x) => a + n(x.by_paper), 0)
+                      : n(t.by_paper);
+  });
+  return total;
+}
+
+function toggleChapter(name) {
+  if (state(U.topics.find((x) => x.name === name)) === "all") U.picked.delete(name);
+  else U.picked.set(name, new Set());          // none / some -> whole chapter
+}
+
+function toggleSub(name, sub) {
+  const t = U.topics.find((x) => x.name === name);
+  const all = live(t).map((x) => x.name);
+  const st = state(t);
+  let set;
+  if (st === "none") set = new Set([sub]);
+  else if (st === "all") set = new Set(all.filter((x) => x !== sub));   // untick one from a whole chapter
+  else {
+    set = U.picked.get(name);
+    set.has(sub) ? set.delete(sub) : set.add(sub);
+  }
+  if (!set.size) U.picked.delete(name);
+  else if (all.every((x) => set.has(x))) U.picked.set(name, new Set());
+  else U.picked.set(name, set);
+}
+
+function mark(text, q) {
+  if (!q) return esc(text);
+  const i = fold(text).indexOf(q);
+  if (i < 0) return esc(text);
+  return `${esc(text.slice(0, i))}<mark>${esc(text.slice(i, i + q.length))}</mark>${esc(text.slice(i + q.length))}`;
+}
+
+/** Hide chapters / chips that don't match the search, without re-rendering the input. */
+function applySearch() {
+  const q = fold(U.q.trim());
+  let shown = 0;
+  box.querySelectorAll(".mqs-ch").forEach((el) => {
+    const t = U.topics[+el.dataset.i];
+    const chHit = !q || fold(t.display).includes(q);
+    let subHit = false;
+    el.querySelectorAll(".mqs-sub").forEach((c) => {
+      const s = t.subtopics[+c.dataset.j];
+      const hit = !!q && fold(s.name).includes(q);
+      subHit = subHit || hit;
+      c.classList.toggle("is-hit", hit);
+      c.querySelector("span").innerHTML = mark(s.name, hit ? q : "");
+    });
+    el.querySelector(".mqs-ch-name").innerHTML = mark(t.display, chHit ? q : "");
+    const on = chHit || subHit;
+    el.hidden = !on;
+    shown += on ? 1 : 0;
+  });
+  const empty = box.querySelector(".mqs-empty");
+  if (empty) empty.hidden = shown > 0;
+}
+
+function chapterCard(t, i) {
+  const st = state(t);
+  const set = U.picked.get(t.name) || new Set();
+  const total = n(t.by_paper);
+  const subs = t.subtopics;
+  const max = Math.max(1, ...subs.map((x) => n(x.by_paper)));
+  const bar = subs.filter((x) => n(x.by_paper)).map((x) =>
+    `<i style="flex:${n(x.by_paper)}" title="${esc(x.name)}: ${n(x.by_paper)}"></i>`).join("");
+  return `
+    <li class="mqs-ch is-${st}${total ? "" : " is-zero"}" data-i="${i}" data-k="${i % 7}">
+      <div class="mqs-ch-head">
+        <button type="button" class="mqs-ch-tick" data-ch="${esc(t.name)}" role="checkbox"
+          aria-checked="${st === "all" ? "true" : st === "some" ? "mixed" : "false"}" ${total ? "" : "disabled"}
+          aria-label="${esc(t.display)}: whole chapter">
+          <span class="mqs-box" aria-hidden="true"></span>
+          <span class="mqs-ch-no">${String(i + 1).padStart(2, "0")}</span>
+          <span class="mqs-ch-name">${esc(t.display)}</span>
+        </button>
+        <span class="mqs-ch-n" title="Marked multiple-choice questions">${total}<small> Qs</small></span>
+      </div>
+      ${bar ? `<div class="mqs-ch-bar" aria-hidden="true">${bar}</div>` : ""}
+      ${subs.length ? `<div class="mqs-subs" role="group" aria-label="${esc(t.display)} subtopics">${subs.map((x, j) => {
+        const c = n(x.by_paper);
+        const on = c > 0 && (st === "all" || set.has(x.name));
+        return `<button type="button" class="mqs-sub${on ? " is-on" : ""}${c ? "" : " is-zero"}" data-j="${j}"
+          data-sub="${esc(x.name)}" data-of="${esc(t.name)}" aria-pressed="${on}" ${c ? "" : "disabled"}
+          title="${c ? `${c} question${c === 1 ? "" : "s"}` : "No multiple-choice questions on this yet"}">
+          <span>${esc(x.name)}</span><em style="--w:${Math.round(100 * c / max)}%">${c}</em></button>`;
+      }).join("")}</div>` : ""}
+    </li>`;
+}
+
+function topicalPicker() {
+  const chosen = U.topics.filter((t) => U.picked.has(t.name));
+  const partly = chosen.filter((t) => state(t) === "some").length;
+  const pool = poolCount();
+  const allOn = U.topics.every((t) => !n(t.by_paper) || state(t) === "all");
+  return `
+    <div class="mqs-field">
+      <div class="mqs-pick-top">
+        <span class="mqs-label">Chapters &amp; subtopics</span>
+        <label class="mqs-search"><span aria-hidden="true">🔍</span>
+          <input type="search" data-q value="${esc(U.q)}" placeholder="Search a chapter or subtopic…"
+            aria-label="Search chapters and subtopics" autocomplete="off"></label>
+        <button type="button" class="mqs-link" data-all="${allOn ? "none" : "all"}">${allOn ? "Clear all" : "Select all"}</button>
+      </div>
+      <p class="mqs-hint">Tick a chapter for all of it, or tap subtopics to practise just those.
+        Bars show where the chapter's questions sit.</p>
+      <ul class="mqs-chs">${U.topics.map(chapterCard).join("")}</ul>
+      <p class="mqs-empty" hidden>Nothing matches that search.</p>
+      <div class="mqs-tray${chosen.length ? "" : " is-empty"}" aria-live="polite">
+        ${chosen.length ? `
+          <div class="mqs-tray-chips">${chosen.map((t) => {
+            const set = U.picked.get(t.name);
+            const what = set.size ? `${set.size} of ${live(t).length} subtopics` : "whole chapter";
+            return `<span class="mqs-tag" data-k="${U.topics.indexOf(t) % 7}"><b>${esc(t.display)}</b>
+              <small>${what}</small><button type="button" data-drop="${esc(t.name)}" aria-label="Remove ${esc(t.display)}">×</button></span>`;
+          }).join("")}</div>
+          <p class="mqs-tray-sum"><b>${pool}</b> question${pool === 1 ? "" : "s"} to draw from ·
+            ${chosen.length} chapter${chosen.length === 1 ? "" : "s"}${partly ? ` (${partly} partly)` : ""}</p>`
+        : `<p class="mqs-tray-sum">Nothing picked yet - tick a chapter or tap a subtopic.</p>`}
+      </div>
+    </div>`;
+}
+
 function render() {
+  const scroller = box.querySelector(".mqs-chs");
+  const keep = scroller ? scroller.scrollTop : 0;
+  requestAnimationFrame(() => { const el = box.querySelector(".mqs-chs"); if (el) el.scrollTop = keep; });
   const years = [...new Set(U.papers.map((x) => x.year))];
   const sessions = [...new Set(papersFor(U.year).map((x) => x.session))].sort((a, b) => SESS_ORDER[a] - SESS_ORDER[b]);
   if (!sessions.includes(U.session)) U.session = sessions[sessions.length - 1] || null;
@@ -133,15 +286,7 @@ function render() {
       </div>
 
       <div class="mqs-panel" ${U.tab === "topical" ? "" : "hidden"}>
-        <div class="mqs-field">
-          <span class="mqs-label">Chapters <small>${U.picked.size ? `${U.picked.size} picked` : "pick one or more"}</small>
-            <button type="button" class="mqs-link" data-all="${U.picked.size === U.topics.length ? "none" : "all"}">
-              ${U.picked.size === U.topics.length ? "Clear" : "Select all"}</button></span>
-          <div class="mqs-topics">${U.topics.map((t) => `
-            <label class="mqs-topic${U.picked.has(t.name) ? " is-on" : ""}">
-              <input type="checkbox" data-topic="${esc(t.name)}" ${U.picked.has(t.name) ? "checked" : ""}>
-              <span>${esc(t.name)}</span><em>${t.count}</em></label>`).join("")}</div>
-        </div>
+        ${topicalPicker()}
         <div class="mqs-row">
           <div class="mqs-field"><span class="mqs-label">Questions</span>
             <div class="mqs-seg">${[10, 20, 30, 40].map((n) => `
@@ -188,6 +333,7 @@ function render() {
         return `<li><a href="${s.url}?view=results"><span class="mqs-score" data-tone="${pct >= 75 ? "good" : pct >= 50 ? "mid" : "low"}">${pct}%</span>
           <b>${esc(s.title)}</b><small>${s.score}/${s.total}</small></a></li>`;
       }).join("")}</ul></div>` : ""}`;
+  applySearch();
 }
 
 function save() {
@@ -206,8 +352,10 @@ async function start() {
     body.paper_id = U.paperId;
   } else {
     if (!U.picked.size) { err.textContent = "Pick at least one chapter."; return; }
-    Object.assign(body, { topics: [...U.picked], count: U.count, year_from: U.yFrom, year_to: U.yTo,
-                          papers: U.comps.length ? U.comps : null });
+    const subtopics = {};
+    U.picked.forEach((set, ch) => { if (set.size) subtopics[ch] = [...set]; });
+    Object.assign(body, { topics: [...U.picked.keys()], subtopics, count: U.count, year_from: U.yFrom,
+                          year_to: U.yTo, papers: U.comps.length ? U.comps : null });
   }
   save();
   U.busy = true;
@@ -239,21 +387,27 @@ box?.addEventListener("click", (e) => {
     if (!U.comps.length) U.comps = [n];
   });
   if (b("[data-all]")) return set(() => {
-    if (b("[data-all]").dataset.all === "all") U.topics.forEach((x) => U.picked.add(x.name));
+    if (b("[data-all]").dataset.all === "all") U.topics.forEach((x) => { if (n(x.by_paper)) U.picked.set(x.name, new Set()); });
     else U.picked.clear();
   });
+  if (b("[data-ch]")) return set(() => toggleChapter(b("[data-ch]").dataset.ch));
+  if (b("[data-sub]")) return set(() => toggleSub(b("[data-sub]").dataset.of, b("[data-sub]").dataset.sub));
+  if (b("[data-drop]")) return set(() => U.picked.delete(b("[data-drop]").dataset.drop));
   if (b("[data-start]")) start();
 });
 
 box?.addEventListener("change", (e) => {
   const t = e.target;
-  if (t.matches("[data-topic]")) {
-    if (t.checked) U.picked.add(t.dataset.topic); else U.picked.delete(t.dataset.topic);
-    render();
-  } else if (t.matches("[data-live]")) { U.live = t.checked; }
+  if (t.matches("[data-live]")) { U.live = t.checked; }
   else if (t.matches("[data-minutes]")) { U.minutes = Math.max(1, Math.min(240, +t.value || 30)); }
   else if (t.matches("[data-yfrom]")) { U.yFrom = +t.value; if (U.yTo < U.yFrom) U.yTo = U.yFrom; render(); }
   else if (t.matches("[data-yto]")) { U.yTo = +t.value; if (U.yFrom > U.yTo) U.yFrom = U.yTo; render(); }
+});
+
+box?.addEventListener("input", (e) => {
+  if (!e.target.matches("[data-q]")) return;
+  U.q = e.target.value;
+  applySearch();
 });
 
 init();

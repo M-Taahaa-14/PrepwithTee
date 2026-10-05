@@ -12,7 +12,7 @@
  * unlocks when the student finishes). Build -> /papers/view/{id} in a new tab.
  * The exact pool size comes from POST /api/booklets/count (debounced).
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20261001a";
+import { api, UpgradeRequiredError } from "/auth.js?v=20261005a";
 
 const root = document.getElementById("builder");
 const SYL = root?.dataset.syllabus;
@@ -209,6 +209,7 @@ function render() {
         <div class="bld-label">Your chapters <b>${st.picks.size}/${max}</b></div>
         <ol class="bld-slots">${slots}</ol>
         <p class="bld-msg${st.msg ? " is-on" : ""}" role="status" id="bld-msg">${esc(st.msg)}</p>
+        <div class="bld-limit" id="bld-limit" hidden></div>
       </div>
       <div class="bld-block">
         <label class="bld-label" for="bld-y0">Years</label>
@@ -255,6 +256,7 @@ function render() {
   document.body.classList.toggle("has-dock", st.picks.size > 0);
   root.querySelectorAll("input[data-partial]").forEach((i) => (i.indeterminate = true));
   renderRecent();
+  if (st.limit && window.PWTLimit) window.PWTLimit.inline(document.getElementById("bld-limit"), st.limit);
 }
 
 function estimate(avgMarks) {
@@ -268,6 +270,7 @@ function estimate(avgMarks) {
 
 function flash(msg) {
   st.msg = msg;
+  if (msg) { st.limit = null; const lim = document.getElementById("bld-limit"); if (lim) lim.hidden = true; }
   const el = document.getElementById("bld-msg");
   if (el) { el.textContent = msg; el.classList.toggle("is-on", !!msg); }
 }
@@ -418,8 +421,15 @@ async function build() {
     loadRecent();
   } catch (e) {
     win?.close();
-    flash(e instanceof UpgradeRequiredError ? `${e.message} — see plans on the pricing page.`
-                                             : e.message || "Couldn't start the build. Try again.");
+    if (e instanceof UpgradeRequiredError && window.PWTLimit) {
+      // The full card opens by itself (limit-card.js); this keeps a small one in the panel.
+      flash("");
+      st.limit = e.detail;
+      window.PWTLimit.inline(document.getElementById("bld-limit"), e.detail);
+    } else {
+      flash(e instanceof UpgradeRequiredError ? `${e.message} — see plans on the pricing page.`
+                                               : e.message || "Couldn't start the build. Try again.");
+    }
   } finally {
     btn.disabled = false;
     btn.innerHTML = `${test ? "Build mock test" : "Build booklet"} <span aria-hidden="true">↗</span>`;

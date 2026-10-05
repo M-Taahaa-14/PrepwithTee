@@ -39,8 +39,8 @@ import users_db as _udb
 router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
-CSS_V = "20260930a"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20260930b"    # the site-wide styles.css pin
+CSS_V = "20261005a"       # bump with catalog.css / catalog.js (immutable caching)
+STYLES_V = "20261005b"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
@@ -425,10 +425,10 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 </main>
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
-<script src="/main.js?v=20260930a"></script>
-<script src="/tools-core.js?v=20260930c"></script>
+<script src="/main.js?v=20261005a"></script>
+<script src="/tools-core.js?v=20261005a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20261001a"></script>
+<script type="module" src="/auth.js?v=20261005a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>

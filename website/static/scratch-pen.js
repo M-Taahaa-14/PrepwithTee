@@ -6,13 +6,14 @@
  * annotator that saves per page, so this stays out of their way.
  * Loaded by auth.js and main.js; the flag makes sure it starts once.
  */
-const V = "20260930a";
+const V = "20261005a";
 
 function start() {
   if (window.__pwtScratchPen) return;
   window.__pwtScratchPen = true;
   // PDF viewers have their own, saved annotations.
   if (document.getElementById("vw") || document.getElementById("mq") || document.querySelector(".an-bar")) return;
+  if (document.body?.hasAttribute("data-no-scratch")) return;          // the whiteboard has its own
   if (!document.querySelector('link[href*="annotate.css"]')) {
     const css = document.createElement("link");
     css.rel = "stylesheet";

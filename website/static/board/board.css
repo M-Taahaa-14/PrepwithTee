@@ -1,0 +1,184 @@
+/* board/board.css — the PrepWithTee Board editor (board/app.js).
+   App chrome with its own tokens; light by default, dimmed slate in the dark theme. */
+.wb-page {
+  --wb-bg: #eef0f5; --wb-bar: #ffffff; --wb-fg: #262536; --wb-mute: #7a7890; --wb-line: #e2e1ea;
+  --wb-hover: #f2f0f9; --wb-accent: #6d4aff; --wb-accent-2: #4f46e5; --wb-on: #ece7ff; --wb-on-fg: #4b2aa8;
+  --wb-card: #ffffff; --wb-shadow: 0 1px 2px rgba(30, 20, 60, .06), 0 10px 30px rgba(30, 20, 60, .12);
+  margin: 0; height: 100vh; height: 100dvh; overflow: hidden; background: var(--wb-bg); color: var(--wb-fg);
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  --vw-top: 58px;
+}
+:root[data-theme="dark"] .wb-page {
+  --wb-bg: #161922; --wb-bar: #1f2430; --wb-fg: #e9e7f3; --wb-mute: #9a98b0; --wb-line: #333a4c;
+  --wb-hover: #2a3040; --wb-accent: #9b85ff; --wb-accent-2: #7c6dff; --wb-on: #3b3263; --wb-on-fg: #ddd3ff;
+  --wb-card: #222838; --wb-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .4);
+}
+.wb { height: 100%; display: flex; flex-direction: column; }
+.wb-loading, .wb-fail { margin: auto; text-align: center; color: var(--wb-mute); }
+.wb-fail h1 { color: var(--wb-fg); font: 800 1.6rem/1.2 Archivo, sans-serif; }
+.wb-top svg, .wb-side svg, .wb-fail svg, .wb-menu svg, .wb-dlg svg, .wb-pres svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* top bar */
+.wb-top { height: 58px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--wb-bar);
+  border-bottom: 1px solid var(--wb-line); position: relative; z-index: 60; }
+.wb-brand { display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--wb-fg);
+  font: 800 1rem/1 Archivo, sans-serif; padding-right: 8px; border-right: 1px solid var(--wb-line); margin-right: 2px; }
+.wb-brand img { border-radius: 8px; }
+.wb-title { min-width: 80px; width: clamp(120px, 24vw, 340px); height: 36px; padding: 0 10px; border: 1px solid transparent;
+  border-radius: 9px; background: transparent; color: var(--wb-fg); font: 700 1rem/1 "Hanken Grotesk", sans-serif; }
+.wb-title:hover { border-color: var(--wb-line); }
+.wb-title:focus { outline: none; border-color: var(--wb-accent); background: var(--wb-card); }
+.wb-title-ro { margin: 0 6px; font: 700 1rem/1.2 "Hanken Grotesk", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw; }
+.wb-badge { display: inline-flex; align-items: center; gap: 4px; font-size: .74rem; font-weight: 700; color: var(--wb-on-fg);
+  background: var(--wb-on); border-radius: 999px; padding: 4px 9px; }
+.wb-badge svg { width: 13px; height: 13px; }
+.wb-status { flex: none; font-size: .78rem; color: var(--wb-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wb-status[data-state="offline"], .wb-status[data-state="error"] { color: #d97706; font-weight: 700; }
+.wb-status[data-state="saved"]::before { content: "✓ "; color: #16a34a; }
+.wb-grow { flex: 1; }
+.wb-pgind { font-size: .8rem; color: var(--wb-mute); white-space: nowrap; }
+.wb-zoom { display: flex; align-items: center; border: 1px solid var(--wb-line); border-radius: 10px; padding: 2px; }
+.wb-zoompct { min-width: 54px; height: 30px; border: 0; background: transparent; color: var(--wb-fg); font: 700 .8rem/1 "Hanken Grotesk", sans-serif;
+  border-radius: 7px; cursor: pointer; }
+.wb-zoompct:hover { background: var(--wb-hover); }
+.wb-acts { display: flex; align-items: center; gap: 6px; }
+.wb-iconbtn { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 9px; background: transparent;
+  color: var(--wb-fg); cursor: pointer; text-decoration: none; flex: none; }
+.wb-zoom .wb-iconbtn { width: 30px; height: 30px; border-radius: 7px; }
+.wb-iconbtn:hover { background: var(--wb-hover); }
+.wb-iconbtn[aria-pressed="true"] { background: var(--wb-on); color: var(--wb-on-fg); }
+.wb-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border: 1px solid var(--wb-line);
+  border-radius: 10px; background: var(--wb-card); color: var(--wb-fg); font: 700 .84rem/1 "Hanken Grotesk", sans-serif;
+  cursor: pointer; text-decoration: none; white-space: nowrap; }
+.wb-btn:hover { background: var(--wb-hover); }
+.wb-btn:focus-visible, .wb-iconbtn:focus-visible, .wb-zoompct:focus-visible { outline: 2px solid var(--wb-accent); outline-offset: 2px; }
+.wb-btn-primary { border-color: transparent; color: #fff; background: linear-gradient(135deg, var(--wb-accent), var(--wb-accent-2)); }
+.wb-btn-primary:hover { background: linear-gradient(135deg, var(--wb-accent-2), var(--wb-accent)); }
+.wb-btn-ghost { background: transparent; }
+
+/* stage + pages */
+.wb-main { flex: 1; min-height: 0; display: flex; position: relative; }
+.wb-stage { flex: 1; min-width: 0; overflow: auto; position: relative; outline: none; transition: margin-left .2s ease; }
+body.ink-pinned .wb-stage { margin-left: 68px; }
+.wb-pages { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 26px 24px 120px; width: max-content; min-width: 100%; box-sizing: border-box; }
+.wb-pg { position: relative; flex: none; background: #fff; border-radius: 3px; box-shadow: var(--wb-shadow); overflow: hidden; }
+.wb-pat { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.wb-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 1; pointer-events: none; }
+.wb-pg .an-layer { z-index: 4; }
+
+/* infinite canvas */
+.wb-stage.is-inf { overflow: hidden; }
+.wb-inf { position: absolute; inset: 0; overflow: hidden; touch-action: none; cursor: grab; }
+.wb-inf.is-panning { cursor: grabbing; }
+.wb-inf.is-hand .an-layer { pointer-events: none !important; }
+.wb-mini { position: absolute; right: 14px; bottom: 14px; width: 168px; height: 112px; z-index: 20; border-radius: 12px;
+  border: 1px solid var(--wb-line); box-shadow: var(--wb-shadow); cursor: crosshair; background: var(--wb-card); }
+
+/* side panel: page thumbnails */
+.wb-side { width: 196px; flex: none; display: flex; flex-direction: column; background: var(--wb-bar); border-left: 1px solid var(--wb-line);
+  transition: margin-right .2s ease; }
+.wb.side-closed .wb-side { margin-right: -197px; }
+.wb-side-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 6px 14px; font-size: .86rem; }
+.wb-thumbs { list-style: none; margin: 0; padding: 4px 12px 12px; overflow-y: auto; flex: 1; display: grid; gap: 12px; align-content: start; }
+.wb-thumb { position: relative; display: grid; justify-items: center; gap: 4px; padding: 6px 0 4px; border-radius: 10px; border: 2px solid transparent; }
+.wb-thumb.is-cur { border-color: var(--wb-accent); background: var(--wb-on); }
+.wb-thumb.is-drag { opacity: .4; }
+.wb-thumb.drop-before { box-shadow: 0 -3px 0 var(--wb-accent); }
+.wb-thumb.drop-after { box-shadow: 0 3px 0 var(--wb-accent); }
+.wb-th-open { padding: 0; border: 0; background: none; cursor: pointer; border-radius: 3px; line-height: 0; }
+.wb-th-open canvas { display: block; border-radius: 3px; box-shadow: 0 1px 4px rgba(0, 0, 0, .18); }
+.wb-th-n { font-size: .72rem; font-weight: 700; color: var(--wb-mute); }
+.wb-th-acts { position: absolute; top: 10px; right: 14px; display: none; gap: 3px; }
+.wb-thumb:hover .wb-th-acts, .wb-thumb:focus-within .wb-th-acts { display: flex; }
+.wb-th-acts button { width: 26px; height: 26px; display: grid; place-items: center; border: 0; border-radius: 7px; background: var(--wb-card);
+  color: var(--wb-fg); box-shadow: 0 1px 4px rgba(0, 0, 0, .2); cursor: pointer; }
+.wb-th-acts button svg { width: 14px; height: 14px; }
+.wb-th-acts [data-th="del"]:hover { color: #dc2626; }
+.wb-addpage { margin: 0 12px 12px; height: 38px; border: 1.5px dashed var(--wb-line); border-radius: 10px; background: transparent;
+  color: var(--wb-mute); font: 700 .84rem/1 "Hanken Grotesk", sans-serif; cursor: pointer; }
+.wb-addpage:hover { border-color: var(--wb-accent); color: var(--wb-accent); }
+
+/* menus, dialogs, toast */
+.wb-menu { position: fixed; z-index: 90; min-width: 250px; max-width: 320px; padding: 6px; background: var(--wb-card, #fff); color: var(--wb-fg, #262536);
+  border: 1px solid var(--wb-line, #e2e1ea); border-radius: 14px; box-shadow: var(--wb-shadow); animation: wb-pop .12s ease-out; }
+@keyframes wb-pop { from { transform: translateY(-4px); opacity: 0; } to { transform: none; opacity: 1; } }
+.wb-menu button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0; border-radius: 9px;
+  background: transparent; color: inherit; text-align: left; font: 600 .86rem/1.25 "Hanken Grotesk", sans-serif; cursor: pointer; }
+.wb-menu button:hover, .wb-menu button:focus { background: var(--wb-hover); outline: none; }
+.wb-menu button:disabled { opacity: .45; cursor: default; }
+.wb-menu b { display: block; font-weight: 700; }
+.wb-menu small { display: block; color: var(--wb-mute); font-size: .74rem; margin-top: 2px; font-weight: 500; }
+.wb-menu em { margin-left: auto; font-style: normal; font-size: .66rem; font-weight: 800; color: #b45309; background: #fef3c7;
+  border-radius: 999px; padding: 3px 7px; white-space: nowrap; }
+.wb-mi-ic { width: 22px; text-align: center; font-size: 1.05rem; }
+.wb-menu hr { border: 0; border-top: 1px solid var(--wb-line); margin: 5px 4px; }
+.wb-dlg-back { position: fixed; inset: 0; z-index: 95; background: rgba(15, 12, 30, .45); display: grid; place-items: center; padding: 16px;
+  animation: wb-fade .15s ease-out; }
+@keyframes wb-fade { from { opacity: 0; } to { opacity: 1; } }
+.wb-dlg { width: min(480px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--wb-card); color: var(--wb-fg);
+  border-radius: 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); }
+.wb-dlg.is-wide { width: min(680px, 100%); }
+.wb-dlg header { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 4px 22px; }
+.wb-dlg h2 { margin: 0; font: 800 1.15rem/1.2 Archivo, sans-serif; }
+.wb-dlg-body { padding: 4px 22px 20px; }
+.wb-dlg-p { margin: .4rem 0 .8rem; line-height: 1.5; color: var(--wb-mute); }
+.wb-dlg-acts { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.wb-lbl { margin: 16px 0 8px; font: 800 .7rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--wb-mute); }
+.wb-papers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.wb-papers button { height: 46px; border-radius: 10px; border: 1px solid var(--wb-line); background: var(--c); cursor: pointer; position: relative;
+  display: flex; align-items: flex-end; padding: 0 8px 6px; }
+.wb-papers span { font-size: .72rem; font-weight: 700; color: #4b5563; }
+.wb-papers [data-paper="chalk"] span, .wb-papers [data-paper="night"] span { color: #e5e7eb; }
+.wb-papers .is-on, .wb-patterns .is-on { outline: 2.5px solid var(--wb-accent); outline-offset: 1px; }
+.wb-patterns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.wb-patterns button { display: grid; gap: 5px; justify-items: center; padding: 6px; border: 1px solid var(--wb-line); border-radius: 10px;
+  background: transparent; color: var(--wb-fg); cursor: pointer; font: 600 .72rem/1.2 "Hanken Grotesk", sans-serif; }
+.wb-patterns canvas { width: 88px; height: 60px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); }
+.wb-seg { display: flex; flex-wrap: wrap; gap: 4px; background: var(--wb-hover); border-radius: 12px; padding: 3px; }
+.wb-seg button { flex: 1; min-height: 34px; border: 0; border-radius: 9px; background: transparent; color: var(--wb-mute); cursor: pointer;
+  font: 700 .8rem/1 "Hanken Grotesk", sans-serif; padding: 0 10px; white-space: nowrap; }
+.wb-seg .is-on { background: var(--wb-card); color: var(--wb-fg); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.wb-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.wb-row select { flex: 1; min-width: 170px; height: 38px; border: 1px solid var(--wb-line); border-radius: 10px; padding: 0 8px;
+  background: var(--wb-card); color: var(--wb-fg); font: 600 .84rem/1 "Hanken Grotesk", sans-serif; }
+.wb-links { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.wb-links li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px; border: 1px solid var(--wb-line); border-radius: 12px; }
+.wb-links code { flex: 1 1 100%; font-size: .78rem; overflow-wrap: anywhere; color: var(--wb-fg); }
+.wb-tag { margin-right: auto; font-size: .74rem; font-weight: 700; color: var(--wb-mute); }
+.wb-check { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--wb-line); border-radius: 12px; cursor: pointer; }
+.wb-check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--wb-accent); }
+.wb-check b { display: block; }
+.wb-check small { display: block; color: var(--wb-mute); margin-top: 2px; }
+.wb-toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 99; padding: 10px 16px; border-radius: 12px;
+  background: #1f2433; color: #fff; font: 700 .86rem/1.3 "Hanken Grotesk", sans-serif; box-shadow: 0 12px 30px rgba(0, 0, 0, .3);
+  opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); }
+.wb-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.wb-toast[data-kind="bad"] { background: #b91c1c; }
+.wb-print { position: fixed; width: 0; height: 0; border: 0; visibility: hidden; }
+
+/* present */
+.wb.is-present .wb-top, .wb.is-present .wb-side, .wb.is-present .wb-mini { display: none; }
+.wb.is-present .wb-stage { margin-left: 0 !important; background: #0f1117; }
+.wb.is-present .wb-pages { gap: 40px; padding: 12px 0 60vh; }
+.wb.is-present ~ .ink-rail, .wb.is-present ~ .an-tab { display: none !important; }
+.wb-pres { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 96; display: flex; align-items: center; gap: 6px;
+  padding: 6px; border-radius: 999px; background: rgba(20, 22, 32, .88); color: #fff; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); }
+.wb-pres button { height: 36px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 12px;
+  border: 0; border-radius: 999px; background: transparent; color: #fff; font: 700 .82rem/1 "Hanken Grotesk", sans-serif; cursor: pointer; }
+.wb-pres button:hover { background: rgba(255, 255, 255, .12); }
+.wb-pres [aria-pressed="true"] { background: #ef4444; }
+.wb-pres-n { font-size: .82rem; font-weight: 700; min-width: 54px; text-align: center; }
+
+@media (max-width: 1100px) {
+  .wb-acts .wb-btn span { display: none; }
+  .wb-acts .wb-btn { padding: 0 9px; }
+}
+@media (max-width: 760px) {
+  .wb-brand span, .wb-status, .wb-pgind { display: none; }
+  .wb-top { gap: 4px; padding: 0 6px; }
+  .wb-zoom { display: none; }
+  .wb-side { position: absolute; right: 0; top: 0; bottom: 0; z-index: 30; box-shadow: var(--wb-shadow); }
+  .wb-pages { padding: 14px 8px 120px; }
+  body.ink-pinned .wb-stage { margin-left: 0; }
+}

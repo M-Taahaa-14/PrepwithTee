@@ -748,3 +748,30 @@ html[data-theme="dark"] .ui-faq-item summary::after { color: var(--lav-ink); }
 .ui-mine[hidden] { display: none !important; }
 .ui-mine nav a { font-weight: 800; }
 .ui-mine nav a .ui-ic { color: currentColor; }
+
+/* ── /features (features.py) ─────────────────────────────────────── */
+.ft-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.ft-jump a { padding: 7px 14px; border-radius: 999px; background: var(--white); border: 1px solid var(--line);
+  color: var(--ink); font-weight: 700; font-size: .86rem; text-decoration: none; }
+.ft-jump a:hover { border-color: var(--accent); color: var(--accent); }
+.ft-new, .ft-group { margin: 30px 0; scroll-margin-top: 90px; }
+.ft-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.ft-grid-new { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.ft-card { display: flex; gap: 14px; padding: 18px; border-radius: 18px; background: var(--white); border: 1px solid var(--line);
+  color: var(--ink); text-decoration: none; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.ft-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(76, 46, 114, .13); border-color: var(--t-ink, var(--accent)); }
+.ft-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ft-ic { flex: none; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; font-size: 1.4rem;
+  background: var(--t, var(--lav)); }
+.ft-group .ft-ic { background: var(--t, var(--lav)); }
+.ft-body { display: grid; gap: 5px; min-width: 0; }
+.ft-body b { font: 800 1rem/1.25 "Hanken Grotesk", sans-serif; color: var(--purple); }
+.ft-body b em { margin-left: 6px; padding: 2px 7px; border-radius: 999px; font: 800 .62rem/1.3 "Hanken Grotesk", sans-serif;
+  font-style: normal; text-transform: uppercase; letter-spacing: .05em; color: #fff; background: linear-gradient(135deg, #7c5cf0, #ec4899);
+  vertical-align: 2px; }
+.ft-body > span { font-size: .9rem; line-height: 1.5; color: var(--grey); }
+.ft-body small { font-size: .82rem; line-height: 1.45; color: var(--ink); padding: 7px 10px; border-radius: 10px; background: var(--page); }
+.ft-body small i { font-style: normal; font-weight: 800; color: var(--gold); margin-right: 4px; }
+.ft-cta { font-weight: 800; font-size: .86rem; color: var(--accent); }
+.ft-card.is-new { border-width: 2px; border-color: var(--t-line, var(--lav-line)); background:
+  linear-gradient(160deg, var(--t, var(--lav)) 0, var(--white) 55%); }

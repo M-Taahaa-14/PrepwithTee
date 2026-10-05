@@ -1,4 +1,4 @@
-﻿/* PrepWithTee — the practice dock.
+/* PrepWithTee — the practice dock.
  *
  * Tools have to be reachable WHILE a student is working, not one navigation
  * away: leaving a half-finished revise session to look up a formula is how
@@ -125,7 +125,8 @@
         t.classList.toggle("on", on);
         t.setAttribute("aria-selected", on ? "true" : "false");
       });
-      var meta = tools.find(function (t) { return t.id === id; });
+      // Any catalogue tool can be opened (shortcuts.js: Alt+G on a chemistry paper), not only the tabs.
+      var meta = all.find(function (t) { return t.id === id; });
       popLink.href = "/" + (meta ? meta.href : "tools.html");
       body.innerHTML = '<p class="pwt-loading">Opening ' +
         (meta ? PWTx.esc(meta.name.toLowerCase()) : "tool") + "…</p>";
@@ -266,6 +267,15 @@
 
     setTool(current);
     if (read(KEY_OPEN) === "1" && window.innerWidth > 900) open(current);
+
+    // For shortcuts.js (Alt+C calculator, Alt+G graph, Alt+S formulas, Alt+T).
+    window.pwtDock = {
+      open: function (id) { open(id || current); },
+      close: close,
+      toggle: function () { dock.classList.contains("open") ? close() : open(); },
+      isOpen: function () { return dock.classList.contains("open"); },
+      current: function () { return current; }
+    };
   }
 
   if (document.readyState === "loading") {

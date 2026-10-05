@@ -35,7 +35,7 @@ from pipeline import config as _pcfg
 
 router = APIRouter()
 
-SESSION_V = "20260930a"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20261005b"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,
@@ -96,7 +96,7 @@ def _question_meta(qids: list[int]) -> tuple[list[dict], dict[int, str]]:
     con = _db.plain_connect()
     try:
         rows = {r["id"]: dict(r) for r in con.execute(
-            f"""SELECT q.id, q.number, q.sub_part, q.rects_json, q.paper_id, c.topic,
+            f"""SELECT q.id, q.number, q.sub_part, q.rects_json, q.paper_id, c.topic, c.subtopic,
                        p.syllabus, p.year, p.session, p.paper, p.variant
                 FROM questions q JOIN papers p ON p.id = q.paper_id
                 LEFT JOIN classifications c ON c.question_id = q.id
@@ -121,7 +121,7 @@ def _question_meta(qids: list[int]) -> tuple[list[dict], dict[int, str]]:
             "ref": (f"{r['syllabus']}/{r['paper']}{r['variant'] or ''}/"
                     f"{SESSION_SHORT.get(r['session'], r['session'])}/{r['year'] % 100:02d} "
                     f"Q{r['number']}{f'({sub})' if sub else ''}"),
-            "topic": r["topic"] or "", "paper_id": r["paper_id"], "page": page, "y": y})
+            "topic": r["topic"] or "", "subtopic": r["subtopic"] or "", "paper_id": r["paper_id"], "page": page, "y": y})
     return out, keys
 
 
@@ -146,23 +146,46 @@ def mcq_topics(syllabus: str = Query(..., pattern=r"^[0-9A-Za-z]{4,6}$")):
     con = _db.plain_connect()
     try:
         rows = con.execute(
-            f"""SELECT c.topic, COUNT(DISTINCT q.id) AS n, MIN(p.year) AS y0, MAX(p.year) AS y1
+            f"""SELECT c.topic, COALESCE(c.subtopic, '') AS subtopic, p.paper,
+                       COUNT(DISTINCT q.id) AS n, MIN(p.year) AS y0, MAX(p.year) AS y1
                 FROM questions q
                 JOIN papers p ON p.id = q.paper_id
                 JOIN classifications c ON c.question_id = q.id
                 WHERE p.syllabus = ? AND p.kind = 'qp' AND p.paper IN ({ph})
                   AND {_pcfg.not_old_theory_sql('p')}
                   AND q.status IS NOT 'excluded'
-                GROUP BY c.topic""", [syllabus, *papers]).fetchall()
+                GROUP BY c.topic, COALESCE(c.subtopic, ''), p.paper""",
+            [syllabus, *papers]).fetchall()
     finally:
         con.close()
-    counts = {r["topic"]: dict(r) for r in rows}
-    order = [c["name"] for c in _catalog.chapters(syllabus)]
-    names = [t for t in order if t in counts] + sorted(t for t in counts if t not in order)
+    # topic -> {n, by_paper, subs: {name: {n, by_paper}}}
+    counts: dict[str, dict] = {}
+    for r in rows:
+        t = counts.setdefault(r["topic"], {"n": 0, "by_paper": {}, "subs": {}})
+        t["n"] += r["n"]
+        t["by_paper"][r["paper"]] = t["by_paper"].get(r["paper"], 0) + r["n"]
+        if r["subtopic"]:
+            st = t["subs"].setdefault(r["subtopic"], {"n": 0, "by_paper": {}})
+            st["n"] += r["n"]
+            st["by_paper"][r["paper"]] = st["by_paper"].get(r["paper"], 0) + r["n"]
+    chapters = {c["name"]: c for c in _catalog.chapters(syllabus)}
+    names = [t for t in chapters if t in counts] + sorted(t for t in counts if t not in chapters)
+
+    def subtopics(name: str) -> list[dict]:
+        have = counts[name]["subs"]
+        order = [s["name"] for s in (chapters.get(name) or {}).get("subtopics", [])]
+        # Syllabus order; a subtopic with no MCQs is still listed (greyed) so the
+        # student sees the whole chapter, then any labels not in the taxonomy.
+        seq = order + sorted(s for s in have if s not in order)
+        return [{"name": s, "count": have.get(s, {}).get("n", 0),
+                 "by_paper": have.get(s, {}).get("by_paper", {})} for s in seq]
+
     return {"syllabus": syllabus, "papers": papers,
-            "topics": [{"name": t, "count": counts[t]["n"]} for t in names],
-            "year_min": min((r["y0"] for r in counts.values()), default=None),
-            "year_max": max((r["y1"] for r in counts.values()), default=None)}
+            "topics": [{"name": t, "display": (chapters.get(t) or {}).get("display") or t,
+                        "count": counts[t]["n"], "by_paper": counts[t]["by_paper"],
+                        "subtopics": subtopics(t)} for t in names],
+            "year_min": min((r["y0"] for r in rows), default=None),
+            "year_max": max((r["y1"] for r in rows), default=None)}
 
 
 # ── Sessions ──────────────────────────────────────────────────────────────────
@@ -171,6 +194,7 @@ class StartReq(BaseModel):
     syllabus: str
     paper_id: int | None = None          # a full past paper ...
     topics: list[str] = []               # ... or a topical set
+    subtopics: dict[str, list[str]] = {} # chapter -> subtopics picked (missing/empty = whole chapter)
     count: int = 20
     year_from: int = 2010
     year_to: int = 2026
@@ -226,7 +250,7 @@ def _topical_pool(req: StartReq) -> list[dict]:
     con = _db.plain_connect()
     try:
         rows = [dict(r) for r in con.execute(
-            f"""SELECT q.id, c.topic, p.year FROM questions q
+            f"""SELECT q.id, c.topic, c.subtopic, p.year FROM questions q
                 JOIN papers p ON p.id = q.paper_id
                 JOIN classifications c ON c.question_id = q.id
                 WHERE p.syllabus = ? AND p.kind = 'qp' AND p.paper IN ({pph})
@@ -237,8 +261,21 @@ def _topical_pool(req: StartReq) -> list[dict]:
         keyed = _keys(con, [r["id"] for r in rows])
     finally:
         con.close()
-    # Only questions with an official key can be marked.
-    return [{"id": r["id"], "bucket": r["topic"], "year": r["year"]} for r in rows if r["id"] in keyed]
+    subs = {t: set(v) for t, v in (req.subtopics or {}).items() if t in req.topics and v}
+    out = []
+    for r in rows:
+        if r["id"] not in keyed:          # only questions with an official key can be marked
+            continue
+        want = subs.get(r["topic"])
+        if want is None:
+            bucket = r["topic"]
+        elif r["subtopic"] in want:
+            # One bucket per subtopic, so the mix covers every subtopic picked.
+            bucket = f"{r['topic']} › {r['subtopic']}"
+        else:
+            continue
+        out.append({"id": r["id"], "bucket": bucket, "year": r["year"]})
+    return out
 
 
 @router.post("/api/mcq/sessions")
@@ -269,13 +306,17 @@ def start_session(req: StartReq, user: dict = Depends(_auth.get_current_user)):
         if not topics:
             raise HTTPException(422, "Pick at least one chapter")
         req.topics = topics
+        req.subtopics = {t: [x for x in dict.fromkeys(v) if x]
+                         for t, v in (req.subtopics or {}).items() if t in topics}
         pool = _topical_pool(req)
         if not pool:
             raise HTTPException(422, "No marked multiple-choice questions match those filters")
         seed = req.seed if req.seed is not None else secrets.randbelow(2**31)
         qids = [q["id"] for q in select_mixed(pool, req.count, seed)]
         p = None
-        kind, title = "topical", _title(code, None, topics, len(qids))
+        labels = [f"{t} ({', '.join(req.subtopics[t])})" if 0 < len(req.subtopics.get(t) or []) <= 2
+                  else t for t in topics]
+        kind, title = "topical", _title(code, None, labels, len(qids))
         limit = _exam_seconds(code, (req.papers or _mcq_papers(code))[0], len(qids))
     if req.timer == "none":
         limit = None
@@ -341,20 +382,31 @@ def _payload(s: dict) -> dict:
 
 
 def _review(qs: list[dict]) -> dict:
+    """Score overall, per chapter, and per subtopic inside each chapter (weakest first)."""
     by_topic: dict[str, dict] = {}
     for q in qs:
-        t = by_topic.setdefault(q["topic"] or "Other", {"topic": q["topic"] or "Other",
-                                                       "right": 0, "total": 0})
+        name = q["topic"] or "Other"
+        t = by_topic.setdefault(name, {"topic": name, "right": 0, "total": 0, "subs": {}})
+        sub = q.get("subtopic") or ""
+        st = t["subs"].setdefault(sub, {"name": sub, "right": 0, "total": 0})
         if q.get("key"):
-            t["total"] += 1
-            t["right"] += 1 if q.get("correct") else 0
+            ok = 1 if q.get("correct") else 0
+            for x in (t, st):
+                x["total"] += 1
+                x["right"] += ok
+
+    def rate(x):
+        return x["right"] / max(1, x["total"])
+
+    for t in by_topic.values():
+        t["subtopics"] = sorted((v for k, v in t.pop("subs").items() if k and v["total"]),
+                                key=lambda x: (rate(x), x["name"]))
     marked = [q for q in qs if q.get("key")]
     return {"right": sum(1 for q in marked if q["correct"]),
             "wrong": sum(1 for q in marked if q["answer"] and not q["correct"]),
             "blank": sum(1 for q in marked if not q["answer"]),
             "unmarked": len(qs) - len(marked),
-            "topics": sorted(by_topic.values(), key=lambda t: (t["right"] / max(1, t["total"]),
-                                                                t["topic"]))}
+            "topics": sorted(by_topic.values(), key=lambda t: (rate(t), t["topic"]))}
 
 
 @router.get("/api/mcq/sessions/{sid}")
@@ -501,8 +553,8 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20261001a"></script>
+<script src="/main.js?v=20261005a"></script>
+<script type="module" src="/auth.js?v=20261005a"></script>
 <script type="module" src="/mcq-session.js?v={SESSION_V}"></script>
 {_dock[1]}
 </body>

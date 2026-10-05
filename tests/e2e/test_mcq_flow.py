@@ -3,6 +3,7 @@ view + answer sheet, one-by-one with the keyboard, live check, submit, results,
 review with "why", annotations saved, phone layout."""
 
 import re
+from urllib.parse import quote
 
 from playwright.sync_api import expect
 
@@ -146,3 +147,48 @@ def test_phone_layout_uses_the_drawer(browser, base_url, shots):
     expect(page.locator("#mq-sheet")).to_be_in_viewport()
     page.screenshot(path=str(shots / "mcq_phone_sheet.png"))
     ctx.close()
+
+
+def test_topical_picker_subtopics(student, shots):
+    """Chapters show their subtopics; tapping chips makes a partial chapter, the
+    tray sums the pool, search finds subtopics, and the session keeps to them."""
+    _enrol(student)
+    topics = student.request.get("/api/mcq/topics?syllabus=5054").json()["topics"]
+    ch = next(t for t in topics if sum(1 for s in t["subtopics"] if s["count"] >= 3) >= 2)
+    subs = [s for s in ch["subtopics"] if s["count"] >= 3][:2]
+    page = student.new_page()
+    page.goto("/mcq/o-level/physics-5054")
+    setup = page.locator("#mq-setup")
+    setup.get_by_role("tab", name=re.compile("Topical practice")).click()
+    card = setup.locator(".mqs-ch", has=page.locator(".mqs-ch-name", has_text=ch["display"])).first
+    expect(card.locator(".mqs-sub")).to_have_count(len(ch["subtopics"]))
+
+    # search narrows to the chapter holding that subtopic and highlights the chip
+    setup.locator("[data-q]").fill(subs[0]["name"][:12])
+    expect(card).to_be_visible()
+    expect(card.locator(".mqs-sub.is-hit").first).to_be_visible()
+    setup.locator("[data-q]").fill("")
+
+    for s in subs:
+        card.locator(f'.mqs-sub[data-sub="{s["name"]}"]').click()
+    card = setup.locator(".mqs-ch", has=page.locator(".mqs-ch-name", has_text=ch["display"])).first
+    expect(card).to_have_class(re.compile("is-some"))
+    expect(card.locator(".mqs-ch-tick")).to_have_attribute("aria-checked", "mixed")
+    tray = setup.locator(".mqs-tray")
+    expect(tray).to_contain_text(f"2 of ")
+    expect(tray.locator(".mqs-tray-sum b")).to_have_text(str(subs[0]["count"] + subs[1]["count"]))
+    setup.get_by_role("button", name="10", exact=True).click()
+    card.scroll_into_view_if_needed()
+    page.screenshot(path=str(shots / "mcq_topical_picker.png"), full_page=True)
+
+    setup.get_by_role("button", name=re.compile("Start practice")).click()
+    expect(page).to_have_url(re.compile(r"/mcq/session/[\w-]+$"))
+    sid = page.url.rsplit("/", 1)[1]
+    d = student.request.get(f"/api/mcq/sessions/{sid}").json()
+    assert {q["topic"] for q in d["questions"]} == {ch["name"]}
+    assert {q["subtopic"] for q in d["questions"]} == {s["name"] for s in subs}
+
+    page.set_viewport_size({"width": 390, "height": 844})
+    page.goto("/mcq/o-level/physics-5054?topics=" + quote(ch["name"]))
+    expect(page.locator(".mqs-ch.is-all")).to_have_count(1)
+    page.screenshot(path=str(shots / "mcq_topical_picker_phone.png"), full_page=False)

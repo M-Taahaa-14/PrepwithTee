@@ -58,6 +58,10 @@ def student(browser, base_url):
     ctx.request.post("/api/me/setup", data={          # enrolment gate
         "name": "E2E Student", "phone": "+92 3001234567", "boards": ["igcse", "o-level", "a-level"]})
     ctx.request.put("/api/me/boards", data={"boards": ["igcse", "o-level"]})
+    # What's new nudges (whats-new.js) would sit over pages other tests click on;
+    # tests that check them set "pwt-wn" to "{}" themselves.
+    ctx.add_init_script("if (!localStorage.getItem('pwt-wn')) localStorage.setItem('pwt-wn', "
+                        "JSON.stringify({'board-2026-10': 1, 'instagram-2026-10': 1, 'coach-rail': 1}))")
     yield ctx
     ctx.close()
 

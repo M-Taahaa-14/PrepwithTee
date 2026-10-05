@@ -418,39 +418,114 @@ export async function initNavbar() {
 
   const wrap = document.createElement("div");
   wrap.className = "account-menu";
+  const AI = {
+    dash: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+    papers: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+    board: '<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+    progress: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',
+    keys: '<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6.5 13h.01M17.5 13h.01M9 14.5h6"/>',
+    moon: '<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>',
+    spark: '<path d="M12 3l2 5.5L20 10l-6 1.5L12 17l-2-5.5L4 10l6-1.5z"/>',
+    out: '<path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
+  };
+  const ic = (k) => `<span class="am-ic" aria-hidden="true"><svg viewBox="0 0 24 24">${AI[k]}</svg></span>`;
+  const dashHref = user.role === "teacher" ? "/teacher-dashboard.html" : user.role === "admin" ? "/admin"
+                 : user.role === "parent" ? "/parent-dashboard.html" : "/dashboard.html";
+  const PLAN = { free: "Free plan", solo: "Solo plan", three: "3 Subjects plan", all: "All Access" };
+  const badge = user.role === "teacher" ? "Teacher" : user.role === "admin" ? "Admin" : user.role === "parent" ? "Parent"
+              : PLAN[user.plan] || "Free plan";
+  const free = user.role === "student" && (!user.plan || user.plan === "free");
+  const avatar = (cls) => user.picture_url
+    ? `<img class="account-avatar ${cls}" src="${escapeHtml(user.picture_url)}" alt="" referrerpolicy="no-referrer">`
+    : `<span class="account-avatar account-initials ${cls}">${INITIALS(user.name)}</span>`;
   wrap.innerHTML = `
-    <button type="button" class="account-trigger" aria-haspopup="true" aria-expanded="false">
-      ${user.picture_url
-        ? `<img class="account-avatar" src="${user.picture_url}" alt="">`
-        : `<span class="account-avatar account-initials">${INITIALS(user.name)}</span>`}
-      <span class="account-name">${user.name?.split(" ")[0] || "Account"}</span>
+    <button type="button" class="account-trigger" aria-haspopup="menu" aria-expanded="false"
+            title="${escapeHtml(user.name || "Account")}" aria-label="Account menu for ${escapeHtml(user.name || "you")}">
+      ${avatar("")}
+      <span class="account-name">${escapeHtml(user.name?.split(" ")[0] || "Account")}</span>
       <svg viewBox="0 0 12 8" width="11" height="8" aria-hidden="true">
         <path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor"
               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <div class="account-dropdown" hidden>
-      <a href="/dashboard.html">Dashboard</a>
-      <a href="/papers">Past papers</a>
-      <a href="/formulas.html">Formula sheets</a>
-      <a href="/profile.html">Edit profile</a>
-      <button type="button" class="account-logout">Sign out</button>
+    <div class="account-dropdown" role="menu" aria-label="Account" hidden>
+      <div class="am-head">
+        ${avatar("am-avatar")}
+        <div class="am-who">
+          <b>${escapeHtml(user.name || "Your account")}</b>
+          <span>${escapeHtml(user.email || "")}</span>
+        </div>
+        <div class="am-plan-row">
+          <span class="am-plan${free ? "" : " is-paid"}">${escapeHtml(badge)}</span>
+          ${free ? '<a class="am-up" href="/pricing.html" role="menuitem">Upgrade →</a>' : ""}
+        </div>
+      </div>
+      <div class="am-group">
+        <a href="${dashHref}" role="menuitem">${ic("dash")}<span>Dashboard</span></a>
+        ${user.role === "student" ? `<a href="/my-papers" role="menuitem">${ic("papers")}<span>My papers</span></a>` : ""}
+        <a href="/whiteboard" role="menuitem">${ic("board")}<span>Whiteboard</span></a>
+        ${user.role === "student" ? `<a href="/topical-progress.html" role="menuitem">${ic("progress")}<span>My progress</span></a>` : ""}
+      </div>
+      <div class="am-group">
+        <a href="/profile.html" role="menuitem">${ic("user")}<span>Profile &amp; settings</span></a>
+        <button type="button" class="am-theme" role="menuitemcheckbox" aria-checked="false">${ic("moon")}<span>Dark mode</span><i class="am-switch" aria-hidden="true"></i></button>
+        <button type="button" data-shortcuts role="menuitem">${ic("keys")}<span>Keyboard shortcuts</span><kbd>?</kbd></button>
+        <a href="/features" role="menuitem">${ic("spark")}<span>What's new</span><em class="am-new">New</em></a>
+      </div>
+      <button type="button" class="account-logout" role="menuitem">${ic("out")}<span>Sign out</span></button>
     </div>`;
   right.appendChild(wrap);
+  // a profile photo that won't load (expired Google link) falls back to initials, not a broken icon
+  wrap.querySelectorAll("img.account-avatar").forEach((img) => img.addEventListener("error", (e) => {
+    const s = document.createElement("span");
+    s.className = `${e.target.className} account-initials`;
+    s.textContent = INITIALS(user.name);
+    e.target.replaceWith(s);
+  }, { once: true }));
 
   const trigger = wrap.querySelector(".account-trigger");
   const drop = wrap.querySelector(".account-dropdown");
-  const setOpen = open => {
+  const items = () => [...drop.querySelectorAll('[role^="menuitem"]')];
+  const themeBtn = drop.querySelector(".am-theme");
+  const paintTheme = () => themeBtn.setAttribute("aria-checked",
+    String(document.documentElement.getAttribute("data-theme") === "dark"));
+  const setOpen = (open, focus = false) => {
     drop.hidden = !open;
     trigger.setAttribute("aria-expanded", String(open));
+    if (open) { paintTheme(); if (focus) items()[0]?.focus(); }
   };
 
   trigger.addEventListener("click", e => {
     e.stopPropagation();
-    setOpen(drop.hidden);
+    setOpen(drop.hidden, e.detail === 0);                 // keyboard-opened: focus the first item
   });
+  trigger.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setOpen(true, true); }
+  });
+  drop.addEventListener("click", e => e.stopPropagation());
+  drop.addEventListener("keydown", e => {
+    const list = items(), i = list.indexOf(document.activeElement);
+    if (e.key === "ArrowDown") { e.preventDefault(); list[(i + 1) % list.length].focus(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); list[(i - 1 + list.length) % list.length].focus(); }
+    else if (e.key === "Home") { e.preventDefault(); list[0].focus(); }
+    else if (e.key === "End") { e.preventDefault(); list[list.length - 1].focus(); }
+    else if (e.key === "Tab") setOpen(false);
+  });
+  themeBtn.addEventListener("click", () => {
+    // set it here (clicking the header's toggle would bubble a click that closes this menu)
+    const dark = document.documentElement.getAttribute("data-theme") !== "dark";
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch {}
+    const btn = document.querySelector(".dm-toggle");
+    if (btn) btn.textContent = dark ? "☀️" : "🌙";
+    paintTheme();
+  });
+  drop.querySelector("[data-shortcuts]").addEventListener("click", () => setOpen(false));
   document.addEventListener("click", () => setOpen(false));
-  document.addEventListener("keydown", e => { if (e.key === "Escape") setOpen(false); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !drop.hidden) { setOpen(false); trigger.focus(); }
+  });
   wrap.querySelector(".account-logout").addEventListener("click", logout);
 
   // Active time spent tracking for students
@@ -563,4 +638,5 @@ if (typeof window !== "undefined") {
 }
 
 // The pen button on every non-PDF page (scratch ink, never saved).
-import("/scratch-pen.js?v=20260930a").catch(() => {});
+import("/scratch-pen.js?v=20261005a").catch(() => {});
+import("/whats-new.js?v=20261005a").catch(() => {});        // feature spotlight + rail coach mark

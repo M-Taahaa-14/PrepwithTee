@@ -176,3 +176,7 @@ html[data-paper="dark"] .vw-stage { background: #07080b; }
 .vw-paper span { margin-left: .3rem; }
 .vw-paper[aria-pressed="true"] { background: #11131a; color: #f3f4f6; border-color: #3a4150; }
 @media (max-width: 900px) { .vw-paper span { display: none; } }
+
+/* the "work on a whiteboard" chip is a link (opens /whiteboard/new?q=) */
+a.vw-chip { display: block; text-decoration: none; }
+.vw-chip-wb { border-color: #c4b5fd; color: #6d28d9; }

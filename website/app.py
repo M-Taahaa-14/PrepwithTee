@@ -110,6 +110,12 @@ import search as _search_mod
 app.include_router(_search_mod.router)
 import og_image as _og_mod
 app.include_router(_og_mod.router)
+import whiteboard as _wb_mod
+app.include_router(_wb_mod.router)
+import features as _features_mod
+app.include_router(_features_mod.router)
+import upgrade as _upgrade_mod
+app.include_router(_upgrade_mod.router)
 
 
 @app.get("/solver", include_in_schema=False)
@@ -2133,10 +2139,12 @@ Coverage: 2020–2025 papers, all sessions and variants.
 - Revision notes (/notes): PrepWithTee's own chapter-by-chapter notes linked to practice
 - Resources (/resources): well-known teachers' PDF notes, books, worksheets, official syllabuses and study planners
 - AI Tutor (/tutor.html) and Photo Solver (/solver): explanations and step-by-step solutions
+- Whiteboard (/whiteboard): PrepWithTee Board - notebooks (lined, squared, graph, dotted, Cornell) or an infinite canvas; pens, shapes, ruler, protractor and compass, stickers and stamps, paste images, past-paper questions, share links and PDF export. 3 boards free, unlimited on any plan
+- Annotation tools on every paper: a left-side toolbar with pens, highlighter, shapes, text, sticky notes, stickers, images, ruler, protractor and compass; ink is saved per page and can be downloaded with the paper
 - Tools (/tools.html): calculator, graph plotter, formula sheets, definitions, command words, periodic table, pseudocode runner
 - My Notes (/notes.html) and Flashcards (/flashcards.html): personal notes and spaced repetition
 - Dashboard (/dashboard.html): progress, streaks, topical & yearly performance
-- Every page, listed (/explore)
+- Every page, listed (/explore); every feature with tips (/features)
 
 == PRICING ==
 - Free: Monthly capped topical access + all free tools (no card required)
@@ -3465,6 +3473,7 @@ class FeedbackReq(BaseModel):
     email: str | None = None        # required: so the tutor can write back
     page: str | None = None         # which page the feedback came from
     type: str | None = None         # "feedback" or "issue"
+    snips: list[str] | None = None  # up to 3 screenshots of the page, as data: URLs (static/snip.js)
 
 
 # ---------------------------------------------------------------------------
@@ -3650,6 +3659,54 @@ def _email_domain_exists(domain: str) -> bool:
         ex.shutdown(wait=False)
 
 
+_SNIPS_DIR = Path(os.environ.get("FEEDBACK_SNIPS_DIR") or ROOT / "data" / "feedback-snips")
+SNIP_MAX = 3
+SNIP_MAX_BYTES = 3 * 1024 * 1024
+_SNIP_NAME = re.compile(r"^[0-9a-f]{32}\.(jpg|png)$")
+
+
+def _save_snips(snips: list[str] | None) -> list[str]:
+    """Decode, check and store feedback screenshots; returns their file names.
+
+    Only real JPEG/PNG bytes are kept (the magic number must match), at most
+    SNIP_MAX of them, each under SNIP_MAX_BYTES. They live OUTSIDE the public
+    /uploads mount: admins read them through /api/admin/feedback/snips/{name}.
+    """
+    import base64
+    import binascii
+    import uuid
+    if not snips:
+        return []
+    if len(snips) > SNIP_MAX:
+        raise HTTPException(400, f"Attach at most {SNIP_MAX} screenshots.")
+    out = []
+    for s in snips:
+        m = re.match(r"^data:image/(jpeg|png);base64,([A-Za-z0-9+/=\s]+)$", s or "")
+        if not m:
+            raise HTTPException(400, "A screenshot couldn't be read - please snip it again.")
+        try:
+            raw = base64.b64decode(m.group(2), validate=False)
+        except (binascii.Error, ValueError):
+            raise HTTPException(400, "A screenshot couldn't be read - please snip it again.")
+        if len(raw) > SNIP_MAX_BYTES:
+            raise HTTPException(400, "A screenshot is too large - snip a smaller area.")
+        ext = "jpg" if raw[:3] == b"\xff\xd8\xff" else "png" if raw[:8] == b"\x89PNG\r\n\x1a\n" else None
+        if not ext:
+            raise HTTPException(400, "Screenshots must be images.")
+        _SNIPS_DIR.mkdir(parents=True, exist_ok=True)
+        name = f"{uuid.uuid4().hex}.{ext}"
+        (_SNIPS_DIR / name).write_bytes(raw)
+        out.append(name)
+    return out
+
+
+def snip_path(name: str) -> Path | None:
+    if not _SNIP_NAME.match(name or ""):
+        return None
+    p = _SNIPS_DIR / name
+    return p if p.is_file() else None
+
+
 def _valid_email(email: str | None, known: str | None = None) -> str:
     email = (email or "").strip()
     if not email:
@@ -3682,6 +3739,7 @@ def submit_feedback(req: FeedbackReq, user: dict | None = _Depends(_auth_mod.may
 
     import users_db as _udb
     fb_type = req.type or "feedback"
+    snips = _save_snips(req.snips)
     _udb.save_feedback({
         "rating": req.rating,
         "message": msg,
@@ -3689,6 +3747,7 @@ def submit_feedback(req: FeedbackReq, user: dict | None = _Depends(_auth_mod.may
         "email": email,
         "page": req.page,
         "type": fb_type,
+        "attachments": json.dumps(snips) if snips else None,
     })
 
     stars = f"{req.rating}/5 ★" if req.rating else "—"
@@ -3705,6 +3764,7 @@ def submit_feedback(req: FeedbackReq, user: dict | None = _Depends(_auth_mod.may
             ("Account", account),
             ("Page", req.page or "—"),
             ("Message", msg),
+            *([("Screenshots", f"{len(snips)} attached - see the admin Inbox")] if snips else []),
         ],
         cta=(f"Reply to {name.split()[0]}",
              f"mailto:{email}?subject=" + quote(f"Re: your PrepWithTee {fb_type}")),
@@ -3935,7 +3995,7 @@ _PUBLIC_PATHS = [
     "/", "/subjects.html", "/explore",
     "/pricing.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/walkthrough.html", "/blog",
-    "/solver",
+    "/solver", "/whiteboard", "/features",
     # Study tools — each has a distinct meta description and real student value
     "/formulas.html", "/definitions.html",
     "/command-words.html", "/calculator.html", "/periodic-table.html",
@@ -3980,6 +4040,8 @@ def sitemap_xml():
         "/mcq": "0.88",
         "/subjects.html": "0.90",
         "/resources": "0.85",
+        "/whiteboard": "0.85",
+        "/features": "0.85",
         "/pricing.html": "0.80",
         "/tools.html": "0.80",
         "/formulas.html": "0.80",

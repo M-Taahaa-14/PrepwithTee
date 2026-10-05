@@ -1,4 +1,4 @@
-"""Annotation tools on the yearly paper viewer, driven with a real pen pointer
+"""Annotation tools (the left rail) on the yearly paper viewer, driven with a real pen pointer
 (Chrome DevTools pen events, like a Wacom tablet): a long pen stroke never
 scrolls the page, Select moves / deletes, text can be edited after placing it,
 and the partial eraser cuts a stroke in two."""
@@ -91,14 +91,16 @@ def test_pen_select_text_and_partial_eraser(student, shots):
     assert [t["txt"] for t in texts] == ["v = u + at  (a const.)"]
 
     # 4. partial eraser: a horizontal line cut in the middle becomes two strokes
-    page.locator('.an-bar [data-tool="line"]').click()
+    page.locator('.an-bar [data-tool="shape"]').click()            # shapes live in a flyout
+    page.locator('.an-bar [data-tool="shape"]').click()
+    page.locator('.ink-fly [data-shape="line"]').click()
     lx, ly = box["x"] + 100, box["y"] + 600
     page.mouse.move(lx, ly); page.mouse.down(); page.mouse.move(lx + 300, ly, steps=8); page.mouse.up()
     page.locator('.an-bar [data-tool="eraser"]').click()
-    # the eraser's own options replace colour/thickness while it is on
-    opts = page.locator(".an-eraseopts")
+    # tapping the eraser again opens its options beside the rail
+    page.locator('.an-bar [data-tool="eraser"]').click()
+    opts = page.locator('.ink-fly[data-kind="eraser"]')
     expect(opts).to_be_visible()
-    expect(page.locator(".an-bar .an-swatch")).to_be_hidden()
     opts.get_by_role("radio", name="Partial").click()
     opts.get_by_role("radio", name="Large eraser").click()
     expect(opts.get_by_role("radio", name="Large eraser")).to_have_attribute("aria-checked", "true")
@@ -109,13 +111,14 @@ def test_pen_select_text_and_partial_eraser(student, shots):
     page.screenshot(path=str(shots / "annotations.png"))
 
     # 5. whole-object mode removes a touched stroke entirely
+    if not opts.is_visible():                        # a stroke on the page closes the flyout
+        page.locator('.an-bar [data-tool="eraser"]').click()
     opts.get_by_role("radio", name="Whole object").click()
+    page.keyboard.press("Escape")                    # closes the flyout
+    expect(opts).to_be_hidden()
     _stroke(cdp, [(lx + 40, ly - 20), (lx + 40, ly), (lx + 40, ly + 20)])
     page.wait_for_timeout(1200)
     assert len([x for x in _strokes(student, pid) if x["t"] != "text"]) == 1
-    page.locator('.an-bar [data-tool="pen"]').click()
-    expect(opts).to_be_hidden()
-    expect(page.locator(".an-bar .an-swatch")).to_be_visible()
 
 
 def test_scratch_pen_on_every_other_page_is_never_saved(student, shots):
@@ -124,10 +127,10 @@ def test_scratch_pen_on_every_other_page_is_never_saved(student, shots):
     page.on("request", lambda r: puts.append(r.url) if "/api/annotations" in r.url else None)
     for url in ("/tools.html", "/papers/igcse", "/yearly"):
         page.goto(url)
-        expect(page.locator(".an-fab")).to_be_visible(timeout=10_000)
+        expect(page.locator(".an-tab")).to_be_visible(timeout=10_000)
         assert page.locator(".an-bar").count() == 1, url
     # draw on /yearly, scroll: the ink moves with the page
-    page.locator(".an-fab").click()
+    page.locator(".an-tab").click()
     page.locator('.an-bar [data-tool="pen"]').click()
     page.mouse.move(400, 500); page.mouse.down(); page.mouse.move(600, 520, steps=10); page.mouse.up()
     expect(page.locator(".an-saved")).to_contain_text("not saved")
@@ -136,12 +139,13 @@ def test_scratch_pen_on_every_other_page_is_never_saved(student, shots):
         f" return [...c.getContext('2d').getImageData(500 * d, {y} * d, 1, 1).data][3] > 0; }})()")
     assert ink_at(510)
     page.locator('.an-bar [data-tool="pointer"]').click()
+    page.mouse.move(600, 400)                                   # off the rail (it scrolls by itself)
     page.mouse.wheel(0, 200); page.wait_for_timeout(400)
     moved = page.evaluate("scrollY")
     assert moved > 0 and ink_at(round(510 - moved)) and not ink_at(510)
     page.screenshot(path=str(shots / "scratch_pen.png"))
     page.reload()
-    expect(page.locator(".an-fab")).to_be_visible()
+    expect(page.locator(".an-tab")).to_be_visible()
     assert not ink_at(510)
     assert puts == [], puts                                    # nothing ever sent
 
@@ -169,14 +173,17 @@ def test_ruler_snaps_strokes_and_protractor_measures(student, shots):
     ruler = page.locator(".an-inst-ruler")
     expect(ruler).to_be_visible()
     pg_w = stage.locator(".vw-pg").first.bounding_box()["width"]
-    svg_w = float(ruler.locator("svg").get_attribute("width"))
-    assert abs((svg_w - 12) - pg_w * 150 / 210) < 2
+    body_w = float(ruler.locator(".an-inst-body").get_attribute("width"))   # 150 mm + 5 mm each end
+    assert abs(body_w - pg_w * 160 / 210) < 2
+    ruler.locator(".an-inst-opt").click()                                   # 30 cm
+    assert abs(float(ruler.locator(".an-inst-body").get_attribute("width")) - pg_w * 310 / 210) < 2
+    ruler.locator(".an-inst-opt").click()                                   # back to 15 cm
 
     # rotate it with the handle to about -30° (handle dragged down-right)
     rb = ruler.bounding_box()
     cx, cy = rb["x"] + rb["width"] / 2, rb["y"] + rb["height"] / 2
     h = ruler.locator(".an-inst-rot").bounding_box()
-    page.mouse.move(h["x"] + 10, h["y"] + 10); page.mouse.down()
+    page.mouse.move(h["x"] + h["width"] / 2, h["y"] + h["height"] / 2); page.mouse.down()
     import math
     r = 200
     page.mouse.move(cx + r * math.cos(math.radians(30)), cy + r * math.sin(math.radians(30)), steps=8)
@@ -188,7 +195,7 @@ def test_ruler_snaps_strokes_and_protractor_measures(student, shots):
     cdp = page.context.new_cdp_session(page)
     ux, uy = math.cos(math.radians(30)), math.sin(math.radians(30))     # along the ruler (screen)
     nx, ny = -uy, ux                                                      # across it
-    half = ruler.locator("svg").evaluate("s => s.getAttribute('height')")
+    half = ruler.locator(".an-inst-body").get_attribute("height")
     edge = float(half) / 2 + 3
     pts = [(cx + nx * edge + ux * t + (4 if i % 2 else -4) * nx,
             cy + ny * edge + uy * t + (4 if i % 2 else -4) * ny) for i, t in enumerate(range(-120, 121, 12))]

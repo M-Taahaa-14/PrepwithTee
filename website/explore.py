@@ -43,6 +43,7 @@ SECTIONS = [
     ]),
     ("Tools", "tools", [
         ("All tools", "/tools.html", "Everything below in one place", False),
+        ("Whiteboard", "/whiteboard", "Notebooks and an infinite canvas: pens, compass, stickers, PDF export", False),
         ("Calculator", "/calculator.html", "Scientific calculator with memory", False),
         ("Graph plotter", "/graph.html", "Plot any function or relation", False),
         ("Grade calculator", "/grade-calculator.html", "Predict your grade from paper marks", False),
@@ -80,6 +81,7 @@ _GROUP_TONES = {"Practise past papers": "lav", "Learn": "green", "AI help": "pin
 
 # The four doors most students want first.
 _START = [
+    ("ai", "What can I do here?", "/features", "Every feature, with the tip that makes it useful", "orange"),
     ("topical", "Topical past papers", "/papers/topical", "Pick chapters, get real questions + mark scheme", "lav"),
     ("yearly", "Papers by year", "/yearly", "Every sitting, no account needed", "blue"),
     ("notes", "Revision notes", "/notes", "Chapter-by-chapter, linked to questions", "green"),

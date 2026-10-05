@@ -36,6 +36,8 @@ os.environ.update({
     "SUPABASE_SERVICE_KEY": "",
     "USERS_DB_PATH": str(_TMP / "users.db"),
     "BOOKLET_DIR": str(_TMP / "booklets"),
+    "INK_ASSET_DIR": str(_TMP / "ink_assets"),
+    "FEEDBACK_SNIPS_DIR": str(_TMP / "feedback_snips"),
     "RESEND_API_KEY": "",
     "SMTP_USER": "",
     "SMTP_PASS": "",

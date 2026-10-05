@@ -554,3 +554,9 @@ body { background-image: var(--bg-glow); background-attachment: fixed; }
 .thresh { display: flex; flex-wrap: wrap; gap: 4px; }
 .thresh .gp { font-size: .72rem; min-width: 0; padding: 1px 7px; }
 @media (max-width: 760px) { .pp-row { grid-template-columns: minmax(0, 1fr) auto; } }
+
+/* Inbox: screenshots a student snipped into feedback */
+.snips { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .6rem; }
+.snip { display: block; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--line); }
+.snip img { display: block; width: 100%; height: 140px; object-fit: cover; object-position: top left; }
+.snip:hover { border-color: var(--accent); }

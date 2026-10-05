@@ -1,0 +1,104 @@
+/* limit-card.css — the free-plan limit card (limit-card.js). Site tokens, so dark mode follows. */
+html.lc-lock { overflow: hidden; }
+.lc-wrap { position: fixed; inset: 0; z-index: 2147483200; display: grid; place-items: center; padding: 16px; }
+.lc-back { position: absolute; inset: 0; background: rgba(20, 14, 38, .55); backdrop-filter: blur(4px); opacity: 0; transition: opacity .2s; }
+.lc-card { position: relative; width: min(860px, 100%); max-height: calc(100vh - 32px); overflow: auto; overscroll-behavior: contain;
+  background: var(--white, #fff); color: var(--ink, #1f1a33); border-radius: 26px; border: 1px solid var(--line, #e8dfce);
+  box-shadow: 0 40px 100px rgba(20, 12, 40, .4); opacity: 0; transform: translateY(14px) scale(.98); transition: opacity .22s, transform .22s; }
+.lc-wrap.is-open .lc-back { opacity: 1; }
+.lc-wrap.is-open .lc-card { opacity: 1; transform: none; }
+.lc-x { position: absolute; top: 14px; right: 14px; z-index: 1; width: 38px; height: 38px; border-radius: 50%; border: 0;
+  background: rgba(255, 255, 255, .85); color: #1f1a33; font: 700 1.35rem/1 system-ui, sans-serif; cursor: pointer; }
+.lc-x:hover { background: #fff; }
+.lc-x:focus-visible, .lc-btn:focus-visible, .lc-plan:focus-visible, .lc-later:focus-visible, .lc-all:focus-visible {
+  outline: 3px solid var(--gold, #c9a227); outline-offset: 2px; }
+
+.lc-hero { padding: 1.6rem 1.8rem 1.3rem; background: linear-gradient(130deg, var(--orange, #fde6cf), var(--pink, #fbe0ea) 55%, var(--lav, #e4def9));
+  border-radius: 26px 26px 0 0; }
+.lc-icon { display: inline-grid; place-items: center; width: 54px; height: 54px; border-radius: 16px; font-size: 1.7rem;
+  background: var(--white, #fff); box-shadow: 0 8px 20px rgba(46, 27, 74, .14); }
+.lc-eyebrow { margin: .9rem 0 .2rem; font: 800 .74rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange-ink, #9a4a0b); }
+.lc-hero h2 { margin: 0; font: 800 clamp(1.35rem, 3vw, 1.85rem)/1.15 "Archivo", sans-serif; color: var(--ink, #1f1a33); max-width: 34ch; }
+.lc-sub { margin: .5rem 0 0; font-size: .95rem; line-height: 1.5; color: var(--ink, #1f1a33); opacity: .8; max-width: 62ch; }
+.lc-sub:empty { display: none; }
+.lc-meter-wrap { margin-top: 1rem; max-width: 460px; }
+.lc-meter-wrap[hidden] { display: none; }
+.lc-meter { height: 10px; border-radius: 99px; background: rgba(255, 255, 255, .7); overflow: hidden; }
+.lc-meter i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--orange-ink, #c2410c), var(--pink-ink, #be185d)); }
+.lc-meta { margin: .4rem 0 0; font-size: .84rem; color: var(--ink, #1f1a33); opacity: .85; }
+
+.lc-body { padding: 1.4rem 1.8rem .6rem; display: grid; gap: 1.1rem; }
+.lc-loading { display: flex; align-items: center; gap: .6rem; margin: .4rem 0 1rem; color: var(--grey, #6b6478); }
+.lc-spin { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid var(--line, #e8dfce); border-top-color: var(--accent, #6d4aff);
+  animation: lc-spin .8s linear infinite; }
+@keyframes lc-spin { to { transform: rotate(360deg); } }
+
+.lc-trial { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem 1.4rem; padding: 1.2rem 1.3rem;
+  border-radius: 20px; color: #fff; background: radial-gradient(120% 140% at 0% 0%, #8b5cf6, #5b21b6 55%, #3b0764);
+  box-shadow: 0 16px 40px rgba(91, 33, 182, .35); }
+.lc-trial-kicker { margin: 0 0 .25rem; font: 800 .76rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase;
+  color: #fde68a; }
+.lc-trial h3 { margin: 0; font: 800 1.3rem/1.2 "Archivo", sans-serif; color: #fff; }
+.lc-trial p { margin: .3rem 0 0; font-size: .9rem; color: rgba(255, 255, 255, .85); }
+.lc-incl { list-style: none; margin: .75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.lc-incl li { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .6rem; border-radius: 99px;
+  background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); font-size: .8rem; color: #fff; }
+.lc-incl b { color: #fde68a; }
+.lc-btn { display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 14px; cursor: pointer;
+  padding: .95rem 1.4rem; font: 800 1rem/1.1 "Hanken Grotesk", sans-serif; text-decoration: none; }
+.lc-btn-trial { background: linear-gradient(180deg, #fde68a, #f5b83d); color: #3b0764; box-shadow: 0 8px 22px rgba(245, 184, 61, .45);
+  white-space: nowrap; }
+.lc-btn-trial:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.lc-btn-trial:disabled { opacity: .7; cursor: wait; transform: none; }
+.lc-err { grid-column: 1 / -1; margin: 0; padding: .5rem .7rem; border-radius: 10px; background: rgba(255, 255, 255, .95);
+  color: #9f1239; font-weight: 700; font-size: .88rem; }
+.lc-err[hidden] { display: none; }
+
+.lc-h { margin: .2rem 0 0; font: 800 .8rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--grey, #6b6478); }
+.lc-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .75rem; }
+.lc-plan { position: relative; display: flex; flex-direction: column; gap: .35rem; padding: 1.05rem 1.05rem .95rem; border-radius: 18px;
+  border: 1.5px solid var(--line, #e8dfce); background: var(--page, #fdf9f3); color: var(--ink, #1f1a33); text-decoration: none;
+  transition: border-color .15s, transform .15s, box-shadow .15s; }
+.lc-plan:hover { border-color: var(--accent, #6d4aff); transform: translateY(-2px); box-shadow: 0 12px 26px rgba(46, 27, 74, .12); }
+.lc-plan.is-best { border-color: var(--accent, #6d4aff); background: var(--accent-soft, #efeaff); }
+.lc-badge { position: absolute; top: -10px; right: 12px; padding: .22rem .55rem; border-radius: 99px; background: var(--accent, #6d4aff);
+  color: var(--on-accent, #fff); font: 800 .68rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .04em; }
+.lc-plan > b { font: 800 1.05rem "Archivo", sans-serif; }
+.lc-price { font: 800 1.3rem "Archivo", sans-serif; color: var(--lav-ink, #4a2e8f); }
+.lc-price small { font: 600 .78rem "Hanken Grotesk", sans-serif; color: var(--grey, #6b6478); }
+.lc-plan ul { list-style: none; margin: .2rem 0 .4rem; padding: 0; display: grid; gap: .25rem; font-size: .83rem; color: var(--ink, #1f1a33); }
+.lc-plan li::before { content: "✓"; margin-right: .4rem; color: var(--green-ink, #15803d); font-weight: 900; }
+.lc-plan-cta { margin-top: auto; font-weight: 800; font-size: .88rem; color: var(--accent, #6d4aff); }
+.lc-fallback { margin: 0; }
+
+.lc-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .9rem 1.8rem 1.3rem; }
+.lc-foot[hidden] { display: none; }
+.lc-later { border: 0; background: none; color: var(--grey, #6b6478); font: 700 .9rem "Hanken Grotesk", sans-serif; cursor: pointer; padding: .4rem 0; }
+.lc-later:hover { color: var(--ink, #1f1a33); }
+.lc-all { font-weight: 800; font-size: .9rem; color: var(--accent, #6d4aff); text-decoration: none; }
+.lc-card.is-done .lc-body { padding-bottom: 1.6rem; }
+
+/* inline version */
+.lc-inline { display: flex; gap: .75rem; align-items: flex-start; padding: .9rem 1rem; border-radius: 16px;
+  background: linear-gradient(130deg, var(--orange, #fde6cf), var(--pink, #fbe0ea)); border: 1px solid var(--orange-line, #f5c99c);
+  color: var(--ink, #1f1a33); }
+.lc-inline-icon { font-size: 1.3rem; }
+.lc-inline b { display: block; font: 800 .98rem/1.25 "Archivo", sans-serif; }
+.lc-inline p { margin: .25rem 0 .6rem; font-size: .85rem; opacity: .85; }
+.lc-btn-sm { padding: .55rem .9rem; font-size: .88rem; border-radius: 11px; background: var(--accent, #6d4aff); color: var(--on-accent, #fff); }
+
+@media (max-width: 640px) {
+  .lc-wrap { padding: 0; place-items: end stretch; }
+  .lc-card { max-height: 94vh; border-radius: 24px 24px 0 0; }
+  .lc-hero { padding: 1.3rem 1.2rem 1.1rem; }
+  .lc-body { padding: 1.1rem 1.2rem .4rem; }
+  .lc-foot { padding: .8rem 1.2rem 1.2rem; }
+  .lc-trial { grid-template-columns: 1fr; }
+  .lc-btn-trial { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lc-back, .lc-card, .lc-plan, .lc-btn-trial { transition: none; }
+  .lc-spin { animation: none; }
+}

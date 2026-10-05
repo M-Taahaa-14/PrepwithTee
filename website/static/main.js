@@ -459,6 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label for="fbMessage" id="fbMsgLabel">What should we improve?</label>
           <textarea id="fbMessage" rows="4" placeholder="Your thoughts — features you'd like, things that felt off, anything…" required></textarea>
         </div>
+        <div class="fb-field" id="fbSnips"></div>
         <div class="fb-field">
           <label for="fbName">Your name</label>
           <input type="text" id="fbName" placeholder="e.g. Ahmed" autocomplete="name" maxlength="120" required>
@@ -488,6 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pWrap.innerHTML = panelHTML;
     document.body.appendChild(pWrap.firstElementChild);
 
+    const SNIP_V   = "20261005a";        // bump with snip.js / snip.css
     const panel    = document.getElementById("fbPanel");
     const tabBtn   = document.getElementById("fbTabBtn");
     const closeBtn = document.getElementById("fbClose");
@@ -556,8 +558,22 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => {});
     }
 
+    // Screenshot field (snip.js): loaded the first time the panel opens.
+    let snips = null;
+    function mountSnips() {
+      if (snips) return;
+      snips = { get: () => [], clear() {} };
+      import(`/snip.js?v=${SNIP_V}`).then((m) => {
+        snips = m.snipField(document.getElementById("fbSnips"), {
+          v: SNIP_V,
+          hide: () => [panel, tabBtn, document.querySelector(".fb-tab")],
+        });
+      }).catch(() => { document.getElementById("fbSnips").hidden = true; });
+    }
+
     function openPanel() {
       prefill();
+      mountSnips();
       panel.classList.add("open");
       panel.setAttribute("aria-hidden", "false"); panel.inert = false;
     }
@@ -620,6 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
             email,
             page: location.pathname || "/",
             type: mode,
+            snips: snips ? snips.get() : [],
           }),
         });
         if (!r.ok) {
@@ -632,6 +649,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       submitBtn.disabled = false; submitBtn.textContent = label;
       msgArea.value = "";
+      if (snips) snips.clear();
       body.hidden = true;
       thanks.hidden = false;
       setTimeout(() => { closePanel(); body.hidden = false; thanks.hidden = true; }, 3200);
@@ -890,5 +908,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // The pen button on every non-PDF page (scratch ink, never saved). auth.js loads it too;
 // scratch-pen.js starts only once.
-import("/scratch-pen.js?v=20260930a").catch(function () {});
+import("/scratch-pen.js?v=20261005a").catch(function () {});
 

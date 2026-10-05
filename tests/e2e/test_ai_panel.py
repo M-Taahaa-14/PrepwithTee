@@ -75,8 +75,13 @@ def test_explain_panel_and_plan_gate(student, shots):
         panel.get_by_role("tab", name="Guide me").click()
         panel.get_by_role("button", name="Show hint 1").click()
         expect(panel.locator(".ai-plan")).to_be_visible()
+        # the site-wide limit card (limit-card.js) opens over the page too
+        expect(page.locator(".lc-card")).to_contain_text("hints")
+        page.keyboard.press("Escape")
+        expect(page.locator(".lc-card")).to_have_count(0)
         chips.nth(1).get_by_role("button", name=re.compile("Explain")).click()
         expect(panel.locator(".ai-plan")).to_contain_text("free worked solution")
+        page.keyboard.press("Escape")
         page.screenshot(path=str(shots / "ai_gate.png"))
 
         # on a plan: hints one at a time

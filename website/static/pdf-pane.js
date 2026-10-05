@@ -130,7 +130,9 @@ export class PdfPane {
         chips.innerHTML = this.chipHTML ? this.chipHTML(q) : `${tag}
           <button type="button" data-open="explain" data-seq="${q.seq}" class="vw-chip">✦ Explain</button>
           <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Guide me</button>
-          <button type="button" data-open="ms" data-seq="${q.seq}" class="vw-chip">✓ Mark scheme</button>`;
+          <button type="button" data-open="ms" data-seq="${q.seq}" class="vw-chip">✓ Mark scheme</button>
+          ${q.qid ? `<a href="/whiteboard/new?q=${q.qid}" target="_blank" rel="noopener" class="vw-chip vw-chip-wb"
+             title="Open this question on a new whiteboard to work it out">🖊️ Whiteboard</a>` : ""}`;
         pg.appendChild(chips);
       }
       this.stage.appendChild(pg);

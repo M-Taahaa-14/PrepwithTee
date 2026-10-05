@@ -35,7 +35,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 RES_DIR = ROOT / "data" / "resources"
-RES_V = "20260930a"                        # bump with resource-viewer.js / catalog.css
+RES_V = "20261005a"                        # bump with resource-viewer.js / catalog.css
 EXTS = {".pdf", ".png", ".jpg", ".jpeg", ".webp", ".docx", ".pptx", ".xlsx", ".zip", ".txt"}
 INLINE = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
 _e = _catalog._e
@@ -376,8 +376,8 @@ def resource_viewer(f: str, user: dict | None = Depends(_auth.maybe_user)):
 <main id="vw" class="vw" data-state="loading"></main>
 <script id="vw-state" type="application/json">{json.dumps(state)}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20261001a"></script>
+<script src="/main.js?v=20261005a"></script>
+<script type="module" src="/auth.js?v=20261005a"></script>
 <script type="module" src="/resource-viewer.js?v={RES_V}"></script>
 </body>
 </html>""", headers={"Cache-Control": "private, no-store"})

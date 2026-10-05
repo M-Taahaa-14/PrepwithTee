@@ -67,7 +67,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 80
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20261001a"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20261005a"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -495,7 +495,8 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", an
         if pages:
             import annot_pdf
             from fastapi.responses import Response
-            return Response(annot_pdf.burn(pdf, pages), media_type="application/pdf",
+            import whiteboard as _wb
+            return Response(annot_pdf.burn(pdf, pages, _wb.resolver(user["id"])), media_type="application/pdf",
                             headers={"Content-Disposition": f'attachment; filename="{name}"',
                                      "Cache-Control": "private, no-store"})
     return FileResponse(pdf, media_type="application/pdf", filename=name,
@@ -816,8 +817,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20260930a"></script>
-<script type="module" src="/auth.js?v=20261001a"></script>
+<script src="/main.js?v=20261005a"></script>
+<script type="module" src="/auth.js?v=20261005a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 {_dock[1]}
 </body>

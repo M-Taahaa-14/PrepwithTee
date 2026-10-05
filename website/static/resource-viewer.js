@@ -3,8 +3,8 @@
  * download, and the annotation bar (saved per page when signed in, under
  * res:<hash>; scratch ink for guests).
  */
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260930a";
-import { createAnnotator } from "/annotate.js?v=20260930a";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);

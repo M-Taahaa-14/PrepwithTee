@@ -254,9 +254,19 @@
 .mq-bar i[data-tone="good"] { background: var(--green-ink); }
 .mq-bar i[data-tone="mid"] { background: var(--gold); }
 .mq-bar i[data-tone="low"] { background: var(--pink-ink); }
+.mq-bar-ch details > summary { display: grid; grid-template-columns: 1fr auto; gap: .3rem .6rem; cursor: pointer; list-style: none; }
+.mq-bar-ch details > summary::-webkit-details-marker { display: none; }
+.mq-bar-ch .mq-bar-name::before { content: "▸"; display: inline-block; width: 1em; color: var(--grey); transition: transform .15s; }
+.mq-bar-ch details[open] .mq-bar-name::before { transform: rotate(90deg); }
+.mq-bar-ch summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+.mq-subbars { list-style: none; margin: .55rem 0 .2rem 1em; padding: 0 0 0 .7rem; border-left: 2px solid var(--line);
+  display: grid; gap: .45rem; }
+.mq-subbars li { display: grid; grid-template-columns: 1fr auto; gap: .2rem .6rem; font-size: .8rem; color: var(--grey); }
+.mq-subbars b { font-weight: 700; }
+.mq-bar-sm { height: 5px; }
+.mq-qtopic small { font-weight: 600; opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .mq-bar-ch .mq-bar-name::before { transition: none; } }
 
-/* the annotation bar sits above the stage, never under the answer sheet */
-.mq-page .an-bar[data-pos="bottom"] { left: calc(50% - var(--sheet-w, 300px) / 2); }
 
 /* ── narrow screens: answer sheet becomes a bottom drawer ─────────── */
 @media (max-width: 1180px) { .mq-vlabel { display: none; } }
@@ -274,8 +284,7 @@
   .mq-dock b { color: var(--purple); font-size: 1rem; }
   .mq-dock i { margin-left: auto; font-style: normal; color: var(--grey); }
   .mq[data-screen="results"] ~ .mq-dock, .mq[data-screen="results"] .mq-dock { display: none; }
-  .mq-page .an-bar[data-pos="bottom"] { left: 50%; bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
-  .mq-page .an-fab { bottom: calc(4.9rem + env(safe-area-inset-bottom, 0px)); left: .8rem; transform: none; }
+  .mq-page .ink-rail { bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
   .mq-rgrid { grid-template-columns: 1fr; }
   .mq-stack { padding: .6rem .3rem 9rem; }
   .mq-sheetpaper { padding: 1rem .9rem 1.4rem; }
@@ -303,7 +312,7 @@
 }
 
 /* the pen bar steps aside while the answer drawer is open */
-.mq.sheet-open ~ .an-bar, .mq.sheet-open ~ .an-fab { display: none; }
+.mq.sheet-open ~ .ink-rail, .mq.sheet-open ~ .an-tab, .mq.sheet-open ~ .ink-fly { display: none; }
 
 /* intro: the paper downloads before Start is allowed (the clock never runs on "Loading…") */
 .mq-prep { display: grid; gap: .4rem; margin: .2rem 0 .4rem; }

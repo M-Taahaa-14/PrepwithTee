@@ -8,12 +8,13 @@
  *   tests    a mock test (kind "test") has no chips: Test / Mark scheme tabs, a
  *            countdown, and the separate mark scheme unlocks on "Finish test"
  */
-import { api } from "/auth.js?v=20261001a";
+import { api } from "/auth.js?v=20261005a";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
-import { PdfPane, debounce } from "/pdf-pane.js?v=20260930a";
+import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20260930a";
+import { createAnnotator } from "/annotate.js?v=20261005a";
 
+const SNIP_V = "20261005a";                 // = main.js SNIP_V
 const S = JSON.parse(document.getElementById("vw-state").textContent);
 const root = document.getElementById("vw");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
@@ -104,6 +105,7 @@ function failed(info) {
         <label><span>What were you trying to build? <span class="vw-opt">(optional)</span></span>
           <textarea name="message" rows="3" maxlength="1200"
             placeholder="e.g. I picked 4 chapters with 40 questions from 2015-2025"></textarea></label>
+        <div class="vw-snips"></div>
         <p class="vw-ref">Reference: <code>${esc(S.id)} · ${esc(code)}</code></p>
         <div class="vw-fail-acts"><button class="vw-btn" type="submit">Send to Tee</button></div>
         <p class="vw-report-msg" role="status"></p>
@@ -116,6 +118,17 @@ function failed(info) {
     e.currentTarget.setAttribute("aria-expanded", String(!form.hidden));
     if (!form.hidden) form.querySelector("input,textarea")?.focus();
   });
+  // Optional screenshot of the page (snip.js), loaded when the form is first opened.
+  const field = form.querySelector(".vw-snips");
+  const mount = () => {
+    if (form._snips) return;
+    form._snips = { get: () => [] };
+    import(`/snip.js?v=${SNIP_V}`).then((m) => {
+      form._snips = m.snipField(field, { v: SNIP_V, hide: () => [] });
+    }).catch(() => { field.hidden = true; });
+  };
+  if (!form.hidden) mount();
+  root.querySelector('[data-fail="report"]').addEventListener("click", mount);
   form.addEventListener("submit", (e) => sendReport(e, form, st, code));
 }
 
@@ -129,7 +142,7 @@ async function sendReport(e, form, st, code) {
   msg.textContent = "Sending…";
   try {
     await api("/api/feedback", { method: "POST", body: {
-      type: "issue", page: location.pathname,
+      type: "issue", page: location.pathname, snips: form._snips ? form._snips.get() : [],
       name: String(f.get("name") || "").trim(), email: String(f.get("email") || "").trim(),
       message: `${note || "(no message)"}\n\n--- Topical paper build failed ---\n` +
                `Booklet: ${S.id}\nPaper: ${S.title}\nSubject: ${S.syllabus}\n` +
@@ -342,7 +355,8 @@ function qbar(q) {
   bar.hidden = false;
   bar.innerHTML = `<b>Q${q.seq}</b><span>${esc(q.topic || "")}</span>
     <button type="button" data-open="explain" data-seq="${q.seq}" class="vw-chip">✦ Explain</button>
-    <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Hint</button>`;
+    <button type="button" data-open="hint" data-seq="${q.seq}" class="vw-chip">💡 Hint</button>
+    ${q.qid ? `<a href="/whiteboard/new?q=${q.qid}" target="_blank" rel="noopener" class="vw-chip">🖊️ Board</a>` : ""}`;
 }
 
 // ── Side panel (ai-panel.js: Explain · Guide me · Mark scheme · Ask) ─────────

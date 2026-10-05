@@ -36,7 +36,7 @@ export async function render(el, { params, setParams, ctx }) {
       { key: "source", label: "Type", sort: true, firstDir: "asc", render: r => pill(...SOURCES[r.source]) },
       { key: "name", label: "From", sort: true, firstDir: "asc", render: r => `<div class="who"><div><b>${esc(r.name || "—")}</b>
           <span class="small">${esc(r.email || r.phone || "no contact details")}</span></div></div>` },
-      { key: "title", label: "Message", render: r => `<b>${esc(r.title)}</b><div class="small muted">${esc(snippet(r.body))}</div>` },
+      { key: "title", label: "Message", render: r => `<b>${esc(r.title)}</b>${(r.meta?.snips || []).length ? ` <span class="pill">📎 ${r.meta.snips.length}</span>` : ""}<div class="small muted">${esc(snippet(r.body))}</div>` },
       { key: "status", label: "Status", sort: true, render: r => pill(...STATUS[r.status]) },
       { key: "at", label: "Received", sort: true, render: r => `<span title="${esc(fmtDate(r.at))}">${esc(rel(r.at))}</span>` },
     ],
@@ -59,7 +59,8 @@ async function setStatus(rows, status) {
 
 function openItem(r, reload) {
   const wa = waLink(r.phone);
-  const meta = Object.entries(r.meta || {}).filter(([, v]) => v !== null && v !== undefined && v !== "");
+  const snips = (r.meta && r.meta.snips) || [];
+  const meta = Object.entries(r.meta || {}).filter(([k, v]) => k !== "snips" && v !== null && v !== undefined && v !== "");
   const d = drawer({
     title: SOURCES[r.source][0],
     body: `
@@ -73,6 +74,8 @@ function openItem(r, reload) {
         ${meta.map(([k, v]) => `<dt>${esc(k[0].toUpperCase() + k.slice(1))}</dt><dd>${esc(v)}</dd>`).join("")}
       </dl>
       ${r.body ? `<div class="msg">${esc(r.body)}</div>` : ""}
+      ${snips.length ? `<h3>Screenshots</h3><div class="snips">${snips.map((u, i) => `<a class="snip" href="${esc(u)}" target="_blank" rel="noopener"
+        title="Open full size"><img src="${esc(u)}" alt="Screenshot ${i + 1} from the student" loading="lazy"></a>`).join("")}</div>` : ""}
       ${r.replies.length ? `<h3>Replies</h3>${r.replies.map(x => `<div class="reply"><div class="small faint">${esc(x.by || "")} · ${esc(rel(x.at))}</div>
         <b>${esc(x.subject)}</b><div class="msg">${esc(x.body)}</div></div>`).join("")}` : ""}
       <div class="row">

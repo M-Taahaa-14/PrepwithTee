@@ -260,7 +260,7 @@ def dash_tabs(current: str) -> str:
     return sync_nav.dash_tabs_html(current).replace('class="dtabs"', 'class="dtabs dtabs-inline"', 1)
 
 
-TOOLS_V = "20260930c"          # = VERSION in static/tools-core.js
+TOOLS_V = "20261005a"          # = VERSION in static/tools-core.js
 
 
 def tools_dock(syllabus: str | None) -> tuple[str, str]:

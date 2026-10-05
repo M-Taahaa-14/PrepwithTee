@@ -14,11 +14,11 @@
  *   Annotations  pen/highlighter/shapes on every page and question (annotate.js)
  * Keys: A–D or 1–4 answer · ← → move · F flag · Esc close panel.
  */
-import { api } from "/auth.js?v=20261001a";
+import { api } from "/auth.js?v=20261005a";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
-import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20260930a";
+import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20260930a";
+import { createAnnotator } from "/annotate.js?v=20261005a";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -269,7 +269,7 @@ function renderPaper(main) {
           <div class="mq-qbar">
             <span class="mq-qnum">${q.n}</span>
             <span class="mq-qref">${esc(q.ref)}</span>
-            ${q.topic ? `<span class="mq-qtopic">${esc(q.topic)}</span>` : ""}
+            ${q.topic ? `<span class="mq-qtopic">${esc(q.topic)}${q.subtopic ? ` <small>› ${esc(q.subtopic)}</small>` : ""}</span>` : ""}
             <span class="mq-qside">${marker(q)}</span>
           </div>
           <div class="mq-crop" data-qid="${q.qid}"><span class="mq-crop-wait">Loading question…</span></div>
@@ -347,7 +347,7 @@ const singleParts = {
   head: (q) => `
     <span class="mq-qcount">Question <b>${q.n}</b> <small>of ${Q().length}</small></span>
     <span class="mq-qref">${esc(q.ref)}</span>
-    ${q.topic ? `<span class="mq-qtopic">${esc(q.topic)}</span>` : ""}
+    ${q.topic ? `<span class="mq-qtopic">${esc(q.topic)}${q.subtopic ? ` <small>› ${esc(q.subtopic)}</small>` : ""}</span>` : ""}
     ${!submitted() ? `<button type="button" class="mq-flagbtn" data-flag="${q.n}" aria-pressed="${q.flagged}">⚑ <span>${q.flagged ? "Flagged" : "Flag"}</span></button>` : ""}`,
   opts: (q) => LETTERS.map((L) => {
     const cls = [q.answer === L ? "is-picked" : "", q.key && L === q.key ? "is-key" : "",
@@ -665,11 +665,19 @@ function verdict(p) {
     : ["A starting point", "Go through every explanation, then try a topical set on your weakest chapter."];
 }
 
+const tone = (p) => (p >= 0.75 ? "good" : p >= 0.5 ? "mid" : "low");
+
 function renderResults(main) {
   const d = S.d, rv = d.review || { right: d.score, wrong: 0, blank: 0, topics: [] };
   const pct = d.total ? d.score / d.total : 0;
   const [title, line] = verdict(pct);
-  const weak = rv.topics.filter((t) => t.total && t.right / t.total < 0.7).slice(0, 3).map((t) => t.topic);
+  const weakT = rv.topics.filter((t) => t.total && t.right / t.total < 0.7).slice(0, 3);
+  const weak = weakT.map((t) => t.topic);
+  // Inside a weak chapter, aim at its weak subtopics (if the chapter was only partly weak).
+  const weakSubs = weakT.flatMap((t) => {
+    const subs = (t.subtopics || []).filter((x) => x.right / x.total < 0.7);
+    return subs.length && subs.length < (t.subtopics || []).length ? subs.map((x) => `${t.topic}::${x.name}`) : [];
+  });
   const avg = d.count ? Math.round((d.elapsed_s || S.elapsed) / d.count) : 0;
   main.innerHTML = `
     <div class="mq-results">
@@ -689,7 +697,7 @@ function renderResults(main) {
             <button type="button" class="vw-btn" data-review="first-wrong">Review mistakes</button>
             <button type="button" class="mq-btn" data-view="paper">📄 Paper with answers</button>
             <button type="button" class="mq-btn" data-act="report">⤓ PDF report</button>
-            ${weak.length ? `<a class="mq-btn" href="${esc(BOOT.backUrl)}?topics=${encodeURIComponent(weak.join("|"))}#start">🎯 Practise weak chapters</a>` : ""}
+            ${weak.length ? `<a class="mq-btn" href="${esc(BOOT.backUrl)}?topics=${encodeURIComponent(weak.join("|"))}${weakSubs.length ? `&subs=${encodeURIComponent(weakSubs.join("|"))}` : ""}#start">🎯 Practise weak spots</a>` : ""}
           </div>
         </div>
       </section>
@@ -706,11 +714,19 @@ function renderResults(main) {
         </section>
         <section class="mq-card2">
           <h2>By chapter</h2>
-          <p class="mq-sub">Weakest first.</p>
+          <p class="mq-sub">Weakest first. Open a chapter to see its subtopics.</p>
           <ul class="mq-bars">${rv.topics.filter((t) => t.total).map((t) => {
             const p = t.right / t.total;
-            return `<li><span class="mq-bar-name">${esc(t.topic)}</span><b>${t.right}/${t.total}</b>
-              <span class="mq-bar"><i style="width:${Math.round(p * 100)}%" data-tone="${p >= 0.75 ? "good" : p >= 0.5 ? "mid" : "low"}"></i></span></li>`;
+            const subs = (t.subtopics || []).filter((x) => x.total);
+            const head = `<span class="mq-bar-name">${esc(t.topic)}</span><b>${t.right}/${t.total}</b>
+              <span class="mq-bar"><i style="width:${Math.round(p * 100)}%" data-tone="${tone(p)}"></i></span>`;
+            if (!subs.length) return `<li>${head}</li>`;
+            return `<li class="mq-bar-ch"><details${p < 0.7 ? " open" : ""}><summary>${head}</summary>
+              <ul class="mq-subbars">${subs.map((x) => {
+                const q = x.right / x.total;
+                return `<li><span>${esc(x.name)}</span><b>${x.right}/${x.total}</b>
+                  <span class="mq-bar mq-bar-sm"><i style="width:${Math.round(q * 100)}%" data-tone="${tone(q)}"></i></span></li>`;
+              }).join("")}</ul></details></li>`;
           }).join("")}</ul>
         </section>
       </div>

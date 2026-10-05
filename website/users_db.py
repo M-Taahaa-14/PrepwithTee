@@ -243,6 +243,7 @@ else:
         email   TEXT,
         page    TEXT,
         type    TEXT,
+        attachments TEXT,
         ts      TEXT DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS subject_requests (
@@ -667,6 +668,7 @@ else:
         _safe_alters = [
             "ALTER TABLE assignments ADD COLUMN student_submissions_json TEXT DEFAULT '[]'",
             "ALTER TABLE feedback ADD COLUMN email TEXT",
+            "ALTER TABLE feedback ADD COLUMN attachments TEXT",
             "ALTER TABLE assignments ADD COLUMN assigned_by TEXT",
             "ALTER TABLE profiles ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'",
             "ALTER TABLE profiles ADD COLUMN plan_expires_at TEXT",
@@ -2107,17 +2109,25 @@ def get_leads(limit: int = 1000) -> list[dict]:
 
 
 def save_feedback(payload: dict) -> dict:
+    """attachments = JSON list of snip file names (data/feedback-snips/)."""
     payload["ts"] = _now()
+    if not payload.get("attachments"):
+        payload.pop("attachments", None)
     try:
         return _insert("feedback", payload,
-                       ["rating", "message", "name", "email", "page", "type", "ts"])
+                       ["rating", "message", "name", "email", "page", "type", "attachments", "ts"])
     except Exception:
-        # Supabase without migration 024 (no email column): keep the address in
+        # Supabase without migration 024 (email) / 027 (attachments): keep both in
         # the message rather than lose the feedback.
-        if not _USE_SUPABASE or "email" not in payload:
+        if not _USE_SUPABASE or not ({"email", "attachments"} & set(payload)):
             raise
-        rest = {k: v for k, v in payload.items() if k != "email"}
-        rest["message"] = f"{rest.get('message') or ''}\n\n(email: {payload['email']})"
+        rest = {k: v for k, v in payload.items() if k not in ("email", "attachments")}
+        extra = []
+        if payload.get("email"):
+            extra.append(f"(email: {payload['email']})")
+        if payload.get("attachments"):
+            extra.append(f"(snips: {payload['attachments']})")
+        rest["message"] = f"{rest.get('message') or ''}\n\n" + "\n".join(extra)
         return _insert("feedback", rest, ["rating", "message", "name", "page", "type", "ts"])
 
 

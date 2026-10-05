@@ -143,6 +143,45 @@ def test_topical_session_mixes_chapters_and_uses_exam_pace(client, new_student):
     assert "pdf_url" not in d
 
 
+def test_topics_carry_subtopics_in_syllabus_order(client):
+    d = client.get("/api/mcq/topics", params={"syllabus": "5054"}).json()
+    with_subs = [t for t in d["topics"] if t["subtopics"]]
+    assert with_subs, "5054 chapters should list their subtopics"
+    for t in with_subs:
+        assert sum(s["count"] for s in t["subtopics"]) <= t["count"]
+        assert all(set(s["by_paper"]) <= {"1"} for s in t["subtopics"])
+        assert t["by_paper"] == {"1": t["count"]}
+
+
+def test_topical_session_limited_to_picked_subtopics(client, new_student):
+    _enrolled(client, new_student)
+    topics = client.get("/api/mcq/topics", params={"syllabus": "5054"}).json()["topics"]
+    # A chapter with at least two populated subtopics: pick only the first two.
+    ch = next(t for t in topics if sum(1 for s in t["subtopics"] if s["count"] >= 3) >= 2)
+    subs = [s["name"] for s in ch["subtopics"] if s["count"] >= 3][:2]
+    other = next(t["name"] for t in topics if t["name"] != ch["name"])
+    s = _start(client, topics=[ch["name"], other], subtopics={ch["name"]: subs}, count=10, seed=5)
+    d = client.get(f"/api/mcq/sessions/{s['id']}").json()
+    mine = [q for q in d["questions"] if q["topic"] == ch["name"]]
+    assert mine and {q["subtopic"] for q in mine} <= set(subs)
+    assert {q["subtopic"] for q in mine} == set(subs)                 # every picked subtopic shows up
+    assert any(q["topic"] == other for q in d["questions"])           # the whole other chapter too
+
+
+def test_review_breaks_chapters_down_by_subtopic(client, new_student):
+    _enrolled(client, new_student)
+    topics = [t["name"] for t in client.get("/api/mcq/topics", params={"syllabus": "5054"}).json()["topics"][:2]]
+    s = _start(client, topics=topics, count=10, seed=1)
+    d = client.get(f"/api/mcq/sessions/{s['id']}").json()
+    q = d["questions"][0]
+    client.put(f"/api/mcq/sessions/{s['id']}/answer", json={"qid": q["qid"], "answer": "A"})
+    assert client.post(f"/api/mcq/sessions/{s['id']}/submit").status_code == 200
+    rv =client.get(f"/api/mcq/sessions/{s['id']}").json()["review"]
+    for t in rv["topics"]:
+        assert sum(x["total"] for x in t["subtopics"]) <= t["total"]
+    assert any(t["subtopics"] for t in rv["topics"])
+
+
 @pytest.mark.parametrize("body,code", [
     ({"topics": []}, 422), ({"topics": ["Not a chapter"]}, 422),
     ({"mode": "scroll", "topics": ["x"]}, 422), ({"paper_id": 99999999}, 404)])
