@@ -1,6 +1,6 @@
 /* shortcuts.css — the keyboard shortcuts panel, the "Go to" hint and toasts (shortcuts.js).
    Colours are the site tokens, so light and dark both follow styles.css. */
-.nav-keys { padding: .5rem; }
+.nav-keys { padding: 0; }
 .nav-keys svg { display: block; }
 .ks-fab { position: fixed; left: 16px; bottom: 16px; z-index: 900; width: 40px; height: 40px; border-radius: 12px;
   display: grid; place-items: center; border: 1.5px solid var(--line); background: var(--white); color: var(--grey);

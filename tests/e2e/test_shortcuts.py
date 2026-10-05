@@ -12,9 +12,10 @@ def _ready(page):
 
 
 def test_panel_from_button_and_question_mark(page, base_url, shots):
+    page.set_viewport_size({"width": 1536, "height": 860})   # the header icon shows from 1400 px
     page.goto(f"{base_url}/papers")                      # server-rendered page
     _ready(page)
-    btn = page.locator(".site-header [data-shortcuts]")
+    btn = page.locator(".site-header .nav-search-wrap [data-shortcuts]")   # inside the search pill
     expect(btn).to_be_visible()
     btn.click()
     dlg = page.get_by_role("dialog", name="Keyboard shortcuts")

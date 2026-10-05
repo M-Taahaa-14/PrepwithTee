@@ -16,6 +16,18 @@ const QUICK = [
   ["My papers", "/my-papers"], ["Every page", "/explore"],
 ];
 
+const RK = "pwt-search-recent";
+function recents() {
+  try { return JSON.parse(localStorage.getItem(RK) || "[]").slice(0, 5); } catch (e) { return []; }
+}
+function remember(t, u) {
+  try {
+    const keep = recents().filter((r) => r.u !== u);
+    localStorage.setItem(RK, JSON.stringify([{ t, u }, ...keep].slice(0, 5)));
+  } catch (e) { /* private mode: recents are a convenience only */ }
+}
+function forget() { try { localStorage.removeItem(RK); } catch (e) { /* ignore */ } }
+
 let rows = null;
 let loading = null;
 let dlg = null;
@@ -60,7 +72,31 @@ function rank(q) {
     out.push([score, r]);
   }
   out.sort((a, b) => b[0] - a[0] || a[1].t.length - b[1].t.length);
+  if (!out.length) return fuzzy(q);
   return out.slice(0, 40).map((x) => x[1]);
+}
+
+/* No exact hit: forgive typos by letting the typed letters appear in order in the title
+   ("trigonmetry" -> Trigonometry, "elctric" -> Electric circuits). */
+function fuzzy(q) {
+  const needle = q.toLowerCase().replace(/\s+/g, "");
+  if (needle.length < 4) return [];
+  const out = [];
+  for (const r of rows) {
+    const hay = r._t;
+    let i = 0;
+    let first = -1;
+    for (const ch of needle) {
+      const at = hay.indexOf(ch, i);
+      if (at < 0) { i = -1; break; }
+      if (first < 0) first = at;
+      i = at + 1;
+    }
+    if (i < 0) continue;
+    out.push([i - first - needle.length, r]);          // tighter spread = closer match
+  }
+  out.sort((a, b) => a[0] - b[0] || a[1].t.length - b[1].t.length);
+  return out.slice(0, 12).map((x) => x[1]);
 }
 
 function highlight(text, q) {
@@ -97,9 +133,13 @@ function build() {
     const q = input.value.trim();
     let items;
     if (!q) {
-      list.innerHTML = `<li class="ss-head">Jump to</li>` + QUICK.map(([t, u], i) =>
-        `<li role="option" id="ss-o${i}"><a href="${u}" class="ss-item"><span class="ss-kind ss-t-lav">Go</span>
-         <span class="ss-text"><b>${esc(t)}</b></span></a></li>`).join("");
+      const rec = recents();
+      let n = 0;
+      const row = (t, u, tag) => `<li role="option" id="ss-o${n++}"><a href="${esc(u)}" class="ss-item" data-t="${esc(t)}">
+         <span class="ss-kind ss-t-lav">${tag}</span><span class="ss-text"><b>${esc(t)}</b></span></a></li>`;
+      list.innerHTML = (rec.length
+        ? `<li class="ss-head">Recent <button type="button" class="ss-clear">Clear</button></li>` + rec.map((r) => row(r.t, r.u, "Recent")).join("")
+        : "") + `<li class="ss-head">Jump to</li>` + QUICK.map(([t, u]) => row(t, u, "Go")).join("");
     } else if (!rows) {
       list.innerHTML = `<li class="ss-empty">Loading…</li>`;
       return;
@@ -109,7 +149,7 @@ function build() {
         const [label, tone] = KIND[r.k] || ["Page", "lav"];
         return `<li role="option" id="ss-o${i}"><a href="${esc(r.u)}" class="ss-item">
           <span class="ss-kind ss-t-${tone}">${label}</span>
-          <span class="ss-text"><b>${highlight(r.t, q)}</b><small>${esc(r.s)}</small></span></a></li>`;
+          <span class="ss-text"><b>${highlight(r.t, q)}</b><small>${esc(r.s)}</small></span></a></li>`.replace("<a ", `<a data-t="${esc(r.t)}" `);
       }).join("") : `<li class="ss-empty">Nothing matches <b>${esc(q)}</b>. Try a subject, a code like 5054, or a chapter name.</li>`;
     }
     sel = 0;
@@ -131,8 +171,13 @@ function build() {
     else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); mark(); }
     else if (e.key === "Enter") {
       const a = o[sel]?.querySelector("a");
-      if (a) { e.preventDefault(); location.href = a.href; }
+      if (a) { e.preventDefault(); remember(a.dataset.t, a.getAttribute("href")); location.href = a.href; }
     }
+  });
+  list.addEventListener("click", (e) => {
+    if (e.target.closest(".ss-clear")) { forget(); render(); return; }
+    const a = e.target.closest("a.ss-item");
+    if (a) remember(a.dataset.t, a.getAttribute("href"));
   });
   dlg.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.preventDefault(); close(); } });
   dlg.addEventListener("mousedown", (e) => { if (e.target === dlg) close(); });

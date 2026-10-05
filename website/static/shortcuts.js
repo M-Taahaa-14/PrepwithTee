@@ -19,7 +19,7 @@
   "use strict";
   if (window.pwtShortcuts) return;
 
-  var V = "20261005b";
+  var V = "20261006a";
   var TOOLS_V = "20261005a";   // = ui.TOOLS_V
   var KEY_OFF = "pwt-keys-single-off";
   var KEY_TIP = "pwt-keys-tip";

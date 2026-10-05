@@ -9141,9 +9141,9 @@ html[data-theme="dark"] .sc2-cta { color: var(--page); }
 .nav-new-pill { font-size: .55rem; padding: 1px 5px 0; margin-left: 4px; }
 /* right-hand cluster: borderless 36 px icon buttons, outline on hover */
 .header-end, .header-right { gap: 6px; }
-.dm-toggle, .notif-btn, .nav-search.nav-keys { width: 36px; height: 36px; padding: 0; border-color: transparent;
+.dm-toggle, .notif-btn { width: 36px; height: 36px; padding: 0; border-color: transparent;
   background: transparent; border-radius: 10px; justify-content: center; margin: 0; }
-.dm-toggle:hover, .notif-btn:hover, .nav-search.nav-keys:hover { border-color: var(--line); background: var(--white); box-shadow: none; }
+.dm-toggle:hover, .notif-btn:hover { border-color: var(--line); background: var(--white); box-shadow: none; }
 .nav-search:not(.nav-keys) { padding: .42rem .7rem; font-size: .82rem; }
 .account-trigger { padding: 3px 10px 3px 3px; gap: 7px; font-size: .84rem; }
 .account-avatar { width: 28px; height: 28px; }
@@ -9151,7 +9151,6 @@ html[data-theme="dark"] .sc2-cta { color: var(--page); }
   border-radius: 5px; padding: .12rem .32rem; color: var(--grey); }
 @media (max-width: 1699px) {
   .nav-search kbd { display: none; }
-  .nav-search.nav-keys { display: none; }
 }
 @media (max-width: 1599px) {
   .account-name { display: none; }
@@ -9166,7 +9165,6 @@ body .dtabs, body .yr-bar { top: 60px; }
 
 /* Navbar, round 2 (2026-10-05): links back up (+2 px), shortcuts button always in the bar */
 .nav-link { font-size: .98rem; }
-.nav-search.nav-keys { display: inline-flex; }
 .header-nav { gap: 22px; }
 @media (max-width: 1600px) { .header-nav { gap: 16px; } }
 @media (max-width: 1440px) { .header-nav { gap: 12px; } .nav-link { font-size: .94rem; } }
@@ -9290,7 +9288,40 @@ body .dtabs, body .yr-bar { top: 66px; }
   .site-header .header-row { grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); }
   .nav-search:not(.nav-keys) { width: auto; }
 }
-@media (min-width: 1500px) { .nav-search:not(.nav-keys) { width: 168px; } }
-@media (min-width: 1800px) { .nav-search:not(.nav-keys) { width: 220px; } }
+@media (min-width: 1500px) { .nav-search:not(.nav-keys) { width: 200px; } }
+@media (min-width: 1800px) { .nav-search:not(.nav-keys) { width: 250px; } }
+/* Round 5 (tutor, 2026-10-06): centre the links in the space BETWEEN the logo and the
+   search/account cluster, so the gaps either side of them look equal. */
+@media (min-width: 1201px) {
+  .site-header .header-row { grid-template-columns: max-content minmax(0, 1fr) max-content; }
+  .site-header .header-nav { justify-self: center; }
+}
 /* the shortcuts button lives in the account menu too; in the header only when there is room */
-@media (max-width: 1799px) { .nav-search.nav-keys { display: none; } }
+
+/* Search round 2 (2026-10-06): the pill says "Search papers…" without being cut off; the palette
+   keeps recent results and a Clear link. */
+.nav-search .ns-long { white-space: nowrap; }
+.nav-search:not(.nav-keys):hover { border-color: var(--accent); color: var(--ink); }
+.nav-search:not(.nav-keys):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ss-head { display: flex; align-items: center; justify-content: space-between; }
+.ss-clear { border: 0; background: none; color: var(--accent); font: 700 .68rem/1 "Hanken Grotesk", sans-serif;
+  letter-spacing: .04em; text-transform: none; cursor: pointer; padding: .2rem .3rem; border-radius: 6px; }
+.ss-clear:hover { background: var(--accent-soft); }
+
+/* Search + shortcuts in ONE pill (tutor, 2026-10-06). The wrapper has a fixed width per
+   breakpoint, so showing/hiding the keyboard icon never changes the width of the right-hand
+   cluster - and the nav links stay centred. Two buttons, because a button cannot hold a button. */
+.nav-search-wrap { display: flex; align-items: stretch; height: 40px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--white); color: var(--grey); overflow: hidden; transition: border-color .15s, box-shadow .15s; }
+.nav-search-wrap:hover { border-color: var(--accent); color: var(--ink); }
+.nav-search-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.nav-search-wrap .nav-search { flex: 1; min-width: 0; width: auto; height: auto; border: 0; border-radius: 0; background: transparent;
+  box-shadow: none; padding: 0 .7rem 0 .8rem; justify-content: flex-start; gap: .55rem; color: inherit; font-size: .88rem; cursor: pointer; }
+.nav-search-wrap .nav-search:hover { background: transparent; border: 0; box-shadow: none; }
+.nav-search-wrap .nav-keys { flex: none; width: 38px; display: grid; place-items: center; padding: 0; border: 0;
+  border-left: 1px solid var(--line); border-radius: 0; background: transparent; color: inherit; cursor: pointer; }
+.nav-search-wrap .nav-keys:hover { background: var(--accent-soft); color: var(--ink); }
+.nav-search-wrap button:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; border-radius: 10px; }
+@media (min-width: 1500px) { .nav-search-wrap { width: 240px; } }
+@media (min-width: 1800px) { .nav-search-wrap { width: 290px; } }
+@media (max-width: 1399px) { .nav-search-wrap .nav-keys { display: none; } }

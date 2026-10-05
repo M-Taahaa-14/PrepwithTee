@@ -40,7 +40,7 @@ router = APIRouter()
 
 SITE_ORIGIN = os.environ.get("SITE_ORIGIN", "https://prepwithtee.com").rstrip("/")
 CSS_V = "20261005a"       # bump with catalog.css / catalog.js (immutable caching)
-STYLES_V = "20261005c"    # the site-wide styles.css pin
+STYLES_V = "20261006d"    # the site-wide styles.css pin
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 # Board and display name per syllabus. The single source of truth: app.py's
