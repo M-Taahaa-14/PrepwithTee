@@ -2531,7 +2531,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
     const r = p.el.getBoundingClientRect();
     const vis = { top: Math.max(r.top, 0), bottom: Math.min(r.bottom, window.innerHeight) };
     const k = pxPerMm(p);
-    const it = { kind, p, deg: 0, len: 150, flip: false, variant: "45", scale: instScale(kind),
+    const it = { kind, p, deg: 0, len: 150, flip: false, variant: "45",
                  x: p.el.clientWidth / 2 - (kind === "setsquare" ? 50 * k : 0),
                  y: (vis.top + vis.bottom) / 2 - r.top + (kind === "protractor" ? 30 * k : kind === "setsquare" ? 40 * k : 0) };
     // instruments already open on this page: start this one clear of them
@@ -2553,29 +2553,6 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
   }
 
   const f1 = (v) => +v.toFixed(1);
-  // Instrument size: 1 = true size. Angles stay right at any size (protractor,
-  // set square); a resized ruler's centimetres no longer match the page, so it
-  // says "not to scale". Remembered per instrument.
-  const SCALES = [0.5, 0.64, 0.8, 1, 1.25, 1.56, 1.95, 2.5];
-  function instScale(kind) {
-    try { const v = +JSON.parse(localStorage.getItem("pwt-inst-scale") || "{}")[kind]; return SCALES.includes(v) ? v : 1; }
-    catch { return 1; }
-  }
-  function keepScale(kind, v) {
-    try {
-      const all = JSON.parse(localStorage.getItem("pwt-inst-scale") || "{}");
-      all[kind] = v;
-      localStorage.setItem("pwt-inst-scale", JSON.stringify(all));
-    } catch { /* ignore */ }
-  }
-  function stepScale(it, dir) {
-    const i = SCALES.indexOf(it.scale);
-    const next = dir === 0 ? 1 : SCALES[Math.max(0, Math.min(SCALES.length - 1, (i < 0 ? 3 : i) + dir))];
-    if (next === it.scale) return;
-    it.scale = next;
-    keepScale(it.kind, next);
-    renderInst(it);
-  }
   /**
    * An instrument's drawing in its own frame (px, origin = the point it turns
    * about; y down), its bounding box, its straight edges (pens snap to them)
@@ -2584,14 +2561,14 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
   function instGeo(it, k) {
     const t = [], lab = [];
     if (it.kind === "ruler") {
-      const L = it.len * k, W = 30 * k, pad = 5 * k, x0 = -L / 2, y0 = -W / 2;
+      const L = it.len * k, W = 20 * k, pad = 4 * k, x0 = -L / 2, y0 = -W / 2;
       for (let mm = 0; mm <= it.len; mm++) {
         const x = x0 + mm * k, len = mm % 10 === 0 ? 6.5 * k : mm % 5 === 0 ? 4.5 * k : 2.6 * k;
         t.push(`<line class="${mm % 10 === 0 ? "is-major" : ""}" x1="${f1(x)}" y1="${f1(y0)}" x2="${f1(x)}" y2="${f1(y0 + len)}"/>`);
         if (mm % 10 === 0) lab.push(`<text x="${f1(x)}" y="${f1(y0 + len + 4.6 * k)}">${mm / 10}</text>`);
       }
       const body = `<rect class="an-inst-body" x="${f1(x0 - pad)}" y="${f1(y0)}" width="${f1(L + 2 * pad)}" height="${f1(W)}" rx="${f1(1.6 * k)}"/>
-        <text class="an-inst-unit${it.scale !== 1 ? " is-warn" : ""}" x="${f1(x0 + L / 2)}" y="${f1(W / 2 - 3 * k)}">${it.scale !== 1 ? "Not to scale" : `${it.len / 10} cm`}</text>`;
+        <text class="an-inst-unit" x="${f1(x0 + L / 2)}" y="${f1(W / 2 - 2.2 * k)}">${it.len / 10} cm</text>`;
       return { body, ticks: t.join(""), labels: lab.join(""), font: Math.max(12, 3.4 * k),
                box: [x0 - pad, y0, L + 2 * pad, W],
                edges: [[[x0 - pad, y0], [x0 + L + pad, y0]], [[x0 - pad, -y0], [x0 + L + pad, -y0]]],
@@ -2650,7 +2627,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
 
   /** (Re)draw an instrument at the page's current scale, keeping where it is. */
   function renderInst(it) {
-    const k = pxPerMm(it.p) * (it.scale || 1);
+    const k = pxPerMm(it.p);              // always true size - never scaled
     const g = instGeo(it, k);
     it.geo = g;
     const [bx, by, bw, bh] = g.box, m = 44;                     // room for the handles outside the body
@@ -2664,12 +2641,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
       <button type="button" class="an-inst-rot" style="${pos(g.rot)}" aria-label="Rotate the ${it.kind}" title="Drag to rotate (Shift: 15° steps)"></button>
       <button type="button" class="an-inst-x" style="${pos(g.close)}" aria-label="Put the ${it.kind} away" title="Put away">×</button>
       <span class="an-inst-deg" style="${pos(g.deg)}">0°</span>
-      <button type="button" class="an-inst-opt" style="${pos(g.opt)}" title="${g.optTitle}">${g.optLabel}</button>
-      <span class="an-inst-size" style="${pos([g.opt[0] + (it.kind === "setsquare" ? 92 : 96), g.opt[1]])}" role="group" aria-label="Size of the ${it.kind}">
-        <button type="button" data-isz="-1" aria-label="Smaller" title="Smaller (Ctrl + scroll)">−</button>
-        <button type="button" data-isz="0" class="${it.scale !== 1 ? "is-off" : ""}" title="${it.scale !== 1 ? "Back to true size" : "True size"}">${Math.round((it.scale || 1) * 100)}%</button>
-        <button type="button" data-isz="1" aria-label="Bigger" title="Bigger (Ctrl + scroll)">+</button>
-      </span>`;
+      <button type="button" class="an-inst-opt" style="${pos(g.opt)}" title="${g.optTitle}">${g.optLabel}</button>`;
     it.el.style.width = `${f1(it.box.w)}px`;
     it.el.style.height = `${f1(it.box.h)}px`;
     placeInstrument(it);
@@ -2685,16 +2657,8 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
 
   function bindInstrument(it) {
     const el = it.el;
-    el.addEventListener("wheel", (e) => {
-      if (!(e.ctrlKey || e.metaKey) || !e.target.closest(".an-inst-shape, .an-inst-ticks, .an-inst-labels")) return;
-      e.preventDefault();
-      e.stopPropagation();
-      stepScale(it, e.deltaY < 0 ? 1 : -1);
-    }, { passive: false });
     el.addEventListener("click", (e) => {
       if (e.target.closest(".an-inst-x")) return toggleInstrument(it.kind);
-      const sz = e.target.closest("[data-isz]");
-      if (sz) return stepScale(it, +sz.dataset.isz);
       if (!e.target.closest(".an-inst-opt")) return;
       if (it.kind === "ruler") it.len = it.len === 150 ? 300 : 150;
       if (it.kind === "protractor") it.flip = !it.flip;
@@ -2702,10 +2666,10 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
       renderInst(it);
     });
     el.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".an-inst-shape, .an-inst-ticks, .an-inst-labels, .an-inst-rot, .an-inst-size, .an-inst-opt")) {
+      if (e.target.closest(".an-inst-shape, .an-inst-ticks, .an-inst-labels, .an-inst-rot, .an-inst-opt")) {
         el.style.zIndex = String(++INST_Z);                          // bring it to the front
       }
-      if (e.target.closest(".an-inst-x, .an-inst-opt, .an-inst-size")) return;
+      if (e.target.closest(".an-inst-x, .an-inst-opt")) return;
       // the empty margin around the shape (it only holds the handles) lets presses through
       if (!e.target.closest(".an-inst-rot, .an-inst-shape, .an-inst-ticks, .an-inst-labels")) return;
       // Pen/highlighter pressed on an EDGE draws along it (hand the press to

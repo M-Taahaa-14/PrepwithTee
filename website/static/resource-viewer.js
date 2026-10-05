@@ -4,7 +4,7 @@
  * res:<hash>; scratch ink for guests).
  */
 import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
-import { createAnnotator } from "/annotate.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005c";
 import { paperButton } from "/paper-theme.js?v=20260928a";
 
 const S = JSON.parse(document.getElementById("vw-state").textContent);

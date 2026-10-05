@@ -478,7 +478,7 @@
     btn.addEventListener("click", () => showView("view-" + btn.dataset.view)));
   $("burger").addEventListener("click", () => $("sidebar").classList.toggle("open"));
   $("signout-btn").addEventListener("click", async () => {
-    const { logout } = await import("/auth.js?v=20261005a");
+    const { logout } = await import("/auth.js?v=20261005c");
     logout();
   });
 

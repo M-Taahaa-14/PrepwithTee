@@ -8,11 +8,11 @@
  *   tests    a mock test (kind "test") has no chips: Test / Mark scheme tabs, a
  *            countdown, and the separate mark scheme unlocks on "Finish test"
  */
-import { api } from "/auth.js?v=20261005a";
+import { api } from "/auth.js?v=20261005c";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005c";
 
 const SNIP_V = "20261005a";                 // = main.js SNIP_V
 const S = JSON.parse(document.getElementById("vw-state").textContent);

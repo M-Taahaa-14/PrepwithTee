@@ -349,12 +349,3 @@ body.ink-pinned .vw { margin-left: 70px; transition: margin-left .2s ease; }
 .an-cmp-lock[aria-pressed="true"] { background: #7c5cf0; color: #fff; }
 .an-cmp-lock svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .an-compass .an-inst-x { pointer-events: auto; }
-/* instrument size: − 100% + (1 = true size) */
-.an-inst-size { position: absolute; pointer-events: auto; transform: translate(-50%, -50%); display: inline-flex; align-items: center;
-  height: 26px; border-radius: 999px; background: #fff; border: 1.5px solid #c4b5fd; box-shadow: 0 2px 8px rgba(0, 0, 0, .18); overflow: hidden; }
-.an-inst-size button { height: 100%; min-width: 26px; padding: 0 6px; border: 0; background: transparent; color: #5b21b6; cursor: pointer;
-  font: 800 13px/1 "Hanken Grotesk", sans-serif; }
-.an-inst-size button:hover { background: #ede9fe; }
-.an-inst-size [data-isz="0"] { min-width: 46px; font-size: 11.5px; border-left: 1px solid #ede9fe; border-right: 1px solid #ede9fe; }
-.an-inst-size [data-isz="0"].is-off { color: #fff; background: #d97706; }
-.an-inst-unit.is-warn { fill: #b45309; opacity: 1; }

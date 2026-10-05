@@ -14,11 +14,11 @@
  *   Annotations  pen/highlighter/shapes on every page and question (annotate.js)
  * Keys: A–D or 1–4 answer · ← → move · F flag · Esc close panel.
  */
-import { api } from "/auth.js?v=20261005a";
+import { api } from "/auth.js?v=20261005c";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
 import { PdfPane, PDF_OPTS, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005c";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";

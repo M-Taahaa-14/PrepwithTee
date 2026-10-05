@@ -9281,3 +9281,16 @@ body .dtabs, body .yr-bar { top: 66px; }
 .site-footer a.footer-soc-ig:hover { color: #fff; border-color: transparent; transform: translateY(-2px);
   background: linear-gradient(45deg, #f9ce34 0%, #ee2a7b 45%, #6228d7 100%); }
 .site-footer .footer-soc-fb { opacity: .45; cursor: default; }
+
+/* Navbar, round 4 (tutor, 2026-10-05): the search field had grown so wide it pushed
+   Dashboard / Notes / ... off-centre. Equal side columns keep the links in the middle
+   of the page (a side only grows past its share when its own content needs it), and
+   the search field is a compact pill again. */
+@media (min-width: 1201px) {
+  .site-header .header-row { grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); }
+  .nav-search:not(.nav-keys) { width: auto; }
+}
+@media (min-width: 1500px) { .nav-search:not(.nav-keys) { width: 168px; } }
+@media (min-width: 1800px) { .nav-search:not(.nav-keys) { width: 220px; } }
+/* the shortcuts button lives in the account menu too; in the header only when there is room */
+@media (max-width: 1799px) { .nav-search.nav-keys { display: none; } }

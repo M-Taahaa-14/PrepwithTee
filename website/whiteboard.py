@@ -60,7 +60,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSET_DIR = Path(os.environ.get("INK_ASSET_DIR") or ROOT / "data" / "ink_assets")
-WB_V = "20261005a"                       # bump with static/board/* and annotate.*
+WB_V = "20261005c"                       # bump with static/board/* and annotate.*
 FREE_BOARDS = 3
 FREE_BYTES = 50 * 1024 * 1024
 PAID_BYTES = 2 * 1024 * 1024 * 1024
@@ -847,7 +847,7 @@ def whiteboard_home(request: Request, user: dict | None = Depends(_auth.maybe_us
 <main id="wbd" class="wbd" data-state="loading"><p class="wbd-loading">Opening your boards…</p></main>
 <script id="wbd-state" type="application/json">{_state({"me": {"id": user["id"], "name": user.get("name") or "", "role": user.get("role") or "student"}, "templates": {k: v[0] for k, v in TEMPLATES.items()}})}</script>
 <script src="/main.js?v=20261005a"></script>
-<script type="module" src="/auth.js?v=20261005a"></script>
+<script type="module" src="/auth.js?v=20261005c"></script>
 <script type="module" src="/board/boards.js?v={WB_V}"></script>
 </body>
 </html>"""

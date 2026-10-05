@@ -403,7 +403,7 @@ def _page(*, title: str, desc: str, path: str, body: str,
 <script src="/main.js?v=20261005a"></script>
 <script src="/tools-core.js?v=20261005a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20261005a"></script>
+<script type="module" src="/auth.js?v=20261005c"></script>
 </body>
 </html>"""
 

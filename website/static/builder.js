@@ -12,7 +12,7 @@
  * unlocks when the student finishes). Build -> /papers/view/{id} in a new tab.
  * The exact pool size comes from POST /api/booklets/count (debounced).
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20261005a";
+import { api, UpgradeRequiredError } from "/auth.js?v=20261005c";
 
 const root = document.getElementById("builder");
 const SYL = root?.dataset.syllabus;

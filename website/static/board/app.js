@@ -12,7 +12,7 @@
  * settings, insert (image / camera / sticky note / sticker / PDF pages),
  * present (fullscreen + laser), share links, export (PDF / PNG / print).
  */
-import { createAnnotator } from "/annotate.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005c";
 import { SIZES, PAPERS, PATTERNS, paperHex, isDark, sizeOf, drawPattern } from "/board/paper.js?v=20261005a";
 
 const ST = JSON.parse(document.getElementById("wb-state").textContent);

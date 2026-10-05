@@ -638,5 +638,5 @@ if (typeof window !== "undefined") {
 }
 
 // The pen button on every non-PDF page (scratch ink, never saved).
-import("/scratch-pen.js?v=20261005a").catch(() => {});
+import("/scratch-pen.js?v=20261005c").catch(() => {});
 import("/whats-new.js?v=20261005a").catch(() => {});        // feature spotlight + rail coach mark

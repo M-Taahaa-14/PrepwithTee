@@ -993,7 +993,7 @@ linked), not agreement with any external file.
       .86rem links, borderless icon buttons; shortcuts button hidden < 1700 px and moved into the account
       menu; account name hidden < 1600 px; Blog hidden 1201-1520 px; sticky `.dtabs` / `.yr-bar` at 60 px;
       STYLES_V 20261005b). Broken Google avatar falls back to initials. Instruments rebuilt in one system
-      (`instGeo` / `renderInst` / `edgeSnap` in annotate.js): bolder ruler (30 mm deep, 15/30 cm toggle),
+      (`instGeo` / `renderInst` / `edgeSnap` in annotate.js): ruler 20 mm deep (tutor: thinner) with a 15/30 cm toggle; instruments are ALWAYS true size (the size control was removed - a resized ruler is not to scale);
       protractor (flip), new **set square** (45° or 30°/60°); pens snap to any straight edge; rotation is
       relative to the grab point; instruments re-render at true scale when the page re-renders.
 

@@ -65,22 +65,12 @@ def test_whiteboard_flow(student, shots, browser, base_url):
         page.locator(f'.ink-rail [data-inst="{kind}"]').click()
         body = page.locator(f".an-inst-{kind} .an-inst-body").bounding_box()
         assert body and body["width"] > 250, (kind, body)
-    # resize: + makes the protractor 25 % bigger, the % button goes back to true size
-    page.locator('.ink-rail [data-inst="setsquare"]').click()           # put the big set square away first
-    prot = page.locator(".an-inst-protractor")
-    w0 = prot.locator(".an-inst-body").bounding_box()["width"]
-    prot.locator('[data-isz="1"]').click()
-    w1 = page.locator(".an-inst-protractor .an-inst-body").bounding_box()["width"]
-    assert abs(w1 / w0 - 1.25) < 0.03, (w0, w1)
-    expect(page.locator('.an-inst-protractor [data-isz="0"]')).to_have_text("125%")
-    page.screenshot(path=str(shots / "whiteboard_instruments.png"))
-    page.locator('.an-inst-protractor [data-isz="0"]').click()
-    assert abs(page.locator(".an-inst-protractor .an-inst-body").bounding_box()["width"] - w0) < 2
-    page.locator('.ink-rail [data-inst="protractor"]').click()          # put it away
-    page.locator('.an-inst-ruler [data-isz="1"]').click()
-    expect(page.locator(".an-inst-ruler .an-inst-unit")).to_have_text("Not to scale")
-    page.locator('.an-inst-ruler [data-isz="0"]').click()
+    # instruments are always true size: no size control, the ruler says its real length
+    assert page.locator(".an-inst-size").count() == 0
     expect(page.locator(".an-inst-ruler .an-inst-unit")).to_have_text("15 cm")
+    page.screenshot(path=str(shots / "whiteboard_instruments.png"))
+    for kind in ("setsquare", "protractor"):
+        page.locator(f'.ink-rail [data-inst="{kind}"]').click()
     page.locator('.ink-rail [data-inst="ruler"]').click()
 
     d = _board(student, bid)

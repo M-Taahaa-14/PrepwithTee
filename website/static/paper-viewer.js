@@ -9,11 +9,11 @@
  *   progress Mark done, marks out of the paper total, and the official grade
  *            thresholds for the sitting (same data the old library showed)
  */
-import { api } from "/auth.js?v=20261005a";
+import { api } from "/auth.js?v=20261005c";
 import { openAiPanel } from "/ai-panel.js?v=20260926r";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20261005a";
+import { createAnnotator } from "/annotate.js?v=20261005c";
 
 let ann = null;                  // the annotation bar, created with the shell
 
