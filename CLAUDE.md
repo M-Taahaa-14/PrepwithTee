@@ -996,3 +996,10 @@ linked), not agreement with any external file.
       (`instGeo` / `renderInst` / `edgeSnap` in annotate.js): bolder ruler (30 mm deep, 15/30 cm toggle),
       protractor (flip), new **set square** (45° or 30°/60°); pens snap to any straight edge; rotation is
       relative to the grab point; instruments re-render at true scale when the page re-renders.
+
+40. **DEPLOYED 2026-10-05 18:39 PKT (commit 9a35978)** - everything in items 38-39 above (ink rail v3,
+    PrepWithTee Board, /features, What's new, navbar/account menu/footer refresh, keyboard shortcuts,
+    free-limit card + trial, feedback snips, MCQ setup styling). Migrations 026 + 027 were already on
+    Supabase. Server dirs `data/ink_assets` + `data/feedback-snips` created (owner prepwithtee).
+    Code backup: `/srv/backup-code-20261005-1839-board.tgz`. Live checks: /whiteboard (JSON-LD),
+    /features, sitemap, all new assets 200, no errors in journalctl after restart.
