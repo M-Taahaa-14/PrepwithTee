@@ -60,7 +60,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSET_DIR = Path(os.environ.get("INK_ASSET_DIR") or ROOT / "data" / "ink_assets")
-WB_V = "20261005c"                       # bump with static/board/* and annotate.*
+WB_V = "20261008b"                       # bump with static/board/* and annotate.*
 FREE_BOARDS = 3
 FREE_BYTES = 50 * 1024 * 1024
 PAID_BYTES = 2 * 1024 * 1024 * 1024
@@ -160,6 +160,9 @@ def clean_settings(v: dict | None) -> dict:
         out["paper"] = p
     if v.get("pattern") in PATTERNS:
         out["pattern"] = v["pattern"]
+    ax = annot_pdf.clean_axes(v.get("ax"))
+    if ax:
+        out["ax"] = ax
     bg = v.get("bg")
     if isinstance(bg, str) and _ASSET_URL.match(bg):
         out["bg"] = bg.split("?")[0]
@@ -186,6 +189,7 @@ TEMPLATES = {
     "lined": ("Lined notebook", "pages", {"pattern": "lined", "paper": "white"}),
     "squared": ("Maths squared", "pages", {"pattern": "squared", "paper": "white"}),
     "graph": ("Graph paper", "pages", {"pattern": "graph", "paper": "white"}),
+    "axes": ("Graph with axes", "pages", {"pattern": "axes", "paper": "white", "ax": dict(annot_pdf.AXES_DEFAULT)}),
     "dotted": ("Dotted journal", "pages", {"pattern": "dotted", "paper": "cream"}),
     "isometric": ("Isometric", "pages", {"pattern": "isometric", "paper": "white"}),
     "cornell": ("Cornell notes", "pages", {"pattern": "cornell", "paper": "white"}),

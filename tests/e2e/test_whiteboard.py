@@ -136,6 +136,9 @@ def test_infinite_canvas_zoom_and_draw(student, shots):
 
 def test_public_page_features_and_spotlight(browser, base_url, shots):
     ctx = browser.new_context(viewport={"width": 1280, "height": 860}, base_url=base_url)
+    # a campaign card (promo-bar.js) holds the spotlight back while it shows: snooze any
+    ctx.add_init_script("""try { localStorage.setItem('pwt-promo-card', JSON.stringify(
+        {id: 'maths-batch-2026-10', at: Date.now()})) } catch (e) {}""")
     page = ctx.new_page()
     page.goto("/whiteboard")
     expect(page.get_by_role("heading", level=1)).to_contain_text("whiteboard")

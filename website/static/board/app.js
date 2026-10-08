@@ -13,7 +13,7 @@
  * present (fullscreen + laser), share links, export (PDF / PNG / print).
  */
 import { createAnnotator } from "/annotate.js?v=20261005c";
-import { SIZES, PAPERS, PATTERNS, paperHex, isDark, sizeOf, drawPattern } from "/board/paper.js?v=20261005a";
+import { SIZES, PAPERS, PATTERNS, paperHex, isDark, sizeOf, drawPattern, AXES_DEFAULT, AXES_SUBS, checkAxes } from "/board/paper.js?v=20261008b";
 
 const ST = JSON.parse(document.getElementById("wb-state").textContent);
 const root = document.getElementById("wb");
@@ -838,8 +838,9 @@ function openPaper() {
     <div class="wb-papers">${Object.entries(PAPERS).map(([k, [n, hex]]) =>
       `<button type="button" data-paper="${k}" class="${s.paper === k ? "is-on" : ""}" style="--c:${hex}" title="${n}" aria-label="${n}"><span>${n}</span></button>`).join("")}</div>
     <p class="wb-lbl">Pattern</p>
-    <div class="wb-patterns">${Object.entries(PATTERNS).map(([k, n]) =>
+    <div class="wb-patterns">${Object.entries(PATTERNS).filter(([k]) => !(inf && k === "axes")).map(([k, n]) =>
       `<button type="button" data-pattern="${k}" class="${s.pattern === k ? "is-on" : ""}"><canvas width="88" height="60" data-prev="${k}"></canvas><span>${n}</span></button>`).join("")}</div>
+    ${inf ? "" : axesForm(s.ax)}
     ${inf ? "" : `<p class="wb-lbl">Size</p><div class="wb-seg">${Object.entries(SIZES).map(([k, z]) =>
       `<button type="button" data-size="${k}" class="${s.size === k ? "is-on" : ""}">${z.name}</button>`).join("")}</div>
     ${s.bg ? '<p class="wb-lbl">Background</p><button type="button" class="wb-btn" data-nobg>Remove the PDF / image background</button>' : ""}
@@ -853,6 +854,36 @@ function openPaper() {
   paintPrev(s.paper);
   let scope = "page";
   const cur = { ...s };
+  const axBox = d.el.querySelector(".wb-axes");
+  const showAxes = () => { if (axBox) axBox.hidden = cur.pattern !== "axes"; };
+  showAxes();
+  if (axBox) {
+    let t = null;
+    const read = () => {
+      const f = (n) => axBox.querySelector(`[name="${n}"]`);
+      return { x0: f("x0").value, x1: f("x1").value, y0: f("y0").value, y1: f("y1").value, dx: f("dx").value, dy: f("dy").value,
+               sub: Number(f("sub").value), eq: f("eq").checked, lab: f("lab").checked };
+    };
+    const commit = () => {
+      const r = checkAxes(read());
+      const err = axBox.querySelector(".wb-axes-err");
+      err.textContent = r.error || "";
+      if (r.error) return;
+      cur.ax = r.ax;
+      applySetting("ax", r.ax, scope);
+    };
+    axBox.addEventListener("input", () => { clearTimeout(t); t = setTimeout(commit, 450); });
+    axBox.addEventListener("change", () => { clearTimeout(t); commit(); });
+    axBox.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); clearTimeout(t); commit(); } });
+    axBox.querySelectorAll("[data-axpreset]").forEach((b) => b.addEventListener("click", () => {
+      const p = AXES_PRESETS[b.dataset.axpreset];
+      for (const [k, v] of Object.entries(p)) {
+        const f = axBox.querySelector(`[name="${k}"]`);
+        if (f) f.type === "checkbox" ? (f.checked = v) : (f.value = v);
+      }
+      commit();
+    }));
+  }
   d.el.addEventListener("click", async (e) => {
     const sc = e.target.closest("[data-sc]");
     if (sc) { scope = sc.dataset.sc; d.el.querySelectorAll("[data-sc]").forEach((x) => x.classList.toggle("is-on", x === sc)); return; }
@@ -863,9 +894,45 @@ function openPaper() {
     cur[key] = val;
     if (key !== "bg") t.parentElement.querySelectorAll("button").forEach((x) => x.classList.toggle("is-on", x === t));
     if (key === "paper") paintPrev(val);
+    if (key === "pattern") {
+      showAxes();
+      if (val === "axes" && !cur.ax) { cur.ax = { ...AXES_DEFAULT }; await applySetting("ax", cur.ax, inf ? "all" : scope); }
+    }
     await applySetting(key, val, inf ? "all" : scope);
     if (key === "bg") t.remove();
   });
+}
+
+// the graph-with-axes settings: ranges, what one big square is worth, small squares per big one
+const AXES_PRESETS = {
+  quad: { x0: -5, x1: 5, y0: -5, y1: 5, dx: 1, dy: 1, sub: 5, eq: true },
+  first: { x0: 0, x1: 10, y0: 0, y1: 10, dx: 1, dy: 1, sub: 5, eq: true },
+  trig: { x0: 0, x1: 360, y0: -2, y1: 2, dx: 30, dy: 0.5, sub: 5, eq: false },
+  data: { x0: 0, x1: 100, y0: 0, y1: 50, dx: 10, dy: 5, sub: 5, eq: false },
+};
+function axesForm(a) {
+  const v = { ...AXES_DEFAULT, ...(a || {}) };
+  const num = (n, label) => `<label><span>${label}</span><input type="number" step="any" name="${n}" value="${esc(v[n])}" inputmode="decimal"></label>`;
+  return `<fieldset class="wb-axes" hidden>
+    <legend class="wb-lbl">Graph axes</legend>
+    <div class="wb-axes-presets">
+      <button type="button" class="wb-chip" data-axpreset="quad">−5 to 5</button>
+      <button type="button" class="wb-chip" data-axpreset="first">0 to 10</button>
+      <button type="button" class="wb-chip" data-axpreset="trig">Trig 0°–360°</button>
+      <button type="button" class="wb-chip" data-axpreset="data">Data 0–100</button>
+    </div>
+    <div class="wb-axes-grid">
+      <b>x</b>${num("x0", "from")}${num("x1", "to")}${num("dx", "1 big square =")}
+      <b>y</b>${num("y0", "from")}${num("y1", "to")}${num("dy", "1 big square =")}
+    </div>
+    <div class="wb-axes-row">
+      <label><span>Small squares in each big square</span>
+        <select name="sub">${AXES_SUBS.map((n) => `<option value="${n}"${v.sub === n ? " selected" : ""}>${n === 1 ? "None" : `${n} × ${n}`}</option>`).join("")}</select></label>
+      <label class="wb-check"><input type="checkbox" name="eq"${v.eq !== false ? " checked" : ""}> Same scale on both axes (square boxes)</label>
+      <label class="wb-check"><input type="checkbox" name="lab"${v.lab !== false ? " checked" : ""}> Number the axes</label>
+    </div>
+    <p class="wb-axes-err" role="alert"></p>
+  </fieldset>`;
 }
 
 async function applySetting(key, val, scope) {

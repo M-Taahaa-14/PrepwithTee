@@ -8,7 +8,7 @@
  * move to folder, share, download PDF, trash / restore / delete forever).
  * Search, sort (recent / name / created), grid or list.
  */
-import { PAPERS, drawPattern, paperHex } from "/board/paper.js?v=20261005a";
+import { PAPERS, drawPattern, paperHex, AXES_DEFAULT } from "/board/paper.js?v=20261008b";
 
 const ST = JSON.parse(document.getElementById("wbd-state").textContent);
 const root = document.getElementById("wbd");
@@ -20,6 +20,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const TPL = [
   ["blank", "Blank", { pattern: "plain", paper: "white" }], ["lined", "Lined", { pattern: "lined", paper: "white" }],
   ["squared", "Maths squared", { pattern: "squared", paper: "white" }], ["graph", "Graph paper", { pattern: "graph", paper: "white" }],
+  ["axes", "Graph with axes", { pattern: "axes", paper: "white", ax: AXES_DEFAULT }],
   ["dotted", "Dotted", { pattern: "dotted", paper: "cream" }], ["isometric", "Isometric", { pattern: "isometric", paper: "white" }],
   ["cornell", "Cornell notes", { pattern: "cornell", paper: "white" }], ["construction", "Constructions", { pattern: "plain", paper: "white" }],
   ["lesson", "Lesson plan", { pattern: "lined", paper: "white" }], ["planner", "Weekly planner", { pattern: "plain", paper: "cream", size: "a4l" }],

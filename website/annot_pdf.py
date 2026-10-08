@@ -323,7 +323,127 @@ PAGE_SIZES = {"a4": (595, 842), "a4l": (842, 595), "letter": (612, 792), "wide":
 PAPERS = {"white": "#ffffff", "cream": "#fbf6ea", "mint": "#eef8f1", "sky": "#eef5fd", "lilac": "#f4f0fd",
           "grey": "#f1f2f4", "chalk": "#1e2a26", "night": "#171a21"}
 DARK_PAPERS = {"chalk", "night"}
-PATTERNS = ("plain", "lined", "narrow", "squared", "graph", "dotted", "isometric", "cornell")
+PATTERNS = ("plain", "lined", "narrow", "squared", "graph", "axes", "dotted", "isometric", "cornell")
+
+# "Graph with axes" (static/board/paper.js checkAxes / axesLayout hold the same rules)
+AXES_DEFAULT = {"x0": -5, "x1": 5, "y0": -5, "y1": 5, "dx": 1, "dy": 1, "sub": 5, "eq": True, "lab": True}
+AXES_SUBS = (1, 2, 4, 5, 10)
+AXES_MAX_CELLS = 60
+
+
+def clean_axes(a) -> dict | None:
+    """The ranges / box values a student typed, or None when they can't make a grid."""
+    if not isinstance(a, dict):
+        return None
+    v = {**AXES_DEFAULT, **a}
+    try:
+        for k in ("x0", "x1", "y0", "y1", "dx", "dy"):
+            v[k] = float(v[k])
+            if not math.isfinite(v[k]) or abs(v[k]) > 1e6:
+                return None
+    except (TypeError, ValueError):
+        return None
+    if v["x1"] <= v["x0"] or v["y1"] <= v["y0"] or v["dx"] <= 0 or v["dy"] <= 0:
+        return None
+    nx, ny = (v["x1"] - v["x0"]) / v["dx"], (v["y1"] - v["y0"]) / v["dy"]
+    if not (1 <= nx <= AXES_MAX_CELLS and 1 <= ny <= AXES_MAX_CELLS):
+        return None
+    for k in ("x0", "x1", "y0", "y1", "dx", "dy"):         # 2.0 -> 2 keeps the JSON tidy
+        if v[k] == int(v[k]):
+            v[k] = int(v[k])
+    try:
+        v["sub"] = int(v["sub"]) if int(v["sub"]) in AXES_SUBS else 5
+    except (TypeError, ValueError):
+        v["sub"] = 5
+    v["eq"] = v.get("eq") is not False
+    v["lab"] = v.get("lab") is not False
+    return {k: v[k] for k in AXES_DEFAULT}
+
+
+def axes_layout(W: float, H: float, mm: float, a) -> dict:
+    v = clean_axes(a) or dict(AXES_DEFAULT)
+    nx = math.ceil((v["x1"] - v["x0"]) / v["dx"] - 1e-9)
+    ny = math.ceil((v["y1"] - v["y0"]) / v["dy"] - 1e-9)
+    m = min(14 * mm, 0.08 * min(W, H))
+    cw, ch = (W - 2 * m) / nx, (H - 2 * m) / ny
+    if v["eq"]:
+        cw = ch = min(cw, ch)
+    left, top = (W - nx * cw) / 2, (H - ny * ch) / 2
+    return {"v": v, "nx": nx, "ny": ny, "cw": cw, "ch": ch, "left": left, "top": top,
+            "right": left + nx * cw, "bottom": top + ny * ch}
+
+
+def fmt_num(n: float) -> str:
+    r = round(n, 6)
+    if r == 0:
+        return "0"
+    return str(int(r)) if r == int(r) else f"{r:g}"
+
+
+def _axes(page, sh, W, H, mm, settings, line, op, dark) -> None:
+    L = axes_layout(W, H, mm, settings.get("ax"))
+    v, nx, ny, cw, ch = L["v"], L["nx"], L["ny"], L["cw"], L["ch"]
+    left, top, right, bottom = L["left"], L["top"], L["right"], L["bottom"]
+    if v["sub"] > 1:
+        for i in range(nx * v["sub"] + 1):
+            x = left + i * cw / v["sub"]
+            sh.draw_line((x, top), (x, bottom))
+        for j in range(ny * v["sub"] + 1):
+            y = top + j * ch / v["sub"]
+            sh.draw_line((left, y), (right, y))
+        sh.finish(color=line, width=0.25, stroke_opacity=op * 0.7)
+    for i in range(nx + 1):
+        sh.draw_line((left + i * cw, top), (left + i * cw, bottom))
+    for j in range(ny + 1):
+        sh.draw_line((left, top + j * ch), (right, top + j * ch))
+    sh.finish(color=line, width=0.6, stroke_opacity=op)
+
+    def X(x):
+        return left + (x - v["x0"]) / v["dx"] * cw
+
+    def Y(y):
+        return bottom - (y - v["y0"]) / v["dy"] * ch
+
+    ink = (1, 1, 1) if dark else (0.2, 0.26, 0.35)
+    ay = Y(0) if v["y0"] <= 0 <= v["y1"] else bottom
+    ax = X(0) if v["x0"] <= 0 <= v["x1"] else left
+    x_end, y_end = X(v["x1"]), Y(v["y1"])
+    fs = max(5.0, min(3.3 * mm, min(cw, ch) * 0.55))
+    ah = max(4.0, min(cw, ch) * 0.28, 2 * mm)
+    off = fs * 1.3                                         # arrowheads past the last numbers
+    sh.draw_line((left, ay), (x_end + off, ay))
+    sh.draw_line((ax, bottom), (ax, y_end - off))
+    sh.finish(color=ink, width=1.1, stroke_opacity=0.75 if dark else 1)
+    sh.draw_polyline([(x_end + off + ah, ay), (x_end + off, ay - ah * 0.5), (x_end + off, ay + ah * 0.5), (x_end + off + ah, ay)])
+    sh.draw_polyline([(ax, y_end - off - ah), (ax - ah * 0.5, y_end - off), (ax + ah * 0.5, y_end - off), (ax, y_end - off - ah)])
+    sh.finish(color=None, fill=ink, width=0, fill_opacity=0.75 if dark else 1)
+    sh.commit(overlay=True)
+
+    font = "helv"
+
+    def text(x, y, s, align="left", valign="base"):
+        tw = fitz.get_text_length(s, fontname=font, fontsize=fs)
+        dx = {"left": 0, "center": -tw / 2, "right": -tw}[align]
+        dy = {"base": 0, "top": fs * 0.8, "middle": fs * 0.35}[valign]
+        page.insert_text(fitz.Point(x + dx, y + dy), s, fontsize=fs, fontname=font, color=ink)
+
+    text(x_end + off + ah * 1.2, ay - fs * 0.35, "x")
+    text(ax, y_end - off - ah * 1.3, "y", "center")
+    if v["lab"]:
+        kx = max(1, math.ceil(fs * 2.4 / cw))
+        ky = max(1, math.ceil(fs * 1.5 / ch))
+        for i in range(nx + 1):
+            val = v["x0"] + i * v["dx"]
+            if i % kx or (abs(val) < 1e-9 and ax != left):
+                continue
+            text(left + i * cw, ay + fs * 0.35, fmt_num(val), "center", "top")
+        for j in range(ny + 1):
+            val = v["y0"] + j * v["dy"]
+            if j % ky or (abs(val) < 1e-9 and ay != bottom):
+                continue
+            text(ax - fs * 0.4, bottom - j * ch, fmt_num(val), "right", "middle")
+        if ax != left and ay != bottom:
+            text(ax - fs * 0.3, ay + fs * 0.3, "0", "right", "top")
 MM = 72 / 25.4
 
 
@@ -332,12 +452,14 @@ def paper_rgb(settings: dict) -> tuple:
     return _rgb(PAPERS.get(p, p if str(p).startswith("#") else "#ffffff"))
 
 
-def _pattern(page: fitz.Page, settings: dict, scale: float = 1.0) -> None:
+def _pattern(page: fitz.Page, settings: dict, scale: float = 1.0, infinite: bool = False) -> None:
     """Lined / squared / graph / dotted / isometric / Cornell, as vector lines.
     scale = page points per real point (an infinite board fitted to one page)."""
     pat = settings.get("pattern") or "plain"
     if pat == "plain":
         return
+    if pat == "axes" and infinite:                           # axes belong to a page (paper.js does the same)
+        pat = "graph"
     W, H = page.rect.width, page.rect.height
     mm = MM * scale
     dark = (settings.get("paper") or "white") in DARK_PAPERS
@@ -373,6 +495,9 @@ def _pattern(page: fitz.Page, settings: dict, scale: float = 1.0) -> None:
         hlines(10 * mm)
         vlines(10 * mm)
         sh.finish(color=line, width=0.6, stroke_opacity=op)
+    elif pat == "axes":
+        _axes(page, sh, W, H, mm, settings, line, op, dark)
+        return
     elif pat == "dotted":
         step = 5 * mm
         y = step
@@ -472,7 +597,7 @@ def render_board(board: dict, pages: list[dict], resolve=None) -> bytes:
             k = min(595.0, 14000 / max(bw, bh))   # 1 world unit = an A4 width (595 pt); PDF max is 14400
             page = doc.new_page(width=bw * k, height=bh * k)
             page.draw_rect(page.rect, color=None, fill=paper_rgb(settings), overlay=False)
-            _pattern(page, settings, k / 595.0)
+            _pattern(page, settings, k / 595.0, infinite=True)
             for s in objs:
                 try:
                     _draw(page, _scaled(s, x0, y0, bw, bh), resolve)

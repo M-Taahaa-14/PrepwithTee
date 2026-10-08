@@ -679,6 +679,42 @@
     .tut-foot-item svg { color:#c9a227; flex-shrink:0; }
 
     /* ── Course catalog ─────────────────────────────────────────── */
+
+    /* New batches section (#courses) */
+    .nb { padding: 72px 22px; }
+    @media (max-width: 640px) { .nb { padding: 48px 16px; } }
+    .nb-head { text-align: center; margin-bottom: 30px; }
+    .nb-head .section-title { margin: .4rem 0 .8rem; }
+    .nb-lede { max-width: 62ch; margin: 0 auto; color: var(--grey); line-height: 1.6; }
+    .nb-plan { list-style: none; padding: 0; margin: 0 0 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .nb-plan li { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: grid; gap: 4px; }
+    .nb-plan .nb-when { font: 800 .7rem/1 Archivo, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--orange-ink); }
+    .nb-plan b { font-family: Archivo, sans-serif; color: var(--ink); font-size: 1.02rem; }
+    .nb-plan li > span:last-child { color: var(--grey); font-size: .88rem; line-height: 1.45; }
+    .nb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .nb-card { border-radius: 26px; padding: 22px; border: 1px solid; display: flex; flex-direction: column; gap: 12px; }
+    .nb-lav { background: var(--lav); border-color: var(--lav-line); --nb-ink: var(--lav-ink); }
+    .nb-green { background: var(--green); border-color: var(--green-line); --nb-ink: var(--green-ink); }
+    .nb-pink { background: var(--pink); border-color: var(--pink-line); --nb-ink: var(--pink-ink); }
+    .nb-card-head { display: flex; gap: 12px; align-items: center; }
+    .nb-icon { font-size: 2rem; width: 52px; height: 52px; display: grid; place-items: center; background: var(--white); border-radius: 16px; flex: none; }
+    .nb-card h3 { font-family: "Playfair Display", serif; font-size: 1.55rem; color: var(--nb-ink); margin: 0; }
+    .nb-card-head p { color: var(--grey); font-size: .85rem; margin: 2px 0 0; }
+    .nb-tier { background: var(--white); border-radius: 16px; padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .nb-tier b { display: block; font-family: Archivo, sans-serif; color: var(--ink); font-size: .95rem; }
+    .nb-tier small { color: var(--grey); font-size: .78rem; font-weight: 600; }
+    .nb-al { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .nb-al-chip { font: 800 .72rem/1 Archivo, sans-serif; color: var(--nb-ink); border: 1.5px solid currentColor; border-radius: 999px; padding: 4px 8px; }
+    .nb-price { text-align: right; font: 900 1.45rem/1 Archivo, sans-serif; color: var(--orange-ink); white-space: nowrap; }
+    .nb-price small, .nb-price span { display: block; font: 700 .7rem/1.3 Archivo, sans-serif; color: var(--grey); }
+    .nb-points { margin: 0; padding-left: 18px; color: var(--ink); font-size: .9rem; line-height: 1.5; display: grid; gap: 6px; }
+    .nb-cta { margin-top: auto; text-align: center; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 12px 16px; font-weight: 800; text-decoration: none; }
+    .nb-cta:hover { filter: brightness(1.08); }
+    .nb-foot { text-align: center; color: var(--grey); margin-top: 18px; font-size: .92rem; }
+    .nb-foot a { color: var(--accent); font-weight: 700; }
+    html[data-theme="dark"] .nb-foot a { color: var(--lav-ink); }
+    @media (max-width: 980px) { .nb-grid { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; } .nb-plan { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .nb-plan { grid-template-columns: 1fr; } }
     .course-grid {
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -1561,165 +1597,65 @@
     </section>
 
     <!-- ══════════════════════════════════════════════════════════
-         COURSE CATALOG  (SEO powerhouse)
+         NEW BATCHES (31 Oct 2026): Maths, Physics, Computer Science
+         Details live on /maths-classes.html, /physics-classes.html, /cs-classes.html
     ═══════════════════════════════════════════════════════════ -->
-    <section class="section container" style="padding-top:72px" id="courses">
-      <div style="text-align:center;margin-bottom:40px">
-        <p class="eyebrow">Cambridge-aligned · Lahore &amp; online</p>
-        <h2 class="section-title" style="margin:.4rem 0 .8rem">Courses available</h2>
-        <p style="max-width:58ch;margin:0 auto;color:var(--grey)">Every course follows the official Cambridge syllabus chapter by chapter — structured revision, past papers and live tutoring all in one place.</p>
+    <section class="section container nb" id="courses">
+      <div class="nb-head">
+        <p class="eyebrow">New batches · starts 31 October · Lahore &amp; online</p>
+        <h2 class="section-title">Classes for May/June 2027</h2>
+        <p class="nb-lede">Three subjects, one plan that works: the whole syllabus by January, then three months of past papers before the exam. Small groups, a test every week, and your money back if the first paid class isn't right.</p>
       </div>
 
-      <div class="course-grid">
+      <ol class="nb-plan" aria-label="How every course runs">
+        <li><span class="nb-when">Nov – Jan</span><b>Full syllabus</b><span>Every chapter taught, with topical past papers as it's finished</span></li>
+        <li><span class="nb-when">Feb – Apr</span><b>Past paper sessions</b><span>Full papers, timed, marked to the official mark scheme</span></li>
+        <li><span class="nb-when">Every week</span><b>4 classes + 1 test</b><span>Groups of 4–6 · scores shared with parents</span></li>
+        <li><span class="nb-when">Zero risk</span><b>Money-back guarantee</b><span>Not happy after the first paid class? Full refund.</span></li>
+      </ol>
 
-        <!-- 4024 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-math">O Level</span>
-            <span class="course-code">4024</span>
+      <div class="nb-grid">
+        <article class="nb-card nb-lav">
+          <div class="nb-card-head"><span class="nb-icon" aria-hidden="true">📐</span><div><h3>Maths</h3><p>O Level Mathematics D · IGCSE Mathematics</p></div></div>
+          <div class="nb-tier">
+            <div><b>O Level &amp; IGCSE</b><small>4024 · 0580 Extended</small></div>
+            <div class="nb-price"><small>PKR</small>8,499<span>/month</span></div>
           </div>
-          <h3 class="course-title" itemprop="name">Mathematics D — O Level</h3>
-          <p class="course-tagline">Build exam confidence, chapter by chapter.</p>
-          <ul class="course-outcomes">
-            <li>Every chapter covered — Paper 1 (non-calc) and Paper 2 (calc)</li>
-            <li>Topical past papers 2020–2025 with mark schemes after each question</li>
-            <li>Timed past-paper sessions and mid-topic tests</li>
-            <li>Weekly lessons + WhatsApp support between sessions</li>
-          </ul>
-          <div class="course-meta">
-            <span itemprop="provider" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">PrepWithTee Tutors</span></span>
-            <span class="course-avail">Online · Lahore</span>
+          <div class="nb-tier">
+            <div><b>A Level 9709</b><small>separate courses</small><div class="nb-al"><span class="nb-al-chip">P1</span><span class="nb-al-chip">P3</span><span class="nb-al-chip">M1</span><span class="nb-al-chip">S1</span></div></div>
+            <div class="nb-price"><small>from PKR</small>12,999<span>/month each</span></div>
           </div>
-          <a class="course-cta" href="course.html?slug=o-level-mathematics-4024" itemprop="url">View full course →</a>
+          <ul class="nb-points"><li>Number &amp; algebra in November, graphs &amp; geometry in December, trig, vectors &amp; statistics in January</li><li>Paper 1 + 2 / Paper 2 + 4 past papers from February</li></ul>
+          <a class="nb-cta" href="/maths-classes.html">See the full Maths course →</a>
         </article>
-
-        <!-- 0580 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-math">IGCSE</span>
-            <span class="course-code">0580</span>
+        <article class="nb-card nb-green">
+          <div class="nb-card-head"><span class="nb-icon" aria-hidden="true">⚛️</span><div><h3>Physics</h3><p>O Level Physics · IGCSE Physics</p></div></div>
+          <div class="nb-tier">
+            <div><b>O Level &amp; IGCSE</b><small>5054 · 0625</small></div>
+            <div class="nb-price"><small>PKR</small>8,499<span>/month</span></div>
           </div>
-          <h3 class="course-title" itemprop="name">Mathematics — IGCSE Extended</h3>
-          <p class="course-tagline">Extended tier, no surprises on exam day.</p>
-          <ul class="course-outcomes">
-            <li>Paper 2 and Paper 4 — every topic from algebra to calculus</li>
-            <li>Topical revision by chapter, not chronologically</li>
-            <li>Timed sessions and mock papers under exam conditions</li>
-            <li>Mark-scheme breakdowns after every question</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
+          <div class="nb-tier">
+            <div><b>A Level 9702</b><small>separate courses</small><div class="nb-al"><span class="nb-al-chip">AS</span><span class="nb-al-chip">A2</span></div></div>
+            <div class="nb-price"><small>from PKR</small>12,999<span>/month each</span></div>
           </div>
-          <a class="course-cta" href="course.html?slug=igcse-mathematics-0580" itemprop="url">View full course →</a>
+          <ul class="nb-points"><li>Mechanics in November, thermal physics &amp; waves in December, electricity, nuclear &amp; space in January</li><li>Structured-answer technique: how to word explanations for the marks</li></ul>
+          <a class="nb-cta" href="/physics-classes.html">See the full Physics course →</a>
         </article>
-
-        <!-- 5054 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-phys">O Level</span>
-            <span class="course-code">5054</span>
+        <article class="nb-card nb-pink">
+          <div class="nb-card-head"><span class="nb-icon" aria-hidden="true">💻</span><div><h3>Computer Science</h3><p>O Level CS · IGCSE CS</p></div></div>
+          <div class="nb-tier">
+            <div><b>O Level &amp; IGCSE</b><small>2210 · 0478</small></div>
+            <div class="nb-price"><small>PKR</small>8,499<span>/month</span></div>
           </div>
-          <h3 class="course-title" itemprop="name">Physics — O Level</h3>
-          <p class="course-tagline">Physics made logical, mark schemes made clear.</p>
-          <ul class="course-outcomes">
-            <li>All 25 chapters from the 2026–2028 Cambridge syllabus</li>
-            <li>Paper 2 structured-theory techniques explained step by step</li>
-            <li>Mark scheme after every past-paper question — method marks demystified</li>
-            <li>Real experiments discussed for describe / explain questions</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
+          <div class="nb-tier">
+            <div><b>A Level 9618</b><small>separate courses</small><div class="nb-al"><span class="nb-al-chip">P1</span><span class="nb-al-chip">P2</span><span class="nb-al-chip">P3</span><span class="nb-al-chip">P4</span></div></div>
+            <div class="nb-price"><small>from PKR</small>12,999<span>/month each</span></div>
           </div>
-          <a class="course-cta" href="course.html?slug=o-level-physics-5054" itemprop="url">View full course →</a>
+          <ul class="nb-points"><li>Systems theory in November–December, algorithms, programming &amp; logic in January</li><li>Pseudocode written and traced every week for the Paper 2 scenario question</li></ul>
+          <a class="nb-cta" href="/cs-classes.html">See the full Computer Science course →</a>
         </article>
-
-        <!-- 0625 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-phys">IGCSE</span>
-            <span class="course-code">0625</span>
-          </div>
-          <h3 class="course-title" itemprop="name">Physics — IGCSE Extended</h3>
-          <p class="course-tagline">Every calculation step, every mark explained.</p>
-          <ul class="course-outcomes">
-            <li>All 24 topics from the latest Cambridge syllabus (incl. Space Physics)</li>
-            <li>Paper 4 extended structured theory — calculation and essay-style answers</li>
-            <li>Command-word focus: describe, explain, calculate, sketch</li>
-            <li>Topical past papers with full mark-by-mark breakdowns</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
-          </div>
-          <a class="course-cta" href="course.html?slug=igcse-physics-0625" itemprop="url">View full course →</a>
-        </article>
-
-        <!-- 2210 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-cs">O Level</span>
-            <span class="course-code">2210</span>
-          </div>
-          <h3 class="course-title" itemprop="name">Computer Science — O Level</h3>
-          <p class="course-tagline">From pseudocode to full marks.</p>
-          <ul class="course-outcomes">
-            <li>Paper 1 theory + Paper 2 problem-solving covered in full</li>
-            <li>Pseudocode writing and algorithm tracing with model answers</li>
-            <li>Python programming fundamentals for Paper 2 questions</li>
-            <li>Boolean logic, binary and networks explained with exam technique</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
-          </div>
-          <a class="course-cta" href="course.html?slug=o-level-cs-2210" itemprop="url">View full course →</a>
-        </article>
-
-        <!-- 0478 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-cs">IGCSE</span>
-            <span class="course-code">0478</span>
-          </div>
-          <h3 class="course-title" itemprop="name">Computer Science — IGCSE</h3>
-          <p class="course-tagline">Program, trace, score.</p>
-          <ul class="course-outcomes">
-            <li>Paper 1 and Paper 2 fully covered, IGCSE command-word focus</li>
-            <li>Pseudocode and flowchart writing with model solutions</li>
-            <li>Real Cambridge past questions every session</li>
-            <li>Ethics, hardware and networking — theory done systematically</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
-          </div>
-          <a class="course-cta" href="course.html?slug=igcse-cs-0478" itemprop="url">View full course →</a>
-        </article>
-
-        <!-- 9702 -->
-        <article class="course-card" itemscope itemtype="https://schema.org/Course">
-          <div class="course-head">
-            <span class="course-chip course-chip-alevel">A Level</span>
-            <span class="course-code">9702</span>
-          </div>
-          <h3 class="course-title" itemprop="name">Physics — A Level (AS &amp; A2)</h3>
-          <p class="course-tagline">A Level Physics, the right way — from AS to A2.</p>
-          <ul class="course-outcomes">
-            <li>Paper 1 MCQ, Paper 2 AS theory, Paper 4 A2 structured — all three</li>
-            <li>Quantum, nuclear and medical physics explained from first principles</li>
-            <li>Every exam series past paper topically classified on the platform</li>
-            <li>Timed mock papers and predicted exam focus areas each term</li>
-          </ul>
-          <div class="course-meta">
-            <span>PrepWithTee Tutors</span>
-            <span class="course-avail">Online · Lahore</span>
-          </div>
-          <a class="course-cta" href="course.html?slug=a-level-physics-9702" itemprop="url">View full course →</a>
-        </article>
-
       </div>
+      <p class="nb-foot">Taking two or more subjects, or several A Level papers? <a href="https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20ask%20about%20bundle%20fees%20for%20the%2031%20October%20batches.">Ask about bundle fees on WhatsApp</a>.</p>
     </section>
 
     <!-- Feature comparison table -->
