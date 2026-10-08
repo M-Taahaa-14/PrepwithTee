@@ -1,0 +1,986 @@
+{
+  "series": {
+    "title": "Trends & internet formats",
+    "about": "Study life told in the formats people already scroll: chat screenshots, tweets, lock screens, receipts, search bars, playlists, Wrapped, error pop-ups, starter packs, notes-app lists, green/red flags, energy meters. Relatable first, a study lesson hidden inside, almost no selling. Everything here is a joke or illustration, never a real person's message.",
+    "check": "Illustrative only: no real names, no fake numbers presented as stats."
+  },
+  "posts": [
+    {
+      "id": "tr-01-chat-mark-scheme",
+      "bg": "sky",
+      "caption": "Me vs the mark scheme, a love story. 💔\n\nThe working was right. The answer was right. The unit was... in my head. Write the unit. Every. Single. Time.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "markscheme",
+        "studymemes",
+        "examseason",
+        "physics"
+      ],
+      "slides": [
+        {
+          "layout": "chat",
+          "title": "me vs the mark scheme",
+          "contact": "the mark scheme",
+          "avatar": "📄",
+          "av_bg": "sun",
+          "status": "online · judging you",
+          "msgs": [
+            [
+              "me",
+              "a = 5"
+            ],
+            [
+              "them",
+              "5 what"
+            ],
+            [
+              "me",
+              "5. the answer is 5."
+            ],
+            [
+              "them",
+              "units?"
+            ],
+            [
+              "me",
+              "it was obvious it's m/s²"
+            ],
+            [
+              "them",
+              "was it written down"
+            ],
+            [
+              "me",
+              "…it was in my head"
+            ],
+            [
+              "time",
+              "11:58 PM"
+            ],
+            [
+              "them",
+              "A0 🙂"
+            ],
+            [
+              "read",
+              "Read"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-02-chat-brain-2am",
+      "bg": "navy",
+      "caption": "Nobody:\nMy brain at 2 AM before a paper: 🧠\n\nGo to sleep. Sleep is literally when your brain stores what you revised.",
+      "hashtags": [
+        "studymemes",
+        "examseason",
+        "relatable",
+        "olevel",
+        "igcse",
+        "studentlife"
+      ],
+      "slides": [
+        {
+          "layout": "chat",
+          "title": "my brain at 2 am:",
+          "contact": "my brain",
+          "avatar": "🧠",
+          "av_bg": "bubble",
+          "status": "online",
+          "msgs": [
+            [
+              "them",
+              "u up?"
+            ],
+            [
+              "me",
+              "I have a paper at 9"
+            ],
+            [
+              "them",
+              "remember that moments question from 2019 you skipped"
+            ],
+            [
+              "me",
+              "no"
+            ],
+            [
+              "them",
+              "what if it comes tomorrow"
+            ],
+            [
+              "me",
+              "tomorrow is MATHS"
+            ],
+            [
+              "time",
+              "2:14 AM"
+            ],
+            [
+              "them",
+              "what's the volume of a cone again"
+            ],
+            [
+              "read",
+              "Seen"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-03-chat-group-chat",
+      "bg": "lime",
+      "caption": "Every class group chat the week before Paper 2. 💀\n\nThe syllabus is the syllabus. Revise all of it, then hit the chapters you're weakest at hardest.",
+      "hashtags": [
+        "studymemes",
+        "groupchat",
+        "examseason",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "chat",
+          "title": "the group chat before paper 2",
+          "contact": "exam survivors 💀",
+          "avatar": "👥",
+          "av_bg": "lilac",
+          "status": "Sam, Maya, Leo, you",
+          "msgs": [
+            [
+              "them",
+              "**Sam:** which chapters are in paper 2"
+            ],
+            [
+              "them",
+              "**Maya:** all of them"
+            ],
+            [
+              "them",
+              "**Sam:** ALL??"
+            ],
+            [
+              "them",
+              "**Leo:** I'm only doing the second half of the book"
+            ],
+            [
+              "me",
+              "that's how you get a 10-mark question on chapter 1"
+            ],
+            [
+              "them",
+              "**Maya:** who has the 2023 mark scheme"
+            ],
+            [
+              "me",
+              "it's free on prepwithtee.com"
+            ],
+            [
+              "read",
+              "Seen by 3"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-04-tweet-one-past-paper",
+      "bg": "lilac",
+      "caption": "Confidence after one past paper: 📈\nConfidence after marking it: 📉\n\n(Marking it is the part that actually helps.)",
+      "hashtags": [
+        "studymemes",
+        "pastpapers",
+        "examseason",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "tweet",
+          "text": "me after doing ONE past paper: I could probably write the next one honestly\n\nme after marking it: who wrote this",
+          "when": "11:32 PM · revision era",
+          "after": "mark every paper you do. that's the whole tip."
+        }
+      ]
+    },
+    {
+      "id": "tr-05-tweet-sensible-answer",
+      "bg": "sun",
+      "caption": "'Accept any sensible answer.'\n\nMe: 👀\n\nThe trick: answer in the words the question uses, and give the reason, not just the fact.",
+      "hashtags": [
+        "markscheme",
+        "studymemes",
+        "examseason",
+        "olevel",
+        "igcse",
+        "exams"
+      ],
+      "slides": [
+        {
+          "layout": "tweet",
+          "text": "the mark scheme said \"accept any sensible answer\"\n\nand my answer was not, in fact, sensible",
+          "when": "4:05 PM · results day flashback"
+        }
+      ]
+    },
+    {
+      "id": "tr-06-tweet-45-minutes",
+      "bg": "mint",
+      "caption": "Revision isn't measured in hours. It's measured in questions you got right that you used to get wrong. ✅\n\nSave this for the next time you feel guilty about 'only' studying 45 minutes.",
+      "hashtags": [
+        "studytips",
+        "revision",
+        "pastpapers",
+        "olevel",
+        "igcse",
+        "studymotivation"
+      ],
+      "slides": [
+        {
+          "layout": "tweet",
+          "text": "6 hours of rewriting notes ❌\n\n45 minutes of past paper questions + checking every mistake ✅\n\nwhy did nobody tell me this two years ago",
+          "when": "9:41 PM · finally getting it"
+        }
+      ]
+    },
+    {
+      "id": "tr-07-lockscreen-exam-morning",
+      "bg": "wall",
+      "caption": "The exam-morning lock screen. 📱\n\nIf your notes-to-self look like that last one, you're ready. Units, 3 s.f., show working. Go.",
+      "hashtags": [
+        "examday",
+        "examseason",
+        "studymemes",
+        "olevel",
+        "igcse",
+        "goodluck"
+      ],
+      "slides": [
+        {
+          "layout": "notif",
+          "date": "exam day",
+          "clock": "7:42",
+          "notifs": [
+            [
+              "⏰",
+              "Clock",
+              "Alarm",
+              "Paper 2 · leave by 8:15",
+              "now"
+            ],
+            [
+              "💬",
+              "Messages",
+              "Mum",
+              "did you take your calculator??",
+              "2m ago"
+            ],
+            [
+              "🔋",
+              "Battery",
+              "Low battery",
+              "10% remaining",
+              "5m ago"
+            ],
+            [
+              "📝",
+              "Reminders",
+              "note to self",
+              "units · 3 s.f. · show working · read the question twice",
+              "7:00"
+            ]
+          ],
+          "cap": "the exam morning lock screen"
+        }
+      ]
+    },
+    {
+      "id": "tr-08-lockscreen-started-october",
+      "bg": "wall2",
+      "caption": "The lock screen of someone who started revising in October. 😌\n\nIt's not too late to be this person.",
+      "hashtags": [
+        "studymotivation",
+        "revision",
+        "examseason",
+        "olevel",
+        "igcse",
+        "studytips"
+      ],
+      "slides": [
+        {
+          "layout": "notif",
+          "date": "Sunday",
+          "clock": "10:05",
+          "notifs": [
+            [
+              "📅",
+              "Calendar",
+              "Mock test",
+              "Saturday · 10:00 AM",
+              "now"
+            ],
+            [
+              "⏳",
+              "Screen Time",
+              "Weekly report",
+              "Your screen time was down 2 hours last week",
+              "1h ago"
+            ],
+            [
+              "✅",
+              "Reminders",
+              "Done",
+              "past paper: Oct/Nov 2023 Paper 2 · marked",
+              "yesterday"
+            ],
+            [
+              "💬",
+              "Messages",
+              "study group",
+              "who's doing the 2022 one tonight?",
+              "yesterday"
+            ]
+          ],
+          "cap": "lock screen of someone who started in October 👀"
+        }
+      ]
+    },
+    {
+      "id": "tr-09-receipt-exam-season",
+      "bg": "desk",
+      "caption": "Your exam season receipt. 🧾\n\nNo refunds. But next season can look very different.",
+      "hashtags": [
+        "studymemes",
+        "examseason",
+        "relatable",
+        "olevel",
+        "igcse",
+        "studentlife"
+      ],
+      "slides": [
+        {
+          "layout": "receipt",
+          "store": "EXAM SEASON\nMART",
+          "meta": "order #0625 · aisle: panic\ncashier: past you",
+          "items": [
+            [
+              "sleep",
+              "−3 hrs/night"
+            ],
+            [
+              "highlighters",
+              "6"
+            ],
+            [
+              "pages highlighted",
+              "all of them"
+            ],
+            [
+              "timetables made",
+              "4"
+            ],
+            [
+              "timetables followed",
+              "0"
+            ],
+            [
+              "past papers done",
+              "1.5"
+            ],
+            [
+              "\"I'll start tomorrow\"",
+              "×63"
+            ],
+            [
+              "panic",
+              "unlimited"
+            ]
+          ],
+          "total": [
+            [
+              "TOTAL",
+              "1 lesson learned"
+            ]
+          ],
+          "footer": "thank you for shopping!\nnext time: start in October",
+          "note": "don't let this\nbe you",
+          "note_at": [
+            70,
+            1150
+          ],
+          "note_c": "white"
+        }
+      ]
+    },
+    {
+      "id": "tr-10-search-whole-syllabus",
+      "bg": "sun",
+      "caption": "We've all typed this. 🫠\n\nThe real answer: you can't, but you CAN do the highest-mark chapters properly. Start with those.",
+      "hashtags": [
+        "studymemes",
+        "examseason",
+        "revision",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "search",
+          "title": "the 1 AM google search:",
+          "query": "how to finish the whole syllabus in",
+          "suggestions": [
+            " 1 week",
+            " 3 days",
+            " one night",
+            " one night without crying",
+            " one night physics"
+          ],
+          "foot": "start now and you'll never need this search."
+        }
+      ]
+    },
+    {
+      "id": "tr-11-search-mark-scheme",
+      "bg": "coral",
+      "caption": "Questions we all have about the mark scheme. 🔍\n\nShort version: it wants units, it wants the exact keyword, and 'or equivalent' means your own wording is fine if it says the same thing.",
+      "hashtags": [
+        "markscheme",
+        "studytips",
+        "examseason",
+        "olevel",
+        "igcse",
+        "pastpapers"
+      ],
+      "slides": [
+        {
+          "layout": "search",
+          "title": "googling the mark scheme be like",
+          "query": "why does the mark scheme",
+          "suggestions": [
+            " want units every time",
+            " say \"or equivalent\"",
+            " not accept my answer",
+            " care about 3 s.f.",
+            " hate me specifically"
+          ],
+          "foot": "(it doesn't hate you. it just wants the keyword.)"
+        }
+      ]
+    },
+    {
+      "id": "tr-12-playlist-lock-in",
+      "bg": "spot",
+      "caption": "Your lock-in playlist. 🎧 Every track is a task. Press play tonight.\n\n(Total runtime: under 2 hours. That's a full revision session that actually works.)",
+      "hashtags": [
+        "studywithme",
+        "revision",
+        "studytips",
+        "olevel",
+        "igcse",
+        "lockin"
+      ],
+      "slides": [
+        {
+          "layout": "playlist",
+          "kind": "study playlist",
+          "title": "lock in 🔒",
+          "by": "PrepWithTee · 7 tracks · 1 hr 55 min",
+          "cover_bg": "linear-gradient(135deg,#CBF266,#9BD7FF)",
+          "cover_emoji": "🦉",
+          "cover_text": "LOCK IN\nMODE",
+          "now": 2,
+          "tracks": [
+            [
+              "phone in another room",
+              "the intro",
+              "0:30"
+            ],
+            [
+              "10 quick recall questions",
+              "warm-up",
+              "10:00"
+            ],
+            [
+              "one topical past paper",
+              "the main track",
+              "45:00"
+            ],
+            [
+              "mark it with the mark scheme",
+              "feat. a red pen",
+              "15:00"
+            ],
+            [
+              "redo every wrong one",
+              "the remix",
+              "20:00"
+            ],
+            [
+              "write the 3 mistakes down",
+              "bonus track",
+              "5:00"
+            ],
+            [
+              "sleep",
+              "the outro (do not skip)",
+              "8:00:00"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-13-exam-season-wrapped",
+      "bg": "wall",
+      "caption": "Your Exam Season Wrapped is here. 🎁 Be honest: which slide hit hardest?\n\nNext year's Wrapped can look very different.",
+      "hashtags": [
+        "wrapped",
+        "studymemes",
+        "examseason",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "wrapped",
+          "eyebrow": "your 2026",
+          "title": "Exam Season [[Wrapped]]",
+          "size": "l",
+          "swap": "lime",
+          "blocks": [
+            {
+              "label": "you opened past papers",
+              "big": "47 times",
+              "sub": "and finished 9 of them",
+              "bg": "lime",
+              "rot": -2
+            },
+            {
+              "label": "your top genre",
+              "big": "panic",
+              "sub": "with a side of \"I'll start tomorrow\"",
+              "bg": "bubble",
+              "rot": 1.5
+            }
+          ]
+        },
+        {
+          "layout": "wrapped",
+          "eyebrow": "your top chapters",
+          "title": "on repeat 🔁",
+          "blocks": [
+            {
+              "label": "most avoided",
+              "big": "1. Vectors\n2. Moments\n3. Logic gates",
+              "list": true,
+              "bg": "sun",
+              "rot": -1.5
+            },
+            {
+              "label": "most played excuse",
+              "big": "\"I work better under pressure\"",
+              "list": true,
+              "sub": "you do not.",
+              "bg": "sky",
+              "rot": 1
+            }
+          ]
+        },
+        {
+          "layout": "wrapped",
+          "eyebrow": "and finally",
+          "title": "your study personality",
+          "blocks": [
+            {
+              "label": "you are",
+              "big": "the comeback kid",
+              "sub": "slow start, big finish. imagine if you started in October.",
+              "bg": "lime",
+              "rot": -1
+            },
+            {
+              "label": "next year's wrapped",
+              "big": "loading…",
+              "sub": "you get to write this one",
+              "bg": "white",
+              "rot": 1.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-14-error-motivation",
+      "bg": "retro",
+      "caption": "motivation.exe has stopped working. 🖥️\n\nFix: don't wait for motivation. Do one question. Motivation shows up after you start, not before.",
+      "hashtags": [
+        "studymotivation",
+        "studymemes",
+        "relatable",
+        "olevel",
+        "igcse",
+        "examseason"
+      ],
+      "slides": [
+        {
+          "layout": "error",
+          "title": "when you open the textbook:",
+          "app": "motivation.exe",
+          "icon": "⚠️",
+          "msg": "motivation.exe has stopped responding",
+          "detail": "Motivation stopped working 3 minutes after you started revising. Unsaved progress may be lost.",
+          "buttons": [
+            "scroll for 2 hours",
+            "do ONE question"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-15-error-chapter-not-found",
+      "bg": "navy",
+      "caption": "Error 404: Chapter 7 not found. 🧠\n\nThe chapter you skipped in September WILL be on the paper. Do one topical booklet on it this week.",
+      "hashtags": [
+        "studymemes",
+        "relatable",
+        "revision",
+        "olevel",
+        "igcse",
+        "examseason"
+      ],
+      "slides": [
+        {
+          "layout": "error",
+          "title": "opening question 1:",
+          "app": "Brain",
+          "icon": "🧠",
+          "msg": "Error 404: chapter 7 not found",
+          "detail": "It was last seen in class in September. Try revising it from past paper questions.",
+          "buttons": [
+            "ignore",
+            "panic",
+            "revise it"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-16-starter-night-before",
+      "bg": "tang",
+      "caption": "The night-before-the-exam starter pack. 📦 How many do you own? Tag the friend who has all six.",
+      "hashtags": [
+        "starterpack",
+        "studymemes",
+        "examseason",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "starter",
+          "title": "night before the exam starter pack",
+          "items": [
+            [
+              "☕",
+              "the third coffee"
+            ],
+            [
+              "📱",
+              "\"just 5 minutes\" on your phone"
+            ],
+            [
+              "🗂️",
+              "13 tabs of past papers, 0 attempted"
+            ],
+            [
+              "🖍️",
+              "highlighted the entire page"
+            ],
+            [
+              "😴",
+              "\"I'll sleep at 1\""
+            ],
+            [
+              "🙏",
+              "praying last year's paper repeats"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-17-starter-a-star",
+      "bg": "mint",
+      "caption": "The A* starter pack. 📦 None of it is expensive. All of it is boring. That's the secret.\n\nSave it and tick off what you already do.",
+      "hashtags": [
+        "starterpack",
+        "studytips",
+        "astar",
+        "olevel",
+        "igcse",
+        "studymotivation"
+      ],
+      "slides": [
+        {
+          "layout": "starter",
+          "title": "the A* starter pack",
+          "items": [
+            [
+              "📝",
+              "past papers with the mark scheme next to them"
+            ],
+            [
+              "⏱️",
+              "timed attempts, not open-book"
+            ],
+            [
+              "🔴",
+              "a red pen for corrections"
+            ],
+            [
+              "📒",
+              "a mistakes notebook"
+            ],
+            [
+              "😴",
+              "8 hours of sleep. yes, really."
+            ],
+            [
+              "💧",
+              "a water bottle, not 4 energy drinks"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-18-notes-revision-todo",
+      "bg": "sun",
+      "caption": "The revision to-do list (honest version). 📝\n\nIf your list is mostly planning and no doing, swap one 'make a timetable' for 'do 10 questions'.",
+      "hashtags": [
+        "studymemes",
+        "todolist",
+        "revision",
+        "olevel",
+        "igcse",
+        "relatable"
+      ],
+      "slides": [
+        {
+          "layout": "notes",
+          "title": "revision to-do 📚",
+          "date": "Sunday 11:48 PM",
+          "items": [
+            [
+              "buy new stationery",
+              true
+            ],
+            [
+              "make a timetable",
+              true
+            ],
+            [
+              "colour-code the timetable",
+              true
+            ],
+            [
+              "make a better timetable",
+              true
+            ],
+            [
+              "start the timetable",
+              false
+            ],
+            [
+              "do one past paper",
+              false
+            ],
+            [
+              "mark it",
+              false
+            ],
+            [
+              "sleep",
+              false
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-19-notes-what-worked",
+      "bg": "lilac",
+      "caption": "Things that actually raised my grade. ✅ Save it. Start at the top.",
+      "hashtags": [
+        "studytips",
+        "revision",
+        "pastpapers",
+        "olevel",
+        "igcse",
+        "studymotivation"
+      ],
+      "slides": [
+        {
+          "layout": "notes",
+          "title": "things that actually raised my grade",
+          "date": "note to future me",
+          "items": [
+            [
+              "doing past papers under timed conditions",
+              false
+            ],
+            [
+              "marking them with the real mark scheme",
+              false
+            ],
+            [
+              "redoing every question I got wrong",
+              false
+            ],
+            [
+              "learning the command words (state / explain / describe)",
+              false
+            ],
+            [
+              "writing units. every. time.",
+              false
+            ],
+            [
+              "sleeping before the exam",
+              false
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tr-20-flags-study-habits",
+      "bg": "cream",
+      "caption": "Study habits: green flags vs red flags. 🟢🚩\n\nComment how many green flags you have. Be honest.",
+      "hashtags": [
+        "studytips",
+        "greenflags",
+        "redflags",
+        "olevel",
+        "igcse",
+        "studyhabits"
+      ],
+      "slides": [
+        {
+          "layout": "flags",
+          "title": "study habits: green flags vs red flags",
+          "green": [
+            "you mark your own paper with the mark scheme",
+            "you redo the questions you got wrong",
+            "you finish a chapter, then do its past paper questions",
+            "you sleep the night before"
+          ],
+          "red": [
+            "\"I'll just read my notes again\"",
+            "skipping every question you can't do",
+            "you've never timed yourself",
+            "an all-nighter before the exam"
+          ],
+          "foot": "how many green flags do you have? 👇"
+        }
+      ]
+    },
+    {
+      "id": "tr-21-meters-exam-season-energy",
+      "bg": "bubble",
+      "caption": "Energy levels during exam season, as accurately as science allows. 🔋\n\nWhich bar are you on right now?",
+      "hashtags": [
+        "studymemes",
+        "examseason",
+        "relatable",
+        "olevel",
+        "igcse",
+        "studentlife"
+      ],
+      "slides": [
+        {
+          "layout": "meters",
+          "title": "exam season energy levels 🔋",
+          "rows": [
+            [
+              "first paper",
+              92
+            ],
+            [
+              "realising there are 7 more",
+              38
+            ],
+            [
+              "the 2-week gap",
+              70
+            ],
+            [
+              "the paper after the gap",
+              24
+            ],
+            [
+              "last paper",
+              6
+            ],
+            [
+              "the day after",
+              100
+            ]
+          ],
+          "foot": "which one are you right now? 👇"
+        }
+      ]
+    },
+    {
+      "id": "tr-22-meters-how-prepared",
+      "bg": "sky",
+      "caption": "How prepared I feel, at every stage. 📊\n\nThe dip after marking is normal. It's the point. Keep going and the bar comes back for real.",
+      "hashtags": [
+        "studymotivation",
+        "pastpapers",
+        "revision",
+        "olevel",
+        "igcse",
+        "studytips"
+      ],
+      "slides": [
+        {
+          "layout": "meters",
+          "title": "how prepared I feel:",
+          "rows": [
+            [
+              "after making a timetable",
+              85
+            ],
+            [
+              "after opening a past paper",
+              35
+            ],
+            [
+              "after marking it",
+              12
+            ],
+            [
+              "after fixing my mistakes",
+              48
+            ],
+            [
+              "after 10 more papers",
+              88
+            ]
+          ],
+          "foot": "the dip is part of it. keep going."
+        }
+      ]
+    }
+  ]
+}

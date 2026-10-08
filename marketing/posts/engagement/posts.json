@@ -1,0 +1,116 @@
+{
+  "series": {
+    "title": "Engagement: this-or-that, tier lists, comment prompts",
+    "about": "Posts built to be answered: pick-one pairs, tier lists people argue with, and one-line prompts. Their job is comments and shares (which push reach), so the caption always asks for a reply. No selling at all.",
+    "check": "Opinion posts: rankings are playful, never presented as data."
+  },
+  "posts": [
+    {
+      "id": "en-01-tot-study-edition",
+      "bg": "lime",
+      "caption": "This or that: study edition. 📚\n\nComment your picks like 1A 2B 3A 4B 5A. Let's see who studies like you. 👇",
+      "hashtags": ["thisorthat", "studygram", "olevel", "igcse", "studytips", "studentlife"],
+      "slides": [
+        {"layout": "tot", "title": "this or that: study edition",
+         "pairs": [["🌅", "morning revision", "🌙", "late-night revision"], ["🎧", "music on", "🤫", "total silence"],
+                   ["📝", "past papers", "📖", "notes"], ["👥", "study group", "🧍", "solo"], ["✍️", "handwritten notes", "💻", "typed notes"]],
+         "foot": "comment your picks 👇 (1A, 2B…)"}
+      ]
+    },
+    {
+      "id": "en-02-tot-subject-edition",
+      "bg": "bubble",
+      "caption": "This or that: subject edition. 🧮⚡💻\n\nThere are no wrong answers. (There are, but we won't say.) Comment yours. 👇",
+      "hashtags": ["thisorthat", "maths", "physics", "computerscience", "olevel", "igcse"],
+      "slides": [
+        {"layout": "tot", "title": "this or that: subject edition",
+         "pairs": [["🧮", "Maths", "⚡", "Physics"], ["📈", "graphs", "🔣", "equations"], ["0️⃣", "binary", "🔤", "hex"],
+                   ["📐", "geometry", "✖️", "algebra"], ["🧾", "pseudocode", "🔀", "flowcharts"]],
+         "foot": "which side are you on? 👇"}
+      ]
+    },
+    {
+      "id": "en-03-tot-exam-day",
+      "bg": "sky",
+      "caption": "This or that: exam day edition. 📝\n\nBe honest about number 3. 👀",
+      "hashtags": ["thisorthat", "examday", "examseason", "olevel", "igcse", "studentlife"],
+      "slides": [
+        {"layout": "tot", "title": "this or that: exam day edition",
+         "pairs": [["🏃", "first one in the hall", "⏰", "arrives at 8:59"], ["🔁", "start at Q1", "🎯", "easiest question first"],
+                   ["🔍", "check every answer", "🚪", "finish and stare at the wall"], ["🗣️", "discuss answers after", "🙉", "never speak of it again"],
+                   ["1️⃣", "one hard paper", "3️⃣", "three easy papers"]],
+         "foot": "drop your answers 👇"}
+      ]
+    },
+    {
+      "id": "en-04-tier-revision-methods",
+      "bg": "sun",
+      "caption": "Revision methods, ranked. 📊\n\nThe top two both make you RECALL and get things wrong on purpose. That's why they work. Re-reading feels productive, but it's mostly recognition.\n\nAgree? Which one would you move? 👇",
+      "hashtags": ["tierlist", "studytips", "revision", "pastpapers", "olevel", "igcse"],
+      "slides": [
+        {"layout": "tier", "title": "revision methods, ranked",
+         "rows": [["S", [["📝", "timed past papers"], ["🔁", "redoing mistakes"]]],
+                  ["A", [["📚", "topical questions"], ["🗣️", "teaching a friend"]]],
+                  ["B", [["🃏", "flashcards"], ["🧠", "blank-page recall"]]],
+                  ["C", [["🗺️", "mind maps"], ["🎥", "videos at 1x"]]],
+                  ["D", [["📖", "re-reading notes"]]],
+                  ["F", [["🖍️", "highlighting everything"], ["📱", "phone \"breaks\""]]]],
+         "foot": "which one would you move? 👇"}
+      ]
+    },
+    {
+      "id": "en-05-tier-excuses",
+      "bg": "coral",
+      "caption": "Excuses not to revise, ranked by how convincing they sound to us at 9 PM. 😌\n\nWhich one is your go-to? Tag the friend who uses the S-tier one.",
+      "hashtags": ["tierlist", "studymemes", "relatable", "olevel", "igcse", "procrastination"],
+      "slides": [
+        {"layout": "tier", "title": "excuses not to revise, ranked",
+         "rows": [["S", [["🗓️", "\"I need a timetable first\""]]],
+                  ["A", [["📅", "\"I'll start on Monday\""], ["🧹", "\"my desk needs cleaning\""]]],
+                  ["B", [["😮‍💨", "\"I work better under pressure\""]]],
+                  ["C", [["☕", "\"after this snack\""], ["📺", "\"one episode\""]]],
+                  ["F", [["🏝️", "\"the exam is ages away\""]]]],
+         "foot": "which one is yours? 👇"}
+      ]
+    },
+    {
+      "id": "en-06-tier-maths-chapters",
+      "bg": "lilac",
+      "caption": "O Level / IGCSE Maths chapters, ranked by vibes only. 🧮\n\nThis is purely our opinion and you're allowed to fight us in the comments. Make your own tier list 👇",
+      "hashtags": ["tierlist", "olevelmaths", "igcsemaths", "maths", "4024", "0580"],
+      "slides": [
+        {"layout": "tier", "title": "maths chapters, ranked by vibes",
+         "rows": [["S", [["📐", "Pythagoras"], ["🔢", "Indices"]]],
+                  ["A", [["📈", "Straight lines"], ["🎲", "Probability"]]],
+                  ["B", [["📊", "Statistics"], ["🧭", "Bearings"]]],
+                  ["C", [["🔺", "Trigonometry"], ["🔁", "Transformations"]]],
+                  ["D", [["➡️", "Vectors"]]],
+                  ["F", [["➗", "Algebraic fractions"]]]],
+         "foot": "fight us in the comments 👇"}
+      ]
+    },
+    {
+      "id": "en-07-prompt-three-emojis",
+      "bg": "tang",
+      "caption": "Describe your revision so far in 3 emojis. Go. 👇\n\n(Ours: 🦉📝☕)",
+      "hashtags": ["studygram", "olevel", "igcse", "examseason", "studentlife", "commentbelow"],
+      "slides": [
+        {"layout": "hook", "eyebrow": "comment game", "title": "describe your revision in **3 emojis** 👇", "size": "xl", "align": "center",
+         "sub": "we'll go first: 🦉📝☕",
+         "doodles": [["sparkle", 860, 260, 90, 10, "white"], ["arrow-down", 780, 1000, 150, 0, "ink"]]}
+      ]
+    },
+    {
+      "id": "en-08-prompt-one-tip",
+      "bg": "mint",
+      "caption": "Your ONE best study tip, in the comments. 👇\n\nWe'll collect the best ones into a carousel (and credit you). Go.",
+      "note": "Only post if you will actually make the follow-up carousel with credited comments.",
+      "hashtags": ["studytips", "studygram", "olevel", "igcse", "commentbelow", "revision"],
+      "slides": [
+        {"layout": "hook", "eyebrow": "your turn", "title": "drop your ((one)) best study tip 👇", "size": "xl", "align": "center", "pop": "coral",
+         "sub": "the best ones go in our next carousel, with credit",
+         "doodles": [["star", 840, 300, 90, 12, "sun"], ["squiggle", 120, 1010, 200, -6, "ink"]]}
+      ]
+    }
+  ]
+}

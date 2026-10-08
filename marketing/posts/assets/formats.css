@@ -192,13 +192,17 @@
 .nt li.done span{color:#9A98A6;text-decoration:line-through}
 
 /* ---------- cheat sheet ---------- */
-.fs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:36px}
-.fs .f{border-radius:24px;padding:22px 26px;border:3px solid var(--ink);background:#fff;color:var(--ink)}
+.fsw{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:40px}
+.fs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:38px}
+.fs .f{border-radius:24px;padding:26px 30px;box-shadow:6px 6px 0 var(--ink);border:3px solid var(--ink);background:#fff;color:var(--ink)}
 .fs .f.wide{grid-column:span 2}
 .fs small{display:block;font:700 21px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#6B6878;margin-bottom:8px}
-.fs b{display:block;font:500 46px/1.25 "STIX Two Text",serif;font-style:italic;letter-spacing:0}
+.fs b{display:block;font:500 50px/1.28 "STIX Two Text",serif;font-style:italic;letter-spacing:0}
 .fs b .up{font-style:normal}
-.fs .k{display:block;font:500 22px/1.3 var(--f-body);color:#6B6878;margin-top:6px}
+.fs .f.words b{font:600 34px/1.3 var(--f-body);font-style:normal;letter-spacing:-.01em}
+.fs .f.words b .fr{font-size:.85em}
+.fsw.dense{padding-bottom:0}.fsw.dense .fs{gap:16px;margin-top:28px}.fsw.dense .fs .f{padding:20px 26px}.fsw.dense .fs b{font-size:44px}.fsw.dense .fs .f.words b{font-size:31px}
+.fs .k{display:block;font:500 23px/1.3 var(--f-body);color:#6B6878;margin-top:6px}
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.78em;line-height:1.1;margin:0 .08em}
 .fr>span:first-child{border-bottom:.06em solid currentColor;padding:0 .12em}
 sup,sub{font-size:.62em;line-height:0}
@@ -237,3 +241,25 @@ sup,sub{font-size:.62em;line-height:0}
 .spot .circ svg{z-index:1}
 .spot .ln.mono .circ{white-space:pre}
 .spot .ln.mono{font-size:38px}
+
+/* ---------- round-2 fixes ---------- */
+.vc{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:30px}
+.chat-body{gap:12px;padding:24px 26px}
+.msg{font-size:29px;padding:15px 24px}
+.sp{flex:none;grid-auto-rows:320px}
+.sp .sticker{font-size:120px}
+.sp p{font:700 29px/1.2 var(--f-body)}
+.nt li{font-size:35px;margin-bottom:26px}
+.nt li .c{width:44px;height:44px}
+.nt h2{font-size:62px}
+.flags li{font-size:30px}
+.flags h3{font-size:46px}
+.meter b{font-size:31px}
+.tier{margin-top:30px}
+.tier .row{min-height:122px}
+.tier .it{font-size:29px;padding:10px 18px}
+.tier .it .emo{font-size:38px}
+.tot{gap:24px}
+.tot .opt{font-size:35px;min-height:120px}
+.tot .opt .emo{font-size:54px}
+.myth p{font-size:29px}.myth>div{padding:24px 28px}.myths{gap:22px}

@@ -1,0 +1,634 @@
+{
+  "series": {
+    "title": "Cheat sheets",
+    "about": "One topic's formulas on one save-able slide, in real maths type (STIX serif). Made to be screenshotted and saved, so every formula is checked against the Cambridge syllabuses. Each card names the topic; 'note' lines say what the letters mean. Re-check before posting if you edit a formula.",
+    "check": "fx markup: ^{sup} _{sub} {numerator // denominator}"
+  },
+  "posts": [
+    {
+      "id": "cs-01-motion-olevel",
+      "bg": "mint",
+      "caption": "Motion, on one page. 📌 Save it for your next physics paper.\n\nThe two graph rules (gradient + area) are worth more marks than any single formula. Learn which graph you're looking at first.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "physics",
+        "kinematics",
+        "cheatsheet",
+        "studytips"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "physics · save this 📌",
+          "title": "Motion cheat sheet",
+          "cells": [
+            {
+              "name": "speed",
+              "f": "v = {d // t}",
+              "note": "distance ÷ time"
+            },
+            {
+              "name": "acceleration",
+              "f": "a = {v − u // t}",
+              "note": "change in velocity ÷ time"
+            },
+            {
+              "name": "resultant force",
+              "f": "F = ma",
+              "note": "N = kg × m/s²"
+            },
+            {
+              "name": "weight",
+              "f": "W = mg",
+              "note": "g ≈ 9.8 N/kg on Earth"
+            },
+            {
+              "name": "momentum",
+              "f": "p = mv",
+              "note": "kg m/s"
+            },
+            {
+              "name": "impulse",
+              "f": "FΔt = Δ(mv)",
+              "note": "force × time = change in momentum"
+            },
+            {
+              "name": "graph rules",
+              "f": "gradient of d–t graph = speed\ngradient of v–t graph = acceleration\narea under v–t graph = distance",
+              "wide": true,
+              "bg": "lime",
+              "words": true
+            }
+          ],
+          "dense": true
+        }
+      ]
+    },
+    {
+      "id": "cs-02-suvat-alevel",
+      "bg": "sky",
+      "caption": "The four SUVAT equations, and the one rule people forget: they only work when the acceleration is CONSTANT. 📌\n\nPick the equation that leaves out the letter you don't know and don't need.",
+      "hashtags": [
+        "alevelphysics",
+        "9702",
+        "physics",
+        "suvat",
+        "kinematics",
+        "cheatsheet"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "a level physics · save this 📌",
+          "title": "SUVAT in one slide",
+          "cells": [
+            {
+              "name": "no s",
+              "f": "v = u + at"
+            },
+            {
+              "name": "no v",
+              "f": "s = ut + {1 // 2}at^{2}"
+            },
+            {
+              "name": "no t",
+              "f": "v^{2} = u^{2} + 2as"
+            },
+            {
+              "name": "no a",
+              "f": "s = {u + v // 2} t"
+            },
+            {
+              "name": "what the letters mean",
+              "f": "s displacement · u initial velocity · v final velocity · a acceleration · t time",
+              "wide": true,
+              "words": true
+            },
+            {
+              "name": "the catch",
+              "f": "constant acceleration only",
+              "note": "free fall near Earth: a = g = 9.81 m/s² (down)",
+              "wide": true,
+              "bg": "sun",
+              "words": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-03-circles",
+      "bg": "lilac",
+      "caption": "Every circle formula you need for O Level & IGCSE Maths. 📌\n\nThe sector ones are just 'fraction of the circle' × the whole circle. Get that idea and you never have to memorise them.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "circles",
+        "maths",
+        "cheatsheet",
+        "mathsrevision"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "maths · save this 📌",
+          "title": "Circles cheat sheet",
+          "cells": [
+            {
+              "name": "circumference",
+              "f": "C = 2πr"
+            },
+            {
+              "name": "area",
+              "f": "A = πr^{2}"
+            },
+            {
+              "name": "arc length",
+              "f": "{θ // 360} × 2πr",
+              "note": "θ in degrees"
+            },
+            {
+              "name": "sector area",
+              "f": "{θ // 360} × πr^{2}"
+            },
+            {
+              "name": "circle theorems (the big four)",
+              "f": "angle in a semicircle = 90°\ntangent ⟂ radius\nangle at centre = 2 × angle at circumference\nopposite angles of a cyclic quadrilateral add to 180°",
+              "wide": true,
+              "bg": "lime",
+              "words": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-04-area-volume",
+      "bg": "sun",
+      "caption": "Areas and volumes in one place. 📌\n\nTip: cones, pyramids and spheres are the ones with fractions in front (⅓, ⅓, 4⁄3). If your formula has a ⅓, it's a pointy shape.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "mensuration",
+        "maths",
+        "cheatsheet",
+        "geometry"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "maths · save this 📌",
+          "title": "Area & volume",
+          "cells": [
+            {
+              "name": "triangle",
+              "f": "{1 // 2}bh  or  {1 // 2}ab sin C"
+            },
+            {
+              "name": "trapezium",
+              "f": "{1 // 2}(a + b)h"
+            },
+            {
+              "name": "cylinder",
+              "f": "V = πr^{2}h",
+              "note": "curved surface = 2πrh"
+            },
+            {
+              "name": "cone",
+              "f": "V = {1 // 3}πr^{2}h",
+              "note": "curved surface = πrl (l = slant height)"
+            },
+            {
+              "name": "sphere",
+              "f": "V = {4 // 3}πr^{3}",
+              "note": "surface area = 4πr²"
+            },
+            {
+              "name": "pyramid",
+              "f": "V = {1 // 3} × base area × h",
+              "words": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-05-electricity",
+      "bg": "tang",
+      "caption": "Electricity formulas, sorted. ⚡📌\n\nThe parallel rule is the one that trips people up: the total is ALWAYS smaller than the smallest resistor.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "electricity",
+        "physics",
+        "cheatsheet",
+        "circuits"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "physics · save this 📌",
+          "title": "Electricity cheat sheet",
+          "cells": [
+            {
+              "name": "Ohm's law",
+              "f": "V = IR"
+            },
+            {
+              "name": "charge",
+              "f": "Q = It",
+              "note": "coulombs = amps × seconds"
+            },
+            {
+              "name": "power",
+              "f": "P = IV = I^{2}R"
+            },
+            {
+              "name": "energy",
+              "f": "E = Pt = IVt",
+              "note": "also E = QV"
+            },
+            {
+              "name": "series",
+              "f": "R = R_{1} + R_{2}",
+              "note": "same current everywhere"
+            },
+            {
+              "name": "parallel",
+              "f": "{1 // R} = {1 // R_{1}} + {1 // R_{2}}",
+              "note": "same p.d. across each branch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-06-data-units",
+      "bg": "bubble",
+      "caption": "Data storage maths for Computer Science. 💾📌\n\nRead the question: Cambridge uses kibi (1024) AND kilo (1000). KiB = 1024 bytes, kB = 1000 bytes.",
+      "hashtags": [
+        "olevelcs",
+        "igcsecs",
+        "computerscience",
+        "0478",
+        "2210",
+        "cheatsheet"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "computer science · save this 📌",
+          "title": "Data units cheat sheet",
+          "cells": [
+            {
+              "name": "the small ones",
+              "f": "4 bits = 1 nibble   ·   8 bits = 1 byte",
+              "wide": true,
+              "words": true
+            },
+            {
+              "name": "binary prefixes",
+              "f": "1 KiB = 1024 B",
+              "note": "MiB = 1024 KiB · GiB = 1024 MiB · TiB = 1024 GiB"
+            },
+            {
+              "name": "decimal prefixes",
+              "f": "1 kB = 1000 B",
+              "note": "MB = 1000 kB · GB = 1000 MB"
+            },
+            {
+              "name": "image file size (bits)",
+              "f": "width × height × colour depth",
+              "wide": true,
+              "words": true
+            },
+            {
+              "name": "sound file size (bits)",
+              "f": "sample rate × resolution × seconds",
+              "wide": true,
+              "words": true
+            },
+            {
+              "name": "then",
+              "f": "bits ÷ 8 = bytes",
+              "note": "1 hex digit = 4 bits",
+              "wide": true,
+              "bg": "lime",
+              "words": true
+            }
+          ],
+          "dense": true
+        }
+      ]
+    },
+    {
+      "id": "cs-07-logic-gates",
+      "bg": "navy",
+      "caption": "Logic gates in one slide. 🔌📌\n\nShortcut: NAND and NOR are just AND and OR with the answer flipped.",
+      "hashtags": [
+        "olevelcs",
+        "igcsecs",
+        "computerscience",
+        "logicgates",
+        "booleanlogic",
+        "cheatsheet"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "computer science · save this 📌",
+          "title": "Logic gates, decoded",
+          "cells": [
+            {
+              "name": "NOT",
+              "f": "Q = NOT A",
+              "note": "flips the input"
+            },
+            {
+              "name": "AND",
+              "f": "Q = A AND B",
+              "note": "1 only if both inputs are 1"
+            },
+            {
+              "name": "OR",
+              "f": "Q = A OR B",
+              "note": "1 if at least one input is 1"
+            },
+            {
+              "name": "XOR",
+              "f": "Q = A XOR B",
+              "note": "1 if the inputs are different"
+            },
+            {
+              "name": "NAND",
+              "f": "Q = A NAND B",
+              "note": "= NOT (A AND B): 0 only if both inputs are 1"
+            },
+            {
+              "name": "NOR",
+              "f": "Q = A NOR B",
+              "note": "= NOT (A OR B): 1 only if both inputs are 0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-08-indices",
+      "bg": "lime",
+      "caption": "The laws of indices. 📌 Seven rules, and the last three are where the marks are.\n\nNegative power = flip it. Fraction power = root it.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "indices",
+        "maths",
+        "cheatsheet",
+        "algebra"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "maths · save this 📌",
+          "title": "Laws of indices",
+          "cells": [
+            {
+              "name": "multiply → add",
+              "f": "a^{m} × a^{n} = a^{m+n}"
+            },
+            {
+              "name": "divide → subtract",
+              "f": "a^{m} ÷ a^{n} = a^{m−n}"
+            },
+            {
+              "name": "power of a power",
+              "f": "(a^{m})^{n} = a^{mn}"
+            },
+            {
+              "name": "power zero",
+              "f": "a^{0} = 1"
+            },
+            {
+              "name": "negative = flip",
+              "f": "a^{−n} = {1 // a^{n}}"
+            },
+            {
+              "name": "fraction = root",
+              "f": "a^{1/n} = ⁿ√a"
+            },
+            {
+              "name": "both at once",
+              "f": "a^{m/n} = (ⁿ√a)^{m}",
+              "note": "e.g. 8^(2/3) = (∛8)² = 2² = 4",
+              "wide": true,
+              "bg": "sun"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-09-trigonometry",
+      "bg": "lilac",
+      "caption": "Trig, all in one place. 📐📌\n\nRight angle? SOH CAH TOA. No right angle? Sine rule or cosine rule. That one question decides which half of this sheet you need.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "trigonometry",
+        "maths",
+        "cheatsheet",
+        "sohcahtoa"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "maths · save this 📌",
+          "title": "Trigonometry cheat sheet",
+          "cells": [
+            {
+              "name": "SOH CAH TOA",
+              "f": "sin θ = {O // H}   cos θ = {A // H}   tan θ = {O // A}",
+              "wide": true
+            },
+            {
+              "name": "Pythagoras",
+              "f": "a^{2} + b^{2} = c^{2}",
+              "note": "c = hypotenuse"
+            },
+            {
+              "name": "area of any triangle",
+              "f": "{1 // 2}ab sin C"
+            },
+            {
+              "name": "sine rule",
+              "f": "{a // sin A} = {b // sin B} = {c // sin C}",
+              "note": "use with a side–angle pair",
+              "wide": true
+            },
+            {
+              "name": "cosine rule",
+              "f": "a^{2} = b^{2} + c^{2} − 2bc cos A",
+              "note": "use with 3 sides, or 2 sides + the angle between them",
+              "wide": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-10-density-pressure-moments",
+      "bg": "mint",
+      "caption": "Density, pressure, moments: three short formulas, a lot of marks. 📌\n\nMoments trap: the distance must be PERPENDICULAR to the force, measured from the pivot.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "physics",
+        "pressure",
+        "moments",
+        "cheatsheet"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "physics · save this 📌",
+          "title": "Density, pressure & moments",
+          "cells": [
+            {
+              "name": "density",
+              "f": "ρ = {m // V}",
+              "note": "kg/m³ or g/cm³"
+            },
+            {
+              "name": "pressure",
+              "f": "p = {F // A}",
+              "note": "Pa = N/m²"
+            },
+            {
+              "name": "pressure in a liquid",
+              "f": "Δp = ρgΔh",
+              "note": "depends on depth, not on the shape of the container",
+              "wide": true
+            },
+            {
+              "name": "moment",
+              "f": "moment = F × d",
+              "note": "d = perpendicular distance from pivot",
+              "words": true
+            },
+            {
+              "name": "balanced",
+              "f": "Σ clockwise = Σ anticlockwise",
+              "note": "principle of moments",
+              "words": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-11-energy-waves",
+      "bg": "sky",
+      "caption": "Energy and waves, one slide each side of the syllabus. 🌊⚡📌\n\nEfficiency can never be more than 100%. If yours is, swap the numbers round.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "physics",
+        "energy",
+        "waves",
+        "cheatsheet"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "physics · save this 📌",
+          "title": "Energy & waves",
+          "cells": [
+            {
+              "name": "kinetic energy",
+              "f": "E_{k} = {1 // 2}mv^{2}"
+            },
+            {
+              "name": "gravitational PE",
+              "f": "ΔE_{p} = mgΔh"
+            },
+            {
+              "name": "work done",
+              "f": "W = Fd",
+              "note": "= energy transferred"
+            },
+            {
+              "name": "power",
+              "f": "P = {W // t} = {ΔE // t}"
+            },
+            {
+              "name": "efficiency",
+              "f": "{useful output // total input} × 100%",
+              "wide": true,
+              "words": true
+            },
+            {
+              "name": "wave speed",
+              "f": "v = fλ",
+              "note": "and T = 1/f"
+            },
+            {
+              "name": "refraction",
+              "f": "n = {sin i // sin r}",
+              "note": "critical angle: n = 1 / sin c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cs-12-straight-lines",
+      "bg": "tang",
+      "caption": "Coordinate geometry on one card. 📈📌\n\nPerpendicular gradients multiply to −1: flip the fraction and change the sign. Gradient 2/3 → perpendicular −3/2.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "straightlines",
+        "maths",
+        "cheatsheet",
+        "graphs"
+      ],
+      "slides": [
+        {
+          "layout": "formula",
+          "eyebrow": "maths · save this 📌",
+          "title": "Straight lines",
+          "cells": [
+            {
+              "name": "gradient",
+              "f": "m = {y_{2} − y_{1} // x_{2} − x_{1}}"
+            },
+            {
+              "name": "equation",
+              "f": "y = mx + c",
+              "note": "c = where it crosses the y-axis"
+            },
+            {
+              "name": "midpoint",
+              "f": "({x_{1} + x_{2} // 2}, {y_{1} + y_{2} // 2})",
+              "wide": true
+            },
+            {
+              "name": "length",
+              "f": "√((x_{2} − x_{1})^{2} + (y_{2} − y_{1})^{2})",
+              "wide": true
+            },
+            {
+              "name": "parallel",
+              "f": "same gradient",
+              "words": true
+            },
+            {
+              "name": "perpendicular",
+              "f": "m_{1} × m_{2} = −1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

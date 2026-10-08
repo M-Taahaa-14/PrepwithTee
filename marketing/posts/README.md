@@ -8,7 +8,12 @@ each `posts.json` holds the words. Change the words, re-run, and you get new PNG
 .venv\Scripts\python marketing\posts\build.py --series memes   # one series
 .venv\Scripts\python marketing\posts\build.py --only mm-03     # one post
 .venv\Scripts\python marketing\posts\build.py --html-only      # just preview.html, no PNGs
+.venv\Scripts\python marketing\posts\build.py --scale 1        # half-size PNGs, for quick checks
 ```
+
+Needs `pip install playwright` + `playwright install chromium`. If a Chromium is already installed
+elsewhere (e.g. a cloud container), point at it with `PW_CHROMIUM=/path/to/chrome` instead.
+Fonts come from Google Fonts, so the build needs internet; it stops if a font fails to load.
 
 Output per series: `png/<id>.png` for a single post, `png/<id>/01.png ...` for a carousel
 (2160x2700, Instagram 4:5 at 2x; stories 2160x3840), `CAPTIONS.md` (caption + hashtags +
@@ -47,8 +52,14 @@ The owl and the navy stay as the anchor; the bright accents are new.
 | `mood/` | calm, cinematic advice carousel | dark, warm lamp-light, white text (post with music) |
 | `promos/` | the class batches | sticker style: bright bg, price burst, chips, WhatsApp bar |
 | `seasonal/` | exam calendar moments, stories | varies |
+| `puzzles/` | 2-slide quizzes, Exam Wordle, spot the mistake (question, then answer) | bright colour + answer cards |
+| `cheat-sheets/` | one topic's formulas on one save-able slide | colour per subject, white formula cards in real maths type |
+| `trends/` | study life in internet formats: chats, tweets, lock screens, receipts, search, playlist, Wrapped, error pop-ups, starter packs, notes app, flags, meters | each format copies the real app's look |
+| `engagement/` | this-or-that, tier lists, comment prompts (no selling) | bright, sticker-like |
+| `myths/` | myth (struck through) vs fact, study + subject misconceptions | red/green split cards |
 
-**Suggested weekly mix (5-6 posts):** 1 meme, 1 study tip, 1 subject Q&A or big type,
+**Suggested weekly mix (5-6 posts):** 1 meme or trend, 1 study tip or cheat sheet, 1 puzzle or
+engagement post, 1 subject Q&A / myth / big type,
 1 feature or testimonial, 1 promo at most, plus stories. Keep about 1 in 5 posts selling.
 
 ## Adding a post
@@ -106,6 +117,39 @@ slide can override it.
 - `promo`: `eyebrow`, `title`, `sub`, `chips` [], `badge` [text, colour], `burst`
   {top, big, bottom, at [x, y, size], bg, rot}, `bar_title`
 
+Internet-format layouts (styles in `assets/formats.css`; most take `title` and `foot`):
+
+- `quiz`: `tags` [[text, colour]], `q`, `options` [4], `answer` (0-3), `cta`, `why`, `reveal`.
+  Two-slide puzzle = the question slide, then `{"inherit": true, "reveal": true}`.
+- `spot` (spot the mistake): `tags`, `title`, `lines` [], `bad` (index), `fix`, `ask`, `mono`, `reveal`
+- `wordle`: `answer` (5 letters), `guesses` [], `reveal`
+- `formula` (cheat sheet): `eyebrow`, `title`, `cells` [{name, f, note, wide, bg, words}], `dense`.
+  `f` uses formula markup: `^{sup}`, `_{sub}`, `{numerator // denominator}`; sin/cos/tan and
+  logic operators stay upright. `words: true` = a sentence, not a formula (upright sans).
+  `dense: true` shrinks the cards when a sheet has 7 or more.
+- `chat`: `contact`, `avatar` (emoji), `av_bg`, `status`, `msgs` [[me|them|time|read, text]].
+  Fits about 10 short messages.
+- `tweet`: `text`, `when`, `after`
+- `notif` (lock screen, use bg wall / wall2): `date`, `clock`, `notifs` [[emoji, app, title, body, time]], `cap`
+- `receipt`: `store`, `meta`, `items` [[left, right]], `total` [[left, right]], `footer`, `rot`,
+  `note`, `note_at` [x, y], `note_c`
+- `search`: `query`, `suggestions` [endings]
+- `playlist` (use bg spot): `kind`, `title`, `by`, `cover_bg`, `cover_emoji`, `cover_text`, `now`,
+  `tracks` [[title, subtitle, duration]]
+- `wrapped` (use bg wall): `eyebrow`, `blocks` [{label, big, sub, bg, rot, list}]
+- `error` (use bg retro / navy): `app`, `icon`, `msg`, `detail`, `buttons` [] (last = highlighted), `top`
+- `ticket` (boarding pass): `eyebrow`, `ticket` {airline, cls, from_l, from, to_l, to, fields
+  [[label, value] x6], name, stub_l, stub}, `bar`, `bar_title`
+- `starter`: `items` [[emoji, text] x6]
+- `flags`: `green` [], `red` []
+- `notes` (notes app): `date`, `items` [text or [text, done]]
+- `meters`: `sub`, `rows` [[label, percent, colour?]]
+- `tier`: `rows` [[S|A|B|C|D|F, [[emoji, text]]]]
+- `tot` (this or that): `pairs` [[emoji, text, emoji, text]]
+- `myth`: `items` [[myth, fact]] (4 fit)
+
+Extra backgrounds for these: `wall`, `wall2` (phone wallpapers), `spot` (music app), `black`, `retro`.
+
 Every slide also takes `bg` (paper, grid, plain, white, cream, lime, lilac, sky, sun, tang,
 bubble, mint, coral, navy, desk, mood), `pop`, `swap`, `ink`, `logo` (right / none),
 `url` (false hides the footer URL), `inset` (CSS inset of the content box) and
@@ -125,8 +169,20 @@ rotated note can trigger it harmlessly, so look at the PNG before changing anyth
   Today: O Level/IGCSE classes PKR 8,499/month, A Level from 12,999 per course, batches start
   31 Oct 2026, money-back after the first paid class, free plan = 3 topical booklets a month,
   yearly past papers free without sign-up.
+- Chats in `trends/` and `pr-06` are jokes or reenactments, never a real person's messages;
+  `pr-06` carries a note saying so. No fake follower counts, likes or "x students" figures.
+- About 1 post in 5 sells. Puzzles, trends, engagement and most myths do not mention classes.
+- Facts in `cheat-sheets/`, `puzzles/` and `myths/` were checked against the syllabuses;
+  re-check any line you edit.
 - Exam-technique facts in `subject-qa/` follow the Cambridge rubrics and mark-scheme
   conventions. Re-check them if a syllabus changes.
+
+## Checking the output
+
+The build prints `<-- OVERFLOW` when something pokes outside the content box. Rotated cards
+(starter packs, Wrapped, torn notes) trip it harmlessly; anything else usually means too much
+text. Look at the PNGs, ideally as a contact sheet, before posting: `gallery.html` shows every
+post with a series filter, search, a full-size viewer (arrow keys) and a "Copy caption" button.
 
 ## Scaling up
 
@@ -134,4 +190,8 @@ Each new post is a few lines of JSON, so hundreds are cheap. Good sources of con
 - **Subject Q&A from the question bank**: one post per chapter per subject ("most common
   mistake in Vectors"), using the stored explanations' "common mistakes" lists.
 - **Big type** for every feature and stat; **bingo/grid4/rows** memes for each exam season.
+- **Puzzles**: one quiz per chapter per subject; every answer must be worked out and checked.
+- **Cheat sheets**: one per chapter; formulas checked against the syllabus formula lists.
+- **Trends**: new internet formats appear constantly; add a layout to `build.py` + `formats.css`
+  once and every future post in that format is just JSON.
 - **Mood** carousels re-skinned with different `light` settings, or with real or stock photos via `photo`.

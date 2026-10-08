@@ -1,0 +1,232 @@
+{
+  "series": {
+    "title": "Myth vs fact",
+    "about": "Strike-through myths next to the real answer. Study habits, exam technique and subject misconceptions. Built for saves and 'wait, really?' shares. Every fact is checked against the syllabus or mark-scheme conventions.",
+    "check": "Facts must stay accurate: re-check against the syllabus before editing."
+  },
+  "posts": [
+    {
+      "id": "my-01-study-myths",
+      "bg": "sun",
+      "caption": "Study myths we need to stop believing. 🙅\n\nNumber 3 is the big one: past papers aren't the end of revision, they ARE revision. Start them as soon as you finish a chapter.",
+      "hashtags": [
+        "studytips",
+        "mythvsfact",
+        "revision",
+        "pastpapers",
+        "olevel",
+        "igcse"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "study myths, busted",
+          "items": [
+            [
+              "You need 10 hours a day to get an A*",
+              "A few focused hours of questions beat a whole day of re-reading."
+            ],
+            [
+              "Highlighting = studying",
+              "Testing yourself is what makes it stick."
+            ],
+            [
+              "Past papers are for the last month",
+              "Start topical questions the week you finish a chapter."
+            ],
+            [
+              "An all-nighter before helps",
+              "Sleep is when your brain stores what you learned."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-02-exam-myths",
+      "bg": "lilac",
+      "caption": "Exam technique myths, busted. ✍️\n\nThere's no negative marking in these papers, so a blank answer is a guaranteed zero. Always write something sensible.",
+      "hashtags": [
+        "examtips",
+        "mythvsfact",
+        "markscheme",
+        "olevel",
+        "igcse",
+        "examseason"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "exam myths, busted",
+          "items": [
+            [
+              "Examiners like long answers",
+              "They mark points. One clear point per mark is enough."
+            ],
+            [
+              "If the answer's right, working doesn't matter",
+              "'Show your working' questions can lose marks without it, and wrong answers still earn method marks."
+            ],
+            [
+              "If you don't know it, leave it blank",
+              "No negative marking. Write something sensible."
+            ],
+            [
+              "Rounding as you go is fine",
+              "Keep full values and round only at the end."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-03-physics-myths",
+      "bg": "mint",
+      "caption": "Physics myths that cost marks. ⚡\n\n'Current gets used up' is the one examiners see most. Current is the same all the way round a series circuit; it's energy that gets transferred.",
+      "hashtags": [
+        "olevelphysics",
+        "igcsephysics",
+        "physics",
+        "mythvsfact",
+        "misconceptions",
+        "studytips"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "physics myths, busted",
+          "items": [
+            [
+              "Heavier things fall faster",
+              "With no air resistance, everything falls with the same acceleration."
+            ],
+            [
+              "Current gets used up in a circuit",
+              "Current is the same all round a series circuit. Energy is transferred."
+            ],
+            [
+              "Mass and weight are the same thing",
+              "Mass is in kg. Weight is a force in N: W = mg."
+            ],
+            [
+              "Heat rises",
+              "Hot fluids rise (convection). Thermal energy moves in every direction."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-04-maths-myths",
+      "bg": "sky",
+      "caption": "Maths myths that cost marks. 🧮\n\nSave this and check your last paper for number 2. It's everywhere.",
+      "hashtags": [
+        "olevelmaths",
+        "igcsemaths",
+        "maths",
+        "mythvsfact",
+        "algebra",
+        "studytips"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "maths myths, busted",
+          "items": [
+            [
+              "x² = 9 means x = 3",
+              "x = 3 or x = −3."
+            ],
+            [
+              "(a + b)² = a² + b²",
+              "(a + b)² = a² + 2ab + b²."
+            ],
+            [
+              "Probability 0.5 means it happens every other time",
+              "It means half the time in the long run."
+            ],
+            [
+              "Multiplying always makes a number bigger",
+              "× 0.5 halves it. Multiplying by a number between 0 and 1 makes it smaller."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-05-cs-myths",
+      "bg": "bubble",
+      "caption": "Computer Science myths, busted. 💻\n\nThe kilobyte one appears on real papers: KiB = 1024 bytes, kB = 1000 bytes. Read which one the question uses.",
+      "hashtags": [
+        "olevelcs",
+        "igcsecs",
+        "computerscience",
+        "mythvsfact",
+        "0478",
+        "2210"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "CS myths, busted",
+          "items": [
+            [
+              "A kilobyte is always 1024 bytes",
+              "1 KiB = 1024 bytes. 1 kB = 1000 bytes. Check the question."
+            ],
+            [
+              "RAM keeps your work when the power goes off",
+              "RAM is volatile. Storage (like an SSD) keeps it."
+            ],
+            [
+              "Validation checks the data is correct",
+              "It checks the data is sensible. Verification checks it was entered or copied correctly."
+            ],
+            [
+              "Lossy compression is always bad",
+              "It makes files much smaller, and you often can't notice what's lost."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "my-06-tuition-myths",
+      "bg": "tang",
+      "caption": "Myths about getting help with your studies. 🦉\n\nOur O Level / IGCSE classes run in groups of 4–6, so everyone gets asked questions, not just the front row. New batches start 31 October. Free demo first.\n\nWhatsApp 0320 488 4375 · prepwithtee.com",
+      "hashtags": [
+        "olevel",
+        "igcse",
+        "alevel",
+        "tuition",
+        "studytips",
+        "mythvsfact"
+      ],
+      "slides": [
+        {
+          "layout": "myth",
+          "title": "myths about getting help",
+          "items": [
+            [
+              "Tuition is only for weak students",
+              "It is just as useful for turning a B into an A*."
+            ],
+            [
+              "Big classes are just as good",
+              "In a group of 4–6, you get asked. In a big class, it is easy to get skipped."
+            ],
+            [
+              "It's too late to start in October",
+              "Our batches finish the syllabus by January, then do past papers till April."
+            ],
+            [
+              "You can't try before you pay",
+              "Book a free demo first. Not happy after your first paid class? Full refund."
+            ]
+          ],
+          "foot": "free demo → WhatsApp 0320 488 4375"
+        }
+      ]
+    }
+  ]
+}

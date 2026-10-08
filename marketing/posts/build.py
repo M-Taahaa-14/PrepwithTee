@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import random
 import re
 from pathlib import Path
@@ -382,6 +383,11 @@ def _title(s, size="m", cls=""):
     return f'<h2 class="h-{s.get("size", size)} {cls}">{md(s["title"])}</h2>'
 
 
+def _vc(inner):
+    """Centre a layout's block vertically in the content box (no dead band at the bottom)."""
+    return f'<div class="vc">{inner}</div>'
+
+
 def _foot(s, cls):
     return f'<div class="{cls}">{md(s["foot"])}</div>' if s.get("foot") else ""
 
@@ -408,13 +414,13 @@ def L_tier(s, ctx):
         its = "".join(f'<span class="it"><span class="emo">{e}</span>{md(t)}</span>' for e, t in items)
         rows.append(f'<div class="row"><div class="lab" style="background:{TIER_COLOURS.get(lab, "#ddd")}">{html.escape(lab)}</div>'
                     f'<div class="items">{its}</div></div>')
-    return f'{_title(s)}<div class="tier">{"".join(rows)}</div>{_foot(s, "tier-foot")}'
+    return _vc(f'{_title(s)}<div class="tier">{"".join(rows)}</div>{_foot(s, "tier-foot")}')
 
 
 def L_tot(s, ctx):
     pairs = "".join(f'<div class="pair"><div class="opt"><span class="emo">{a}</span>{md(b)}</div><div class="or">or</div>'
                     f'<div class="opt"><span class="emo">{c}</span>{md(d)}</div></div>' for a, b, c, d in s["pairs"])
-    return f'{_title(s)}<div class="tot">{pairs}</div>{_foot(s, "tier-foot")}'
+    return _vc(f'{_title(s)}<div class="tot">{pairs}</div>{_foot(s, "tier-foot")}')
 
 
 def L_quiz(s, ctx):
@@ -446,7 +452,7 @@ def L_tweet(s, ctx):
 def L_myth(s, ctx):
     rows = "".join(f'<div class="myth"><div class="m"><small>myth</small><p>{md(m)}</p></div><div class="f"><small>fact</small><p>{md(f)}</p></div></div>'
                    for m, f in s["items"])
-    return f'{_title(s)}<div class="myths">{rows}</div>{_foot(s, "tier-foot")}'
+    return _vc(f'{_title(s)}<div class="myths">{rows}</div>{_foot(s, "tier-foot")}')
 
 
 def L_receipt(s, ctx):
@@ -469,7 +475,7 @@ MAG = ('<svg viewBox="0 0 24 24" width="36" height="36"><circle cx="10" cy="10" 
 def L_search(s, ctx):
     q = html.escape(s["query"])
     sugs = "".join(f'<div class="sug">{MAG}<span>{q}<b>{md(x)}</b></span></div>' for x in s["suggestions"])
-    return f'{_title(s)}<div class="search"><div class="sq">{MAG}<span>{q}</span><span class="caret"></span></div>{sugs}</div>{_foot(s, "search-foot")}'
+    return _vc(f'{_title(s)}<div class="search"><div class="sq">{MAG}<span>{q}</span><span class="caret"></span></div>{sugs}</div>{_foot(s, "search-foot")}')
 
 
 def L_playlist(s, ctx):
@@ -520,13 +526,13 @@ def L_starter(s, ctx):
     tilt = [-2, 1.5, -1, 2, -1.5, 1]
     cells = "".join(f'<div{style(transform=f"rotate({tilt[i % 6]}deg)")}><span class="sticker">{e}</span><p>{md(t)}</p></div>'
                     for i, (e, t) in enumerate(s["items"]))
-    return f'{_title(s)}<div class="sp">{cells}</div>'
+    return _vc(f'{_title(s)}<div class="sp">{cells}</div>{_foot(s, "tier-foot")}')
 
 
 def L_flags(s, ctx):
     g = "".join(f'<li><span class="emo">🟢</span><span>{md(t)}</span></li>' for t in s["green"])
     r = "".join(f'<li><span class="emo">🚩</span><span>{md(t)}</span></li>' for t in s["red"])
-    return (f'{_title(s)}<div class="flags"><div class="col g"><h3>green flags</h3><ul>{g}</ul></div>'
+    return _vc(f'{_title(s)}<div class="flags"><div class="col g"><h3>green flags</h3><ul>{g}</ul></div>'
             f'<div class="col r"><h3>red flags</h3><ul>{r}</ul></div></div>{_foot(s, "tier-foot")}')
 
 
@@ -545,6 +551,7 @@ def fx(t: str) -> str:
     s = re.sub(r"\^\{([^{}]+)\}", r"<sup>\1</sup>", s)
     s = re.sub(r"_\{([^{}]+)\}", r"<sub>\1</sub>", s)
     s = re.sub(r"\{(.+?) // (.+?)\}", r'<span class="fr"><span>\1</span><span>\2</span></span>', s)
+    s = re.sub(r"\b(sin|cos|tan|NOT|AND|OR|XOR|NAND|NOR)\b", r'<span class="up">\1</span>', s)   # operators stay upright
     return s
 
 
@@ -552,10 +559,11 @@ def L_formula(s, ctx):
     cells = []
     for c in s["cells"]:
         note = f'<span class="k">{md(c["note"])}</span>' if c.get("note") else ""
-        cells.append(f'<div class="f{" wide" if c.get("wide") else ""}"{style(background=col(c["bg"]) if c.get("bg") else None)}>'
+        cls = "f" + (" wide" if c.get("wide") else "") + (" words" if c.get("words") else "")
+        cells.append(f'<div class="{cls}"{style(background=col(c["bg"]) if c.get("bg") else None)}>'
                      f'<small>{md(c["name"])}</small><b>{fx(c["f"])}</b>{note}</div>')
-    return (f'<div class="eyebrow">{md(s.get("eyebrow", "save this 📌"))}</div>'
-            f'<h2 class="h-{s.get("size", "m")}" style="margin-top:14px">{md(s["title"])}</h2><div class="fs">{"".join(cells)}</div>{_foot(s, "fs-foot")}')
+    return (f'<div class="fsw{" dense" if s.get("dense") else ""}"><div class="eyebrow">{md(s.get("eyebrow", "save this 📌"))}</div>'
+            f'<h2 class="h-{s.get("size", "m")}" style="margin-top:14px">{md(s["title"])}</h2><div class="fs">{"".join(cells)}</div>{_foot(s, "fs-foot")}</div>')
 
 
 def L_spot(s, ctx):
@@ -606,7 +614,7 @@ def L_meters(s, ctx):
         rows.append(f'<div class="meter"><b>{md(r[0])}</b><div class="track"><div class="fill"{style(width=f"{max(r[1], 0)}%", background=c, border_right="0" if r[1] == 0 else None)}></div></div>'
                     f'<em>{r[1]}%</em></div>')
     sub = f'<p class="sub" style="margin-top:18px">{md(s["sub"])}</p>' if s.get("sub") else ""
-    return f'{_title(s)}{sub}<div class="meters">{"".join(rows)}</div>{_foot(s, "meters-foot")}'
+    return _vc(f'{_title(s)}{sub}<div class="meters">{"".join(rows)}</div>{_foot(s, "meters-foot")}')
 
 
 LAYOUTS = {k[2:]: v for k, v in globals().items() if k.startswith("L_")}
@@ -800,7 +808,8 @@ def render(d: Path, posts: list[dict], only: str, scale: float) -> None:
     out = d / "png"
     out.mkdir(exist_ok=True)
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        exe = os.environ.get("PW_CHROMIUM")   # a preinstalled Chromium when the bundled one is missing
+        browser = pw.chromium.launch(executable_path=exe) if exe else pw.chromium.launch()
         pg = browser.new_page(viewport={"width": 1200, "height": 2000}, device_scale_factor=scale)
         pg.goto((d / "preview.html").as_uri(), wait_until="networkidle")
         missing = pg.evaluate("""async () => { const bad = [];

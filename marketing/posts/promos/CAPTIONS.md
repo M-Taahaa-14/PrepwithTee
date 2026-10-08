@@ -48,3 +48,46 @@ WhatsApp 0320 488 4375
 #alevel #alevelmaths #alevelphysics #alevelcs #lahore #tuition
 
 ---
+
+## pr-04-boarding-pass  (single)
+Files: `png/pr-04-boarding-pass.png`
+
+Your seat on the next batch is waiting. ✈️
+
+Maths, Physics & Computer Science for O Level / IGCSE. Boarding 31 October: syllabus done Nov – Jan, past papers Feb – Apr, then you land in the exam ready.
+
+Groups of 4–6 · 4 classes + 1 test a week · PKR 8,499/month per subject. Free demo first, full refund if your first paid class isn't right.
+
+WhatsApp 0320 488 4375
+
+#olevel #igcse #maths #physics #computerscience #tuition
+
+---
+
+## pr-05-receipt-8499  (single)
+Files: `png/pr-05-receipt-8499.png`
+
+What PKR 8,499 a month actually gets you. 🧾
+
+Per subject, O Level / IGCSE Maths, Physics or Computer Science. New batches start 31 October.
+
+A Level papers run as separate courses from PKR 12,999/month.
+
+Book a free demo → WhatsApp 0320 488 4375
+
+#olevel #igcse #maths #physics #computerscience #tuition
+
+---
+
+## pr-06-chat-classes  (single)
+Files: `png/pr-06-chat-classes.png`
+
+> NOTE: Illustrative chat (the questions people ask most), not a real customer's messages.
+
+The questions everyone asks before joining. 💬 (Answers are real, the chat is a reenactment.)
+
+New batches for O Level, IGCSE and A Level start 31 October. WhatsApp 0320 488 4375 to book a free demo.
+
+#olevel #igcse #alevel #tuition #maths #physics
+
+---
