@@ -1055,3 +1055,14 @@ linked), not agreement with any external file.
       A new `id` re-shows it to everyone. Bump its ?v in nav.html + `python sync_nav.py`.
     - Instagram posters: `marketing/2026-10-classes/posters.html` -> `render.py` -> `png/`
       (gitignored, regenerable); captions in CAPTIONS.md.
+
+43. **Class pages v2 + whiteboard graph with axes - DEPLOYED 2026-10-08 19:16 UTC (commit 90a4154;
+    backup /srv/backup-code-20261008-1916-classes2.tgz).**
+    - `scripts/class_pages.py` owns two generated blocks in each class page (`<!--CP:SHOW-->` = six real
+      screenshots from static/images/classes/ + parents/students + outcomes; `<!--CP:SYL-->` = week-by-week
+      plan for all 13 courses, dated from 31 Oct, plus the Feb-Apr past-paper weeks). Edit the data there and
+      re-run; `--check` reports stale pages. Styles in classes.css (`cp-*`).
+    - pricing.html `#courses` = the new batches (plan strip + 3 subject cards), the old course catalogue is gone.
+    - Board "Graph with axes": `settings.ax = {x0,x1,y0,y1,dx,dy,sub,eq,lab}`; rules + layout in paper.js
+      (checkAxes / axesLayout), annot_pdf.py (clean_axes / axes_layout / _axes, used by whiteboard.clean_settings
+      and PDF export) - keep them identical. Max 60 big squares per axis; infinite canvas draws plain graph.
