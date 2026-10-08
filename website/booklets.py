@@ -69,7 +69,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 200          # the slider stops at the chapter pool; this only guards build time
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20261008b"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20261008c"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600

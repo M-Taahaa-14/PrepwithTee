@@ -1,5 +1,6 @@
 /* builder-review.js — step 2 of the topical builder: "Review & customise".
  *
+ * MOCK TESTS ONLY (tutor, 2026-10-08) - practice booklets build in one step.
  * Step 1 (builder.js) picks chapters, years and papers. This step shows the
  * actual questions before anything is built (tutor, 2026-10-08 - mock tests are
  * mainly for teachers, who need to see what goes in):
@@ -157,11 +158,7 @@ function render() {
   <div class="rv" aria-busy="${rv.busy}">
     <div class="rv-top">
       <button type="button" class="rv-back" data-rv="back">← Chapters</button>
-      <div class="rv-title"><p class="bld-eyebrow">Step 2 of 2</p><h2>Review &amp; customise</h2></div>
-      <div class="bld-kind rv-kind" role="radiogroup" aria-label="Kind of paper">
-        <button type="button" role="radio" data-rv-kind="booklet" aria-checked="${!test}"><b>Practice booklet</b></button>
-        <button type="button" role="radio" data-rv-kind="test" aria-checked="${test}"><b>Mock test</b></button>
-      </div>
+      <div class="rv-title"><p class="bld-eyebrow">Step 2 of 2</p><h2>Review &amp; customise your mock test</h2></div>
     </div>
     ${summaryHTML(t, mins, test)}
     <p class="rv-msg${rv.msg ? " is-on" : ""}" role="status">${esc(rv.msg)}</p>
@@ -479,10 +476,9 @@ export function onImgError(e) {
 }
 
 export function onClick(e) {
-  const t = e.target.closest("[data-rv],[data-rv-kind],[data-rv-step],[data-rv-mode],[data-rv-diff],[data-rv-bdiff],[data-rv-rate]");
+  const t = e.target.closest("[data-rv],[data-rv-step],[data-rv-mode],[data-rv-diff],[data-rv-bdiff],[data-rv-rate]");
   if (!t) return;
   const id = t.dataset.id ? +t.dataset.id : null;
-  if (t.dataset.rvKind) { ctx.onKind(t.dataset.rvKind); render(); return; }
   if (t.dataset.rvMode) { rv.mode = t.dataset.rvMode; save(); render(); return; }
   if (t.dataset.rvDiff) { toggle(rv.diff, t.dataset.rvDiff); save(); render(); return; }
   if (t.dataset.rvBdiff) { toggle(rv.drawer.diff, t.dataset.rvBdiff); browse(true); return; }

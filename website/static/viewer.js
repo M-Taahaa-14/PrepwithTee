@@ -346,7 +346,7 @@ function shell() {
         <button type="button" class="vw-tbtn" data-act="fit" id="vw-z">100%</button>
         <button type="button" class="vw-tbtn" data-act="in" aria-label="Zoom in">+</button>
       </div>
-      ${S.role === "owner" || S.role === "staff" ? `<a class="vw-tbtn" href="${esc(S.editUrl)}"
+      ${TEST && (S.role === "owner" || S.role === "staff") ? `<a class="vw-tbtn" href="${esc(S.editUrl)}"
           title="Back to Review &amp; customise with these questions - build a new version">✎ <span>Edit</span></a>` : ""}
       ${S.can_share ? `<button type="button" class="vw-btn vw-btn-ghost" data-act="share">⇪ <span>Share</span></button>` : ""}
       ${paperButton()}

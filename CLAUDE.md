@@ -1010,7 +1010,8 @@ linked), not agreement with any external file.
     `~/.claude/plans/as-for-the-mock-bubbly-giraffe.md`. **Run `website/migrations/028_test_builder.sql`
     on Supabase before deploying** (question_ratings + booklet_shares; the code degrades to "unrated" /
     no sharing without it).
-    - **Two steps for everyone**: step 1 unchanged (chapters -> Build now); **Review & customise**
+    - **Mock tests only** (tutor, same day: NOT for topical booklets, which keep the one-step build;
+      the viewer's Edit and `?from=` are test-only too). Step 1 unchanged (chapters -> Build now); **Review & customise**
       (`static/builder-review.js`) = mix panel (per chapter/subtopic MCQ + theory steppers, or "to a mark
       total"; difficulty include-chips; Apply mix keeps Locked cards), cards (thumbnail, ref, chapter,
       marks, MCQ badge, difficulty), Preview drawer (full question + MS / MCQ letter), Swap (same bucket +

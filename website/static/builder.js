@@ -10,13 +10,14 @@
  * Two kinds of paper: a practice booklet (mark scheme after each question) or a
  * mock test (exam cover, random questions, mark scheme as a separate file that
  * unlocks when the student finishes). Build -> /papers/view/{id} in a new tab.
- * "Review & customise" (builder-review.js) shows the questions first and lets
- * the user set MCQ / theory per chapter, swap, remove and reorder; ?from=<id>
- * opens it on an existing paper ("Edit this paper").
+ * Mock tests only (tutor, 2026-10-08): "Review & customise" (builder-review.js)
+ * shows the questions first and lets the user set MCQ / theory per chapter,
+ * swap, remove and reorder; ?from=<id> opens it on an existing test ("Edit").
+ * Practice booklets keep the one-step build.
  * The exact pool size comes from POST /api/booklets/count (debounced).
  */
 import { api, UpgradeRequiredError } from "/auth.js?v=20261005c";
-import * as review from "/builder-review.js?v=20261008b";
+import * as review from "/builder-review.js?v=20261008c";
 
 const root = document.getElementById("builder");
 const SYL = root?.dataset.syllabus;
@@ -78,8 +79,8 @@ async function loadFrom(id) {
   if (p.year_from) st.y0 = p.year_from;
   if (p.year_to) st.y1 = p.year_to;
   st.papers = new Set((p.papers || []).map(String));
-  st.kind = b.kind === "test" ? "test" : "booklet";
-  if (p.include_ms === false) st.includeMs = false;
+  if (b.kind !== "test") return false;        // review is for mock tests only
+  st.kind = "test";
   if (!st.picks.size) return false;
   loadRecent();
   openReview(b.question_ids);
@@ -276,18 +277,19 @@ function render() {
           scheme is a separate file that unlocks when you finish.</p>` :
         `<label class="bld-toggle"><input type="checkbox" id="bld-ms" ${st.includeMs ? "checked" : ""}>
           <span>Mark scheme after each question</span></label>`}
-      <button type="button" class="bld-review" id="bld-review" ${canBuild ? "" : "disabled"}>
+      ${test ? `<button type="button" class="bld-review" id="bld-review" ${canBuild ? "" : "disabled"}>
         <b>Review &amp; customise →</b>
-        <span>See every question first · choose MCQ / theory per chapter · swap or remove</span></button>
+        <span>See every question first · choose MCQ / theory per chapter · swap or remove</span></button>` : ""}
       <button type="button" class="cat-btn bld-go" id="bld-go" ${canBuild ? "" : "disabled"}>
-        ${test ? "Build mock test now" : "Build booklet now"} <span aria-hidden="true">↗</span></button>
-      <p class="bld-hint bld-center">Questions picked for you · opens in a new tab</p>
+        ${test ? "Build mock test now" : "Build booklet"} <span aria-hidden="true">↗</span></button>
+      <p class="bld-hint bld-center">${test ? "Questions picked for you · opens" : "Opens"} in a new tab</p>
       <div class="bld-recent" id="bld-recent"></div>
     </aside>
   </div>
   <div class="bld-mbar" ${st.picks.size ? "" : "hidden"}>
     <span><b>${st.picks.size}/${max}</b> chapters · ${pool ? `${st.maxQ} of ${pool.toLocaleString()} Q` : "…"}</span>
-    <button type="button" class="bld-mbar-opt" data-review ${canBuild ? "" : "disabled"}>Review</button>
+    ${test ? `<button type="button" class="bld-mbar-opt" data-review ${canBuild ? "" : "disabled"}>Review</button>`
+           : `<a href="#bld-side" class="bld-mbar-opt">Options</a>`}
     <button type="button" class="cat-btn" data-build ${canBuild ? "" : "disabled"}>Build ↗</button>
   </div>`;
   const fresh = typing && document.getElementById(typing.id);
@@ -378,7 +380,7 @@ root?.addEventListener("input", (e) => {
 root?.addEventListener("click", (e) => {
   if (st.view === "review") return review.onClick(e);
   if (e.target.closest("#bld-review, [data-review]")) {
-    if (st.picks.size && st.pool) openReview();
+    if (st.kind === "test" && st.picks.size && st.pool) openReview();
     return;
   }
   const chip = e.target.closest("[data-sub]");
