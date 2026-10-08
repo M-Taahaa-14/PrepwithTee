@@ -807,6 +807,7 @@ def render(d: Path, posts: list[dict], only: str, scale: float) -> None:
     from playwright.sync_api import sync_playwright
     out = d / "png"
     out.mkdir(exist_ok=True)
+    failed = []
     with sync_playwright() as pw:
         exe = os.environ.get("PW_CHROMIUM")   # a preinstalled Chromium when the bundled one is missing
         browser = pw.chromium.launch(executable_path=exe) if exe else pw.chromium.launch()
@@ -835,9 +836,16 @@ def render(d: Path, posts: list[dict], only: str, scale: float) -> None:
                 else:
                     (out / p["id"]).mkdir(exist_ok=True)
                     path = out / p["id"] / f"{i + 1:02d}.png"
-                sec.screenshot(path=str(path))
+                try:
+                    path.write_bytes(sec.screenshot())
+                except OSError as e:   # Windows: the old PNG is open in a viewer / preview pane
+                    failed.append(path)
+                    print(f"  {path.relative_to(HERE)}   <-- NOT SAVED ({e.strerror}: close any app showing it)")
+                    continue
                 print(f"  {path.relative_to(HERE)}{'   <-- OVERFLOW' if over else ''}")
         browser.close()
+    if failed:
+        print(f"  {len(failed)} file(s) not saved - close them, then re-run with --series {d.name}")
 
 
 def main() -> None:
