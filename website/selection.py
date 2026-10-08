@@ -142,3 +142,105 @@ def order_recent_first(rows: list[dict]) -> list[dict]:
                 str(q.get("sub_part") or ""))
     return sorted(rows, key=key)
 
+
+
+# ── Targeted drafts (the "Review & customise" step) ──────────────────────────
+
+def kind_of(q: dict) -> str:
+    return "mcq" if q.get("mcq") else "theory"
+
+
+def availability(pool: list[dict]) -> dict[str, dict]:
+    """{bucket: {"mcq": n, "theory": n, "mcq_marks": m, "theory_marks": m}}."""
+    out: dict[str, dict] = {}
+    for q in pool:
+        a = out.setdefault(q["bucket"], {"mcq": 0, "theory": 0, "mcq_marks": 0, "theory_marks": 0})
+        k = kind_of(q)
+        a[k] += 1
+        a[f"{k}_marks"] += q.get("marks") or 0
+    return out
+
+
+def default_plan(pool: list[dict], total: int) -> dict[str, dict]:
+    """Split `total` the way select_mixed would (every bucket gets one), then
+    each bucket's share between MCQ and theory in proportion to what it has."""
+    avail = availability(pool)
+    per = quotas({b: a["mcq"] + a["theory"] for b, a in avail.items()}, total)
+    plan = {}
+    for b, n in per.items():
+        a = avail[b]
+        mcq = round(n * a["mcq"] / max(1, a["mcq"] + a["theory"]))
+        mcq = min(mcq, a["mcq"])
+        theory = min(n - mcq, a["theory"])
+        mcq = min(a["mcq"], n - theory)
+        plan[b] = {"mcq": mcq, "theory": theory}
+    return plan
+
+
+def select_targeted(pool: list[dict], plan: dict[str, dict] | None = None,
+                    marks_target: int | None = None, total: int = 20,
+                    seed: int | None = None, locked: list | tuple = ()) -> list[dict]:
+    """Pick questions to a per-bucket MCQ / theory plan.
+
+    `locked` ids are always kept and count towards their own bucket's share.
+    With `marks_target` the plan is only a cap per bucket/kind: questions are
+    added round-robin across buckets until the marks are reached (never going
+    over when a smaller question still fits). Without a plan the split is
+    default_plan(pool, total). Returns rows in no particular order - the caller
+    orders them (sectioned + order_recent_first)."""
+    rng = random.Random(seed)
+    seen, rows = set(), []
+    for q in pool:
+        if q["id"] not in seen:
+            seen.add(q["id"])
+            rows.append(q)
+    by_id = {q["id"]: q for q in rows}
+    keep = [by_id[i] for i in dict.fromkeys(locked) if i in by_id]
+    if plan is None:
+        plan = default_plan(rows, total if marks_target is None else len(rows))
+    groups: dict[tuple, list] = defaultdict(list)
+    kept_ids = {q["id"] for q in keep}
+    for q in rows:
+        if q["id"] not in kept_ids:
+            groups[(q["bucket"], kind_of(q))].append(q)
+    for k in groups:
+        groups[k] = _weighted_order(groups[k], rng)
+    used = defaultdict(int)
+    for q in keep:
+        used[(q["bucket"], kind_of(q))] += 1
+
+    def cap(key):
+        return max(0, int((plan.get(key[0]) or {}).get(key[1]) or 0))
+
+    chosen = list(keep)
+    if marks_target is None:
+        for key, cands in groups.items():
+            chosen.extend(cands[:max(0, cap(key) - used[key])])
+        return chosen
+
+    marks = sum(q.get("marks") or 0 for q in chosen)
+    keys = [k for k in groups if cap(k) > used[k]]
+    rng.shuffle(keys)
+    while marks < marks_target and keys:
+        nxt = []
+        for key in keys:
+            if marks >= marks_target:
+                break
+            cands, room = groups[key], marks_target - marks
+            fit = next((i for i, q in enumerate(cands) if (q.get("marks") or 0) <= room), None)
+            if fit is None:
+                continue
+            q = cands.pop(fit)
+            chosen.append(q)
+            marks += q.get("marks") or 0
+            used[key] += 1
+            if cands and used[key] < cap(key):
+                nxt.append(key)
+        keys = nxt
+    return chosen
+
+
+def sectioned(rows: list[dict]) -> list[dict]:
+    """Section A (multiple choice) before Section B (structured); each section
+    keeps the order it was given."""
+    return [q for q in rows if q.get("mcq")] + [q for q in rows if not q.get("mcq")]

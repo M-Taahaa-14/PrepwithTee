@@ -75,9 +75,37 @@ def select(con, args, topics):
             log.warning("only %d questions available; asked for %d", k, args.count)
         chosen = order[:k]
 
-    # Stable order so the test reads paper-by-paper and the MS lines up.
-    chosen.sort(key=lambda q: (q["year"], q["session"], q["variant"], q["number"]))
+    # Stable order so the test reads paper-by-paper and the MS lines up;
+    # multiple choice first (Section A), structured after (Section B).
+    chosen.sort(key=lambda q: (not config.is_mcq(args.syllabus, q["paper"], q["year"]),
+                               q["year"], q["session"], q["variant"], q["number"]))
     return chosen
+
+
+def sections(syllabus, chosen):
+    """[(title, first_seq, count, marks)] when a test mixes multiple choice and
+    structured questions (tutor, 2026-10-08: exam-style Section A / Section B);
+    [] for a single-kind test, which prints exactly as before. Expects the MCQs
+    first - the web builder and select() both order them that way."""
+    mcq = [config.is_mcq(syllabus, q["paper"], q["year"]) for q in chosen]
+    if all(mcq) or not any(mcq):
+        return []
+    n = sum(mcq)
+    marks = lambda qs: sum(q["marks"] or 0 for q in qs)          # noqa: E731
+    return [("Section A — Multiple choice", 1, n, marks(chosen[:n])),
+            ("Section B — Structured questions", n + 1, len(chosen) - n, marks(chosen[n:]))]
+
+
+def _with_marks(syllabus, rows):
+    """Plain dicts, with an MCQ worth one mark even where the paper never
+    printed "[1]" (many MCQ rows have marks NULL)."""
+    out = []
+    for r in rows:
+        d = dict(r)
+        if not d.get("marks") and config.is_mcq(syllabus, d["paper"], d["year"]):
+            d["marks"] = 1
+        out.append(d)
+    return out
 
 
 def cover(doc, args, subject, topics, chosen, *, is_ms):
@@ -225,6 +253,8 @@ def cover(doc, args, subject, topics, chosen, *, is_ms):
         f"The total mark for this {'mark scheme' if is_ms else 'paper'} is {total_m}.",
         "The number of marks is given in brackets [  ] at the end of each question or part.",
     ]
+    for title, _first, count, marks in sections(args.syllabus, chosen):
+        info.append(f"{title}: {count} question{'s' if count != 1 else ''}, {marks} marks.")
     if not is_ms:
         info.append(
             f"Questions are drawn from Cambridge past papers: {args.syllabus} ({span}).")
@@ -274,13 +304,24 @@ def _get_insert(con, cache, syl, year, session, paper):
     return (idoc, p2map)
 
 
+def _section_heading(b, secs, seq, new_page):
+    """Print a section's heading before its first question."""
+    for title, first, count, marks in secs:
+        if first == seq:
+            if new_page and b.page is not None and b.page_has_content:
+                b.new_page()
+            b.topic_header(f"{title}  ·  {marks} marks")
+
+
 def render_test(con, args, subject, topics, chosen, cache):
     b = Booklet()
     shown_inserts: set = set()
     ins_cache: dict = {}
+    secs = sections(args.syllabus, chosen)
 
     for seq, q in enumerate(chosen, 1):
         _progress("question", seq, len(chosen))
+        _section_heading(b, secs, seq, new_page=True)
         syl = args.syllabus
         year, session, paper = q["year"], q["session"], q["paper"]
         sd = config.session_display(session)
@@ -322,7 +363,7 @@ def render_test(con, args, subject, topics, chosen, cache):
         ref = config.source_ref(syl, code, q["session"], q["year"],
                                 q["number"], q["sub_part"] or "")
         if q["marks"]:
-            ref += f"   [{q['marks']} marks]"
+            ref += f"   [{q['marks']} mark{'' if q['marks'] == 1 else 's'}]"
         first_h = (rects[0]["y1"] - rects[0]["y0"]) if rects else 40.0
         b.question_header(seq, ref, first_h)
         if rects:
@@ -370,8 +411,11 @@ def render_ms(con, args, subject, topics, chosen, cache):
     b = Booklet()
     missing = 0
     mcq_answers = []          # [(seq, letter, ref)] for the grid at the back
+    secs = sections(args.syllabus, chosen)
 
     for seq, q in enumerate(chosen, 1):
+        # MCQ letters go to the grid at the back: only Section B gets a heading here
+        _section_heading(b, secs[1:], seq, new_page=False)
         code = f"{q['paper']}{q['variant']}"
         ref = config.source_ref(args.syllabus, code, q["session"], q["year"],
                                 q["number"], q["sub_part"] or "")
@@ -503,6 +547,7 @@ def main():
                              "(not in the database, or their original papers are missing)")
     else:
         chosen = select(con, args, topics)
+    chosen = _with_marks(args.syllabus, chosen)
     subject = taxonomy.get("subject", args.syllabus)
     cache: dict[str, fitz.Document] = {}
 

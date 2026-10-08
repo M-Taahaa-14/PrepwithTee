@@ -45,6 +45,7 @@ import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -58,16 +59,17 @@ import auth as _auth
 import catalog as _catalog
 import db as _db
 import users_db as _udb
-from selection import order_recent_first, select_mixed
+from pipeline import config as _pcfg
+from selection import order_recent_first, sectioned, select_mixed
 
 router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
-MAX_QUESTIONS = 80
+MAX_QUESTIONS = 200          # the slider stops at the chapter pool; this only guards build time
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20261005c"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20261008b"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -169,11 +171,24 @@ class BookletReq(Selection):
     include_ms: bool = True
     seed: int | None = None
     kind: Literal["booklet", "test"] = "booklet"
+    # The exact questions, in order, from the "Review & customise" step. Each
+    # must be in this selection's pool; MCQs are moved ahead of theory.
+    ids: list[int] | None = None
 
     @field_validator("max_questions")
     @classmethod
     def _maxq(cls, v):
         if not 1 <= v <= MAX_QUESTIONS:
+            raise ValueError(f"between 1 and {MAX_QUESTIONS} questions")
+        return v
+
+    @field_validator("ids")
+    @classmethod
+    def _ids(cls, v):
+        if v is None:
+            return v
+        v = list(dict.fromkeys(v))
+        if not 1 <= len(v) <= MAX_QUESTIONS:
             raise ValueError(f"between 1 and {MAX_QUESTIONS} questions")
         return v
 
@@ -196,13 +211,29 @@ def require_enrolled(user: dict, syllabus: str) -> None:
             "url": _catalog.subject_url(syllabus)})
 
 
-def _owned(booklet_id: str, user: dict) -> dict:
+def _share_of(booklet_id: str, user: dict) -> dict | None:
+    """The student's share row for someone else's booklet (assigned / by link)."""
+    try:
+        return _udb.get_booklet_share(booklet_id, user["id"])
+    except Exception as exc:                  # migration 028 not applied yet
+        print(f"[booklets] shares unavailable: {exc}", flush=True)
+        return None
+
+
+def _owned(booklet_id: str, user: dict, shared: bool = True) -> dict:
+    """The booklet, if this user may open it: its owner, staff, or (shared=True)
+    a student it was shared with. Anything else is a 404, never a 403."""
     if not re.fullmatch(r"[A-Za-z0-9_-]{6,16}", booklet_id or ""):
         raise HTTPException(404, "Booklet not found")
     b = _udb.get_booklet(booklet_id)
-    if b is None or (b["user_id"] != user["id"] and not _staff(user)):
+    if b is None:
         raise HTTPException(404, "Booklet not found")
-    return b
+    if b["user_id"] == user["id"] or _staff(user):
+        return b
+    share = _share_of(booklet_id, user) if shared else None
+    if share is None:
+        raise HTTPException(404, "Booklet not found")
+    return {**b, "_share": share}
 
 
 # PDF.js asks for a booklet in many byte-range requests; looking the row up in
@@ -210,21 +241,32 @@ def _owned(booklet_id: str, user: dict) -> dict:
 # kind never change, so remember them briefly.
 _READY: dict[str, tuple[float, dict]] = {}
 _READY_TTL = 300
+_READY_SHARES: dict[tuple, tuple[float, dict | None]] = {}
 
 
 def _owned_ready(booklet_id: str, user: dict) -> dict:
     hit = _READY.get(booklet_id)
     if hit and time.time() - hit[0] < _READY_TTL:
         b = hit[1]
-        if b["user_id"] != user["id"] and not _staff(user):
+        if b["user_id"] == user["id"] or _staff(user):
+            return b
+        key = (booklet_id, user["id"])         # a shared student: their row, cached too
+        sh = _READY_SHARES.get(key)
+        if not sh or time.time() - sh[0] >= _READY_TTL:
+            sh = (time.time(), _share_of(booklet_id, user))
+            _READY_SHARES[key] = sh
+        if sh[1] is None:
             raise HTTPException(404, "Booklet not found")
-        return b
+        return {**b, "_share": sh[1]}
     b = _owned(booklet_id, user)
     if b["status"] != "ready":
         raise HTTPException(409, "This booklet is still being built.")
     if len(_READY) > 2000:
         _READY.clear()
-    _READY[booklet_id] = (time.time(), b)
+        _READY_SHARES.clear()
+    _READY[booklet_id] = (time.time(), {k: v for k, v in b.items() if k != "_share"})
+    if "_share" in b:
+        _READY_SHARES[(booklet_id, user["id"])] = (time.time(), b["_share"])
     return b
 
 
@@ -273,7 +315,7 @@ def question_pool(sel: Selection) -> list[dict]:
     con = _db.plain_connect()
     try:
         rows = con.execute(
-            f"""SELECT q.id, q.number, q.sub_part, q.marks, c.topic, c.secondary_topic, c.subtopic,
+            f"""SELECT q.id, q.number, q.sub_part, q.marks, q.text, c.topic, c.secondary_topic, c.subtopic,
                        p.year, p.session, p.paper, p.variant, p.rel_path
                 FROM questions q
                 JOIN classifications c ON c.question_id = q.id
@@ -299,11 +341,35 @@ def question_pool(sel: Selection) -> list[dict]:
             bucket = f"{home} › {r['subtopic']}"
         else:
             bucket = home
+        mcq = _pcfg.is_mcq(sel.syllabus, r["paper"], r["year"])
         pool.append({"id": r["id"], "bucket": bucket, "year": r["year"],
                      "session": r["session"], "paper": r["paper"], "variant": r["variant"],
                      "number": r["number"], "sub_part": r["sub_part"],
-                     "marks": r["marks"], "chapter": home})
+                     # an MCQ is one mark even where the paper never printed "[1]"
+                     "marks": r["marks"] or (1 if mcq else None), "mcq": mcq,
+                     "chapter": home, "subtopic": r["subtopic"],
+                     "text": " ".join((r["text"] or "").split())[:400]})
     return pool
+
+
+def chosen_from_ids(sel: "BookletReq", pool: list[dict]) -> list[dict]:
+    """The questions the user lined up, in their order (MCQ section first).
+    Anything outside the selection's pool is refused: ids are not trusted."""
+    by_id = {q["id"]: q for q in pool}
+    bad = [i for i in sel.ids if i not in by_id]
+    if bad:
+        raise HTTPException(422, f"{len(bad)} question(s) are not in this selection any more "
+                                 "(years, papers or chapters changed). Review the list again.")
+    return sectioned([by_id[i] for i in sel.ids])
+
+
+def pick_questions(req: "BookletReq", pool: list[dict], seed: int) -> list[dict]:
+    """The builder's choice: the reviewed list as given, else a random mix.
+    A mock test always reads Section A (MCQ) then Section B (theory)."""
+    if req.ids:
+        return chosen_from_ids(req, pool)
+    chosen = order_recent_first(select_mixed(pool, req.max_questions, seed))
+    return sectioned(chosen) if req.kind == "test" else chosen
 
 
 # ── API ───────────────────────────────────────────────────────────────────────
@@ -392,7 +458,7 @@ def _create_booklet(req: BookletReq, user: dict, known: dict) -> dict:
     seed = req.seed if req.seed is not None else secrets.randbits(31)
     # Which questions: still a mix covering every picked chapter. Their order:
     # newest paper first, never shuffled.
-    chosen = order_recent_first(select_mixed(pool, req.max_questions, seed))
+    chosen = pick_questions(req, pool, seed)
     subj = _catalog.SUBJECTS[req.syllabus]
     title = (("Mock test: " if req.kind == "test" else "")
              + " · ".join(known[p.chapter]["display"] for p in req.picks)
@@ -401,7 +467,8 @@ def _create_booklet(req: BookletReq, user: dict, known: dict) -> dict:
     _udb.create_booklet({
         "id": booklet_id, "user_id": user["id"], "syllabus": req.syllabus,
         "title": title, "seed": seed,
-        "params_json": {**req.model_dump(), "total_marks": sum(q["marks"] or 0 for q in chosen)},
+        "params_json": {**req.model_dump(exclude={"ids"}), "reviewed": bool(req.ids),
+                        "total_marks": sum(q["marks"] or 0 for q in chosen)},
         "question_ids": [q["id"] for q in chosen], "status": "queued",
         "progress": 0, "stage": "Picking questions"})
     _EXEC.submit(_build_safely, booklet_id, user)
@@ -416,7 +483,21 @@ def my_booklets(user: dict = Depends(_auth.get_current_user)):
          "status": b["status"], "created_at": b["created_at"], "kind": _kind(b),
          "questions": len(b.get("question_ids") or []), "url": f"/papers/view/{b['id']}",
          "available": not expired(b)}
-        for b in _udb.list_booklets(user["id"])]}
+        for b in _udb.list_booklets(user["id"])],
+        "shared": _shared_list(user)}
+
+
+def _shared_list(user: dict) -> list[dict]:
+    try:
+        rows = _udb.list_shared_booklets(user["id"])
+    except Exception as exc:                  # migration 028 not applied yet
+        print(f"[booklets] shared list unavailable: {exc}", flush=True)
+        return []
+    return [{"id": b["id"], "title": b["title"], "syllabus": b["syllabus"], "status": b["status"],
+             "created_at": b["shared"].get("created_at"), "kind": _kind(b),
+             "questions": len(b.get("question_ids") or []), "url": f"/papers/view/{b['id']}",
+             "available": not expired(b), "via": b["shared"].get("via"),
+             "finished": bool(b["shared"].get("finished_at"))} for b in rows]
 
 
 @router.get("/api/booklets/{booklet_id}")
@@ -424,8 +505,9 @@ def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)
     b = _owned(booklet_id, user)
     return {**{k: b.get(k) for k in ("id", "title", "syllabus", "status", "progress", "stage",
                                      "params_json", "page_map_json", "created_at")},
+            "question_ids": b.get("question_ids") or [],
             "error": failure(b)["message"] if b["status"] == "failed" else None,
-            "kind": _kind(b)}
+            "kind": _kind(b), **_viewer_role(b, user)}
 
 
 @router.get("/api/booklets/{booklet_id}/status")
@@ -454,7 +536,7 @@ def booklet_retry(booklet_id: str, user: dict = Depends(_auth.get_current_user))
     quota is taken now - only a successful build is ever counted - but the
     allowance must still have room for it (a failed build never counted, so a
     retry is a new build as far as the limit goes)."""
-    b = _fail_if_stuck(_owned(booklet_id, user))
+    b = _fail_if_stuck(_owned(booklet_id, user, shared=False))
     if b["status"] != "failed":
         raise HTTPException(409, "This paper isn't in a failed state.")
     counted = not (b.get("params_json") or {}).get("set_by")      # tutor-set papers are free
@@ -474,6 +556,8 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", an
     b = _owned_ready(booklet_id, user)
     if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
         raise HTTPException(404, "No such part")
+    if part == "ms" and not ms_allowed(b, user):
+        raise HTTPException(403, {"code": "ms_locked", "message": ms_locked_message(b)})
     pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
     if not pdf.exists():
         raise HTTPException(410, f"This paper was not opened for {RETENTION_DAYS} days, so its PDF has "
@@ -778,6 +862,7 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
     b = _owned(booklet_id, user)
     if expired(b):
         return _record_page(b, user)
+    mark_opened(b, user)
     import blog as _blog
     esc = _catalog._e
     subj = _catalog.SUBJECTS.get(b["syllabus"], {})
@@ -787,6 +872,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
              "totalMarks": (b.get("params_json") or {}).get("total_marks"),
              "subjectUrl": _catalog.subject_url(b["syllabus"]) if subj else "/papers",
              "rebuildUrl": _rebuild_url(b),
+             "editUrl": _edit_url(b),
+             **_viewer_role(b, user),
              # prefill for the "Tell us about this problem" form on a failed build
              "me": {"name": user.get("full_name") or user.get("name") or "",
                     "email": user.get("email") or ""}}
@@ -827,6 +914,12 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 
 # ── My papers (history) ───────────────────────────────────────────────────────
 
+def _edit_url(b: dict) -> str:
+    """The builder's review step, loaded with this paper's questions."""
+    base = _catalog.subject_url(b["syllabus"]) if b["syllabus"] in _catalog.SUBJECTS else "/papers/topical"
+    return f"{base}?from={b['id']}#builder"
+
+
 def _rebuild_url(b: dict) -> str:
     """The builder, pre-ticked with the same chapters (and mode)."""
     from urllib.parse import urlencode
@@ -846,6 +939,36 @@ def _date(ts) -> str:
         return f"{d.day} {d.strftime('%b %Y')}"
     except Exception:
         return str(ts or "")[:10]
+
+
+def _shared_card(b: dict) -> str:
+    """A paper a teacher shared with this student (assigned or by link)."""
+    import ui
+    esc = _catalog._e
+    params = b.get("params_json") or {}
+    test = _kind(b) == "test"
+    sh = b.get("shared") or {}
+    subj = _catalog.SUBJECTS.get(b["syllabus"], {})
+    chapters = [p["chapter"] for p in params.get("picks", []) if p.get("chapter")]
+    n = len(b.get("question_ids") or [])
+    bid = esc(b["id"])
+    ready = b["status"] == "ready" and not expired(b)
+    badge = ('<span class="mp-badge mp-ready">Finished</span>' if sh.get("finished_at") else
+             '<span class="mp-badge mp-building">From your teacher</span>')
+    acts = (f'<a class="cat-btn" href="/papers/view/{bid}">Open</a>' if ready else
+            '<span class="cat-note">No longer available - ask your teacher.</span>')
+    return f"""
+    <article class="mp-card is-{'ready' if ready else 'record'} cat-tone-{subj.get('tone', 'blue')}"
+             data-syllabus="{esc(b['syllabus'])}" data-kind="shared">
+      <div class="mp-ic">{ui.icon("test" if test else "topical")}</div>
+      <div class="mp-body">
+        <p class="mp-top"><span class="cat-code">{esc(b['syllabus'])}</span>
+          <span class="mp-kind">{'Mock test' if test else 'Topical paper'}</span>{badge}</p>
+        <h3>{esc(' · '.join(chapters) or b['title'] or 'Topical paper')}</h3>
+        <p class="mp-meta">{esc(subj.get('plain', ''))} · shared {_date(sh.get('created_at'))} · {n} questions</p>
+        <div class="mp-acts">{acts}</div>
+      </div>
+    </article>"""
 
 
 def _paper_card(b: dict, inked: set[str]) -> str:
@@ -942,7 +1065,11 @@ def my_papers_page(syllabus: str = "", user: dict | None = Depends(_auth.maybe_u
         inked = _udb.annotated_docs(user["id"], "booklet:")
     except Exception:
         inked = set()
-    codes = sorted({b["syllabus"] for b in rows})
+    try:
+        shared = _udb.list_shared_booklets(user["id"], 100)
+    except Exception:                          # migration 028 not applied yet
+        shared = []
+    codes = sorted({b["syllabus"] for b in rows + shared})
     live = [b for b in rows if not expired(b)]
     old = [b for b in rows if expired(b)]
     chips = "".join(
@@ -953,15 +1080,20 @@ def my_papers_page(syllabus: str = "", user: dict | None = Depends(_auth.maybe_u
            f'aria-pressed="{str(syllabus not in codes).lower()}">All subjects</button>{chips}</div>'
            f'<div class="yr-chips"><button type="button" class="yr-chip" data-mp-kind="" aria-pressed="true">All</button>'
            f'<button type="button" class="yr-chip" data-mp-kind="booklet" aria-pressed="false">Topical</button>'
-           f'<button type="button" class="yr-chip" data-mp-kind="test" aria-pressed="false">Mock tests</button></div>'
-           f'</div>') if rows else ""
-    empty = ("" if rows else
+           f'<button type="button" class="yr-chip" data-mp-kind="test" aria-pressed="false">Mock tests</button>'
+           + (f'<button type="button" class="yr-chip" data-mp-kind="shared" aria-pressed="false">Shared with me</button>'
+              if shared else "") + '</div>'
+           f'</div>') if rows or shared else ""
+    empty = ("" if rows or shared else
              '<div class="ui-empty"><h2>No papers yet</h2><p>Topical papers and mock tests you build appear '
              'here, together with your annotations. Build your first one from a subject page.</p>'
              '<div class="cat-actions"><a class="cat-btn" href="/papers/topical">Build a topical paper</a>'
              '<a class="cat-btn cat-btn-ghost" href="/papers/mock-tests">Make a mock test</a></div></div>')
     sec_live = (f'<section class="mp-sec"><h2 class="ui-h2">Ready to open</h2><div class="mp-list">'
                 f'{"".join(_paper_card(b, inked) for b in live)}</div></section>') if live else ""
+    sec_shared = (f'<section class="mp-sec"><h2 class="ui-h2">Shared with me</h2>'
+                  f'<p class="cat-note mp-note">Papers and tests your teacher gave you.</p><div class="mp-list">'
+                  f'{"".join(_shared_card(b) for b in shared)}</div></section>') if shared else ""
     sec_old = (f'<section class="mp-sec"><h2 class="ui-h2">Older - kept as a record</h2>'
                f'<p class="cat-note mp-note">Not opened for {RETENTION_DAYS} days, so the PDF was removed.</p>'
                f'<div class="mp-list">{"".join(_paper_card(b, inked) for b in old)}</div></section>') if old else ""
@@ -982,6 +1114,7 @@ def my_papers_page(syllabus: str = "", user: dict | None = Depends(_auth.maybe_u
     </header>
     {bar}
     {empty}
+    {sec_shared}
     {sec_live}
     {sec_old}
     <p class="cat-note mp-none" hidden>Nothing matches those filters.</p>
@@ -1009,3 +1142,189 @@ def _record_page(b: dict, user: dict) -> HTMLResponse:
         crumbs=[("Home", "/"), ("Past papers", "/papers"), ("My papers", "/my-papers"),
                 ("Record", f"/papers/view/{b['id']}")]),
         headers={"Cache-Control": "private, no-store"})
+
+
+# ── Sharing (test builder v2, tutor 2026-10-08) ──────────────────────────────
+# A teacher builds a paper once and gives it to students: assigned (one homework
+# per student, from their roster or groups) or through a share link. Each
+# student opens the SAME PDF with their own ink. For a mock test the teacher
+# decides when the mark scheme opens: after the student presses Finish
+# (default), straight away, or never (teacher_only). Enforced here - the old
+# unlock was only in the browser.
+
+def ms_allowed(b: dict, user: dict) -> bool:
+    share = b.get("_share")
+    if share is None:                      # owner or staff
+        return True
+    policy = share.get("ms_policy") or "after_finish"
+    return policy == "now" or (policy == "after_finish" and bool(share.get("finished_at")))
+
+
+def ms_locked_message(b: dict) -> str:
+    policy = (b.get("_share") or {}).get("ms_policy")
+    if policy == "teacher_only":
+        return "Your teacher keeps the mark scheme for this test - they will go through it with you."
+    return "The mark scheme opens when you press Finish test."
+
+
+def _viewer_role(b: dict, user: dict) -> dict:
+    share = b.get("_share")
+    if share is None:
+        mine = b["user_id"] == user["id"]
+        return {"role": "owner" if mine else "staff",
+                "can_share": user.get("role") in ("teacher", "admin")
+                             and (mine or user.get("role") == "admin")}
+    return {"role": "shared", "can_share": False,
+            "ms_policy": share.get("ms_policy") or "after_finish",
+            "finished": bool(share.get("finished_at")),
+            "ms_open": ms_allowed(b, user)}
+
+
+def _owner_for_sharing(booklet_id: str, user: dict) -> dict:
+    if user.get("role") not in ("teacher", "admin"):
+        raise HTTPException(403, "Only teachers can share papers.")
+    b = _owned(booklet_id, user, shared=False)
+    if b["user_id"] != user["id"] and user.get("role") != "admin":
+        raise HTTPException(403, "Only the teacher who built this paper can share it.")
+    return b
+
+
+class AssignReq(BaseModel):
+    student_ids: list[str] = []
+    group_ids: list[int] = []
+    due_date: str | None = None
+    instructions: str | None = None
+    ms_policy: Literal["after_finish", "now", "teacher_only"] = "after_finish"
+
+
+def _roster(user: dict) -> dict[str, dict]:
+    return {s["student_id"]: s for s in _udb.get_teacher_students(user["id"])}
+
+
+@router.get("/api/booklets/{booklet_id}/shares")
+def booklet_shares(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
+    """The owner's panel: who has it, the link, and whom they could give it to."""
+    b = _owner_for_sharing(booklet_id, user)
+    params = b.get("params_json") or {}
+    token = params.get("share_token")
+    roster = _roster(user)
+    return {
+        "shares": [{"student_id": s["student_id"], "name": s.get("name"), "email": s.get("email"),
+                    "via": s.get("via"), "ms_policy": s.get("ms_policy"),
+                    "opened_at": s.get("opened_at"), "finished_at": s.get("finished_at")}
+                   for s in _udb.list_booklet_shares(booklet_id)],
+        "link": f"/papers/s/{token}" if token else None,
+        "link_ms_policy": params.get("link_ms_policy") or "after_finish",
+        "students": sorted(({"id": sid, "name": r.get("name"), "email": r.get("email"),
+                             "syllabus": r.get("syllabus")} for sid, r in roster.items()),
+                           key=lambda r: (r["name"] or "").lower()),
+        "groups": [{"id": g["id"], "name": g["name"], "syllabus": g.get("syllabus")}
+                   for g in _udb.get_teacher_groups(user["id"])],
+    }
+
+
+@router.post("/api/booklets/{booklet_id}/assign")
+def booklet_assign(booklet_id: str, req: AssignReq, user: dict = Depends(_auth.get_current_user)):
+    """Give the paper to students as homework. Built once; nothing is rebuilt."""
+    b = _owner_for_sharing(booklet_id, user)
+    admin = user.get("role") == "admin"
+    roster = _roster(user)
+    want: list[str] = list(dict.fromkeys(req.student_ids))
+    for gid in dict.fromkeys(req.group_ids):
+        g = _udb.get_group(gid)
+        if not g or (g.get("teacher_id") != user["id"] and not admin):
+            raise HTTPException(403, "That group is not yours.")
+        want += [m["student_id"] for m in _udb.get_group_members(gid) if m.get("student_id")]
+    want = [s for s in dict.fromkeys(want) if s != b["user_id"]]
+    if not want:
+        raise HTTPException(400, "Pick at least one student or group.")
+    if not admin and any(s not in roster for s in want):
+        raise HTTPException(403, "You can only give papers to your own students.")
+    test = _kind(b) == "test"
+    title = (b["title"] or "Topical paper").split(" — ")[0]
+    picks = [p["chapter"] for p in (b.get("params_json") or {}).get("picks", [])]
+    done = 0
+    for sid in want:
+        if admin and not _udb.get_user(sid):
+            continue
+        hw = _udb.create_assignment({
+            "user_id": sid, "syllabus": b["syllabus"], "kind": "homework",
+            "title": title, "instructions": (req.instructions or "").strip() or None,
+            "topics_json": json.dumps(picks),
+            "attachments_json": json.dumps([{"type": "paper", "booklet_id": b["id"],
+                                             "name": b["title"]}]),
+            "due_date": req.due_date or None, "status": "assigned", "assigned_by": user["id"]})
+        _udb.upsert_booklet_share({"booklet_id": b["id"], "student_id": sid, "via": "assign",
+                                   "assignment_id": (hw or {}).get("id"),
+                                   "ms_policy": req.ms_policy if test else "now"})
+        _READY_SHARES.pop((b["id"], sid), None)
+        done += 1
+    return {"ok": True, "assigned": done}
+
+
+class LinkReq(BaseModel):
+    ms_policy: Literal["after_finish", "now", "teacher_only"] | None = None     # None = keep
+
+
+@router.post("/api/booklets/{booklet_id}/link")
+def booklet_link(booklet_id: str, req: LinkReq | None = None,
+                 user: dict = Depends(_auth.get_current_user)):
+    """Turn the share link on (or change its mark-scheme rule). Same link each time."""
+    req = req or LinkReq()
+    b = _owner_for_sharing(booklet_id, user)
+    params = dict(b.get("params_json") or {})
+    params["share_token"] = params.get("share_token") or secrets.token_urlsafe(9)
+    params["link_ms_policy"] = req.ms_policy or params.get("link_ms_policy") or "after_finish"
+    _udb.update_booklet(booklet_id, {"params_json": params})
+    _READY.pop(booklet_id, None)
+    return {"link": f"/papers/s/{params['share_token']}", "ms_policy": params["link_ms_policy"]}
+
+
+@router.delete("/api/booklets/{booklet_id}/link")
+def booklet_unlink(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
+    """Switch the link off. Students who already joined keep the paper."""
+    b = _owner_for_sharing(booklet_id, user)
+    params = {k: v for k, v in (b.get("params_json") or {}).items() if k != "share_token"}
+    _udb.update_booklet(booklet_id, {"params_json": params})
+    _READY.pop(booklet_id, None)
+    return {"ok": True}
+
+
+@router.get("/papers/s/{token}")
+def join_by_link(token: str, user: dict | None = Depends(_auth.maybe_user)):
+    if not re.fullmatch(r"[A-Za-z0-9_-]{8,24}", token or ""):
+        raise HTTPException(404, "This link isn't valid.")
+    if user is None:
+        return RedirectResponse(f"/login.html?next=/papers/s/{token}", 302)
+    b = _udb.get_booklet_by_share_token(token)
+    if b is None:
+        raise HTTPException(404, "This link has been switched off by your teacher.")
+    if b["user_id"] != user["id"] and _udb.get_booklet_share(b["id"], user["id"]) is None:
+        policy = (b.get("params_json") or {}).get("link_ms_policy") or "after_finish"
+        _udb.upsert_booklet_share({"booklet_id": b["id"], "student_id": user["id"], "via": "link",
+                                   "ms_policy": policy if _kind(b) == "test" else "now"})
+    return RedirectResponse(f"/papers/view/{b['id']}", 302)
+
+
+@router.post("/api/booklets/{booklet_id}/finish")
+def booklet_finish(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
+    """The student finished the test: record it, and open the scheme if allowed."""
+    b = _owned(booklet_id, user)
+    share = b.get("_share")
+    if share is not None and not share.get("finished_at"):
+        now = datetime.now(timezone.utc).isoformat()
+        _udb.update_booklet_share(booklet_id, user["id"], {"finished_at": now})
+        b = {**b, "_share": {**share, "finished_at": now}}
+        _READY_SHARES.pop((booklet_id, user["id"]), None)
+    return {"ok": True, "ms_open": ms_allowed(b, user)}
+
+
+def mark_opened(b: dict, user: dict) -> None:
+    """First time a shared student opens the paper (the teacher's list shows it)."""
+    share = b.get("_share")
+    if share is not None and not share.get("opened_at"):
+        try:
+            _udb.update_booklet_share(b["id"], user["id"],
+                                      {"opened_at": datetime.now(timezone.utc).isoformat()})
+        except Exception as exc:
+            print(f"[booklets] opened_at not saved: {exc}", flush=True)

@@ -312,6 +312,9 @@ a.cat-subj .cat-subj-meta { color: var(--grey); }
 .mqs-chips button[aria-pressed="true"], .mqs-seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .mqs-chips button[aria-pressed="true"] small { color: inherit; opacity: .8; }
 .mqs-chips button:focus-visible, .mqs-seg button:focus-visible, .mqs-tabs button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mqs-qty { display: flex; align-items: center; gap: .6rem; margin-top: .5rem; }
+.mqs-qty input[type=range] { flex: 1; min-width: 150px; accent-color: var(--accent); }
+.mqs-qty-n { font-weight: 800; min-width: 2.2ch; text-align: right; color: var(--ink); }
 .mqs-seg { display: inline-flex; flex-wrap: wrap; gap: .3rem; }
 .mqs-summary { margin: 0; padding: .7rem .9rem; border-radius: 12px; background: var(--cream); font-size: .9rem; color: var(--grey); }
 .mqs-summary b { color: var(--ink); }

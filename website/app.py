@@ -89,6 +89,8 @@ app.include_router(_blog_mod.router)
 app.include_router(_fc_mod.router)
 import catalog as _catalog_mod
 import booklets as _booklets_mod
+import question_bank as _qbank_mod
+app.include_router(_qbank_mod.router)   # /api/booklets/draft before /api/booklets/{id}
 # booklets first: /papers/view/{id} must win over catalog's /papers/{board}/{subject}
 app.include_router(_booklets_mod.router)
 import ai_help as _ai_help_mod

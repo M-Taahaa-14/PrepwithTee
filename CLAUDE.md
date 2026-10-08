@@ -1003,3 +1003,38 @@ linked), not agreement with any external file.
     Supabase. Server dirs `data/ink_assets` + `data/feedback-snips` created (owner prepwithtee).
     Code backup: `/srv/backup-code-20261005-1839-board.tgz`. Live checks: /whiteboard (JSON-LD),
     /features, sitemap, all new assets 200, no errors in journalctl after restart.
+
+
+41. **Test builder v2: preview, customise, share (tutor, 2026-10-08, local, not deployed).** Plan:
+    `~/.claude/plans/as-for-the-mock-bubbly-giraffe.md`. **Run `website/migrations/028_test_builder.sql`
+    on Supabase before deploying** (question_ratings + booklet_shares; the code degrades to "unrated" /
+    no sharing without it).
+    - **Two steps for everyone**: step 1 unchanged (chapters -> Build now); **Review & customise**
+      (`static/builder-review.js`) = mix panel (per chapter/subtopic MCQ + theory steppers, or "to a mark
+      total"; difficulty include-chips; Apply mix keeps Locked cards), cards (thumbnail, ref, chapter,
+      marks, MCQ badge, difficulty), Preview drawer (full question + MS / MCQ letter), Swap (same bucket +
+      type), Remove, Lock, drag / up-down **within a section**, + Add (search question text, filters,
+      sort), Undo. Draft = ordered ids in localStorage `bld.draft.{syl}` keyed by the selection.
+      `?from=<booklet id>` opens review on an existing paper (viewer "Edit").
+    - Server: `website/question_bank.py` - `POST /api/booklets/draft`, `/api/booklets/alternatives`,
+      `GET /api/question/{id}/thumb.png|preview.png` (cached in data/thumbs/), `/review`,
+      `PUT /api/questions/{id}/rating`. `BookletReq.ids` = build exactly these (each must be in
+      `question_pool(sel)`, else 422); `booklets.pick_questions` is shared with admin_ops. Pool rows carry
+      `mcq` and effective marks (an MCQ = 1 mark even where marks is NULL). `selection.select_targeted /
+      default_plan / availability / sectioned` (tests/unit/test_select_targeted.py).
+    - **Mixed tests = Section A (MCQ) then Section B (theory)**, always (random path too). testgen prints the
+      section headings + cover lines; the bubble sheet numbers 1..n contiguously. "[1 mark]" singular fixed.
+    - **Difficulty = teachers' ratings only** (tutor: no examiner-report/AI estimate yet;
+      classifications.difficulty stays empty as the slot for one). Teacher sees own rating, else the median;
+      students see the median. NOTE the session JWT snapshots the role - a newly promoted teacher must sign
+      in again before rating/sharing works.
+    - **Sharing** (owner must be teacher/admin): viewer Share dialog -> assign to roster students / own
+      groups (one homework per student with a `{"type":"paper"}` attachment + a booklet_shares row; built
+      once, own ink each), share link `/papers/s/{token}` (sign-in required; switching it off keeps who
+      joined), who opened / finished, PDF links. **Mock-test mark scheme is now enforced on the server for
+      shared students** (`ms_policy` after_finish | now | teacher_only; `POST /api/booklets/{id}/finish`);
+      the owner's own tests keep the localStorage unlock. My papers has "Shared with me". Shared papers
+      never use the student's quota.
+    - Tests: tests/api/test_test_builder.py (20), tests/e2e/test_test_review.py.
+    - Known unrelated failure: tests/e2e/test_annotations.py ruler width (expects 160/210 of the page;
+      annotate.js changed after the test in 880fc26).

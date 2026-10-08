@@ -123,6 +123,26 @@ else:
         created_at    TEXT DEFAULT (datetime('now')),
         updated_at    TEXT DEFAULT (datetime('now'))
     );
+    -- Test builder v2 (migrations/028_test_builder.sql): teachers' difficulty
+    -- ratings, and booklets shared with students (assigned or joined by link).
+    CREATE TABLE IF NOT EXISTS question_ratings (
+        question_id INTEGER NOT NULL,
+        rater_id    TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        difficulty  INTEGER NOT NULL CHECK (difficulty BETWEEN 1 AND 3),
+        updated_at  TEXT DEFAULT (datetime('now')),
+        PRIMARY KEY (question_id, rater_id)
+    );
+    CREATE TABLE IF NOT EXISTS booklet_shares (
+        booklet_id    TEXT NOT NULL REFERENCES booklets(id) ON DELETE CASCADE,
+        student_id    TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+        via           TEXT NOT NULL DEFAULT 'assign',
+        assignment_id INTEGER,
+        ms_policy     TEXT NOT NULL DEFAULT 'after_finish',
+        opened_at     TEXT,
+        finished_at   TEXT,
+        created_at    TEXT DEFAULT (datetime('now')),
+        PRIMARY KEY (booklet_id, student_id)
+    );
     -- MCQ practice sessions + page annotations (migrations/022_mcq_sessions_annotations.sql)
     CREATE TABLE IF NOT EXISTS mcq_sessions (
         id            TEXT PRIMARY KEY,
@@ -4284,3 +4304,131 @@ def log_broadcast_send(bid: int, email: str, ok: bool, error: str | None = None)
         c.execute("INSERT OR REPLACE INTO newsletter_sends (broadcast_id,email,ok,error,sent_at) "
                   "VALUES (?,?,?,?,?)", (bid, email, row["ok"], error, row["sent_at"]))
         c.commit()
+
+
+# ── Test builder v2: difficulty ratings + shared booklets (migration 028) ────
+
+def get_question_ratings(question_ids: list[int]) -> list[dict]:
+    """Every teacher rating for these questions: [{question_id, rater_id, difficulty}]."""
+    ids = sorted({int(i) for i in question_ids})
+    out: list[dict] = []
+    for i in range(0, len(ids), 500):
+        chunk = ids[i:i + 500]
+        if _USE_SUPABASE:
+            out += (_client().table("question_ratings").select("question_id,rater_id,difficulty")
+                    .in_("question_id", chunk).execute().data or [])
+        else:
+            with _local() as c:
+                out += [dict(r) for r in c.execute(
+                    "SELECT question_id, rater_id, difficulty FROM question_ratings "
+                    f"WHERE question_id IN ({','.join('?' for _ in chunk)})", chunk)]
+    return out
+
+
+def set_question_rating(question_id: int, rater_id: str, difficulty: int | None) -> None:
+    """Set (1-3) or clear (None) one teacher's rating of a question."""
+    now = _now()
+    if _USE_SUPABASE:
+        t = _client().table("question_ratings")
+        if difficulty is None:
+            t.delete().eq("question_id", question_id).eq("rater_id", rater_id).execute()
+        else:
+            t.upsert({"question_id": question_id, "rater_id": rater_id,
+                      "difficulty": difficulty, "updated_at": now},
+                     on_conflict="question_id,rater_id").execute()
+        return
+    with _local() as c:
+        if difficulty is None:
+            c.execute("DELETE FROM question_ratings WHERE question_id=? AND rater_id=?",
+                      (question_id, rater_id))
+        else:
+            c.execute("INSERT INTO question_ratings (question_id, rater_id, difficulty, updated_at) "
+                      "VALUES (?,?,?,?) ON CONFLICT(question_id, rater_id) DO UPDATE SET "
+                      "difficulty=excluded.difficulty, updated_at=excluded.updated_at",
+                      (question_id, rater_id, difficulty, now))
+        c.commit()
+
+
+def upsert_booklet_share(row: dict) -> None:
+    """Give a student access to a booklet. Re-sharing keeps opened/finished."""
+    if _USE_SUPABASE:
+        _client().table("booklet_shares").upsert(row, on_conflict="booklet_id,student_id").execute()
+        return
+    cols = list(row)
+    upd = [k for k in cols if k not in ("booklet_id", "student_id")]
+    with _local() as c:
+        c.execute(f"INSERT INTO booklet_shares ({', '.join(cols)}) VALUES "
+                  f"({', '.join('?' for _ in cols)}) ON CONFLICT(booklet_id, student_id) DO "
+                  + ("UPDATE SET " + ", ".join(f"{k}=excluded.{k}" for k in upd) if upd else "NOTHING"),
+                  [row[k] for k in cols])
+        c.commit()
+
+
+def get_booklet_share(booklet_id: str, student_id: str) -> dict | None:
+    if _USE_SUPABASE:
+        rows = (_client().table("booklet_shares").select("*").eq("booklet_id", booklet_id)
+                .eq("student_id", student_id).limit(1).execute().data or [])
+        return rows[0] if rows else None
+    with _local() as c:
+        r = c.execute("SELECT * FROM booklet_shares WHERE booklet_id=? AND student_id=?",
+                      (booklet_id, student_id)).fetchone()
+        return dict(r) if r else None
+
+
+def update_booklet_share(booklet_id: str, student_id: str, fields: dict) -> None:
+    if _USE_SUPABASE:
+        (_client().table("booklet_shares").update(fields).eq("booklet_id", booklet_id)
+         .eq("student_id", student_id).execute())
+        return
+    with _local() as c:
+        c.execute(f"UPDATE booklet_shares SET {', '.join(f'{k}=?' for k in fields)} "
+                  "WHERE booklet_id=? AND student_id=?", [*fields.values(), booklet_id, student_id])
+        c.commit()
+
+
+def list_booklet_shares(booklet_id: str) -> list[dict]:
+    """Who has this booklet, with their names (the owner's panel)."""
+    if _USE_SUPABASE:
+        rows = (_client().table("booklet_shares")
+                .select("*, profiles!booklet_shares_student_id_fkey(name,email)")
+                .eq("booklet_id", booklet_id).order("created_at").execute().data or [])
+        return [{**r, **(r.pop("profiles", None) or {})} for r in rows]
+    with _local() as c:
+        return [dict(r) for r in c.execute(
+            "SELECT s.*, p.name, p.email FROM booklet_shares s JOIN profiles p ON p.id=s.student_id "
+            "WHERE s.booklet_id=? ORDER BY s.created_at", (booklet_id,))]
+
+
+def list_shared_booklets(student_id: str, limit: int = 30) -> list[dict]:
+    """Booklets other people shared with this student, newest share first."""
+    if _USE_SUPABASE:
+        shares = (_client().table("booklet_shares").select("booklet_id,via,finished_at,created_at")
+                  .eq("student_id", student_id).order("created_at", desc=True)
+                  .limit(limit).execute().data or [])
+        ids = [s["booklet_id"] for s in shares]
+        rows = (_client().table("booklets").select("id,user_id,syllabus,title,status,created_at,"
+                                                   "question_ids,params_json")
+                .in_("id", ids).execute().data or []) if ids else []
+    else:
+        with _local() as c:
+            shares = [dict(r) for r in c.execute(
+                "SELECT booklet_id, via, finished_at, created_at FROM booklet_shares "
+                "WHERE student_id=? ORDER BY created_at DESC LIMIT ?", (student_id, limit))]
+            ids = [s["booklet_id"] for s in shares]
+            rows = [dict(r) for r in c.execute(
+                "SELECT id,user_id,syllabus,title,status,created_at,question_ids,params_json "
+                f"FROM booklets WHERE id IN ({','.join('?' for _ in ids)})", ids)] if ids else []
+    by_id = {r["id"]: _booklet_out(r) for r in rows}
+    return [{**by_id[s["booklet_id"]], "shared": s} for s in shares if s["booklet_id"] in by_id]
+
+
+def get_booklet_by_share_token(token: str) -> dict | None:
+    """The booklet whose share link carries this token (params_json.share_token)."""
+    if _USE_SUPABASE:
+        rows = (_client().table("booklets").select("*").eq("params_json->>share_token", token)
+                .limit(1).execute().data or [])
+        return _booklet_out(rows[0]) if rows else None
+    with _local() as c:
+        r = c.execute("SELECT * FROM booklets WHERE json_extract(params_json, '$.share_token') = ?",
+                      (token,)).fetchone()
+        return _booklet_out(dict(r) if r else None)

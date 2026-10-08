@@ -408,7 +408,6 @@ def booklet_for_student(user_id: str, req: dict, admin=Admin):
     import secrets
     import booklets as _b
     import catalog as _catalog
-    from selection import order_recent_first, select_mixed
     student = _udb.get_user(user_id)
     if not student:
         raise HTTPException(404, "No such student")
@@ -421,7 +420,7 @@ def booklet_for_student(user_id: str, req: dict, admin=Admin):
     if not pool:
         raise HTTPException(400, "No questions match - widen the years or pick other chapters")
     seed = sel.seed if sel.seed is not None else secrets.randbits(31)
-    chosen = order_recent_first(select_mixed(pool, sel.max_questions, seed))
+    chosen = _b.pick_questions(sel, pool, seed)
     subj = _catalog.SUBJECTS[sel.syllabus]
     title = (("Mock test: " if sel.kind == "test" else "")
              + " · ".join(known[p.chapter]["display"] for p in sel.picks)
@@ -429,7 +428,8 @@ def booklet_for_student(user_id: str, req: dict, admin=Admin):
     bid = secrets.token_urlsafe(6)
     _udb.create_booklet({
         "id": bid, "user_id": user_id, "syllabus": sel.syllabus, "title": title, "seed": seed,
-        "params_json": {**sel.model_dump(), "total_marks": sum(q["marks"] or 0 for q in chosen),
+        "params_json": {**sel.model_dump(exclude={"ids"}), "reviewed": bool(sel.ids),
+                        "total_marks": sum(q["marks"] or 0 for q in chosen),
                         "set_by": admin.get("email") or "admin"},
         "question_ids": [q["id"] for q in chosen], "status": "queued", "progress": 0,
         "stage": "Picking questions"})

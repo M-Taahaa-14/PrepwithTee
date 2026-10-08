@@ -107,6 +107,8 @@ function state(t) {
   return set.size ? "some" : "all";
 }
 
+const MAX_Q = 200;   // same ceiling as the topical booklet builder
+
 function poolCount() {
   let total = 0;
   U.topics.forEach((t) => {
@@ -244,6 +246,9 @@ function render() {
   if (!sessions.includes(U.session)) U.session = sessions[sessions.length - 1] || null;
   const variants = papersFor(U.year, U.session).sort((a, b) => a.paper - b.paper || String(a.variant).localeCompare(b.variant));
   if (!variants.some((x) => x.id === U.paperId)) U.paperId = variants[0]?.id || null;
+  const poolNow = poolCount();
+  const qMax = Math.max(1, Math.min(MAX_Q, poolNow || MAX_Q));
+  if (U.count > qMax) U.count = qMax;
   const p = selected();
   const mins = officialMins();
   const active = U.sessions.filter((s) => s.status === "active");
@@ -290,7 +295,11 @@ function render() {
         <div class="mqs-row">
           <div class="mqs-field"><span class="mqs-label">Questions</span>
             <div class="mqs-seg">${[10, 20, 30, 40].map((n) => `
-              <button type="button" data-count="${n}" aria-pressed="${U.count === n}">${n}</button>`).join("")}</div></div>
+              <button type="button" data-count="${n}" aria-pressed="${U.count === n}">${n}</button>`).join("")}</div>
+            <div class="mqs-qty">
+              <input type="range" data-count-range min="1" max="${qMax}" value="${U.count}" aria-label="Number of questions" ${poolNow ? "" : "disabled"}>
+              <output class="mqs-qty-n">${U.count}</output>
+            </div></div>
           <div class="mqs-field"><span class="mqs-label">Years</span>
             <div class="mqs-years2">
               <select data-yfrom aria-label="From year">${allYears.map((y) => `<option ${y === U.yFrom ? "selected" : ""}>${y}</option>`).join("")}</select>
@@ -399,12 +408,18 @@ box?.addEventListener("click", (e) => {
 box?.addEventListener("change", (e) => {
   const t = e.target;
   if (t.matches("[data-live]")) { U.live = t.checked; }
+  else if (t.matches("[data-count-range]")) { U.count = +t.value; render(); }
   else if (t.matches("[data-minutes]")) { U.minutes = Math.max(1, Math.min(240, +t.value || 30)); }
   else if (t.matches("[data-yfrom]")) { U.yFrom = +t.value; if (U.yTo < U.yFrom) U.yTo = U.yFrom; render(); }
   else if (t.matches("[data-yto]")) { U.yTo = +t.value; if (U.yFrom > U.yTo) U.yFrom = U.yTo; render(); }
 });
 
 box?.addEventListener("input", (e) => {
+  if (e.target.matches("[data-count-range]")) {
+    U.count = +e.target.value;
+    const out = box.querySelector(".mqs-qty-n"); if (out) out.textContent = U.count;
+    return;
+  }
   if (!e.target.matches("[data-q]")) return;
   U.q = e.target.value;
   applySearch();

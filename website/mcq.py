@@ -229,7 +229,7 @@ class StartReq(BaseModel):
     @field_validator("count")
     @classmethod
     def _count(cls, v):
-        return max(5, min(60, v))
+        return max(5, min(200, v))
 
 
 def _title(code: str, p: dict | None = None, topics: list[str] | None = None, n: int = 0) -> str:

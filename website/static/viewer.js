@@ -7,6 +7,11 @@
  *   chips    per question: Explain / Guide me / Mark scheme -> ai-panel.js
  *   tests    a mock test (kind "test") has no chips: Test / Mark scheme tabs, a
  *            countdown, and the separate mark scheme unlocks on "Finish test"
+ *   sharing  the teacher who built it gets Share (assign to their students /
+ *            groups, a share link, who opened / finished) and Edit (back to the
+ *            builder's review step). A student it was shared with finishes on
+ *            the server, which decides whether the mark scheme opens
+ *            (after finishing / straight away / teacher keeps it).
  */
 import { api } from "/auth.js?v=20261005c";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
@@ -32,6 +37,7 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 
 const TEST = S.kind === "test";
+const SHARED = S.role === "shared";
 const CROP = "Cropping questions from the original papers";
 const STAGES = TEST ? [
   ["Picking questions", 1],
@@ -234,11 +240,14 @@ async function open() {
 const panes = { paper: null, ms: null };
 let annotator = null;
 let part = "paper";
-const finished = () => store.get(`test-done:${S.id}`) === "1";
+// A shared student's "finished" and "may see the scheme" come from the server;
+// the owner's own tests keep the local unlock.
+const finished = () => (SHARED ? !!S.finished : store.get(`test-done:${S.id}`) === "1");
+const msOpen = () => (SHARED ? !!S.ms_open : finished());
 const minutes = Math.max(5, Math.round(S.totalMarks || 20));   // the cover's "1 minute per mark"
 
 async function showPart(which) {
-  if (which === "ms" && !finished()) return;
+  if (which === "ms" && !msOpen()) return;
   part = which;
   document.querySelectorAll("[data-part]").forEach((b) =>
     b.setAttribute("aria-selected", String(b.dataset.part === which)));
@@ -262,15 +271,28 @@ async function showPart(which) {
   pane.refit?.();
 }
 
-function finishTest() {
-  if (!finished() && !confirm("Finish the test and unlock the mark scheme?")) return;
+async function finishTest() {
+  const keeps = SHARED && S.ms_policy === "teacher_only";
+  if (!finished() && !confirm(keeps ? "Finish the test? Your teacher will be told you're done."
+                                    : "Finish the test and unlock the mark scheme?")) return;
+  try {
+    const r = await api(`/api/booklets/${S.id}/finish`, { method: "POST" });
+    if (SHARED) { S.finished = true; S.ms_open = r.ms_open; }
+  } catch (e) {
+    if (SHARED) { alert(e.message || "Couldn't reach the server - try again."); return; }
+  }
   store.set(`test-done:${S.id}`, "1");
   timer.stop();
+  document.querySelector("[data-act=finish]")?.remove();
   const lock = document.querySelector('[data-part="ms"]');
+  if (!msOpen()) {
+    lock.title = "Your teacher keeps the mark scheme for this test";
+    lock.textContent = "✓ Finished";
+    return;
+  }
   lock.disabled = false;
   lock.removeAttribute("title");
   lock.textContent = "Mark scheme";
-  document.querySelector("[data-act=finish]")?.remove();
   showPart("ms");
 }
 
@@ -310,8 +332,8 @@ function shell() {
       <a class="vw-back" href="${S.subjectUrl}#builder" title="Back to the builder">←</a>
       ${TEST ? `<div class="vw-seg" role="tablist" aria-label="Paper or mark scheme">
           <button type="button" role="tab" data-part="paper" aria-selected="true">Test</button>
-          <button type="button" role="tab" data-part="ms" aria-selected="false" ${finished() ? "" : "disabled"}
-            ${finished() ? "" : 'title="Unlocks when you finish the test"'}>${finished() ? "Mark scheme" : "🔒 Mark scheme"}</button>
+          <button type="button" role="tab" data-part="ms" aria-selected="false" ${msOpen() ? "" : "disabled"}
+            ${msOpen() ? "" : `title="${SHARED && S.ms_policy === "teacher_only" ? "Your teacher keeps the mark scheme for this test" : "Unlocks when you finish the test"}"`}>${msOpen() ? "Mark scheme" : finished() ? "✓ Finished" : "🔒 Mark scheme"}</button>
         </div>` : `<button type="button" class="vw-tbtn" data-act="toc" aria-expanded="false"
               aria-controls="vw-toc">☰ <span>Contents</span></button>`}
       <h1 class="vw-title" title="${esc(S.title)}">${esc(S.title)}</h1>
@@ -324,6 +346,9 @@ function shell() {
         <button type="button" class="vw-tbtn" data-act="fit" id="vw-z">100%</button>
         <button type="button" class="vw-tbtn" data-act="in" aria-label="Zoom in">+</button>
       </div>
+      ${S.role === "owner" || S.role === "staff" ? `<a class="vw-tbtn" href="${esc(S.editUrl)}"
+          title="Back to Review &amp; customise with these questions - build a new version">✎ <span>Edit</span></a>` : ""}
+      ${S.can_share ? `<button type="button" class="vw-btn vw-btn-ghost" data-act="share">⇪ <span>Share</span></button>` : ""}
       ${paperButton()}
       <a class="vw-tbtn vw-dl-ink" href="/api/booklets/${S.id}/pdf?annotated=1"
          title="Download with your pen, highlighter and text marks">✎ <span>With my ink</span></a>
@@ -388,6 +413,7 @@ root.addEventListener("click", (e) => {
   else if (act === "close") closePanel();
   else if (act === "timer") timer.toggle();
   else if (act === "finish") finishTest();
+  else if (act === "share") openShare();
   else if (act === "toc") {
     const toc = document.getElementById("vw-toc");
     toc.hidden = !toc.hidden;
@@ -411,5 +437,141 @@ document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && (e.key === "=" || e.key === "+")) { e.preventDefault(); pane?.zoomIn(); }
   if ((e.ctrlKey || e.metaKey) && e.key === "-") { e.preventDefault(); pane?.zoomOut(); }
 });
+
+// ── Share (teachers) ────────────────────────────────────────────────────────
+const POLICY = {
+  after_finish: "After they press Finish test",
+  now: "Straight away",
+  teacher_only: "Never - I'll go through it with them",
+};
+let shareDlg = null;
+
+async function openShare() {
+  if (!shareDlg) {
+    shareDlg = document.createElement("dialog");
+    shareDlg.className = "vw-share";
+    shareDlg.setAttribute("aria-label", "Share this paper");
+    document.body.appendChild(shareDlg);
+    shareDlg.addEventListener("click", onShareClick);
+    shareDlg.addEventListener("submit", (e) => e.preventDefault());
+  }
+  shareDlg.innerHTML = `<div class="vw-share-load">Loading…</div>`;
+  if (!shareDlg.open) shareDlg.showModal();
+  try {
+    renderShare(await api(`/api/booklets/${S.id}/shares`));
+  } catch (e) {
+    shareDlg.innerHTML = `<p class="vw-share-err">${esc(e.message)}</p>
+      <div class="vw-share-foot"><button type="button" class="vw-btn vw-btn-ghost" data-sh="close">Close</button></div>`;
+  }
+}
+
+function policySelect(name, value) {
+  if (!TEST) return "";
+  return `<label class="vw-share-field">Mark scheme opens
+    <select name="${name}">${Object.entries(POLICY).map(([k, v]) =>
+      `<option value="${k}" ${k === value ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>`;
+}
+
+const when = (ts) => ts ? new Date(ts).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "";
+
+function renderShare(d) {
+  const have = new Set(d.shares.map((x) => x.student_id));
+  const link = d.link ? location.origin + d.link : "";
+  shareDlg.innerHTML = `
+    <header class="vw-share-head"><h2>Share this ${TEST ? "test" : "paper"}</h2>
+      <button type="button" class="vw-share-x" data-sh="close" aria-label="Close">×</button></header>
+    <div class="vw-share-body">
+      <section>
+        <h3>Give it to my students</h3>
+        <p class="vw-share-hint">Each student gets it as homework and opens this same paper with their own ink.</p>
+        ${d.groups.length ? `<div class="vw-share-list">${d.groups.map((g) => `<label>
+            <input type="checkbox" name="g" value="${g.id}"> 👥 ${esc(g.name)}${g.syllabus ? ` <small>${esc(g.syllabus)}</small>` : ""}</label>`).join("")}</div>` : ""}
+        ${d.students.length ? `<div class="vw-share-list">${d.students.map((s) => `<label>
+            <input type="checkbox" name="s" value="${esc(s.id)}" ${have.has(s.id) ? "disabled" : ""}>
+            ${esc(s.name || s.email)} <small>${have.has(s.id) ? "already has it" : esc(s.syllabus || "")}</small></label>`).join("")}</div>`
+          : `<p class="vw-share-hint">No students are assigned to you yet - use the link below.</p>`}
+        <div class="vw-share-row">
+          <label class="vw-share-field">Due date <input type="date" name="due"></label>
+          ${policySelect("policy", "after_finish")}
+        </div>
+        <label class="vw-share-field">Note for students <textarea name="note" rows="2" maxlength="500"
+          placeholder="e.g. Do this without a calculator, 40 minutes."></textarea></label>
+        <button type="button" class="vw-btn" data-sh="assign" ${d.students.length || d.groups.length ? "" : "disabled"}>Assign</button>
+        <p class="vw-share-msg" role="status"></p>
+      </section>
+      <section>
+        <h3>Share link</h3>
+        <p class="vw-share-hint">Anyone who signs in with the link can open it - handy for a WhatsApp group.</p>
+        ${link ? `<div class="vw-share-link"><input type="text" readonly value="${esc(link)}" aria-label="Share link">
+            <button type="button" class="vw-btn" data-sh="copy">Copy</button></div>
+          ${policySelect("lpolicy", d.link_ms_policy)}
+          <button type="button" class="vw-btn vw-btn-ghost" data-sh="link-save">Save link setting</button>
+          <button type="button" class="vw-btn vw-btn-ghost" data-sh="unlink">Switch the link off</button>`
+        : `${policySelect("lpolicy", "after_finish")}
+          <button type="button" class="vw-btn" data-sh="link">Create a link</button>`}
+      </section>
+      <section>
+        <h3>Who has it <small>${d.shares.length}</small></h3>
+        ${d.shares.length ? `<table class="vw-share-table"><thead><tr><th>Student</th><th>Opened</th>${TEST ? "<th>Finished</th>" : ""}</tr></thead>
+          <tbody>${d.shares.map((x) => `<tr><td>${esc(x.name || x.email || "Student")}
+              <small>${x.via === "link" ? "via link" : "assigned"}</small></td>
+            <td>${x.opened_at ? "✓ " + when(x.opened_at) : "—"}</td>
+            ${TEST ? `<td>${x.finished_at ? "✓ " + when(x.finished_at) : "—"}</td>` : ""}</tr>`).join("")}</tbody></table>`
+          : `<p class="vw-share-hint">Nobody yet.</p>`}
+      </section>
+      <section>
+        <h3>Print</h3>
+        <p class="vw-share-links"><a href="/api/booklets/${S.id}/pdf?download=1">⤓ ${TEST ? "Test" : "Paper"} PDF</a>
+          ${TEST ? `<a href="/api/booklets/${S.id}/pdf?download=1&part=ms">⤓ Mark scheme PDF</a>` : ""}</p>
+      </section>
+    </div>`;
+}
+
+async function onShareClick(e) {
+  const act = e.target.closest("[data-sh]")?.dataset.sh;
+  if (!act) { if (e.target === shareDlg) shareDlg.close(); return; }
+  const val = (sel) => shareDlg.querySelector(sel)?.value;
+  const btn = e.target.closest("button");
+  try {
+    if (act === "close") { shareDlg.close(); return; }
+    if (act === "copy") {
+      const inp = shareDlg.querySelector(".vw-share-link input");
+      try { await navigator.clipboard.writeText(inp.value); } catch { inp.select(); document.execCommand("copy"); }
+      btn.textContent = "Copied ✓";
+      return;
+    }
+    if (act === "assign") {
+      const ids = [...shareDlg.querySelectorAll('input[name="s"]:checked')].map((i) => i.value);
+      const groups = [...shareDlg.querySelectorAll('input[name="g"]:checked')].map((i) => +i.value);
+      const msg = shareDlg.querySelector(".vw-share-msg");
+      if (!ids.length && !groups.length) { msg.textContent = "Tick at least one student or group."; return; }
+      btn.disabled = true;
+      const r = await api(`/api/booklets/${S.id}/assign`, { method: "POST", body: {
+        student_ids: ids, group_ids: groups, due_date: val('input[name="due"]') || null,
+        instructions: val('textarea[name="note"]') || null,
+        ...(TEST ? { ms_policy: val('select[name="policy"]') } : {}) } });
+      await openShare();
+      shareDlg.querySelector(".vw-share-msg").textContent =
+        `Assigned to ${r.assigned} student${r.assigned === 1 ? "" : "s"}.`;
+      return;
+    }
+    if (act === "link" || act === "link-save") {
+      await api(`/api/booklets/${S.id}/link`, { method: "POST",
+        body: TEST ? { ms_policy: val('select[name="lpolicy"]') } : {} });
+      await openShare();
+      return;
+    }
+    if (act === "unlink") {
+      if (!confirm("Switch the link off? Students who already opened it keep the paper.")) return;
+      await api(`/api/booklets/${S.id}/link`, { method: "DELETE" });
+      await openShare();
+    }
+  } catch (err) {
+    const msg = shareDlg.querySelector(".vw-share-msg");
+    if (msg) msg.textContent = err.message || "Something went wrong.";
+    else alert(err.message);
+    if (btn) btn.disabled = false;
+  }
+}
 
 open().catch(lostContact);
