@@ -1066,3 +1066,81 @@ linked), not agreement with any external file.
     - Board "Graph with axes": `settings.ax = {x0,x1,y0,y1,dx,dy,sub,eq,lab}`; rules + layout in paper.js
       (checkAxes / axesLayout), annot_pdf.py (clean_axes / axes_layout / _axes, used by whiteboard.clean_settings
       and PDF export) - keep them identical. Max 60 big squares per axis; infinite canvas draws plain graph.
+
+44. **Teaching console + shared ink (plan `~/.claude/plans/alright-so-you-can-federated-moler.md`, approved
+    2026-10-09; phases 1-2 done, local, NOT deployed).** **Run `website/migrations/029_teaching.sql` on
+    Supabase before deploying** (all tables for every phase: teach_items, shared_ink, wb_members,
+    collab_presence, live_sessions, lesson_plan, teach_feedback, parent_reports; SQLite copy in
+    `teach_store.TEACH_SCHEMA`).
+    - **Access rule = `teaching.teaches(user, student_id, syllabus=None)`** (teacher_students, cached 60 s,
+      cleared by any admin mutation; admin always passes). Booklets: a teacher now opens only their own
+      students' booklets (was: any teacher, any booklet). Messages need a link (`teaching.linked`) or a reply.
+    - **Shared ink (near-live, polling - tutor's choice, no WebSockets)**: collaborative booklet =
+      `params_json.collab` (teacher-built, or the student's "Work on this with my teacher" = POST
+      `/api/booklets/{id}/collab`, copies their ink). `collab.py` /api/collab GET/PUT(version, 409)/poll on
+      `shared_ink`; boards use `wb_members` (edit role: `_board_for(write="draw")`; write=True stays owner
+      only) + `/api/wb/boards/{id}/poll`. `static/collab.js`: `merge3` (3-way by object id - mine wins for what
+      I changed, deletes stick), poll 1.5 s with company / 6 s alone, paused when hidden, `presenceBar`
+      ("Tariq is here", Hide other ink). annotate.js: `remote()` (skips a busy page; resets that page's undo),
+      `busy()`, `hideAuthors()`. Every object carries `by` (server keeps known authors).
+    - **/teach console** = static/teach (index, app.js, sections today/students/student/folder/homework/
+      groups/messages/settings, teach.css tokens only) REUSING the admin modules: `core.setApiBase("/api/teach")`
+      - student-manage.js / homework.js / lookup use `API_BASE`; DataTable skips saved views off-admin.
+      `teach.py` /api/teach/* mirrors /api/admin paths + shapes and calls the admin functions after `_mine()`;
+      role read from the DB per request. One version for both consoles: `scripts/bump_admin_assets.py`
+      rebuilds BOTH import maps (teach's lists every /admin/ module too). `/teacher-dashboard.html` 301s to
+      `/teach` (old files kept until the tutor confirms; delete teacher-dashboard.html + teacher-student.js then).
+    - **Folder** = teach_items per student+subject (kinds booklet/test/board/homework/class/note/link; tnote =
+      private teacher note). Homework without a row shows as a virtual item. Status: student opens ->
+      in_progress (`teach_store.student_event`), mock-test finish -> done, teacher -> marked. A teacher-built
+      mock test owned by the student follows `params_json.ms_policy` (`booklets._set_for_me`), so the
+      student does NOT get the scheme early. Teacher-made boards don't count against the free 3.
+    - **Phase 4 (student side) done**: `website/classroom.py` = SSR `/classroom` (one subject -> straight to it;
+      no teacher -> class-pages pitch) and `/classroom/{syl}`: Next up, teacher card + Message, kind filter
+      chips, the folder in 4 columns with the teacher's marks/comments (teach_feedback) on marked items,
+      classes held. "I've done this" (booklet/board/note/link/file; tests finish themselves, homework on its
+      page) = POST /api/classroom/items/{id}/done[?undo=1]; Open links beacon .../open (-> in progress).
+      Bell: `classroom.notifications()` merged into /api/notifications. "My classroom" in DASH_TABS + the
+      Dashboard menu (sync_nav stamped). static/classroom.css/js (CLASSROOM_V).
+    - Tests: tests/api/test_collab.py, test_teach.py, test_classroom.py, tests/unit/test_collab_merge.py,
+      tests/e2e/test_collab_live.py, test_teach_console.py, test_classroom.py.
+    - Local server for this work can run on 8037 (`prepwithtee-local-8037` in launch.json) when 8017 is taken;
+      e2e: `E2E_BASE_URL=http://localhost:8037`.
+
+45. **Help centre v2 (2026-10-09, local, not deployed).** Plan `~/.claude/plans/prepwithtee-support-v2.md`.
+    Replaces the old chatbot widget (relative links that 404'd under /papers/..., stale hard-coded FAQ,
+    keyword matcher that answered "I can't log in" with the sign-up blurb).
+    - `website/support.py`: `facts()` / `facts_text()` = the ONE source of prices, subjects, limits and
+      class details (billing.PERIODS, catalog.SUBJECTS, access quotas; `CLASSES`/`TUTORING` mirror
+      promo-bar.js and pricing.html TUT_PRICES - update them with the next batch). Answer order:
+      `intent()` (word boundaries, English + Roman Urdu) -> account-aware answer with one-tap fixes
+      (retry the booklet, start the trial, reset password, upload proof) -> `navigate()` (sitting ->
+      `/yearly/open?...&variant=1`, chapters/notes from the search index) -> free AI
+      (`content_ai.providers()`, then `_chat_complete`) with facts + the student's context; every link
+      the AI writes goes through `clean_links()` (unknown pages are unlinked). Non-English questions
+      get the deterministic answer translated. `/api/chatbot` still answers (old cached widgets).
+      `support._app()` reuses the loaded app module (`app` or `website.app`) - never `from app import`.
+    - `support_store.py` + **`migrations/030_support.sql` (run on Supabase before deploying)**:
+      `support_threads` (handoffs; Inbox source `support`, replies via inbox_status, shown back to the
+      student under My requests) and `support_events` (question log, scrubbed of emails/numbers,
+      guest rows pruned after 30 days). Without the migration a handoff falls back to a feedback row.
+    - Status banner + office hours (PKT, default 10am-10pm daily) in `data/support/status.json`
+      (`SUPPORT_STATUS_FILE`; tests point it at their temp dir). Edited in /admin -> Support.
+    - Front end `static/support.js` + `support.css` (site tokens; full screen < 600 px; z-index above the
+      promo card). Launcher keeps id `pwt-chatbot-wrap` / class `pwt-chatbot-fab` so the dock rules in
+      tools.css / catalog.css / viewer.css still move it. Hidden on /papers/view, /yearly/view,
+      /mcq/session, /whiteboard/{id}; opened there from the account menu ("Help & support") or
+      `window.pwtSupport.open(tab, ask)`; `[data-support]` elements open it. Chat history lives in
+      sessionStorage (does NOT auto-reopen on the next page). Diagnostics (page, browser, JS errors,
+      failed /api/ calls) are attached to handoffs. `chatbot-widget.js` is now a loader shim; pages
+      load `/support.js?v=...` directly; main.js + auth.js bumped to 20261009a everywhere.
+    - Admin: Inbox renders help requests (transcript, device, account summary via
+      `/api/admin/support/{id}/account`, "Draft a reply" via content_ai); Support section = report
+      (asked, intents, most asked, unanswered, 👎) + banner/hours editor.
+    - Tests: tests/unit/test_support_intent.py, tests/api/test_support.py, tests/e2e/test_support_widget.py.
+      NOTE `list_booklets` leaves out `error` - fetch the full row for failed ones.
+    - Follow-ups (same day): the help centre Home shows NO plan card (tutor: no use for it) - only
+      problem alerts (failed booklet, payment proof waiting / rejected). Promo bar = one 38 px line
+      (lead + Playfair italic date, price, guarantee drop away as it narrows; `PROMO.lead/leadShort/
+      date/price/guar`). Annotation tab = gradient pen badge + "Draw" label (annotate.css `.an-tab-ic`);
+      annotate/scratch-pen and the viewer page constants bumped to 20261009t.

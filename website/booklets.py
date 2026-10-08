@@ -58,6 +58,7 @@ import access as _access
 import auth as _auth
 import catalog as _catalog
 import db as _db
+import teaching as _teaching
 import users_db as _udb
 from pipeline import config as _pcfg
 from selection import order_recent_first, sectioned, select_mixed
@@ -69,7 +70,7 @@ BOOKLET_DIR = Path(os.environ.get("BOOKLET_DIR") or ROOT / "data" / "booklets")
 MAX_CHAPTERS = 4
 MAX_QUESTIONS = 200          # the slider stops at the chapter pool; this only guards build time
 BUILD_TIMEOUT_S = 600
-VIEWER_V = "20261008c"          # bump with viewer.css / viewer.js / builder.js
+VIEWER_V = "20261009t"          # bump with viewer.css / viewer.js / builder.js
 
 RETENTION_DAYS = int(os.environ.get("BOOKLET_RETENTION_DAYS") or 30)
 SWEEP_EVERY_S = 6 * 3600
@@ -199,6 +200,18 @@ def _staff(user: dict) -> bool:
     return user.get("role") in ("teacher", "admin")
 
 
+def _teaches_owner(b: dict, user: dict) -> bool:
+    """An admin, or a teacher linked to the booklet's owner. Any teacher used to
+    be able to open any student's booklet."""
+    return _teaching.teaches(user, b["user_id"])
+
+
+def is_collab(b: dict) -> bool:
+    """Built by a teacher for a student (or opened up by the student): the
+    teacher and the student ink on ONE shared layer (collab.py)."""
+    return bool((b.get("params_json") or {}).get("collab"))
+
+
 def require_enrolled(user: dict, syllabus: str) -> None:
     """Enrolling is free, but it is what unlocks a subject's features."""
     if _staff(user):
@@ -228,7 +241,7 @@ def _owned(booklet_id: str, user: dict, shared: bool = True) -> dict:
     b = _udb.get_booklet(booklet_id)
     if b is None:
         raise HTTPException(404, "Booklet not found")
-    if b["user_id"] == user["id"] or _staff(user):
+    if b["user_id"] == user["id"] or _teaches_owner(b, user):
         return b
     share = _share_of(booklet_id, user) if shared else None
     if share is None:
@@ -248,7 +261,7 @@ def _owned_ready(booklet_id: str, user: dict) -> dict:
     hit = _READY.get(booklet_id)
     if hit and time.time() - hit[0] < _READY_TTL:
         b = hit[1]
-        if b["user_id"] == user["id"] or _staff(user):
+        if b["user_id"] == user["id"] or _teaches_owner(b, user):
             return b
         key = (booklet_id, user["id"])         # a shared student: their row, cached too
         sh = _READY_SHARES.get(key)
@@ -503,11 +516,39 @@ def _shared_list(user: dict) -> list[dict]:
 @router.get("/api/booklets/{booklet_id}")
 def booklet_detail(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
     b = _owned(booklet_id, user)
+    if b["user_id"] == user["id"] and is_collab(b) and b["status"] == "ready":
+        import teach_store as _ts                 # the student opened a paper in their folder
+        _ts.student_event(("booklet", "test"), booklet_id)
     return {**{k: b.get(k) for k in ("id", "title", "syllabus", "status", "progress", "stage",
                                      "params_json", "page_map_json", "created_at")},
             "question_ids": b.get("question_ids") or [],
             "error": failure(b)["message"] if b["status"] == "failed" else None,
-            "kind": _kind(b), **_viewer_role(b, user)}
+            "kind": _kind(b), **_viewer_role(b, user),
+            "collab": is_collab(b) and "_share" not in b, "me": user["id"],
+            "owner_id": b["user_id"],
+            "can_collab": (b["user_id"] == user["id"] and not is_collab(b)
+                           and bool(_teaching.teachers_of(user["id"])))}
+
+
+@router.post("/api/booklets/{booklet_id}/collab")
+def booklet_collab_on(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
+    """The student opens one of their own papers to their teacher: from now on
+    both ink on one shared layer. The ink they already had is carried over."""
+    b = _owned(booklet_id, user, shared=False)
+    if b["user_id"] != user["id"]:
+        raise HTTPException(403, "Only the student who owns this paper can share it.")
+    if not _teaching.teachers_of(user["id"]):
+        raise HTTPException(409, "You don't have a teacher on PrepWithTee yet.")
+    if not is_collab(b):
+        import teach_store as _ts
+        for doc in (f"booklet:{booklet_id}", f"booklet:{booklet_id}:ms"):
+            if _ts.ink_pages(doc):
+                continue
+            for page, strokes in _udb.get_annotations(user["id"], doc).items():
+                _ts.save_ink(doc, page, [{**o, "by": o.get("by") or user["id"]} for o in strokes], 0, user["id"])
+        _udb.update_booklet(booklet_id, {"params_json": {**(b.get("params_json") or {}), "collab": True}})
+        _READY.pop(booklet_id, None)
+    return {"ok": True, "collab": True}
 
 
 @router.get("/api/booklets/{booklet_id}/status")
@@ -557,7 +598,7 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", an
     if part not in ("paper", "ms") or (part == "ms" and _kind(b) != "test"):
         raise HTTPException(404, "No such part")
     if part == "ms" and not ms_allowed(b, user):
-        raise HTTPException(403, {"code": "ms_locked", "message": ms_locked_message(b)})
+        raise HTTPException(403, {"code": "ms_locked", "message": ms_locked_message(b, user)})
     pdf = BOOKLET_DIR / (f"{booklet_id}_ms.pdf" if part == "ms" else f"{booklet_id}.pdf")
     if not pdf.exists():
         raise HTTPException(410, f"This paper was not opened for {RETENTION_DAYS} days, so its PDF has "
@@ -575,7 +616,11 @@ def booklet_pdf(booklet_id: str, download: bool = False, part: str = "paper", an
             + ("-mark-scheme" if part == "ms" else "") + ("-annotated" if annotated else "") + ".pdf")
     if annotated:
         doc = f"booklet:{booklet_id}" + (":ms" if part == "ms" else "")
-        pages = _udb.get_annotations(user["id"], doc)
+        if is_collab(b) and "_share" not in b:
+            import teach_store as _ts
+            pages = {r["page"]: r.get("objects") or [] for r in _ts.ink_pages(doc)}
+        else:
+            pages = _udb.get_annotations(user["id"], doc)
         if pages:
             import annot_pdf
             from fastapi.responses import Response
@@ -904,8 +949,8 @@ def viewer_page(booklet_id: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20261005a"></script>
-<script type="module" src="/auth.js?v=20261005c"></script>
+<script src="/main.js?v=20261009a"></script>
+<script type="module" src="/auth.js?v=20261009a"></script>
 <script type="module" src="/viewer.js?v={VIEWER_V}"></script>
 {_dock[1]}
 </body>
@@ -1152,16 +1197,28 @@ def _record_page(b: dict, user: dict) -> HTMLResponse:
 # (default), straight away, or never (teacher_only). Enforced here - the old
 # unlock was only in the browser.
 
+def _set_for_me(b: dict, user: dict) -> dict | None:
+    """A mock test a teacher built for this student (they own it, /teach):
+    behaves like an assigned test - the mark scheme follows the teacher's rule.
+    Returns a share-shaped dict, else None."""
+    pj = b.get("params_json") or {}
+    if b["user_id"] != user["id"] or not pj.get("set_by_id") or _kind(b) != "test"             or user.get("role") in ("teacher", "admin"):
+        return None
+    return {"ms_policy": pj.get("ms_policy") or "after_finish", "finished_at": pj.get("finished_at")}
+
+
 def ms_allowed(b: dict, user: dict) -> bool:
     share = b.get("_share")
+    if share is None:
+        share = _set_for_me(b, user)
     if share is None:                      # owner or staff
         return True
     policy = share.get("ms_policy") or "after_finish"
     return policy == "now" or (policy == "after_finish" and bool(share.get("finished_at")))
 
 
-def ms_locked_message(b: dict) -> str:
-    policy = (b.get("_share") or {}).get("ms_policy")
+def ms_locked_message(b: dict, user: dict | None = None) -> str:
+    policy = (b.get("_share") or (_set_for_me(b, user) if user else None) or {}).get("ms_policy")
     if policy == "teacher_only":
         return "Your teacher keeps the mark scheme for this test - they will go through it with you."
     return "The mark scheme opens when you press Finish test."
@@ -1169,6 +1226,8 @@ def ms_locked_message(b: dict) -> str:
 
 def _viewer_role(b: dict, user: dict) -> dict:
     share = b.get("_share")
+    if share is None and _set_for_me(b, user):
+        share = _set_for_me(b, user)
     if share is None:
         mine = b["user_id"] == user["id"]
         return {"role": "owner" if mine else "staff",
@@ -1310,6 +1369,16 @@ def join_by_link(token: str, user: dict | None = Depends(_auth.maybe_user)):
 def booklet_finish(booklet_id: str, user: dict = Depends(_auth.get_current_user)):
     """The student finished the test: record it, and open the scheme if allowed."""
     b = _owned(booklet_id, user)
+    own = _set_for_me(b, user)
+    if own is not None:                     # a test the teacher built for me
+        if not own.get("finished_at"):
+            pj = {**(b.get("params_json") or {}), "finished_at": datetime.now(timezone.utc).isoformat()}
+            _udb.update_booklet(booklet_id, {"params_json": pj})
+            b = {**b, "params_json": pj}
+            _READY.pop(booklet_id, None)
+        import teach_store as _ts
+        _ts.student_event(("test",), booklet_id, done=True)
+        return {"ok": True, "ms_open": ms_allowed(b, user)}
     share = b.get("_share")
     if share is not None and not share.get("finished_at"):
         now = datetime.now(timezone.utc).isoformat()

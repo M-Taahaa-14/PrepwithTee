@@ -1,0 +1,56 @@
+{
+  "series": {
+    "title": "Seasonal & moments",
+    "about": "Posts tied to the exam calendar (Oct/Nov and May/June series, results days) and cultural moments. Stories are 1080x1920."
+  },
+  "posts": [
+    {
+      "id": "ss-01-paper-tomorrow-story",
+      "size": "story",
+      "bg": "grid",
+      "caption": "(Story) Paper tomorrow? Pack this. 🎒 Add a link sticker → prepwithtee.com",
+      "slides": [
+        {
+          "layout": "checklist",
+          "title": "Paper tomorrow?\n((pack this.))",
+          "size": "l",
+          "boxed": true,
+          "items": [
+            ["statement of entry + ID", "check the time and centre, twice"],
+            ["2 black pens", "one is the backup. trust me."],
+            ["calculator: DEG mode", "and a battery that isn't dying"],
+            ["pencil, ruler, rubber", "plus compasses + protractor for maths"],
+            ["clear water bottle", "label off"],
+            ["10 PM: stop revising", "sleep is part of the plan"]
+          ],
+          "tail": "good luck. you've got this 🍀",
+          "doodles": [["sparkle", 880, 360, 80, 0, "ink"], ["star", 940, 1560, 70, 10, "ink"]]
+        }
+      ]
+    },
+    {
+      "id": "ss-02-oct-nov-good-luck",
+      "bg": "lilac",
+      "caption": "To everyone sitting Oct/Nov papers: you've done the work. Trust it. 💜\n\nWe're rooting for you. Tag a friend who's in the exam hall this week.",
+      "hashtags": ["octnov", "examseason", "olevel", "igcse", "alevel", "goodluck"],
+      "slides": [
+        {
+          "layout": "hook",
+          "align": "center",
+          "size": "l",
+          "pop": "lime",
+          "eyebrow": "oct / nov 2026",
+          "title": "To everyone in\nthe exam hall\nthis month:",
+          "sub": "you've done the work. **((trust it.))**",
+          "doodles": [
+            ["heart", 150, 300, 80, -12, "ink"],
+            ["heart", 240, 250, 46, 10, "ink"],
+            ["sparkle", 860, 330, 80, 0, "ink"],
+            ["sparkle", 820, 1040, 50, 0, "ink"],
+            ["squiggle", 140, 1040, 150, -6]
+          ]
+        }
+      ]
+    }
+  ]
+}

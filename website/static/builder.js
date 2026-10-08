@@ -16,7 +16,7 @@
  * Practice booklets keep the one-step build.
  * The exact pool size comes from POST /api/booklets/count (debounced).
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20261005c";
+import { api, UpgradeRequiredError } from "/auth.js?v=20261009a";
 import * as review from "/builder-review.js?v=20261008c";
 
 const root = document.getElementById("builder");

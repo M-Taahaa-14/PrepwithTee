@@ -24,12 +24,13 @@ from pydantic import BaseModel
 
 import access as _access
 import billing as _billing
+import support_store as _support_store
 import users_db as _udb
 from admin_auth import Admin, record
 
 router = APIRouter(prefix="/api/admin")
 
-INBOX_SOURCES = ("lead", "contact", "feedback", "request")
+INBOX_SOURCES = ("lead", "contact", "feedback", "request", "support")
 INBOX_STATUSES = ("new", "replied", "handled", "archived")
 
 
@@ -65,6 +66,7 @@ def inbox_items() -> list[dict]:
         contacts=lambda: _udb.get_contacts(),
         feedback=lambda: _udb.get_feedback(),
         requests=lambda: _udb.get_subject_requests(),
+        support=lambda: _safe(_support_store.list_threads, []),
         status=lambda: _safe(_udb.list_inbox_status, {}),
     )
     st = got["status"]
@@ -102,6 +104,13 @@ def inbox_items() -> list[dict]:
         add("request", r["id"], r.get("ts"), name="Subject request", email=None, phone=None,
             title=f"Add {r.get('subject') or '?'}" + (f" ({r['board']})" if r.get("board") else ""),
             body=r.get("message") or "", meta={"subject": r.get("subject"), "board": r.get("board")})
+    for r in got["support"]:
+        first = (r.get("message") or "").strip().splitlines()[0][:90] if (r.get("message") or "").strip() else ""
+        add("support", r["id"], r.get("created_at"), name=r.get("name") or "Student", email=r.get("email"),
+            phone=None, title=f"Help request: {first}" if first else "Help request", body=r.get("message") or "",
+            meta={"page": r.get("page"), "user_id": r.get("user_id"),
+                  "transcript": r.get("transcript_json") or [], "diag": r.get("diag_json") or {},
+                  "snips": r.get("snips_json") or []})
     out.sort(key=lambda x: x["at"] or "", reverse=True)
     return out
 

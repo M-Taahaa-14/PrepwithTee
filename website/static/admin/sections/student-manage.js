@@ -2,7 +2,7 @@
 // the class log and homework - what the classic page's student console did.
 
 import { $, $$, api, esc, icon, pill, rel, fmtDate, modal, toast, confirmBox, tabBar, loadingHtml,
-         emptyState, ring, gradeFor, gradePill } from "../core.js";
+         emptyState, ring, gradeFor, gradePill, API_BASE } from "../core.js";
 import { setHomework, openAssignment, stateOf, STATES } from "./homework.js";
 
 const LEVELS = [["not_started", "Not started"], ["learning", "Learning"], ["confident", "Confident"]];
@@ -47,7 +47,7 @@ function seg(name, current, data) {
 
 async function chapters(box, sid, syl, detail) {
   let tax;
-  try { tax = await api(`/api/admin/syllabus/${encodeURIComponent(syl)}/topics`); }
+  try { tax = await api(`${API_BASE}/syllabus/${encodeURIComponent(syl)}/topics`); }
   catch (ex) { box.innerHTML = emptyState("alert-triangle", ex.message); return; }
   const idx = {};
   (detail.progress || []).filter(p => p.syllabus === syl).forEach(p => { idx[`${p.topic}|${p.subtopic || ""}`] = p; });
@@ -70,7 +70,7 @@ async function chapters(box, sid, syl, detail) {
       e.preventDefault();
       const body = { syllabus: syl, topic: b.dataset.t, subtopic: b.dataset.st || null, [b.dataset.f]: b.dataset.v };
       try {
-        await api(`/api/admin/students/${encodeURIComponent(sid)}/progress`, { method: "POST", body });
+        await api(`${API_BASE}/students/${encodeURIComponent(sid)}/progress`, { method: "POST", body });
         $$(".chip", b.parentElement).forEach(c => { const on = c === b; c.classList.toggle("on", on); c.setAttribute("aria-pressed", on); });
         const key = `${b.dataset.t}|${b.dataset.st || ""}`;
         idx[key] = { ...(idx[key] || {}), [b.dataset.f]: b.dataset.v };
@@ -82,7 +82,7 @@ async function chapters(box, sid, syl, detail) {
       const t = tax.topics.find(x => x.name === all.dataset.all);
       const level = idx[`${t.name}|`]?.status || "not_started";
       try {
-        await api(`/api/admin/students/${encodeURIComponent(sid)}/progress/bulk`, { method: "POST",
+        await api(`${API_BASE}/students/${encodeURIComponent(sid)}/progress/bulk`, { method: "POST",
           body: { items: t.subtopics.map(st => ({ syllabus: syl, topic: t.name, subtopic: st, status: level })) } });
         t.subtopics.forEach(st => { idx[`${t.name}|${st}`] = { status: level }; });
         $$(`[data-t="${CSS.escape(t.name)}"][data-st]`, box).forEach(c => c.classList.toggle("on", c.dataset.v === level));
@@ -163,7 +163,7 @@ async function papers(box, sid, syl, detail) {
     const cur = done[k] || {};
     const body = { syllabus: syl, year: +y, session: ss, paper: +p, variant: va, status: cur.status || "confident",
                    score: cur.score ?? null, max_score: cur.max_score ?? null, grade: cur.grade ?? null, note: cur.note ?? null, ...extra };
-    const r = await api(`/api/admin/students/${encodeURIComponent(sid)}/papers`, { method: "POST", body });
+    const r = await api(`${API_BASE}/students/${encodeURIComponent(sid)}/papers`, { method: "POST", body });
     done[k] = { ...cur, ...extra, ...(r.paper || {}), set_by: "tutor" };
   };
 
@@ -251,7 +251,7 @@ function classes(box, sid, detail, reload) {
   }));
   $$("[data-del]", box).forEach(b => b.addEventListener("click", async () => {
     if (!(await confirmBox("Delete class", "Delete this class from the log?", "Delete", true))) return;
-    await api(`/api/admin/classes/${b.dataset.del}`, { method: "DELETE" });
+    await api(`${API_BASE}/classes/${b.dataset.del}`, { method: "DELETE" });
     toast("Deleted"); reload();
   }));
 }
@@ -274,7 +274,7 @@ async function classForm(sid, c, detail) {
       if (!v("date")) return "Pick a date.";
       const body = { class_date: v("date"), start_time: v("time") || null, duration_min: v("dur") ? +v("dur") : null,
                      syllabus: v("syl") || null, status: v("status"), topic: v("topic") || null, note: v("note") || null };
-      await api(c ? `/api/admin/classes/${c.id}` : `/api/admin/students/${encodeURIComponent(sid)}/classes`,
+      await api(c ? `${API_BASE}/classes/${c.id}` : `${API_BASE}/students/${encodeURIComponent(sid)}/classes`,
                 { method: c ? "PATCH" : "POST", body });
       toast("Saved");
       return true;

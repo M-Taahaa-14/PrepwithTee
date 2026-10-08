@@ -1,0 +1,107 @@
+{
+  "series": {
+    "title": "Subject Q&A",
+    "about": "One bright colour per subject (Maths = lilac, Physics = mint, CS = bubblegum), a real exam-technique question and a tilted lined note with the answer. The owl is the recurring character."
+  },
+  "posts": [
+    {
+      "id": "qa-01-what-examiners-want",
+      "caption": "Getting stuck is part of studying. Losing marks you *earned* isn't. 🦉\n\nOne exam-technique fix each for Maths, Physics and CS, straight from how the mark schemes are written.\n\nEvery past-paper question on prepwithtee.com has an Explain button: step-by-step working, how the marks are given, common mistakes.",
+      "hashtags": ["olevel", "igcse", "examtips", "maths", "physics", "computerscience", "cambridge"],
+      "slides": [
+        {
+          "layout": "hook",
+          "bg": "paper",
+          "size": "l",
+          "title": "What if you knew\n*exactly* what the\nexaminer wants?",
+          "note": "We read the mark schemes so you don't have to. Swipe for **Maths, Physics & CS.**",
+          "note_right": true,
+          "doodles": [["arrow-curl", 120, 980, 150, -20], ["sparkle", 880, 330, 70, 0, "ink"]]
+        },
+        {
+          "layout": "qa",
+          "bg": "lilac",
+          "subject": "Maths",
+          "label_c": "#7B4FD6",
+          "question": "How do you stop losing the last accuracy mark?",
+          "answer": [
+            "Non-exact answers: **3 significant figures**, unless the question says otherwise.",
+            "Angles in degrees: **1 decimal place.**",
+            "Keep **4+ figures** in your working. Round **once**, at the very end.",
+            "π: use the **calculator button** or 3.142."
+          ],
+          "mistake": "rounding halfway through, so the answer is off by 0.01 and the A1 is gone.",
+          "owl_at": [838, 540, 12],
+          "owl_says": "3 s.f. or bust"
+        },
+        {
+          "layout": "qa",
+          "bg": "mint",
+          "subject": "Physics",
+          "label_c": "#13895A",
+          "question": "How do you get full marks on a calculation?",
+          "answer": [
+            "**Step 1:** write the equation in symbols, e.g. p = F / A.",
+            "**Step 2:** substitute your numbers, **in SI units**.",
+            "**Step 3:** give the answer **with its unit**, to 2–3 s.f.",
+            "Wrong final answer? A clear substitution can still earn the method mark."
+          ],
+          "mistake": "not converting first: g → kg, cm² → m², kJ → J, minutes → seconds.",
+          "owl_at": [838, 540, -8],
+          "owl_says": "units = marks"
+        },
+        {
+          "layout": "qa",
+          "bg": "bubble",
+          "subject": "Computer Science",
+          "label_c": "#C2297F",
+          "question": "How do you write pseudocode the examiner can mark?",
+          "answer": [
+            "Use Cambridge's keywords: **INPUT, OUTPUT, IF…THEN…ENDIF, FOR…NEXT, WHILE…DO…ENDWHILE.**",
+            "Assign with **←**, not =.",
+            "**Initialise** totals and counters *before* the loop.",
+            "Indent every block. Name things Total, not x."
+          ],
+          "mistake": "OUTPUT inside the loop, so it prints 50 times instead of once.",
+          "owl_at": [838, 540, 8],
+          "owl_says": "← not ="
+        },
+        {
+          "layout": "cta",
+          "bg": "paper",
+          "title": "Stuck doesn't\nlast long here.",
+          "sub": "Every past-paper question has an **Explain** button: the working, step by step, how the marks are given, and the mistakes people make.",
+          "button": "prepwithtee.com",
+          "doodles": [
+            ["sparkle", 860, 300, 70, 0, "ink"],
+            ["sparkle", 940, 390, 34, 0, "ink"],
+            ["arrow-loop", 640, 960, 200, 0]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qa-02-command-words",
+      "bg": "sky",
+      "caption": "Half of “I knew it but got 1 mark” is answering the wrong command word. 🎯\n\nState ≠ Describe ≠ Explain. Save this and check it before your next paper.",
+      "hashtags": ["commandwords", "examtips", "olevel", "igcse", "alevel", "cambridge"],
+      "slides": [
+        {
+          "layout": "defs",
+          "title": "Command words,\nexplained like\nyou're tired.",
+          "size": "m",
+          "colours": ["#fff", "lime", "sun", "bubble", "lilac", "mint"],
+          "items": [
+            ["State", "A short answer. No reasons needed."],
+            ["Describe", "What happens, or the pattern. For a graph: the **trend + numbers**."],
+            ["Explain", "**Why** or **how**. If there's no “because”, it isn't an explanation."],
+            ["Calculate", "A number, with working shown **and a unit**."],
+            ["Suggest", "Apply what you know to something new. More than one answer can score."],
+            ["Sketch", "The shape and key features. Not an accurate plot."]
+          ],
+          "doodles": [["arrow-down", 800, 250, 120, 10]]
+        }
+      ]
+    }
+  ]
+}

@@ -400,10 +400,10 @@ def _page(*, title: str, desc: str, path: str, body: str,
 {_nav()}
 <main class="{main_class}">{body}</main>
 {_foot()}
-<script src="/main.js?v=20261005a"></script>
+<script src="/main.js?v=20261009a"></script>
 <script src="/tools-core.js?v=20261005a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20261005c"></script>
+<script type="module" src="/auth.js?v=20261009a"></script>
 </body>
 </html>"""
 

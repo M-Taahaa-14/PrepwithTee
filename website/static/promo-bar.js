@@ -21,22 +21,38 @@
     until: "2026-11-15",                       // last day it shows (late joiners still welcome)
     badge: "New batch",
     text: "Maths, Physics & Computer Science batches start 31 October - O Level & IGCSE from PKR 8,499/month, money-back guarantee.",
-    short: "New batches from 31 Oct · from PKR 8,499/mo",
+    // the one-line bar: lead + date, then details that drop away as the screen narrows
+    lead: "Maths, Physics & CS classes start",
+    leadShort: "New classes from",              // phones
+    date: "31 Oct",
+    price: "O Level & IGCSE from PKR 8,499/mo",
+    guar: "Money-back guarantee",
     subjects: [                               // [label, page, A Level courses]
       ["Maths", "/maths-classes.html", "9709 · P1 · P3 · M1 · S1"],
       ["Physics", "/physics-classes.html", "9702 · AS · A2"],
       ["CS", "/cs-classes.html", "9618 · P1 – P4"],
     ],
-    wa: "https://wa.me/923204884375?text=Hi%20Tee%21%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20the%20batch%20starting%2031%20October.%20Subject%3A%20",
+    all: "/courses.html",
+    // the same filled-in request as the class pages' demo buttons (scripts/class_pages.py)
+    wa: "https://wa.me/923204884375?text=" + encodeURIComponent([
+      "Hi Tee! I'd like to book a FREE DEMO class.", "",
+      "📚 Subject + level (e.g. A Level Maths 9709 - P1): ",
+      "📅 Batch: starts Saturday 31 October 2026 (groups of 4-6)",
+      "📍 Online or in person in Lahore: ",
+      "🎯 Exam session (e.g. May/June 2027): ",
+      "👤 Student's name: ",
+      "🏫 School & current grade/year: ",
+      "🕒 Best days & time for the demo: ", "",
+      "(Sent from prepwithtee.com" + location.pathname + ")"].join("\n")),
   };
   var BAR_KEY = "pwt-promo-closed";
   var CARD_KEY = "pwt-promo-card";            // JSON {id, at}
   var CARD_SNOOZE_DAYS = 3;
-  var QUIET = /^\/(maths-classes|physics-classes|cs-classes|admin|login|set-password|reset-password|forgot-password|whiteboard\/|papers\/view|yearly\/view|mcq\/session)/;
+  var QUIET = /^\/(courses|maths-classes|physics-classes|cs-classes|admin|login|set-password|reset-password|forgot-password|whiteboard\/|papers\/view|yearly\/view|mcq\/session)/;
 
   if (window.__pwtPromo) return;
   window.__pwtPromo = true;
-  if (/^\/(maths|physics|cs)-classes/.test(location.pathname)) window.__pwtWhatsNew = true;  // keep the course page clean
+  if (/^\/(courses|(maths|physics|cs)-classes)/.test(location.pathname)) window.__pwtWhatsNew = true;  // keep the course page clean
   if (QUIET.test(location.pathname)) return;
   if (new Date() > new Date(PROMO.until + "T23:59:59+05:00")) return;
 
@@ -58,18 +74,28 @@
   var CSS =
     ".pwt-promo,.pwt-pc{--pp-a:#2E1B4A;--pp-b:#4C2E72;--pp-ink:#fff;--pp-sub:rgba(255,255,255,.78);--pp-gold:#E8913A;--pp-gold-ink:#2b1606;" +
       "--pp-wa:#25D366;--pp-wa-ink:#06301a;--pp-glass:rgba(255,255,255,.08);--pp-line:rgba(255,255,255,.16)}" +
-    /* bar */
-    ".pwt-promo{background:linear-gradient(90deg,var(--pp-a),var(--pp-b) 55%,var(--pp-a));color:var(--pp-ink);font:600 .9rem/1.35 'Hanken Grotesk',system-ui,sans-serif;position:relative;z-index:60}" +
-    ".pwt-promo-in{max-width:1240px;margin:0 auto;padding:9px 48px 9px 16px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center}" +
-    ".pwt-promo-badge{font:800 .7rem/1 Archivo,sans-serif;letter-spacing:.12em;text-transform:uppercase;background:var(--pp-gold);color:var(--pp-gold-ink);padding:5px 9px;border-radius:999px}" +
-    ".pwt-promo-links{display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center}" +
-    ".pwt-promo-links a{color:var(--pp-gold-ink);background:var(--pp-gold);font-weight:800;font-size:.8rem;text-decoration:none;white-space:nowrap;padding:4px 10px;border-radius:999px}" +
-    ".pwt-promo-links a:hover{filter:brightness(1.08)}" +
+    /* bar: one slim line (~38px), the details drop away as the screen narrows */
+    ".pwt-promo{background:linear-gradient(90deg,var(--pp-a),var(--pp-b) 50%,var(--pp-a));color:var(--pp-ink);position:relative;z-index:60;" +
+      "font:500 .84rem/1.2 'Hanken Grotesk',system-ui,sans-serif;font-feature-settings:'tnum' 1;letter-spacing:.005em}" +
+    ".pwt-promo-in{max-width:1240px;margin:0 auto;height:38px;padding:0 44px 0 16px;display:flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;overflow:hidden}" +
+    ".pwt-promo-badge{flex:none;font:700 .62rem/1 'Hanken Grotesk',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--pp-gold);" +
+      "border:1px solid rgba(232,145,58,.55);padding:4px 8px;border-radius:999px}" +
+    ".pwt-promo-msg{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--pp-sub)}" +
+    ".pwt-promo-msg b{color:var(--pp-ink);font-weight:600}" +
+    ".pwt-promo-msg em{font:italic 700 1rem/1 'Playfair Display',Georgia,serif;color:var(--pp-gold);margin-left:3px}" +
+    ".pwt-promo-msg i{font-style:normal;opacity:.45;margin:0 8px}" +
+    ".pwt-promo-cta{flex:none;color:var(--pp-gold-ink);background:var(--pp-gold);font-weight:700;font-size:.78rem;text-decoration:none;padding:5px 12px;border-radius:999px;transition:filter .15s}" +
+    ".pwt-promo-cta:hover{filter:brightness(1.08)}" +
+    ".pwt-promo-cta:focus-visible,.pwt-promo-msg a:focus-visible{outline:2px solid var(--pp-gold);outline-offset:2px}" +
     ".pwt-x{position:absolute;width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:var(--pp-ink);opacity:.75;font-size:1.25rem;line-height:1;cursor:pointer}" +
     ".pwt-x:hover,.pwt-x:focus-visible{opacity:1;background:rgba(255,255,255,.14)}" +
-    ".pwt-promo .pwt-x{right:10px;top:50%;transform:translateY(-50%)}" +
-    ".pwt-promo-short{display:none}" +
-    "@media (max-width:720px){.pwt-promo-long{display:none}.pwt-promo-short{display:inline}.pwt-promo{font-size:.84rem}}" +
+    ".pwt-promo .pwt-x{right:8px;top:50%;transform:translateY(-50%);width:26px;height:26px;font-size:1.1rem}" +
+    "@media (max-width:1100px){.pwt-promo-guar,.pwt-promo-msg i.g{display:none}}" +
+    "@media (max-width:820px){.pwt-promo-price,.pwt-promo-msg i.p{display:none}}" +
+    ".pwt-promo-lead-s{display:none}" +
+    "@media (max-width:520px){.pwt-promo-badge,.pwt-promo-lead,.pwt-promo-when{display:none}.pwt-promo-lead-s{display:inline}" +
+      ".pwt-promo-in{gap:10px;padding-left:12px}.pwt-promo{font-size:.82rem}}" +
+    "@media (max-width:360px){.pwt-promo-cta-l{display:none}}" +
     /* card */
     ".pwt-pc{position:fixed;left:20px;bottom:20px;z-index:10000;width:min(390px,calc(100vw - 40px));color:var(--pp-ink);font-family:'Hanken Grotesk',system-ui,sans-serif;" +
       "background:radial-gradient(420px 260px at 100% 0,#6B3FA0 0,transparent 70%),linear-gradient(160deg,var(--pp-b),var(--pp-a));border-radius:24px;padding:22px 22px 20px;" +
@@ -94,6 +120,7 @@
     ".pwt-pc-acts a{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;padding:11px 12px;font-weight:800;font-size:.9rem;text-decoration:none;white-space:nowrap}" +
     ".pwt-pc-acts a:hover{filter:brightness(1.06)}" +
     ".pwt-pc-wa{background:var(--pp-wa);color:var(--pp-wa-ink)}" +
+    ".pwt-pc-all{background:var(--pp-gold);color:var(--pp-gold-ink)}" +
     ".pwt-pc-wa svg{width:17px;height:17px}" +
     "@media (max-width:560px){.pwt-pc{left:10px;right:10px;bottom:10px;width:auto;padding:18px 16px 16px;border-radius:20px}.pwt-pc h3{font-size:1.3rem}.pwt-pc-sub{display:none}}" +
     "@media (prefers-reduced-motion:reduce){.pwt-pc{transition:none}}";
@@ -102,23 +129,28 @@
   function daysLeft() { return Math.ceil((new Date(PROMO.start + "T00:00:00+05:00") - new Date()) / 864e5); }
 
   function mountBar(header) {
+    var d = daysLeft();
+    var when = d > 1 && d <= 14 ? " · " + d + " days to go" : "";
     var bar = el("div", "pwt-promo",
       '<div class="pwt-promo-in"><span class="pwt-promo-badge"></span>' +
-      '<span><span class="pwt-promo-long"></span><span class="pwt-promo-short"></span></span>' +
-      '<span class="pwt-promo-links"></span></div>' +
+      '<span class="pwt-promo-msg"><b class="pwt-promo-lead"></b><b class="pwt-promo-lead-s"></b><em></em><span class="pwt-promo-when"></span>' +
+      '<i class="p" aria-hidden="true">|</i><span class="pwt-promo-price"></span>' +
+      '<i class="g" aria-hidden="true">|</i><span class="pwt-promo-guar"></span></span>' +
+      '<a class="pwt-promo-cta"></a></div>' +
       '<button type="button" class="pwt-x" aria-label="Close announcement">×</button>');
     bar.setAttribute("role", "region");
     bar.setAttribute("aria-label", "Announcement");
     bar.querySelector(".pwt-promo-badge").textContent = PROMO.badge;
-    bar.querySelector(".pwt-promo-long").textContent = PROMO.text;
-    bar.querySelector(".pwt-promo-short").textContent = PROMO.short;
-    var links = bar.querySelector(".pwt-promo-links");
-    PROMO.subjects.forEach(function (sub) {
-      var a = document.createElement("a");
-      a.href = sub[1];
-      a.textContent = sub[0] + " →";
-      links.appendChild(a);
-    });
+    bar.querySelector(".pwt-promo-lead").textContent = PROMO.lead;
+    bar.querySelector(".pwt-promo-lead-s").textContent = PROMO.leadShort;
+    bar.querySelector(".pwt-promo-msg em").textContent = PROMO.date;
+    bar.querySelector(".pwt-promo-when").textContent = when;
+    bar.querySelector(".pwt-promo-price").textContent = PROMO.price;
+    bar.querySelector(".pwt-promo-guar").textContent = PROMO.guar;
+    bar.querySelector(".pwt-promo-msg").title = PROMO.text;
+    var cta = bar.querySelector(".pwt-promo-cta");
+    cta.href = PROMO.all;
+    cta.innerHTML = 'See<span class="pwt-promo-cta-l"> courses</span> →';
     var old = document.querySelector(".announce");
     bar.querySelector(".pwt-x").addEventListener("click", function () {
       set(BAR_KEY, PROMO.id);
@@ -140,7 +172,7 @@
       '<div class="pwt-pc-rows"></div>' +
       '<span class="pwt-pc-guar">💯 Not happy after the first paid class? Full refund.</span>' +
       '<p class="pwt-pc-from">O Level &amp; IGCSE <b>PKR 8,499</b>/mo · A Level courses from <b>PKR 12,999</b>/mo</p>' +
-      '<div class="pwt-pc-acts"><a class="pwt-pc-wa" target="_blank" rel="noopener" data-go>' + WA_SVG + 'Book a free demo class</a></div>');
+      '<div class="pwt-pc-acts"><a class="pwt-pc-all" data-go>All courses →</a><a class="pwt-pc-wa" target="_blank" rel="noopener" data-go>' + WA_SVG + 'Free demo</a></div>');
     card.setAttribute("role", "dialog");
     card.setAttribute("aria-label", "New Maths batch");
     card.querySelector(".pwt-pc-count").textContent = count;
@@ -157,6 +189,7 @@
       rows.appendChild(r);
     });
     card.querySelector(".pwt-pc-wa").href = PROMO.wa;
+    card.querySelector(".pwt-pc-all").href = PROMO.all;
     var snooze = function () { set(CARD_KEY, JSON.stringify({ id: PROMO.id, at: Date.now() })); };
     var close = function () {
       snooze();

@@ -1,0 +1,142 @@
+{
+  "series": {
+    "title": "Memes & relatable",
+    "about": "Shareable, low-sell posts in known meme formats (born to / forced to, types of students, bingo, expectation vs reality). The brand is just the logo and URL. These bring reach; everything else converts it."
+  },
+  "posts": [
+    {
+      "id": "mm-01-born-forced",
+      "bg": "cream",
+      "caption": "PrepWithTee = damage control. 📚✨\n\nTag the friend who's in the bottom row right now.",
+      "hashtags": ["studentlife", "olevel", "igcse", "alevel", "studymemes", "examseason"],
+      "slides": [
+        {
+          "layout": "rows",
+          "rows": [
+            {
+              "title": "Born to:",
+              "items": [
+                ["🧋", "sip iced coffee at a cute café"],
+                ["📒", "follow a colour-coded study plan"],
+                ["🏸", "play badminton till midnight"]
+              ]
+            },
+            {
+              "title": "*Forced to:*",
+              "items": [
+                ["💻", "do 10 past papers in one night"],
+                ["📚", "learn 5 chapters in 5 days"],
+                ["😿", "cry over “show your working”"]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mm-02-night-before-types",
+      "bg": "white",
+      "caption": "The night before Paper 2 reveals who you really are. 🌙\n\nWhich one are you? Be honest. 👇",
+      "hashtags": ["studentlife", "studymemes", "examseason", "olevel", "igcse", "relatable"],
+      "slides": [
+        {
+          "layout": "grid4",
+          "title": "Types of students\nthe night before ((Paper 2))",
+          "size": "m",
+          "pop": "sun",
+          "tiles": [
+            ["🦉", "The night owl", "starts at 1 AM. peaks at 3 AM. sleeps through the alarm."],
+            ["🏃", "The speedrunner", "14 chapters. one night. zero regrets (yet)."],
+            ["😌", "The “I revised all year” one", "in bed by 10. suspicious. annoying."],
+            ["📱", "The group chat", "“guys is chapter 9 coming??” x 47"]
+          ],
+          "foot": "tag the night owl 👇"
+        }
+      ]
+    },
+    {
+      "id": "mm-03-exam-hall-bingo",
+      "bg": "lilac",
+      "caption": "Exam hall bingo. 🎯 How many have you had?\n\nScreenshot, mark yours, drop your score in the comments. 👇",
+      "hashtags": ["examseason", "studentlife", "olevel", "igcse", "alevel", "bingo"],
+      "slides": [
+        {
+          "layout": "bingo",
+          "title": "Exam hall bingo",
+          "sub": "how many? 👇",
+          "cells": [
+            "pen dies mid-answer",
+            "invigilator stops behind you",
+            "calculator stuck in RAD",
+            "blank on question 1",
+            "“5 minutes remaining”",
+            "forgot the formula you revised 5 times",
+            "answer comes out 4.99999",
+            "rubber rolls off the desk",
+            "someone asks for extra paper at minute 10",
+            "“show that”… you got something else",
+            "ruler too short for the graph",
+            "hand cramp at Q7",
+            "units?? what units",
+            "the hall is freezing",
+            "a sneeze echoes",
+            "remember the answer walking out",
+            "last question: 12 marks",
+            "everyone turns the page at once",
+            "a topic you skipped",
+            "graph drawn in pen",
+            "clock is 2 mins fast",
+            "changed a right answer to wrong",
+            "leaves after 30 mins (?)",
+            "pencil sharpener noise"
+          ],
+          "hits": [2, 6, 11, 16, 22]
+        }
+      ]
+    },
+    {
+      "id": "mm-04-expectation-reality",
+      "bg": "white",
+      "caption": "“I'll start revising in September.” 🙂\n\nIt's October. 🙃\n\nIf you're in the bottom half, start with one chapter tonight: topical past papers, free → prepwithtee.com",
+      "hashtags": ["studentlife", "procrastination", "examseason", "olevel", "igcse", "studymemes"],
+      "slides": [
+        {
+          "layout": "versus",
+          "title": "“I'll start revising\nin September”",
+          "size": "m",
+          "halves": [
+            {
+              "tag": "expectation",
+              "bg": "mint",
+              "say": "calm. colour-coded notes. 8 hours of sleep. *iconic.*",
+              "emoji": ["🧘", "📒", "😴", "🍵"]
+            },
+            {
+              "tag": "reality",
+              "bg": "coral",
+              "say": "it's October. learning chapter 1 and chapter 14 at the same time.",
+              "emoji": ["🔥", "🫠", "📚", "⏰"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mm-05-pov-any-sensible",
+      "bg": "sun",
+      "caption": "We've all been the “sensible answer” that wasn't. 💀\n\n(Our Explain button shows you which answers *do* count.) prepwithtee.com",
+      "hashtags": ["markscheme", "studymemes", "olevel", "igcse", "alevel", "relatable"],
+      "slides": [
+        {
+          "layout": "hook",
+          "eyebrow": "pov:",
+          "size": "l",
+          "pop": "coral",
+          "title": "the mark scheme says\n“accept ((any sensible))\n((answer))”…",
+          "sub": "…and yours, somehow, wasn't. 💀",
+          "doodles": [["burst", 860, 300, 100, 0], ["arrow-down", 160, 1000, 120, -30]]
+        }
+      ]
+    }
+  ]
+}

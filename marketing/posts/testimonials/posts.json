@@ -1,0 +1,49 @@
+{
+  "series": {
+    "title": "Testimonials",
+    "about": "Real words from students and parents on tilted colour cards. ONLY use genuine quotes, with the person's permission - never invent one."
+  },
+  "posts": [
+    {
+      "id": "tm-01-what-they-say",
+      "bg": "white",
+      "note": "These three quotes are copied from the website homepage testimonials. Confirm they are genuine and that the students are happy to be named before posting.",
+      "caption": "Real students. Real marks. 📈\n\nWant to be the next card? Book a free demo → WhatsApp 0320 488 4375 · prepwithtee.com",
+      "hashtags": ["testimonials", "olevel", "igcse", "alevel", "lahore", "tuition"],
+      "slides": [
+        {
+          "layout": "cards",
+          "title": "What do\nthey *say?*",
+          "colours": ["#9B5CE0", "#4F6BE8", "#1F6E8C"],
+          "cards": [
+            {
+              "text": "Sir Taahaa helped me jump from a **C to an A*** in A Level Maths P3. The topical papers cut straight to what examiners ask.",
+              "name": "Rayyan K.",
+              "role": "A Level Maths (9709)",
+              "emoji": "🎓"
+            },
+            {
+              "text": "I used to get stuck on Physics 0625 Paper 4 calculation steps. The mark scheme breakdowns made **method marks super clear.**",
+              "name": "Hamza M.",
+              "role": "IGCSE Physics (0625)",
+              "emoji": "⚡"
+            },
+            {
+              "text": "One-on-one attention made all the difference. No skipped doubts. **Went from B to A** in O Level Maths 4024.",
+              "name": "Zoha S.",
+              "role": "O Level Maths (4024)",
+              "emoji": "📐"
+            }
+          ],
+          "doodles": [
+            ["arrow-curl", 650, 250, 170, 30],
+            ["sparkle", 520, 450, 70, 0, "ink"],
+            ["sparkle", 960, 980, 60, 0, "ink"],
+            ["sparkle", 980, 1150, 46, 0, "ink"]
+          ],
+          "url": false
+        }
+      ]
+    }
+  ]
+}

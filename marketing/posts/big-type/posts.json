@@ -1,0 +1,88 @@
+{
+  "series": {
+    "title": "Big type",
+    "about": "One idea, five words, filling the whole square on a single bright colour. One word swaps colour. Stops the scroll; works as a carousel cover too."
+  },
+  "posts": [
+    {
+      "id": "bt-01-syllabus-by-january",
+      "bg": "tang",
+      "caption": "Imagine walking into February with the whole syllabus done. 😌\n\nNew Maths, Physics & CS batches start 31 October: syllabus Nov – Jan, past papers Feb – Apr. Small groups, 4 classes + 1 test a week.\n\nBook a free demo → WhatsApp 0320 488 4375",
+      "hashtags": ["olevel", "igcse", "alevel", "lahore", "tuition", "maths", "physics", "computerscience"],
+      "slides": [
+        {
+          "layout": "bigtype",
+          "px": 168,
+          "lines": ["the whole", "syllabus.", "done by", "[[January.]]"],
+          "after": "New Maths, Physics & CS batches start **31 October**. Past papers Feb – Apr."
+        }
+      ]
+    },
+    {
+      "id": "bt-02-40k-questions",
+      "bg": "lilac",
+      "swap": "purple",
+      "caption": "Every Cambridge past-paper question since 2010, sorted by chapter and subtopic. 📚\n\nPick a chapter, get every question on it, mark scheme right underneath.\n\nO Level · IGCSE · A Level → prepwithtee.com",
+      "hashtags": ["pastpapers", "topicalpastpapers", "olevel", "igcse", "alevel", "cambridge"],
+      "slides": [
+        {
+          "layout": "bigtype",
+          "px": 150,
+          "lines": ["40,000+", "past paper", "questions.", "sorted by", "[[topic.]]"],
+          "after": "O Level, IGCSE & A Level. 2010 – 2025. Mark scheme under every one."
+        }
+      ]
+    },
+    {
+      "id": "bt-03-one-booklet",
+      "bg": "bubble",
+      "caption": "Stop scrolling through 40 PDFs to find the 6 questions on your chapter. 🫠\n\nPick up to 4 chapters → get every past-paper question on them, newest first, mark scheme under each one.\n\n3 free booklets every month → prepwithtee.com",
+      "hashtags": ["pastpapers", "studytips", "olevel", "igcse", "alevel", "revision"],
+      "note": "Slide 3 quotes a testimonial from the website's homepage - confirm it is a real student's words before posting.",
+      "slides": [
+        {
+          "layout": "bigtype",
+          "px": 148,
+          "lines": ["every past", "paper question", "on your chapter.", "in [[ONE]]", "booklet."]
+        },
+        {
+          "layout": "checklist",
+          "title": "go from *chaos*\nto **clarity**",
+          "size": "l",
+          "items": [
+            "pick up to 4 chapters (or just subtopics)",
+            "questions from 2010 – 2025",
+            "mark scheme right under each question",
+            "newest papers first",
+            "3 free booklets every month"
+          ]
+        },
+        {
+          "layout": "quote",
+          "quote": "Having mark schemes right under each question **saves so much time.**",
+          "name": "Bilal A.",
+          "role": "A Level Physics (9702)",
+          "tail": "Build your first booklet free.",
+          "tail_sub": "prepwithtee.com",
+          "url": false
+        }
+      ]
+    },
+    {
+      "id": "bt-04-free-past-papers",
+      "bg": "mint",
+      "swap": "navy",
+      "caption": "No sign-up. No paywall. Just the papers. 📄\n\nEvery O Level, IGCSE and A Level past paper we cover, with its mark scheme, open to everyone.\n\nprepwithtee.com/yearly",
+      "hashtags": ["pastpapers", "freeresources", "olevel", "igcse", "alevel", "cambridge"],
+      "slides": [
+        {
+          "layout": "bigtype",
+          "px": 176,
+          "lines": ["every", "past paper.", "[[free.]]", "no sign-up."],
+          "after": "O Level, IGCSE & A Level, with mark schemes. **prepwithtee.com/yearly**",
+          "url": false
+        }
+      ]
+    }
+  ]
+}

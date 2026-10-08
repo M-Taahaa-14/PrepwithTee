@@ -973,6 +973,14 @@ def list_notifications(user: _CurrentUser):
                 "href": "/homework.html", "done": False,
             })
 
+    # The shared folder with a teacher (classroom.py): new papers / boards /
+    # notes from them, and things they've marked.
+    try:
+        import classroom as _classroom
+        notes += _classroom.notifications(user)
+    except Exception as exc:
+        print(f"[notifications] classroom: {exc}", flush=True)
+
     # Newest first; anything without a timestamp sinks rather than jumping.
     notes.sort(key=lambda n: str(n.get("at") or ""), reverse=True)
     notes = notes[:40]
@@ -1812,6 +1820,14 @@ def send_message(req: SendMessageReq, user: _CurrentUser):
         raise HTTPException(400, "Message body cannot be empty")
     if len(body) > 4000:
         raise HTTPException(400, "Message too long (max 4000 chars)")
+    # Only between people who belong together (teacher <-> their student,
+    # parent <-> child or the child's teacher, anyone <-> admin), or a reply to
+    # someone who wrote first. It used to accept any user id at all.
+    import teaching as _teaching
+    if not _teaching.linked(user, req.recipient_id) and not any(
+            m.get("sender_id") == req.recipient_id
+            for m in _udb.get_messages_between(user["id"], req.recipient_id)):
+        raise HTTPException(403, "You can only message your teachers, students or family here.")
     msg = _udb.create_message(user["id"], req.recipient_id, body)
     return {"ok": True, "message": msg}
 

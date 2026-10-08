@@ -12,14 +12,15 @@
  * settings, insert (image / camera / sticky note / sticker / PDF pages),
  * present (fullscreen + laser), share links, export (PDF / PNG / print).
  */
-import { createAnnotator } from "/annotate.js?v=20261005c";
+import { createAnnotator } from "/annotate.js?v=20261009t";
+import { merge3, baseOf, presenceBar } from "/collab.js?v=20261009a";
 import { SIZES, PAPERS, PATTERNS, paperHex, isDark, sizeOf, drawPattern, AXES_DEFAULT, AXES_SUBS, checkAxes } from "/board/paper.js?v=20261008b";
 
 const ST = JSON.parse(document.getElementById("wb-state").textContent);
 const root = document.getElementById("wb");
 const DOC = `wb:${ST.board}`;
 const BASE = 1000;                                   // infinite canvas: px per world unit at 100 %
-const B = { board: null, pages: [], versions: new Map(), seen: new Map(), els: new Map(), ps: new Map(),
+const B = { board: null, pages: [], versions: new Map(), seen: new Map(), base: new Map(), els: new Map(), ps: new Map(),
             readonly: false, zoom: 1, cur: 0, p: null, dirtyThumb: false, me: null };
 let ann = null;
 
@@ -86,8 +87,12 @@ async function putPage(pid, objects, tries = 0) {
   if (r.status === 409) {
     const d = await r.json().catch(() => ({}));
     if (d.code === "stale" && tries < 4) {
-      const merged = merge(pid, objects, d.objects || []);
+      // three-way: what we last agreed on, mine, theirs (collab.js) - a teacher and
+      // a student drawing at once both keep their work, deletes stick
+      const merged = B.base.has(pid) ? merge3(B.base.get(pid), objects, d.objects || [])
+                                     : merge(pid, objects, d.objects || []);
       B.versions.set(pid, d.version);
+      B.base.set(pid, baseOf(d.objects || []));
       if (merged.length !== objects.length) {
         const p = ann.page(DOC, pid);
         if (p) { p.strokes = merged; ann.repaint(); }
@@ -101,6 +106,7 @@ async function putPage(pid, objects, tries = 0) {
   const d = await r.json();
   B.versions.set(pid, d.version);
   B.seen.set(pid, new Set(objects.map((o) => o.id)));
+  B.base.set(pid, baseOf(objects));
   clearDraft(pid);
   const pg = B.pages.find((x) => x.id === pid);
   if (pg) pg.objects = objects;
@@ -110,6 +116,7 @@ const store = {
   load: async () => Object.fromEntries(B.pages.map((p) => [p.id, p.objects])),
   async save(doc, pid, objects) {
     if (B.readonly) return;
+    if (ST.me) for (const o of objects) if (!o.by) o.by = ST.me.id;      // who drew it (shared boards)
     draft(pid, objects);
     for (let attempt = 0; ; attempt++) {
       try { await putPage(pid, objects); setStatus(ann?.pending > 1 ? "saving" : "saved"); return; }
@@ -133,6 +140,102 @@ function setStatus(state) {
   el.dataset.state = state;
 }
 
+// ── live sync (a board shared between a teacher and a student) ──────────────
+// Every 1.5 s while someone else has the board open, 6 s when alone, paused in
+// a hidden tab: pages someone else saved come in (a page busy here waits for
+// its own save, which merges them), pages they added / deleted / reordered too.
+const SYNC = { since: null, here: [], timer: 0, waiting: new Map(), onPeople: null, stopped: false };
+
+function startSync(data) {
+  SYNC.since = new Date().toISOString();
+  if (data.collab) {
+    const host = root.querySelector(".wb-status");
+    const wrapEl = document.createElement("span");
+    host.after(wrapEl);
+    const mine = data.owner_id ? data.owner_id === ST.me.id : ST.mine;
+    SYNC.onPeople = presenceBar(wrapEl, { me: ST.me.id, getAnn: () => ann,
+      label: mine ? "Shared with your teacher" : "Shared board" });
+    SYNC.onPeople([], data.people || []);
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { clearTimeout(SYNC.timer); syncTick(); } });
+  syncLater();
+}
+
+function syncLater() {
+  clearTimeout(SYNC.timer);
+  if (SYNC.stopped || document.hidden) return;
+  SYNC.timer = setTimeout(syncTick, SYNC.here.length || SYNC.waiting.size ? 1500 : 6000);
+}
+
+async function syncTick() {
+  if (SYNC.stopped || document.hidden) return;
+  try {
+    const q = new URLSearchParams({ since: SYNC.since, page: String((B.cur || 0) + 1) });
+    const d = await api("GET", `/api/wb/boards/${ST.board}/poll?${q}`);
+    SYNC.since = d.now;
+    SYNC.here = d.here || [];
+    SYNC.onPeople?.(SYNC.here);
+    const fresh = new Map((d.pages || []).map((r) => [r.id, r]));
+    if (B.board.kind !== "infinite" && (d.order || []).join() !== B.pages.map((x) => x.id).join()) {
+      await syncOrder(d.order || [], fresh);
+    }
+    for (const r of fresh.values()) SYNC.waiting.set(r.id, r);
+    for (const [pid, r] of [...SYNC.waiting]) if (await applyRemotePage(r)) SYNC.waiting.delete(pid);
+  } catch (e) {
+    if (e.status === 401 || e.status === 404) { SYNC.stopped = true; return; }
+  }
+  syncLater();
+}
+
+async function applyRemotePage(r) {
+  const pg = B.pages.find((x) => x.id === r.id);
+  if (!pg) return true;
+  if ((B.versions.get(r.id) || 0) >= r.version) return true;
+  if (!(await ann.remote(DOC, r.id, r.objects))) return false;
+  B.versions.set(r.id, r.version);
+  B.base.set(r.id, baseOf(r.objects));
+  B.seen.set(r.id, new Set(r.objects.map((o) => o.id)));
+  pg.objects = r.objects;
+  if (JSON.stringify(pg.settings || {}) !== JSON.stringify(r.settings || {})) { pg.settings = r.settings; relayout(); }
+  markThumb(r.id);
+  return true;
+}
+
+async function syncOrder(order, fresh) {
+  if (order.some((id) => !B.pages.find((x) => x.id === id) && !fresh.has(id))) {
+    try {                                          // a new page we have no copy of: fetch the board
+      const full = await api("GET", `/api/wb/boards/${ST.board}`);
+      for (const p of full.pages) if (!fresh.has(p.id)) fresh.set(p.id, p);
+    } catch { return; }
+  }
+  for (const pg of [...B.pages]) {
+    if (order.includes(pg.id)) continue;
+    const el = B.els.get(pg.id);
+    if (el) { ann.detachWithin(el); el.remove(); }
+    B.els.delete(pg.id);
+    B.pages.splice(B.pages.indexOf(pg), 1);
+  }
+  for (const id of order) {
+    if (B.pages.find((x) => x.id === id)) continue;
+    const f = fresh.get(id);
+    if (!f) continue;
+    const pg = { id, settings: f.settings || {}, objects: f.objects || [], version: f.version || 1 };
+    B.pages.push(pg);
+    B.versions.set(id, pg.version);
+    B.base.set(id, baseOf(pg.objects));
+    B.seen.set(id, new Set(pg.objects.map((o) => o.id)));
+    const el = pageEl(pg);
+    wrap.appendChild(el);
+    B.ps.set(id, await ann.attach(el, DOC, id, { strokes: pg.objects }));
+    fresh.delete(id);
+  }
+  B.pages.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  for (const pg of B.pages) { const el = B.els.get(pg.id); if (el) wrap.appendChild(el); }
+  relayout();
+  renderThumbs();
+  onScroll();
+}
+
 // ── start ────────────────────────────────────────────────────────────────────
 async function start() {
   let data;
@@ -149,6 +252,7 @@ async function start() {
   for (const p of B.pages) {
     B.versions.set(p.id, p.version || 1);
     B.seen.set(p.id, new Set((p.objects || []).map((o) => o.id)));
+    B.base.set(p.id, baseOf(p.objects || []));
     // a save that never reached the server (closed offline): put it back
     if (!B.readonly) {
       try {
@@ -171,6 +275,7 @@ async function start() {
   if (B.board.kind === "infinite") await mountInfinite(); else await mountPages();
   for (const p of B.pages) if (p.restored) { ann.page(DOC, p.id)?.strokes && store.save(DOC, p.id, ann.page(DOC, p.id).strokes); }
   if (ST.insertq) insertQuestion(ST.insertq);
+  if (!ST.share && ST.me) startSync(data);
   if (new URLSearchParams(location.search).get("share") === "1") openShare();
   root.dataset.state = "ready";
 }
@@ -978,8 +1083,13 @@ async function openShare() {
   const body = d.el.querySelector(".wb-dlg-body");
   const paint = () => {
     body.innerHTML = `
-      ${me.has_teacher ? `<label class="wb-check"><input type="checkbox" data-teacher ${B.board.shared_with_teacher ? "checked" : ""}>
-        <span><b>Send to my teacher</b><small>Your teacher can open this board (they can't change it).</small></span></label>` : ""}
+      ${me.has_teacher ? `<p class="wb-lbl">My teacher</p>
+        <div class="wb-row"><select data-teacher aria-label="What your teacher can do">
+          <option value="off" ${!B.board.shared_with_teacher ? "selected" : ""}>Not shared with my teacher</option>
+          <option value="view" ${B.board.shared_with_teacher && !B.board.teacher_edit ? "selected" : ""}>My teacher can view it</option>
+          <option value="edit" ${B.board.teacher_edit ? "selected" : ""}>My teacher can view and write on it</option>
+        </select></div>
+        <p class="wb-dlg-p"><small>When your teacher can write on it, you both see each other's ink within a second or two.</small></p>` : ""}
       <p class="wb-lbl">Make a link</p>
       <div class="wb-row">
         <select data-role aria-label="What people with the link can do"><option value="view">Anyone with the link can view</option>
@@ -996,10 +1106,13 @@ async function openShare() {
   paint();
   body.addEventListener("change", async (e) => {
     if (!e.target.matches("[data-teacher]")) return;
+    const v = e.target.value;
     try {
-      await api("PATCH", `/api/wb/boards/${ST.board}`, { shared_with_teacher: e.target.checked });
-      B.board.shared_with_teacher = e.target.checked;
-      toast(e.target.checked ? "Your teacher can now open this board" : "No longer shared with your teacher");
+      await api("PATCH", `/api/wb/boards/${ST.board}`, { shared_with_teacher: v !== "off", teacher_edit: v === "edit" });
+      B.board.shared_with_teacher = v !== "off";
+      B.board.teacher_edit = v === "edit";
+      toast({ off: "No longer shared with your teacher", view: "Your teacher can now open this board",
+              edit: "Your teacher can now write on this board with you" }[v]);
     } catch (err) { toast(err.message, "bad"); }
   });
   body.addEventListener("click", async (e) => {

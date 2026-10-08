@@ -1,0 +1,81 @@
+{
+  "series": {
+    "title": "Class promos",
+    "about": "The class batches, in the new sticker style: bright background, price burst, tilted chips, WhatsApp bar. Use sparingly - roughly 1 in 5 posts should sell."
+  },
+  "posts": [
+    {
+      "id": "pr-01-batch-sticker",
+      "bg": "sun",
+      "caption": "New batches start 31 October. 🗓️\n\nMaths, Physics & Computer Science for O Level, IGCSE and A Level. Small groups of 4–6, 4 classes + 1 test a week. Syllabus done Nov – Jan, past papers Feb – Apr.\n\nFrom PKR 8,499/month. Not happy after your first paid class? Full refund.\n\nBook a free demo → WhatsApp 0320 488 4375",
+      "hashtags": ["olevel", "igcse", "alevel", "lahore", "tuition", "maths", "physics", "computerscience"],
+      "slides": [
+        {
+          "layout": "promo",
+          "eyebrow": "starts 31 october",
+          "pop": "coral",
+          "title": "Maths,\nPhysics\n& CS\n((classes))",
+          "size": "l",
+          "sub": "O Level · IGCSE · A Level\nsmall groups of 4–6, online or in Lahore",
+          "chips": [
+            "📚 syllabus done Nov – Jan",
+            "📝 past papers Feb – Apr",
+            "🗓️ 4 classes + 1 test a week",
+            "💯 money-back guarantee"
+          ],
+          "badge": ["new batch", "lime"],
+          "burst": {
+            "top": "from",
+            "big": "8,499",
+            "bottom": "PKR / month",
+            "at": [650, 240, 330],
+            "bg": "lime",
+            "rot": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "pr-02-money-back",
+      "bg": "navy",
+      "swap": "lime",
+      "caption": "Zero risk. 🤝\n\nThe demo class is free. And if you're not happy after your first PAID class, you get a full refund.\n\nMaths, Physics & CS batches start 31 October → WhatsApp 0320 488 4375",
+      "hashtags": ["olevel", "igcse", "alevel", "lahore", "tuition"],
+      "slides": [
+        {
+          "layout": "bigtype",
+          "px": 132,
+          "lines": ["not happy", "after your first", "paid class?", "[[full refund.]]"],
+          "after": "And the demo class is free. WhatsApp **0320 488 4375**.",
+          "doodles": [["sparkle", 880, 280, 80, 0, "lime"], ["underline", 92, 840, 560, -1, "lime"]]
+        }
+      ]
+    },
+    {
+      "id": "pr-03-alevel-papers",
+      "bg": "lilac",
+      "caption": "A Level? Only pay for the papers you're actually sitting. 🎯\n\nMaths 9709: P1 · P3 · M1 · S1\nPhysics 9702: AS · A2\nComputer Science 9618: P1 – P4\n\nFrom PKR 12,999/month per course, ask about bundles. Starts 31 October.\n\nWhatsApp 0320 488 4375",
+      "hashtags": ["alevel", "alevelmaths", "alevelphysics", "alevelcs", "lahore", "tuition"],
+      "slides": [
+        {
+          "layout": "promo",
+          "eyebrow": "a level · starts 31 october",
+          "pop": "lime",
+          "title": "Take only\nthe ((papers))\nyou need.",
+          "size": "l",
+          "sub": "**Maths 9709** P1 · P3 · M1 · S1\n**Physics 9702** AS · A2\n**CS 9618** P1 – P4",
+          "chips": ["👥 groups of 4–6", "🧪 weekly tests", "💯 money-back guarantee"],
+          "badge": ["a level", "sun"],
+          "burst": {
+            "top": "from",
+            "big": "12,999",
+            "bottom": "PKR / month",
+            "at": [700, 200, 300],
+            "bg": "sun",
+            "rot": -6
+          }
+        }
+      ]
+    }
+  ]
+}

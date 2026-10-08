@@ -53,6 +53,8 @@ from pydantic import BaseModel, field_validator
 import access as _access
 import annot_pdf
 import auth as _auth
+import teach_store as _ts
+import teaching as _teaching
 import users_db as _udb
 import wb_store as S
 
@@ -60,7 +62,7 @@ router = APIRouter()
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSET_DIR = Path(os.environ.get("INK_ASSET_DIR") or ROOT / "data" / "ink_assets")
-WB_V = "20261008b"                       # bump with static/board/* and annotate.*
+WB_V = "20261009t"                       # bump with static/board/* and annotate.*
 FREE_BOARDS = 3
 FREE_BYTES = 50 * 1024 * 1024
 PAID_BYTES = 2 * 1024 * 1024 * 1024
@@ -96,14 +98,7 @@ def _limits(user: dict) -> dict:
 
 
 def _teaches(teacher: dict | None, student_id: str) -> bool:
-    if not teacher or teacher.get("role") not in ("teacher", "admin"):
-        return False
-    if teacher.get("role") == "admin":
-        return True
-    try:
-        return any(r.get("student_id") == student_id for r in _udb.get_teacher_students(teacher["id"]))
-    except Exception:
-        return False
+    return _teaching.teaches(teacher, student_id)
 
 
 def _id_or_404(v: str) -> str:
@@ -112,17 +107,29 @@ def _id_or_404(v: str) -> str:
     return v
 
 
-def _board_for(user: dict | None, board_id: str, write: bool = False) -> dict:
-    """The board, if this user may see it (owner; their teacher / an admin
-    read-only). 404 for everyone else, so ids can't be probed."""
+def _board_for(user: dict | None, board_id: str, write: bool | str = False) -> dict:
+    """The board, if this user may see it. 404 for everyone else, so ids can't
+    be probed.
+      read:          owner; a member (wb_members); their teacher if the student
+                     shared it; an admin
+      write="draw":  owner, or a member with the edit role (pages + ink)
+      write=True:    owner only (rename, trash, share links)"""
     b = S.get_board(_id_or_404(board_id))
     if not b or not user:
         raise HTTPException(404, "Board not found")
     if b["owner_id"] == user["id"]:
         return b
-    if not write and _teaches(user, b["owner_id"]) and (b.get("shared_with_teacher") or user.get("role") == "admin"):
+    role = _ts.board_role(b["id"], user["id"])
+    if write == "draw" and role == "edit":
+        return b
+    if not write and (role or (_teaches(user, b["owner_id"])
+                               and (b.get("shared_with_teacher") or user.get("role") == "admin"))):
         return b
     raise HTTPException(404, "Board not found")
+
+
+def _can_draw(user: dict, b: dict) -> bool:
+    return b["owner_id"] == user["id"] or _ts.board_role(b["id"], user["id"]) == "edit"
 
 
 def _share_or_404(token: str) -> tuple[dict, dict]:
@@ -138,7 +145,14 @@ def _share_or_404(token: str) -> tuple[dict, dict]:
 
 
 def _live_count(owner_id: str) -> int:
-    return sum(1 for b in S.list_boards(owner_id) if not b.get("deleted_at"))
+    """Boards counted against the free limit - a board a teacher made for the
+    student (a member the student didn't add) is the teacher's, not counted."""
+    live = [b for b in S.list_boards(owner_id) if not b.get("deleted_at")]
+    try:
+        theirs = {b["id"] for b in live for m in _ts.board_members(b["id"]) if m.get("added_by") not in (None, owner_id)}
+    except Exception:
+        theirs = set()
+    return sum(1 for b in live if b["id"] not in theirs)
 
 
 def _room_for_board(user: dict) -> None:
@@ -314,7 +328,62 @@ def wb_get(board_id: str, user: dict = Depends(_auth.get_current_user)):
     mine = b["owner_id"] == user["id"]
     if mine:
         S.update_board(b["id"], {"opened_at": S.now()})
-    return {**_full(b), "readonly": not mine or bool(b.get("deleted_at"))}
+        _ts.student_event(("board",), b["id"])         # a board in their folder: now in progress
+    others = _people(b, user)
+    return {**_full(b), "readonly": not _can_draw(user, b) or bool(b.get("deleted_at")),
+            "me": user["id"], "people": others,
+            "collab": len(others) > 1 or bool(b.get("shared_with_teacher")),
+            "teacher_edit": any(p["role"] == "edit" and p["id"] != b["owner_id"] for p in others)}
+
+
+def _people(b: dict, user: dict) -> list[dict]:
+    """Everyone else who can open this board: owner + members (+ the owner's
+    teachers when the board is shared with them). For names on presence dots."""
+    try:
+        rows = _ts.board_members(b["id"])
+    except Exception:
+        rows = []
+    ids = {b["owner_id"]: "edit", **{r["user_id"]: r["role"] for r in rows}}
+    out = []
+    for uid, role in ids.items():
+        u = _udb.get_user(uid) or {}
+        out.append({"id": uid, "name": u.get("name") or "Someone", "role": role,
+                    "teacher": u.get("role") in ("teacher", "admin"), "owner": uid == b["owner_id"]})
+    return out
+
+
+@router.get("/api/wb/boards/{board_id}/poll")
+def wb_poll(board_id: str, since: str | None = None, page: str | None = None,
+            user: dict = Depends(_auth.get_current_user)):
+    """What changed since `since` (the `now` of the previous poll): pages
+    (objects + version), the page order, and who else has the board open.
+    The editor calls this every 1-6 s while open."""
+    b = _board_for(user, board_id)
+    doc = f"wb:{b['id']}"
+    try:
+        _ts.touch_presence(doc, user["id"], (page or "")[:40] or None)
+        here = [r for r in _ts.present(doc) if r["user_id"] != user["id"]]
+    except Exception:
+        here = []
+    t = _ts.now()
+    pages = []
+    if since:
+        # 2 s of overlap: a save that landed while the last poll ran is not missed
+        from datetime import datetime, timedelta
+        try:
+            cut = (datetime.fromisoformat(since) - timedelta(seconds=2)).isoformat()
+        except ValueError:
+            cut = None
+        rows = _ts._select("wb_pages", {"board_id": b["id"]}, gt=("updated_at", cut)) if cut else []
+        pages = [{"id": r["page_id"], "objects": r.get("objects") or [], "version": r.get("version") or 1,
+                  "settings": r.get("settings") or {}} for r in rows]
+    names = {}
+    for r in here:
+        u = _udb.get_user(r["user_id"]) or {}
+        names[r["user_id"]] = {"id": r["user_id"], "name": u.get("name") or "Someone", "page": r.get("page"),
+                               "teacher": u.get("role") in ("teacher", "admin")}
+    return {"now": t, "pages": pages, "order": b.get("page_order") or [], "title": b.get("title"),
+            "here": list(names.values())}
 
 
 class BoardPatch(BaseModel):
@@ -324,6 +393,7 @@ class BoardPatch(BaseModel):
     settings: dict | None = None
     thumb: str | None = None
     shared_with_teacher: bool | None = None
+    teacher_edit: bool | None = None                      # my teachers may draw on it too
     move: bool = False                                    # folder_id given (None = out of any folder)
 
 
@@ -368,6 +438,11 @@ def wb_patch(board_id: str, req: BoardPatch, user: dict = Depends(_auth.get_curr
         _drop_cover(b.get("thumb"), f["thumb"], user["id"], b["id"])
     if req.shared_with_teacher is not None:
         f["shared_with_teacher"] = req.shared_with_teacher
+    if req.teacher_edit is not None:
+        for t in _teaching.teachers_of(user["id"]):
+            _ts.set_board_member(b["id"], t["id"], "edit" if req.teacher_edit else None, user["id"])
+        if req.teacher_edit:
+            f["shared_with_teacher"] = True
     if f:
         if set(f) - {"thumb", "starred"}:
             f["updated_at"] = S.now()
@@ -467,7 +542,7 @@ class NewPage(BaseModel):
 
 @router.post("/api/wb/boards/{board_id}/pages")
 def wb_add_page(board_id: str, req: NewPage, user: dict = Depends(_auth.get_current_user)):
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     if b["kind"] != "pages":
         raise HTTPException(400, "An infinite board has one canvas")
     order = list(b.get("page_order") or [])
@@ -494,11 +569,13 @@ class PageSave(BaseModel):
 
 @router.put("/api/wb/boards/{board_id}/pages/{page_id}")
 def wb_save_page(board_id: str, page_id: str, req: PageSave, user: dict = Depends(_auth.get_current_user)):
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     if b.get("deleted_at"):
         raise HTTPException(409, {"code": "trashed", "message": "This board is in the trash - restore it to edit"})
     objs = _check_objects(req.objects, b["kind"] == "infinite")
-    v = S.save_page(b["id"], _id_or_404(page_id), objs, req.version)
+    known = {o.get("id"): o.get("by") for o in (S.get_page(b["id"], _id_or_404(page_id)) or {}).get("objects") or []}
+    objs = [{**o, "by": known.get(o.get("id")) or o.get("by") or user["id"]} for o in objs]    # authorship
+    v = S.save_page(b["id"], page_id, objs, req.version)
     if v is None:
         cur = S.get_page(b["id"], page_id)
         if not cur:
@@ -516,7 +593,7 @@ class PagePatch(BaseModel):
 
 @router.patch("/api/wb/boards/{board_id}/pages/{page_id}")
 def wb_page_settings(board_id: str, page_id: str, req: PagePatch, user: dict = Depends(_auth.get_current_user)):
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     if not S.get_page(b["id"], _id_or_404(page_id)):
         raise HTTPException(404, "Page not found")
     s = clean_settings(req.settings)
@@ -526,7 +603,7 @@ def wb_page_settings(board_id: str, page_id: str, req: PagePatch, user: dict = D
 
 @router.delete("/api/wb/boards/{board_id}/pages/{page_id}")
 def wb_delete_page(board_id: str, page_id: str, user: dict = Depends(_auth.get_current_user)):
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     order = [p for p in (b.get("page_order") or []) if p != page_id]
     if not order:
         raise HTTPException(400, "A board needs at least one page")
@@ -541,7 +618,7 @@ class Order(BaseModel):
 
 @router.put("/api/wb/boards/{board_id}/order")
 def wb_order(board_id: str, req: Order, user: dict = Depends(_auth.get_current_user)):
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     if sorted(req.order) != sorted(b.get("page_order") or []):
         raise HTTPException(400, "The order must list every page once")
     S.update_board(b["id"], {"page_order": req.order, "updated_at": S.now()})
@@ -622,7 +699,8 @@ def ink_asset(asset_id: str, s: str | None = None, user: dict | None = Depends(_
     a = S.get_asset(_id_or_404(asset_id))
     if not a:
         raise HTTPException(404, "Not found")
-    ok = bool(user) and (a["owner_id"] == user["id"] or user.get("role") == "admin" or _teaches(user, a["owner_id"]))
+    ok = bool(user) and (a["owner_id"] == user["id"] or user.get("role") == "admin" or _teaches(user, a["owner_id"])
+                         or _teaching._teaches_id(a["owner_id"], user["id"]))
     if not ok and s:
         try:
             _, b = _share_or_404(s)
@@ -640,7 +718,7 @@ def ink_asset(asset_id: str, s: str | None = None, user: dict | None = Depends(_
 @router.post("/api/wb/boards/{board_id}/import-pdf")
 async def wb_import_pdf(board_id: str, file: UploadFile = File(...), user: dict = Depends(_auth.get_current_user)):
     """Each page of a PDF becomes a new board page with that page as its background."""
-    b = _board_for(user, board_id, write=True)
+    b = _board_for(user, board_id, write="draw")
     if not _limits(user)["pdf_import"]:
         raise HTTPException(403, {"code": "wb_paid", "message": "Importing PDFs comes with a paid plan."})
     if b["kind"] != "pages":
@@ -811,6 +889,15 @@ def wb_students(user: dict = Depends(_auth.get_current_user)):
     rows = _udb.get_teacher_students(user["id"]) if user.get("role") == "teacher" else []
     names = {r["student_id"]: r.get("name") or r.get("email") or "Student" for r in rows}
     boards = S.boards_shared_with_teacher(list(names))
+    have = {b["id"] for b in boards}
+    try:                                   # boards built for / opened to me as a member
+        for m in _ts.member_boards(user["id"]):
+            b = S.get_board(m["board_id"])
+            if b and not b.get("deleted_at") and b["id"] not in have and b["owner_id"] in names:
+                boards.append(b)
+                have.add(b["id"])
+    except Exception:
+        pass
     return {"boards": [{**_summary(b), "student": names.get(b["owner_id"]), "student_id": b["owner_id"]} for b in boards]}
 
 
@@ -850,8 +937,8 @@ def whiteboard_home(request: Request, user: dict | None = Depends(_auth.maybe_us
 {_blog._nav()}
 <main id="wbd" class="wbd" data-state="loading"><p class="wbd-loading">Opening your boards…</p></main>
 <script id="wbd-state" type="application/json">{_state({"me": {"id": user["id"], "name": user.get("name") or "", "role": user.get("role") or "student"}, "templates": {k: v[0] for k, v in TEMPLATES.items()}})}</script>
-<script src="/main.js?v=20261005a"></script>
-<script type="module" src="/auth.js?v=20261005c"></script>
+<script src="/main.js?v=20261009a"></script>
+<script type="module" src="/auth.js?v=20261009a"></script>
 <script type="module" src="/board/boards.js?v={WB_V}"></script>
 </body>
 </html>"""

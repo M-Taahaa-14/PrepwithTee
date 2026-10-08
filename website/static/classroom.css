@@ -1,0 +1,68 @@
+/* My classroom (/classroom) - the student's side of teaching. Site tokens only
+   (styles.css), so light and dimmed-slate dark both work. */
+
+.cr-subjects { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin: 1.2rem 0 2rem; }
+.cr-subj { display: flex; flex-direction: column; gap: .55rem; padding: 1.1rem 1.2rem; border-radius: var(--radius-lg);
+  background: var(--white); border: 1px solid var(--line); color: var(--ink); text-decoration: none;
+  transition: transform .15s, border-color .15s; }
+.cr-subj:hover { transform: translateY(-2px); border-color: var(--accent); }
+.cr-subj b { font-size: 1.15rem; }
+.cr-subj-code { align-self: flex-start; font: 800 .72rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .04em;
+  padding: .3rem .55rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.cr-subj-stats { display: flex; gap: .9rem; font-size: .82rem; color: var(--grey); }
+.cr-subj-stats b { color: var(--ink); }
+.cr-teachers { display: flex; align-items: center; gap: .4rem; font-size: .86rem; color: var(--grey); }
+.cr-av { width: 2.2rem; height: 2.2rem; border-radius: 50%; object-fit: cover; flex: none; display: inline-grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent); border: 1px solid var(--line); font: 800 .78rem/1 "Hanken Grotesk", sans-serif; }
+.cr-teachers .cr-av { width: 1.7rem; height: 1.7rem; font-size: .62rem; margin-right: -.3rem; }
+.cr-teachers span { margin-left: .45rem; }
+
+.cr-top { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1rem; margin: 1rem 0; }
+.cr-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; }
+.cr-card h2 { margin: .1rem 0 .3rem; font-size: 1.2rem; }
+.cr-next { background: linear-gradient(135deg, var(--accent-soft), var(--white)); }
+.cr-next .cat-btn { margin-top: .4rem; }
+.cr-eyebrow { margin: 0; font: 800 .72rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.cr-class-next { margin: .8rem 0 0; padding-top: .7rem; border-top: 1px solid var(--line); font-size: .9rem; }
+.cr-teacher { display: flex; align-items: center; gap: .75rem; }
+.cr-teacher + .cr-teacher { margin-top: .8rem; }
+.cr-teacher div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cr-teacher span { color: var(--grey); font-size: .84rem; }
+
+.cr-bar { display: flex; flex-wrap: wrap; gap: .35rem; margin: 1.2rem 0 .8rem; }
+.cr-bar .yr-chip { display: inline-flex; align-items: center; gap: .3rem; border: 1px solid var(--line); background: var(--white);
+  color: var(--ink); border-radius: 999px; padding: .36rem .75rem; cursor: pointer; font: 700 .8rem/1.1 "Hanken Grotesk", sans-serif; }
+.cr-bar .yr-chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+.cr-cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; align-items: start; }
+.cr-col { background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: .75rem; min-height: 8rem; }
+.cr-col h2 { margin: .1rem .2rem .7rem; font: 800 .88rem/1.3 "Hanken Grotesk", sans-serif; color: var(--grey); display: flex; align-items: center; gap: .4rem; }
+.cr-col h2 span { background: var(--line); color: var(--ink); border-radius: 999px; padding: .05rem .5rem; font-size: .75rem; }
+.cr-col[data-col="marked"] h2 { color: var(--green-ink); }
+.cr-item { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: .8rem .85rem; margin-bottom: .6rem;
+  display: flex; flex-direction: column; gap: .45rem; }
+.cr-item[hidden] { display: none; }
+.cr-item h3 { margin: 0; font-size: .98rem; line-height: 1.3; }
+.cr-item-top { display: flex; align-items: center; gap: .4rem; justify-content: space-between; }
+.cr-kind { font-size: .76rem; font-weight: 700; color: var(--grey); }
+.cr-due { font-size: .74rem; font-weight: 700; color: var(--orange-ink); background: var(--orange); padding: .15rem .45rem; border-radius: 999px; }
+.cr-due.is-late { color: var(--pink-ink); background: var(--pink); }
+.cr-body { margin: 0; font-size: .88rem; white-space: pre-wrap; color: var(--ink); }
+.cr-chips { display: flex; flex-wrap: wrap; gap: .3rem; }
+.cr-chip { font-size: .72rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; background: var(--lav); color: var(--lav-ink); }
+.cr-fb { background: var(--green); color: var(--green-ink); border-radius: 10px; padding: .5rem .65rem; font-size: .86rem; }
+.cr-fb p { margin: .2rem 0 0; }
+.cr-fb-h { display: block; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.cr-mark { font-size: 1.15rem; }
+.cr-actions { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.cr-actions .cat-btn { padding: .45rem .8rem; font-size: .82rem; }
+.cr-undo { background: none; border: 0; color: var(--grey); font: 600 .8rem/1 inherit; text-decoration: underline; cursor: pointer; padding: .3rem 0; }
+.cr-empty { color: var(--grey); font-size: .86rem; margin: .3rem .2rem; }
+.cr-classes { margin: 1.4rem 0 2rem; }
+.cr-classes ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.cr-classes li { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; padding: .45rem 0; border-top: 1px solid var(--line); }
+.cr-classes li:first-child { border-top: 0; }
+.cr-classes li em { color: var(--grey); font-size: .86rem; flex-basis: 100%; }
+
+@media (max-width: 1100px) { .cr-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .cr-cols, .cr-top { grid-template-columns: 1fr; } }

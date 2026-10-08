@@ -247,7 +247,7 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script type="module">
-import { getUser, api, logout } from "/auth.js?v=20261005c";
+import { getUser, api, logout } from "/auth.js?v=20261009a";
 
 const user = await getUser();
 if (!user) { location.replace("/login.html"); throw 0; }
@@ -431,7 +431,7 @@ async function sendMsg(recipientId) {
 }
 </script>
 
-  <script defer src="chatbot-widget.js?v=20260929a"></script>
+  <script defer src="/support.js?v=20261009a"></script>
   <script defer src="/limit-card.js?v=20261005a"></script>
   <script defer src="/shortcuts.js?v=20261006a"></script>
   <script type="module">import('/profile-gate.js?v=20260928c').then(function(m){m.gateOnLoad()}).catch(function(){});</script>

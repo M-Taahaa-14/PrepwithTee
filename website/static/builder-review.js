@@ -18,7 +18,7 @@
  * so a reload doesn't lose a teacher's work. Build sends the exact ids
  * (POST /api/booklets {ids}); the server checks every one is in the selection.
  */
-import { api, UpgradeRequiredError } from "/auth.js?v=20261005c";
+import { api, UpgradeRequiredError } from "/auth.js?v=20261009a";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

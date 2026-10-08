@@ -38,6 +38,7 @@ os.environ.update({
     "BOOKLET_DIR": str(_TMP / "booklets"),
     "INK_ASSET_DIR": str(_TMP / "ink_assets"),
     "FEEDBACK_SNIPS_DIR": str(_TMP / "feedback_snips"),
+    "SUPPORT_STATUS_FILE": str(_TMP / "support_status.json"),
     "RESEND_API_KEY": "",
     "SMTP_USER": "",
     "SMTP_PASS": "",

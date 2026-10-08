@@ -251,7 +251,7 @@ def auth_callback(request: Request, code: str = "", state: str = "", error: str 
     if role == "admin":
         dest = "/admin"
     elif role == "teacher":
-        dest = "/teacher-dashboard.html"
+        dest = "/teach"
     elif role == "parent":
         dest = "/parent-dashboard.html"
     elif not user.get("profile_complete"):

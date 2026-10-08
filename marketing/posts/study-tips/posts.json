@@ -1,0 +1,125 @@
+{
+  "series": {
+    "title": "Study tips",
+    "about": "Value-first study advice on notebook paper (lined, grid, journal). Hand-drawn circles, arrows and highlighter. Selling only on the last slide."
+  },
+  "posts": [
+    {
+      "id": "st-01-past-paper-habits",
+      "bg": "paper",
+      "caption": "Doing past papers ≠ getting better at past papers. 📄\n\nThese 3 habits are the difference. Save this for your next revision session.\n\nTopical past papers (every chapter, mark scheme under each question) → prepwithtee.com",
+      "hashtags": ["olevel", "igcse", "alevel", "pastpapers", "studytips", "cambridge", "studygram"],
+      "slides": [
+        {
+          "layout": "hook",
+          "title": "Here are ((3 habits))\nthat turn past papers\ninto actual marks",
+          "size": "l",
+          "kicker": "the second one hurts a little.",
+          "next_pill": true,
+          "doodles": [
+            ["arrow-curl", 760, 930, 170, 10],
+            ["sparkle", 880, 300, 70, 0, "ink"],
+            ["sparkle", 950, 380, 36, 0, "ink"]
+          ]
+        },
+        {
+          "layout": "tip",
+          "num": "01",
+          "title": "Go by topic before\nyou go full paper.",
+          "body": "A full paper tests 20 topics at once, so you never see the pattern. Do one chapter's questions back to back until it clicks. *Then* sit full papers.",
+          "try": "tonight: one chapter, 10 questions.",
+          "doodles": [["burst", 860, 220, 90, 0]]
+        },
+        {
+          "layout": "tip",
+          "num": "02",
+          "title": "Mark it like the\nexaminer. *Strictly.*",
+          "pop": "coral",
+          "body": "No “I basically had it”. If the mark scheme wants the unit, the unit *is* the mark. Be meaner than the examiner and the real thing feels easy.",
+          "try": "red pen. no mercy.",
+          "doodles": [["squiggle", 820, 250, 150, -8, "coral"]]
+        },
+        {
+          "layout": "tip",
+          "num": "03",
+          "title": "Keep a ((mistakes page)).",
+          "pop": "sky",
+          "body": "Every lost mark goes on one page: the question, what you wrote, what they wanted. Read it before every paper. It becomes your most valuable notes.",
+          "try": "same mistake twice → top of the list.",
+          "doodles": [["star", 880, 230, 80, 12, "ink"]]
+        },
+        {
+          "layout": "cta",
+          "title": "Past papers,\n((sorted by topic)).",
+          "sub": "Pick a chapter, get every past-paper question on it, **mark scheme right under each one**. 3 free booklets a month.",
+          "button": "prepwithtee.com",
+          "doodles": [["arrow-loop", 700, 920, 200, 0], ["sparkle", 900, 260, 60, 0, "ink"]]
+        }
+      ]
+    },
+    {
+      "id": "st-02-mark-scheme-codes",
+      "bg": "paper",
+      "caption": "The mark scheme is literally the examiner's brain on paper. 🧠\n\nOnce you can read it, you know exactly where your marks went (and how to stop losing them).\n\nM1, A1, B1, ft, oe, cao: decoded. Save this one.",
+      "hashtags": ["markscheme", "olevelmaths", "igcsemaths", "alevelmaths", "cambridge", "examtips"],
+      "slides": [
+        {
+          "layout": "defs",
+          "title": "Mark scheme codes,\n==decoded.==",
+          "size": "m",
+          "margin": true,
+          "inset": "150px 92px 130px 200px",
+          "items": [
+            ["M1", "**Method mark.** Right method, even if the arithmetic goes wrong later."],
+            ["A1", "**Accuracy mark.** Correct answer, but only if you earned the M mark first."],
+            ["B1", "**Independent mark.** A correct fact or value on its own."],
+            ["ft", "**Follow through.** Your earlier wrong answer, used correctly, still scores."],
+            ["oe", "**Or equivalent.** 0.5, ½ and 50% can all be right."],
+            ["cao", "**Correct answer only.** No partial credit. Exact, or nothing."]
+          ],
+          "tail": "moral: always show your method. M1 is free marks.",
+          "doodles": [["sparkle", 900, 200, 60, 0, "ink"]]
+        }
+      ]
+    },
+    {
+      "id": "st-03-30-days-journal",
+      "bg": "desk",
+      "caption": "30 days. One chapter a day. In order. 📓\n\nWhat you start with a plan, you finish with a grade.\n\nWant the questions for each chapter, sorted and ready? prepwithtee.com",
+      "hashtags": ["studyplan", "olevel", "igcse", "studywithme", "examseason", "studymotivation"],
+      "slides": [
+        {
+          "layout": "journal",
+          "title": "30 Days to\nExam-Ready",
+          "sub": "what you start with a plan,\nyou finish with a grade.",
+          "note": {"text": "What you do daily\ndecides your grade.", "meta": "Learn  |  Practise  |  Mark  |  Repeat"},
+          "sticky": "**One chapter a day.**\nIn order.\nNo guessing what's next.",
+          "polaroids": [["📚", "day 1", "sky"], ["🏆", "day 30", "sun"]],
+          "button": "start at prepwithtee.com",
+          "url": false,
+          "logo": "right",
+          "white_owl": true
+        }
+      ]
+    },
+    {
+      "id": "st-04-stop-highlighting",
+      "bg": "paper",
+      "caption": "Highlighting feels productive. It's mostly colouring in. 🖍️\n\nYour brain remembers what it has to *retrieve*, not what it re-reads. Close the book and answer questions.\n\nEvery past paper, free, no sign-up → prepwithtee.com",
+      "hashtags": ["studytips", "activerecall", "olevel", "igcse", "alevel", "studygram"],
+      "slides": [
+        {
+          "layout": "hook",
+          "title": "Stop ~~highlighting~~.\nStart ((answering)).",
+          "size": "l",
+          "sub": "Re-reading feels productive. Your brain only remembers what it has to *pull back out*. Questions do that. Highlighters don't.",
+          "pop": "sun",
+          "doodles": [["arrow-down", 830, 210, 110, 25, "coral"], ["burst", 900, 520, 80, 0]],
+          "note": "**Try it tonight:** close the book. Write down everything you remember about one topic. *Then* check what you missed.",
+          "note_style": "lime",
+          "note_right": true
+        }
+      ]
+    }
+  ]
+}

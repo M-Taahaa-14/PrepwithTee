@@ -68,17 +68,25 @@
   border-radius: 999px; box-shadow: 0 6px 16px rgba(0, 0, 0, .18); }
 .an-saved:empty { display: none; }
 
-/* unpinned: a slim tab on the left edge */
+/* unpinned: a slim tab on the left edge - a gradient pen badge over a short label */
 .an-tab { position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 72; display: flex;
-  flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px 9px 5px; border: 1px solid var(--ir-line);
-  border-left: 0; border-radius: 0 14px 14px 0; background: var(--ir-bg); color: var(--ir-accent); cursor: pointer;
-  box-shadow: var(--ir-shadow); font: 800 .62rem/1 "Hanken Grotesk", sans-serif; letter-spacing: .06em;
-  text-transform: uppercase; transition: padding .15s; }
-.an-tab:hover { padding-left: 9px; }
+  flex-direction: column; align-items: center; gap: 5px; padding: 7px 7px 8px 6px; border: 1px solid var(--ir-line);
+  border-left: 0; border-radius: 0 16px 16px 0; background: color-mix(in srgb, var(--ir-bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: var(--ir-fg); cursor: pointer;
+  box-shadow: var(--ir-shadow); font: 600 .66rem/1 "Hanken Grotesk", system-ui, sans-serif; letter-spacing: .01em;
+  transition: padding .18s ease, box-shadow .18s ease; }
+.an-tab-ic { width: 32px; height: 32px; border-radius: 11px; display: grid; place-items: center; color: #fff;
+  background: linear-gradient(140deg, #9a7bff 0%, #6d4aff 55%, #4f46e5 100%);
+  box-shadow: 0 4px 12px rgba(109, 74, 255, .35), inset 0 1px 0 rgba(255, 255, 255, .25);
+  transition: transform .18s cubic-bezier(.34, 1.56, .64, 1); }
+.an-tab:hover { padding-left: 10px; }
+.an-tab:hover .an-tab-ic { transform: rotate(-8deg) scale(1.06); }
+.an-tab:focus-visible { outline: 2px solid var(--ir-accent); outline-offset: 2px; }
 .an-tab[hidden] { display: none; }
-.an-tab svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.9;
+.an-tab svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2;
   stroke-linecap: round; stroke-linejoin: round; }
-.an-tab span { color: var(--ir-mute); }
+.an-tab span:last-child { color: var(--ir-fg); opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .an-tab, .an-tab-ic { transition: none; } }
 /* pinned on a wide screen: the paper moves over */
 body.ink-pinned .vw { margin-left: 70px; transition: margin-left .2s ease; }
 

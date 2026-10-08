@@ -12,6 +12,7 @@ const SECTIONS = {
   student:    () => import("./sections/student.js"),
   teachers:   () => import("./sections/teachers.js"),
   inbox:      () => import("./sections/inbox.js"),
+  support:    () => import("./sections/support.js"),
   calendly:   () => import("./sections/calendly.js"),
   payments:   () => import("./sections/payments.js"),
   courses:    () => import("./sections/courses.js"),
@@ -26,7 +27,8 @@ const SECTIONS = {
 
 const NAV = [
   { items: [{ id: "overview", label: "Overview", icon: "layout-dashboard" }] },
-  { items: [{ id: "inbox", label: "Inbox", icon: "inbox", badge: "inbox_new" }] },
+  { items: [{ id: "inbox", label: "Inbox", icon: "inbox", badge: "inbox_new" },
+            { id: "support", label: "Support", icon: "lifebuoy" }] },
   { group: "People", items: [
     { id: "students", label: "Students", icon: "school" },
     { id: "teachers", label: "Teachers", icon: "users", badge: "applications" },

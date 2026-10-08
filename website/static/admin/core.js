@@ -9,6 +9,11 @@ export function esc(v) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+/** Where the console's API lives. The teaching console (/teach) sets
+ *  "/api/teach": same paths and shapes, scoped to the teacher's students. */
+export let API_BASE = "/api/admin";
+export function setApiBase(base) { API_BASE = base; }
+
 export const icon = name => `<i class="ti ti-${name}" aria-hidden="true"></i>`;
 
 export class ApiError extends Error {
@@ -215,7 +220,7 @@ const cache = {};
 export async function lookup(name) {
   if (cache[name]) return cache[name];
   const urls = {
-    subjects: ["/api/admin/overview", d => d.subject_options || []],
+    subjects: [API_BASE === "/api/admin" ? "/api/admin/overview" : `${API_BASE}/subjects`, d => d.subject_options || []],
     teachers: ["/api/admin/teacher-profiles", d => d.teachers || []],
   };
   const [url, pick] = urls[name];

@@ -13,11 +13,12 @@
  *            the server, which decides whether the mark scheme opens
  *            (after finishing / straight away / teacher keeps it).
  */
-import { api } from "/auth.js?v=20261005c";
+import { api } from "/auth.js?v=20261009a";
 import { openAiPanel } from "/ai-panel.js?v=20260927a";
 import { PdfPane, debounce } from "/pdf-pane.js?v=20261005a";
 import { paperButton } from "/paper-theme.js?v=20260928a";
-import { createAnnotator } from "/annotate.js?v=20261005c";
+import { createAnnotator } from "/annotate.js?v=20261009t";
+import { collab, presenceBar } from "/collab.js?v=20261009a";
 
 const SNIP_V = "20261005a";                 // = main.js SNIP_V
 const S = JSON.parse(document.getElementById("vw-state").textContent);
@@ -206,11 +207,17 @@ async function waitReady() {
 // ── Viewer ──────────────────────────────────────────────────────────────────
 let pane = null;
 let questions = [];
+let META = {};
+// A paper built by a teacher for a student (or opened up by the student):
+// both ink on one shared layer, near-live (collab.js). One sync per document.
+const live = { paper: null, ms: null, page: 1 };
+const liveFor = (doc) => (doc.endsWith(":ms") ? live.ms : live.paper);
 
 async function open() {
   if (!(await waitReady())) return;
   loader({ progress: 99, stage: "Opening" });
   const meta = await api(`/api/booklets/${S.id}`);
+  META = meta;
   questions = (meta.page_map_json || { questions: [] }).questions || [];
   shell();
   if (S.skipped) {
@@ -220,11 +227,21 @@ async function open() {
       <button type="button" aria-label="Dismiss">×</button></p>`);
     root.querySelector(".vw-note button").addEventListener("click", (e) => e.currentTarget.parentElement.remove());
   }
-  const ann = createAnnotator({ mount: document.body });
+  let shared = null;
+  if (meta.collab) {
+    const onPeople = presenceBar(document.querySelector(".vw-tools"), {
+      me: meta.me, getAnn: () => annotator,
+      label: meta.role === "owner" ? "Shared with your teacher" : "Shared with your student" });
+    live.paper = collab({ doc: `booklet:${S.id}`, me: meta.me, onPeople });
+    if (TEST) live.ms = collab({ doc: `booklet:${S.id}:ms`, me: meta.me, onPeople });
+    shared = { load: (d) => liveFor(d).store.load(d), save: (d, p, o) => liveFor(d).store.save(d, p, o) };
+  }
+  const ann = createAnnotator({ mount: document.body, ...(shared ? { store: shared } : {}) });
+  live.paper?.connect(ann, { page: () => live.page });
   pane = new PdfPane(document.getElementById("vw-stage"), {
     questions, ranged: true, uniform: true,      // first page long before the whole file
     onPageEl: (el, n) => ann.attach(el, `booklet:${S.id}`, n),
-    onPage: (n) => { document.getElementById("vw-pn").textContent = n; },
+    onPage: (n) => { document.getElementById("vw-pn").textContent = n; live.page = n; },
     onZoom: (label) => { document.getElementById("vw-z").textContent = label; },
     onQuestion: qbar,
   });
@@ -265,6 +282,7 @@ async function showPart(which) {
       onZoom: (label) => { document.getElementById("vw-z").textContent = label; },
     });
     pane = panes.ms;
+    live.ms?.connect(annotator, { page: () => live.page });
     await panes.ms.load(`/api/booklets/${S.id}/pdf?part=ms`);
   }
   document.getElementById("vw-pt").textContent = pane.numPages || "…";
@@ -349,9 +367,11 @@ function shell() {
       ${TEST && (S.role === "owner" || S.role === "staff") ? `<a class="vw-tbtn" href="${esc(S.editUrl)}"
           title="Back to Review &amp; customise with these questions - build a new version">✎ <span>Edit</span></a>` : ""}
       ${S.can_share ? `<button type="button" class="vw-btn vw-btn-ghost" data-act="share">⇪ <span>Share</span></button>` : ""}
+      ${META.can_collab ? `<button type="button" class="vw-btn vw-btn-ghost" data-act="collab"
+          title="Your teacher sees this paper and you both write on it together">👩‍🏫 <span>Work on this with my teacher</span></button>` : ""}
       ${paperButton()}
       <a class="vw-tbtn vw-dl-ink" href="/api/booklets/${S.id}/pdf?annotated=1"
-         title="Download with your pen, highlighter and text marks">✎ <span>With my ink</span></a>
+         title="Download with the pen, highlighter and text marks">✎ <span>${META.collab ? "With our ink" : "With my ink"}</span></a>
       <a class="vw-btn vw-dl" href="/api/booklets/${S.id}/pdf?download=1">⤓ <span>Download</span></a>
     </header>
     <div class="vw-body">
@@ -404,6 +424,19 @@ function closePanel() {
   refitSoon();
 }
 
+async function shareWithTeacher(btn) {
+  if (!confirm("Share this paper with your teacher? They will see it, and anything either of you writes "
+               + "on it shows up for both of you. The ink you already have comes along.")) return;
+  btn.disabled = true;
+  try {
+    await api(`/api/booklets/${S.id}/collab`, { method: "POST" });
+    location.reload();
+  } catch (err) {
+    btn.disabled = false;
+    alert(err.message || "Couldn't share it - try again.");
+  }
+}
+
 // ── Events ──────────────────────────────────────────────────────────────────
 root.addEventListener("click", (e) => {
   const act = e.target.closest("[data-act]")?.dataset.act;
@@ -414,6 +447,7 @@ root.addEventListener("click", (e) => {
   else if (act === "timer") timer.toggle();
   else if (act === "finish") finishTest();
   else if (act === "share") openShare();
+  else if (act === "collab") shareWithTeacher(e.target.closest("[data-act]"));
   else if (act === "toc") {
     const toc = document.getElementById("vw-toc");
     toc.hidden = !toc.hidden;

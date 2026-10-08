@@ -1,0 +1,219 @@
+{
+  "series": {
+    "title": "Puzzles & quick quizzes",
+    "about": "Two-slide carousels: a question people try to answer in their head, then the answer with the 'why'. Quizzes, Exam Wordle and Spot the Mistake. Built for comments ('I got B!') and saves. Every answer is checked; re-check if you edit one."
+  },
+  "posts": [
+    {
+      "id": "pz-01-standard-form-trap",
+      "bg": "lilac",
+      "caption": "30-second challenge ⏱️ No calculator.\n\nComment your answer BEFORE you swipe. 👇",
+      "hashtags": ["olevelmaths", "igcsemaths", "mathschallenge", "standardform", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["maths", "white"], ["⏱ 30 s", "lime"], ["no calculator", "sun"]],
+         "q": "0.0004 × 0.03 = ?\n(in standard form)",
+         "options": ["1.2 × 10⁻⁵", "1.2 × 10⁻⁶", "12 × 10⁻⁶", "1.2 × 10⁻⁴"], "answer": 0,
+         "cta": "comment A, B, C or D 👇",
+         "why": "4 × 3 = 12, with **6** decimal places → 0.000012 = **1.2 × 10⁻⁵**. C is the trap: right value, but in standard form the first number must be between 1 and 10."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-02-acceleration",
+      "bg": "mint",
+      "caption": "Physics in 30 seconds ⚡ Which one did you pick?\n\nSwipe for the answer.",
+      "hashtags": ["olevelphysics", "igcsephysics", "physicsquiz", "acceleration", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["physics", "white"], ["⏱ 30 s", "lime"]],
+         "q": "A car goes from rest to 20 m/s in 4 s. Its acceleration is…",
+         "options": ["80 m/s²", "5 m/s²", "0.2 m/s²", "24 m/s²"], "answer": 1,
+         "cta": "comment your answer 👇",
+         "why": "a = (v − u) ÷ t = (20 − 0) ÷ 4 = **5 m/s²**. 80 is v × t and 0.2 is t ÷ v: both the wrong way round."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-03-binary-to-denary",
+      "bg": "bubble",
+      "caption": "Binary speed-run 💻 No converter allowed.\n\nAnswer in the comments, then swipe.",
+      "hashtags": ["olevelcs", "igcsecs", "computerscience", "binary", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["computer science", "white"], ["⏱ 30 s", "lime"]],
+         "q": "What is the binary number 1011 0101 in denary?",
+         "options": ["181", "173", "165", "245"], "answer": 0,
+         "cta": "drop your answer 👇",
+         "why": "Place values 128 64 32 16 8 4 2 1. Add the ones with a 1 under them: 128 + 32 + 16 + 4 + 1 = **181**."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-04-percent-trap",
+      "bg": "sun",
+      "caption": "This one catches nearly everyone the first time. 😅\n\nUp 10%, down 10%... back to the start? Swipe.",
+      "hashtags": ["mathschallenge", "percentages", "olevelmaths", "igcsemaths", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["maths", "white"], ["trap question", "coral"]],
+         "q": "A price goes up 10%, then down 10%. Compared with the start, it's now…",
+         "options": ["the same", "1% lower", "1% higher", "10% lower"], "answer": 1,
+         "cta": "be honest. what did you pick? 👇",
+         "why": "× 1.1, then × 0.9 = **× 0.99**, so it's 1% lower. The second 10% is taken off a *bigger* number."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-05-parallel-resistors",
+      "bg": "mint",
+      "caption": "Electricity check 🔌 Series or parallel... does it matter? (Yes.)\n\nSwipe for the answer.",
+      "hashtags": ["physics", "electricity", "olevelphysics", "igcsephysics", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["physics", "white"], ["electricity", "sky"]],
+         "q": "Two 6 Ω resistors in parallel. The combined resistance is…",
+         "options": ["12 Ω", "6 Ω", "3 Ω", "⅓ Ω"], "answer": 2,
+         "cta": "comment A–D 👇",
+         "why": "1/R = 1/6 + 1/6 = 2/6, so R = **3 Ω**. In parallel the total is always *less* than the smallest resistor. 12 Ω would be series."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-06-how-many-values",
+      "bg": "bubble",
+      "caption": "The classic off-by-one 👀\n\nWhat did you say? Swipe.",
+      "hashtags": ["computerscience", "binary", "olevelcs", "igcsecs", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["computer science", "white"], ["trap question", "coral"]],
+         "q": "How many different values can 8 bits store?",
+         "options": ["255", "256", "8", "128"], "answer": 1,
+         "cta": "first instinct. go 👇",
+         "why": "2⁸ = **256** different values: 0 to 255. 255 is the *biggest* value, not how many there are."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-07-which-is-a-vector",
+      "bg": "sky",
+      "caption": "Easy marks... if you know the definition. 🎯",
+      "hashtags": ["physics", "vectors", "olevelphysics", "igcsephysics", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["physics", "white"], ["definitions", "lilac"]],
+         "q": "Which one of these is a vector?",
+         "options": ["speed", "mass", "velocity", "energy"], "answer": 2,
+         "cta": "comment your answer 👇",
+         "why": "A vector has a size **and a direction**. Velocity is speed in a stated direction. Speed, mass and energy are scalars."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-08-powers",
+      "bg": "lilac",
+      "caption": "Quick one 🧠 No calculator, no googling.",
+      "hashtags": ["maths", "indices", "olevelmaths", "igcsemaths", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["maths", "white"], ["indices", "sun"]],
+         "q": "3⁰ + 3⁻¹ = ?",
+         "options": ["1⅓", "0", "3", "−3"], "answer": 0,
+         "cta": "comment A–D 👇",
+         "why": "Anything (except 0) to the power 0 is **1**, and 3⁻¹ = **⅓**. So 1 + ⅓ = **1⅓**."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-09-two-to-the-five",
+      "bg": "tang",
+      "caption": "Sounds easy. Half the comments will be wrong. 😌",
+      "hashtags": ["maths", "indices", "mathschallenge", "quiz"],
+      "slides": [
+        {"layout": "quiz", "tags": [["maths", "white"], ["⏱ 10 s", "lime"]],
+         "q": "Which is bigger: 2⁵ or 5²?",
+         "options": ["2⁵", "5²", "they're equal", "can't tell without a calculator"], "answer": 0,
+         "cta": "10 seconds. go 👇",
+         "why": "2⁵ = 2 × 2 × 2 × 2 × 2 = **32**, and 5² = **25**."},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-10-wordle-physics",
+      "bg": "mint",
+      "caption": "Exam Wordle: Physics edition 🟩🟨⬛\n\nCan you get it in 3? Comment your guess, answer on slide 2.",
+      "hashtags": ["wordle", "physics", "olevelphysics", "igcsephysics", "puzzle"],
+      "slides": [
+        {"layout": "wordle", "title": "Exam Wordle:\n*Physics*", "answer": "joule", "guesses": ["force", "mould"],
+         "foot": "hint: it's a unit ⚡ guess it in the comments"},
+        {"inherit": true, "reveal": true, "foot": "**JOULE**: the unit of energy and work. 1 J = 1 N × 1 m"}
+      ]
+    },
+    {
+      "id": "pz-11-wordle-cs",
+      "bg": "bubble",
+      "caption": "Exam Wordle: CS edition 💻🟩\n\nGot it? Comment before you swipe.",
+      "hashtags": ["wordle", "computerscience", "olevelcs", "igcsecs", "puzzle"],
+      "slides": [
+        {"layout": "wordle", "title": "Exam Wordle:\n*Computer Science*", "answer": "array", "guesses": ["logic", "radar"],
+         "foot": "hint: a data structure 📦"},
+        {"inherit": true, "reveal": true, "foot": "**ARRAY**: many values, one name, an index for each"}
+      ]
+    },
+    {
+      "id": "pz-12-wordle-maths",
+      "bg": "lilac",
+      "caption": "Exam Wordle: Maths edition 📐\n\nComment your guess. Answer on slide 2.",
+      "hashtags": ["wordle", "maths", "olevelmaths", "igcsemaths", "puzzle"],
+      "slides": [
+        {"layout": "wordle", "title": "Exam Wordle:\n*Maths*", "answer": "prism", "guesses": ["angle", "prime"],
+         "foot": "hint: think volume 🧊"},
+        {"inherit": true, "reveal": true, "foot": "**PRISM**: volume = area of cross-section × length"}
+      ]
+    },
+    {
+      "id": "pz-13-spot-brackets",
+      "bg": "paper",
+      "caption": "Spot the mistake 🔍 One line is wrong. Which one?\n\nComment the line number, then swipe.",
+      "hashtags": ["spotthemistake", "algebra", "olevelmaths", "igcsemaths", "puzzle"],
+      "slides": [
+        {"layout": "spot", "tags": [["maths", "lilac"], ["spot the mistake", "sun"]], "title": "Solve 3(x − 2) = 12",
+         "lines": ["3(x − 2) = 12", "3x − 2 = 12", "3x = 14", "x = 14/3"], "bad": 1,
+         "ask": "which line is wrong? 👀 comment the number",
+         "fix": "the 3 multiplies **both** terms: 3x − 6 = 12 → 3x = 18 → **x = 6**"},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-14-spot-weight",
+      "bg": "paper",
+      "caption": "Spot the mistake ⚖️ This one costs marks in real papers every year.",
+      "hashtags": ["spotthemistake", "physics", "olevelphysics", "igcsephysics", "puzzle"],
+      "slides": [
+        {"layout": "spot", "tags": [["physics", "mint"], ["spot the mistake", "sun"]], "title": "Find the weight of a 500 g mass\n(g = 10 N/kg)",
+         "lines": ["W = m × g", "W = 500 × 10", "W = 5000 N"], "bad": 1,
+         "ask": "where did it go wrong? 👀",
+         "fix": "convert first: 500 g = **0.5 kg** → W = 0.5 × 10 = **5 N**"},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-15-spot-square",
+      "bg": "paper",
+      "caption": "The most common algebra mistake on the planet? Probably this one. 🌍",
+      "hashtags": ["spotthemistake", "algebra", "olevelmaths", "igcsemaths", "puzzle"],
+      "slides": [
+        {"layout": "spot", "tags": [["maths", "lilac"], ["spot the mistake", "sun"]], "title": "Expand (x + 3)²",
+         "lines": ["(x + 3)²", "= x² + 3²", "= x² + 9"], "bad": 1,
+         "ask": "something's missing... what? 👀",
+         "fix": "(x + 3)(x + 3) = **x² + 6x + 9**. Don't lose the middle term!"},
+        {"inherit": true, "reveal": true}
+      ]
+    },
+    {
+      "id": "pz-16-spot-pseudocode",
+      "bg": "paper",
+      "caption": "Spot the bug 🐛 This pseudocode is meant to add up 1 to 10.\n\nWhat's missing?",
+      "hashtags": ["spotthebug", "pseudocode", "computerscience", "olevelcs", "igcsecs"],
+      "slides": [
+        {"layout": "spot", "tags": [["computer science", "bubble"], ["spot the bug", "sun"]], "title": "Add up the numbers 1 to 10",
+         "mono": true, "lines": ["FOR Count ← 1 TO 10", "  Total ← Total + Count", "NEXT Count", "OUTPUT Total"], "bad": 1,
+         "ask": "what's the bug? 🐛 comment below",
+         "fix": "Total is used before it has a value. Add **Total ← 0** before the loop."},
+        {"inherit": true, "reveal": true}
+      ]
+    }
+  ]
+}

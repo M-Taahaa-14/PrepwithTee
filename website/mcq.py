@@ -35,7 +35,7 @@ from pipeline import config as _pcfg
 
 router = APIRouter()
 
-SESSION_V = "20261005c"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
+SESSION_V = "20261009t"      # bump with mcq-session.js/.css, mcq-setup.js, annotate.js
 LETTERS = ("A", "B", "C", "D")
 # Official durations (minutes) for the multiple-choice components.
 EXAM_MINS = {("9702", 1): 75, ("5054", 1): 60, ("5070", 1): 60,
@@ -553,8 +553,8 @@ def session_page(sid: str, user: dict | None = Depends(_auth.maybe_user)):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="/main.js?v=20261005a"></script>
-<script type="module" src="/auth.js?v=20261005c"></script>
+<script src="/main.js?v=20261009a"></script>
+<script type="module" src="/auth.js?v=20261009a"></script>
 <script type="module" src="/mcq-session.js?v={SESSION_V}"></script>
 {_dock[1]}
 </body>

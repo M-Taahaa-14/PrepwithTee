@@ -715,14 +715,6 @@ def teacher_resources_flat(user: _Teacher):
 
 # ── Teacher Groups Workflow ───────────────────────────────────────────────────
 
-class GroupCreateReq(BaseModel):
-    name: str
-    description: str | None = None
-    syllabus: str | None = None
-    max_students: int = 6
-    schedule: dict | None = None
-
-
 class GroupMembersReq(BaseModel):
     student_ids: list[str]
 
@@ -732,32 +724,6 @@ class GroupSessionReq(BaseModel):
     duration_min: int | None = 60
     topic: str | None = None
     notes: str | None = None
-
-
-@router.get("/groups")
-def list_teacher_groups(user: _Teacher):
-    groups = _udb.get_teacher_groups(user["id"])
-    for g in groups:
-        g["member_count"] = _udb.get_group_member_count(g["id"])
-    return {"groups": groups}
-
-
-@router.post("/groups")
-def create_teacher_group(req: GroupCreateReq, user: _Teacher):
-    if not (req.name or "").strip():
-        raise HTTPException(400, "Group name is required")
-    payload = {
-        "name": req.name.strip(),
-        "description": (req.description or "").strip() or None,
-        "teacher_id": user["id"],
-        "syllabus": req.syllabus,
-        "max_students": max(1, req.max_students),
-        "schedule_json": json.dumps(req.schedule or {}),
-        "status": "active",
-    }
-    group = _udb.create_group(payload)
-    group["member_count"] = 0
-    return {"group": group}
 
 
 @router.get("/groups/{group_id}")

@@ -1,0 +1,83 @@
+{
+  "series": {
+    "title": "Feature showcases",
+    "about": "Real screenshots of prepwithtee.com in a laptop frame, with zoomed-in cards and handwritten callouts. Re-capture website/static/demos/hero/*.jpg after UI changes and these update on the next build."
+  },
+  "posts": [
+    {
+      "id": "ft-01-explain-button",
+      "caption": "1 AM. One question. No one to ask. 😩\n\nEvery past-paper question on PrepWithTee has an Explain button: the working step by step, how the marks are given, and the mistakes people usually make.\n\nTry it → prepwithtee.com",
+      "hashtags": ["studytips", "olevel", "igcse", "alevel", "pastpapers", "studyhelp"],
+      "slides": [
+        {
+          "layout": "device",
+          "bg": "sky",
+          "eyebrow": "on every question",
+          "size": "l",
+          "title": "Stuck at 1 AM?\nTap ==Explain.==",
+          "sub": "The working, step by step. How the marks are given. The mistakes people make.",
+          "shot": "08-explain.jpg",
+          "laptop_at": [70, 690, 860],
+          "zooms": [{"crop": [858, 338, 405, 222], "w": 500, "at": [520, 840], "rot": 3}],
+          "callouts": [["the actual working ✍️", 560, 1170, -4, "sun"]],
+          "url": false
+        }
+      ]
+    },
+    {
+      "id": "ft-02-build-a-booklet",
+      "caption": "Your own topical past paper, in 4 taps. 📄\n\n1. Pick your board and subject\n2. Tick up to 4 chapters (or just the subtopics)\n3. Get every past-paper question on them, newest first, mark scheme under each\n4. Mark it and see your grade\n\n3 free booklets every month → prepwithtee.com",
+      "hashtags": ["pastpapers", "topicalpastpapers", "olevel", "igcse", "alevel", "revision"],
+      "slides": [
+        {
+          "layout": "hook",
+          "bg": "lilac",
+          "size": "xl",
+          "pop": "lime",
+          "title": "Make your own\n((topical paper))\nin 4 taps.",
+          "kicker": "no more digging through 40 PDFs.",
+          "next_pill": true,
+          "doodles": [["sparkle", 860, 280, 80, 0, "ink"], ["arrow-curl", 720, 920, 170, 10]]
+        },
+        {
+          "layout": "device",
+          "bg": "lilac",
+          "eyebrow": "step 1",
+          "title": "Pick up to\n4 chapters.",
+          "shot": "03-chapters.jpg",
+          "laptop_at": [130, 560, 840],
+          "zooms": [{"crop": [100, 240, 715, 125], "w": 640, "at": [330, 1000], "rot": -2}],
+          "callouts": [["or just the subtopics 👀", 520, 380, 3, "lime"]]
+        },
+        {
+          "layout": "device",
+          "bg": "lilac",
+          "eyebrow": "step 2",
+          "title": "Every past question.\nNewest first.",
+          "shot": "05-booklet.jpg",
+          "laptop_at": [130, 560, 840],
+          "callouts": [["mark scheme after each question ✓", 200, 1150, -3, "lime"]]
+        },
+        {
+          "layout": "device",
+          "bg": "lilac",
+          "eyebrow": "step 3",
+          "title": "Mark it.\nSee your grade.",
+          "shot": "09-marks.jpg",
+          "laptop_at": [130, 560, 840],
+          "zooms": [{"crop": [858, 306, 390, 92], "w": 560, "at": [430, 1030], "rot": 2}],
+          "callouts": [["official grade thresholds", 470, 400, 3, "lime"]]
+        },
+        {
+          "layout": "cta",
+          "bg": "lilac",
+          "title": "Your first 3\nbooklets are\n((free.))",
+          "size": "xl",
+          "sub": "Every month. O Level, IGCSE & A Level.",
+          "button": "prepwithtee.com",
+          "doodles": [["sparkle", 860, 300, 80, 0, "ink"], ["sparkle", 950, 400, 40, 0, "ink"]]
+        }
+      ]
+    }
+  ]
+}

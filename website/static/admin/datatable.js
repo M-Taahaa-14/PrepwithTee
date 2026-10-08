@@ -11,7 +11,7 @@
 // input, so focus and the caret stay put. Only the body, footer and the
 // options inside the filter <select>s are refreshed.
 
-import { $, $$, api, esc, icon, debounce, emptyState, modal, toast } from "./core.js";
+import { $, $$, api, esc, icon, debounce, emptyState, modal, toast, API_BASE } from "./core.js";
 
 const DEFAULTS = { q: "", sort: null, dir: "desc", page: 1, per: 50, filters: {} };
 
@@ -350,8 +350,12 @@ export class DataTable {
   async _loadViews() {
     const box = $("[data-views]", this.el);
     let views = [];
-    try { views = (await api(`/api/admin/views?section=${encodeURIComponent(this.o.views)}`)).views; }
-    catch { /* views are optional */ }
+    // Saved views live in the admin API; elsewhere (the teaching console) only the built-in ones.
+    const saved = API_BASE === "/api/admin";
+    if (saved) {
+      try { views = (await api(`/api/admin/views?section=${encodeURIComponent(this.o.views)}`)).views; }
+      catch { /* views are optional */ }
+    }
     const builtin = this.o.builtinViews || [];
     const isOn = p => JSON.stringify(normalise(p)) === JSON.stringify(normalise({ q: this.state.q, ...this.state.filters }));
     box.innerHTML = `<span class="lbl">Views</span>` +
@@ -359,7 +363,7 @@ export class DataTable {
         `<button class="chip${isOn(v.params) ? " on" : ""}" data-builtin="${i}">${esc(v.name)}</button>`).join("") +
       views.map(v => `<span class="chip${isOn(v.params) ? " on" : ""}" data-view="${v.id}" role="button" tabindex="0">${esc(v.name)}
         <button class="btn ghost sm icon x" data-del="${v.id}" aria-label="Delete view ${esc(v.name)}">${icon("x")}</button></span>`).join("") +
-      `<button class="chip" data-save>${icon("plus")} Save view</button>`;
+      (saved ? `<button class="chip" data-save>${icon("plus")} Save view</button>` : "");
     const apply = params => {
       const { q = "", ...filters } = params;
       this.state.q = q; this.state.filters = { ...filters }; this.state.page = 1;
@@ -378,7 +382,7 @@ export class DataTable {
       await api(`/api/admin/views/${b.dataset.del}`, { method: "DELETE" });
       this._loadViews();
     }));
-    $("[data-save]", box).addEventListener("click", async () => {
+    $("[data-save]", box)?.addEventListener("click", async () => {
       const ok = await modal({
         title: "Save this view", submit: "Save view",
         body: `<label class="field"><span>Name</span><input class="input" name="name" required maxlength="60"

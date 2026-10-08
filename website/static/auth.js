@@ -70,7 +70,7 @@ export async function requireRole(...roles) {
   }
   if (!roles.includes(user.role)) {
     const home = user.role === "admin"   ? "/admin.html"
-               : user.role === "teacher" ? "/teacher-dashboard.html"
+               : user.role === "teacher" ? "/teach"
                : user.role === "parent"  ? "/parent-dashboard.html"
                : "/dashboard.html";
     location.replace(home);
@@ -396,7 +396,7 @@ export async function initNavbar() {
   document.querySelector(".nav-signin")?.remove();
   const existingDash = nav.querySelector(".nav-dashboard");
   if (existingDash) {
-    existingDash.href = user.role === "teacher" ? "/teacher-dashboard.html"
+    existingDash.href = user.role === "teacher" ? "/teach"
                       : user.role === "admin"   ? "/admin.html"
                       : user.role === "parent"  ? "/parent-dashboard.html"
                       : "/dashboard.html";
@@ -427,10 +427,11 @@ export async function initNavbar() {
     keys: '<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6.5 13h.01M17.5 13h.01M9 14.5h6"/>',
     moon: '<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>',
     spark: '<path d="M12 3l2 5.5L20 10l-6 1.5L12 17l-2-5.5L4 10l6-1.5z"/>',
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 015 .9c0 1.8-2.5 2.2-2.5 3.9M12 17h.01"/>',
     out: '<path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
   };
   const ic = (k) => `<span class="am-ic" aria-hidden="true"><svg viewBox="0 0 24 24">${AI[k]}</svg></span>`;
-  const dashHref = user.role === "teacher" ? "/teacher-dashboard.html" : user.role === "admin" ? "/admin"
+  const dashHref = user.role === "teacher" ? "/teach" : user.role === "admin" ? "/admin"
                  : user.role === "parent" ? "/parent-dashboard.html" : "/dashboard.html";
   const PLAN = { free: "Free plan", solo: "Solo plan", three: "3 Subjects plan", all: "All Access" };
   const badge = user.role === "teacher" ? "Teacher" : user.role === "admin" ? "Admin" : user.role === "parent" ? "Parent"
@@ -472,6 +473,7 @@ export async function initNavbar() {
         <button type="button" class="am-theme" role="menuitemcheckbox" aria-checked="false">${ic("moon")}<span>Dark mode</span><i class="am-switch" aria-hidden="true"></i></button>
         <button type="button" data-shortcuts role="menuitem">${ic("keys")}<span>Keyboard shortcuts</span><kbd>?</kbd></button>
         <a href="/features" role="menuitem">${ic("spark")}<span>What's new</span><em class="am-new">New</em></a>
+        <button type="button" data-support="home" role="menuitem">${ic("help")}<span>Help &amp; support</span></button>
       </div>
       <button type="button" class="account-logout" role="menuitem">${ic("out")}<span>Sign out</span></button>
     </div>`;
@@ -522,6 +524,15 @@ export async function initNavbar() {
     paintTheme();
   });
   drop.querySelector("[data-shortcuts]").addEventListener("click", () => setOpen(false));
+  // the dropdown stops clicks bubbling, so open the help centre here (loading it if this page hasn't)
+  drop.querySelector("[data-support]").addEventListener("click", () => {
+    setOpen(false);
+    if (window.pwtSupport) return window.pwtSupport.open("home");
+    const s = document.createElement("script");
+    s.src = "/support.js?v=20261009a";
+    s.onload = () => window.pwtSupport && window.pwtSupport.open("home");
+    document.head.appendChild(s);
+  });
   document.addEventListener("click", () => setOpen(false));
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && !drop.hidden) { setOpen(false); trigger.focus(); }
@@ -638,5 +649,5 @@ if (typeof window !== "undefined") {
 }
 
 // The pen button on every non-PDF page (scratch ink, never saved).
-import("/scratch-pen.js?v=20261005c").catch(() => {});
+import("/scratch-pen.js?v=20261009t").catch(() => {});
 import("/whats-new.js?v=20261005a").catch(() => {});        // feature spotlight + rail coach mark

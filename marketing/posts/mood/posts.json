@@ -1,0 +1,67 @@
+{
+  "series": {
+    "title": "Moody / cinematic",
+    "about": "Dark, warm 'desk-lamp at night' slides with short white lines. Post as a carousel with a calm instrumental track. The light is drawn in CSS; swap in real or stock desk photos later via the 'photo' field if wanted."
+  },
+  "posts": [
+    {
+      "id": "md-01-exam-season-calm",
+      "bg": "mood",
+      "caption": "Exam season doesn't need more hours. It needs fewer decisions. 🕯️\n\nSave this for the night before.",
+      "hashtags": ["examseason", "studymotivation", "studytips", "olevel", "igcse", "alevel"],
+      "slides": [
+        {
+          "layout": "mood",
+          "light": "lamp-right",
+          "size": "l",
+          "title": "Exam season\n(student edition)",
+          "sub": "*no 4 AM grind. no lies.*",
+          "bokeh": [[820, 260, 60], [900, 420, 30], [760, 520, 18]],
+          "doodles": [["lamp", 760, 760, 260, 0, "rgba(255,200,130,.55)"]],
+          "logo": "right"
+        },
+        {
+          "layout": "mood",
+          "light": "lamp-left",
+          "title": "You don't need\nmore hours.",
+          "sub": "You need *fewer topics at a time.* Pick the three that cost you the most marks. Start there.",
+          "bokeh": [[120, 300, 50], [60, 460, 24]],
+          "logo": "right"
+        },
+        {
+          "layout": "mood",
+          "light": "blue",
+          "title": "Sleep is part\nof the syllabus.",
+          "sub": "Your memory saves while you sleep. An all-nighter deletes the save file.",
+          "bokeh": [[860, 280, 70, "rgba(150,190,255,.3)"], [780, 420, 26, "rgba(150,190,255,.3)"]],
+          "logo": "right"
+        },
+        {
+          "layout": "mood",
+          "light": "candle",
+          "title": "Questions > notes.",
+          "sub": "Twenty minutes of past-paper questions beats two hours of rereading.",
+          "bokeh": [[500, 900, 40], [430, 820, 16]],
+          "logo": "right"
+        },
+        {
+          "layout": "mood",
+          "light": "lamp-right",
+          "title": "Mark it the\nsame night.",
+          "sub": "Feedback you get tomorrow is feedback you'll ignore.",
+          "bokeh": [[840, 300, 44], [930, 500, 20]],
+          "logo": "right"
+        },
+        {
+          "layout": "mood",
+          "light": "dawn",
+          "size": "l",
+          "title": "Calm isn't luck.",
+          "sub": "*It's a plan you made last week.*\n\nprepwithtee.com",
+          "url": false,
+          "logo": "right"
+        }
+      ]
+    }
+  ]
+}

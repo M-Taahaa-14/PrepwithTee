@@ -114,10 +114,18 @@ import og_image as _og_mod
 app.include_router(_og_mod.router)
 import whiteboard as _wb_mod
 app.include_router(_wb_mod.router)
+import collab as _collab_mod
+app.include_router(_collab_mod.router)
+import teach as _teach_mod
+app.include_router(_teach_mod.router)
+import classroom as _classroom_mod
+app.include_router(_classroom_mod.router)
 import features as _features_mod
 app.include_router(_features_mod.router)
 import upgrade as _upgrade_mod
 app.include_router(_upgrade_mod.router)
+import support as _support_mod
+app.include_router(_support_mod.router)
 
 
 @app.get("/solver", include_in_schema=False)
@@ -130,6 +138,12 @@ def solver_page():
 @app.get("/ask.html", include_in_schema=False)
 def legacy_ask():
     return RedirectResponse("/solver", 301)
+
+
+@app.get("/teacher-dashboard.html", include_in_schema=False)
+def legacy_teacher_dashboard():
+    """The old teacher portal; the teaching console (/teach) replaced it."""
+    return RedirectResponse("/teach", 301)
 app.include_router(_catalog_mod.router)
 
 # ── Public course catalog ─────────────────────────────────────────────────────
@@ -2119,99 +2133,22 @@ def solve_followup(req: SolveFollowReq, request: Request):
     return {"html": _clean_html(text), "provider": provider}
 
 
-# ── Live Help Chatbot Widget Endpoint (Task 17) ────────────────────────────────
-
-CHATBOT_SYSTEM = """You are PrepWithTee's concise, friendly support assistant. PrepWithTee is a Cambridge O Level, IGCSE & A Level exam prep platform based in Lahore, Pakistan, built by Tee (a Cambridge-trained tutor).
-
-== SUBJECTS ==
-- Physics: O Level 5054 & IGCSE 0625
-- Mathematics D: O Level 4024 & IGCSE 0580
-- Computer Science: O Level 2210 & IGCSE 0478
-- Chemistry: O Level 5070 & IGCSE 0620
-- A Level: Maths 9709, Physics 9702, CS 9618
-Coverage: 2020–2025 papers, all sessions and variants.
-
-== FEATURES ==
-- Past papers hub (/papers): explains every way to practise and a revision plan
-- Topical papers (/papers/topical): pick board, subject, chapters and subtopics; builds a booklet with the mark scheme after each question
-- Mock tests (/papers/mock-tests): timed exam-style test from chosen chapters; mark scheme unlocks on Finish
-- Past papers by year (/yearly): every sitting's question paper, mark scheme and insert, side by side - opens without an account
-- MCQ practice (/mcq): full papers or topical sets, marked instantly against the official key
-- My papers (/my-papers): every booklet and mock test the student built; open ones from the last 30 days, older ones kept as a record
-- Revision notes (/notes): PrepWithTee's own chapter-by-chapter notes linked to practice
-- Resources (/resources): well-known teachers' PDF notes, books, worksheets, official syllabuses and study planners
-- AI Tutor (/tutor.html) and Photo Solver (/solver): explanations and step-by-step solutions
-- Whiteboard (/whiteboard): PrepWithTee Board - notebooks (lined, squared, graph, dotted, Cornell) or an infinite canvas; pens, shapes, ruler, protractor and compass, stickers and stamps, paste images, past-paper questions, share links and PDF export. 3 boards free, unlimited on any plan
-- Annotation tools on every paper: a left-side toolbar with pens, highlighter, shapes, text, sticky notes, stickers, images, ruler, protractor and compass; ink is saved per page and can be downloaded with the paper
-- Tools (/tools.html): calculator, graph plotter, formula sheets, definitions, command words, periodic table, pseudocode runner
-- My Notes (/notes.html) and Flashcards (/flashcards.html): personal notes and spaced repetition
-- Dashboard (/dashboard.html): progress, streaks, topical & yearly performance
-- Every page, listed (/explore); every feature with tips (/features)
-
-== PRICING ==
-- Free: Monthly capped topical access + all free tools (no card required)
-- Solo Subject: PKR 1,000/month — unlimited access to 1 syllabus
-- 3 Subjects: PKR 2,000/month — unlimited access to 3 syllabuses
-- All Subjects + AI Tutor: PKR 3,000/month — everything unlimited
-- 1-on-1 Tutoring: PKR 20,000/month — personal Cambridge tutor + all features
-Payment: JazzCash, EasyPaisa, Bank Transfer. Account upgraded within 24 hours after payment.
-
-== CONTACT ==
-- WhatsApp Tee: https://wa.me/923204884375 (+92 320 488 4375) — typically replies within a few hours
-- Contact page: /contact.html
-- Sign up / login: /login.html
-
-== COMMON FAQs ==
-Q: Is there a free trial?
-A: Yes — the Free plan gives capped monthly access with no credit card needed.
-Q: How do I pay?
-A: JazzCash, EasyPaisa, or Bank Transfer. WhatsApp Tee after payment to confirm.
-Q: Do you cover A Level?
-A: Yes — Maths (9709), Physics (9702), and CS (9618).
-Q: Can I change my plan?
-A: Yes — contact Tee on WhatsApp to upgrade or change anytime.
-Q: Is there a mobile app?
-A: The website works on mobile browsers. A dedicated app is coming soon.
-
-== RESPONSE RULES ==
-1. Answer in 2–4 sentences maximum. Never write long paragraphs.
-2. Always give a direct action: link to a page, tell them to WhatsApp Tee, or tell them to sign up.
-3. Use **bold** for key terms. Use bullet lists only when listing 3+ items.
-4. When mentioning a page, include its path like (→ /pricing.html).
-5. If you can't help or the issue is complex, say: "For this, please message Tee directly on WhatsApp (+92 320 488 4375) or visit /contact.html"
-6. Tone: warm, direct, and professional. No filler phrases like "Great question!" or "Absolutely!"."""
+# ── Old support-bot endpoint ──────────────────────────────────────────────────
+# The help centre (support.py, static/support.js) replaced the chatbot widget.
+# Browsers holding a cached chatbot-widget.js still POST here, so it answers
+# through the same engine and returns the old {"reply"} shape.
 
 class ChatbotReq(BaseModel):
     message: str
     history: list[dict] | None = None
 
-_chatbot_hits: dict[str, list[float]] = {}
 
 @app.post("/api/chatbot")
-def chatbot_reply(req: ChatbotReq, request: Request):
-    msg = (req.message or "").strip()
-    if not msg:
-        raise HTTPException(400, "Message required")
-
-    ip = _client_ip(request)
-    now = time.time()
-    hits = [t for t in _chatbot_hits.get(ip, []) if now - t < 3600]
-    if len(hits) >= 20:
-        raise HTTPException(429, "You've reached the message limit for this hour. Message Tee directly on WhatsApp (+92 320 488 4375) for further help.")
-    hits.append(now)
-    _chatbot_hits[ip] = hits
-
-    messages = [{"role": "system", "content": CHATBOT_SYSTEM}]
-    for h in (req.history or [])[-6:]:
-        if h.get("role") in ("user", "assistant") and h.get("content"):
-            messages.append({"role": h["role"], "content": str(h["content"])[:500]})
-    messages.append({"role": "user", "content": msg[:1000]})
-
-    reply, provider = _chat_complete(messages, max_tokens=300)
-    if reply is None:
-        return {"reply": "We offer topicals, mark schemes, and AI tutor help for Cambridge Physics, Maths & CS! Sign up for free or message Tee on WhatsApp for instant guidance."}
-
-    return {"reply": reply, "provider": provider}
+def chatbot_reply(req: ChatbotReq, request: Request,
+                  user: dict | None = _Depends(_auth_mod.maybe_user)):
+    out = _support_mod.chat(_support_mod.ChatReq(message=req.message, history=req.history),
+                            request, user)
+    return {"reply": out["reply"], "provider": out.get("source")}
 
 
 # Vision providers for the Photo Solver tab. Tried in order; first key that is
@@ -3818,6 +3755,13 @@ def admin_console():
                         headers={"X-Robots-Tag": "noindex, nofollow", "Cache-Control": "no-cache"})
 
 
+@app.get("/teach")
+def teach_console():
+    """Teaching console (static/teach/). Sign-in + role are checked by /api/teach."""
+    return FileResponse(Path(__file__).parent / "static" / "teach" / "index.html",
+                        headers={"X-Robots-Tag": "noindex, nofollow", "Cache-Control": "no-cache"})
+
+
 def _crop_files_for_key(q_key: str):
     """(debug_png, crop_pdf) Paths for a natural key like '0625_s25_11_q01'.
 
@@ -3995,7 +3939,7 @@ app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 
 _PUBLIC_PATHS = [
     "/", "/subjects.html", "/explore",
-    "/pricing.html", "/maths-classes.html", "/physics-classes.html", "/cs-classes.html", "/teachers.html", "/tools.html",
+    "/pricing.html", "/courses.html", "/maths-classes.html", "/physics-classes.html", "/cs-classes.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/walkthrough.html", "/blog",
     "/solver", "/whiteboard", "/features",
     # Study tools — each has a distinct meta description and real student value
@@ -4045,6 +3989,7 @@ def sitemap_xml():
         "/whiteboard": "0.85",
         "/features": "0.85",
         "/pricing.html": "0.80",
+        "/courses.html": "0.90",
         "/maths-classes.html": "0.85",
         "/physics-classes.html": "0.85",
         "/cs-classes.html": "0.85",

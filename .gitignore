@@ -23,3 +23,6 @@ e2e-shots/
 
 # regenerable poster renders (marketing/*/render.py)
 marketing/*/png/
+marketing/posts/*/png/
+marketing/posts/*/preview.html
+marketing/posts/gallery.html

@@ -3187,7 +3187,7 @@ StudentConsole.init({
         }
         if (u) {
           // Logged in but not admin — redirect to their own dashboard
-          const dash = u.role === "teacher" ? "/teacher-dashboard.html"
+          const dash = u.role === "teacher" ? "/teach"
                      : u.role === "parent"  ? "/parent-dashboard.html"
                      : "/dashboard.html";
           location.replace(dash);

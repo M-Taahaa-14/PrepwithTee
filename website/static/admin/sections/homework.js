@@ -1,5 +1,5 @@
 import { $, $$, api, esc, icon, pill, rel, fmtDate, modal, toast, drawer, confirmBox, download,
-         lookup, debounce, avatar } from "../core.js";
+         lookup, debounce, avatar, API_BASE } from "../core.js";
 import { DataTable } from "../datatable.js";
 
 export const title = "Homework";
@@ -56,7 +56,7 @@ export async function render(el, { params, setParams }) {
       { label: "Reopen", icon: "rotate", run: rows => setStatus(rows, "assigned") },
       { label: "Delete", icon: "trash", run: async rows => {
         if (!(await confirmBox("Delete homework", `Delete ${rows.length} assignment${rows.length === 1 ? "" : "s"}? Students lose any files they handed in.`, "Delete", true))) return false;
-        for (const r of rows) await api(`/api/admin/assignments/${r.id}`, { method: "DELETE" });
+        for (const r of rows) await api(`${API_BASE}/assignments/${r.id}`, { method: "DELETE" });
         toast("Deleted"); return true;
       } },
     ],
@@ -65,12 +65,12 @@ export async function render(el, { params, setParams }) {
 }
 
 async function loadRows() {
-  const d = await api("/api/admin/homework");
+  const d = await api(`${API_BASE}/homework`);
   return d.students.flatMap(s => s.assignments.map(a => ({ ...a, student_name: s.name, email: s.email, picture_url: s.picture_url })));
 }
 
 async function setStatus(rows, status) {
-  for (const r of rows) await api(`/api/admin/assignments/${r.id}`, { method: "PATCH", body: { status } });
+  for (const r of rows) await api(`${API_BASE}/assignments/${r.id}`, { method: "PATCH", body: { status } });
   toast(status === "done" ? "Marked done" : "Reopened");
   return true;
 }
@@ -104,19 +104,19 @@ export function openAssignment(a, reload) {
     onMount: (d, close) => {
       const done = () => { close(); reload(); };
       $$("[data-dl]", d).forEach(b => b.addEventListener("click", () =>
-        download(`/api/admin/assignments/${a.id}/submission/${b.dataset.dl}`, b.dataset.name).catch(e => toast(e.message, true))));
+        download(`${API_BASE}/assignments/${a.id}/submission/${b.dataset.dl}`, b.dataset.name).catch(e => toast(e.message, true))));
       $("[data-done]", d).addEventListener("click", async () => {
-        await api(`/api/admin/assignments/${a.id}`, { method: "PATCH", body: { status: a.status === "done" ? "assigned" : "done" } });
+        await api(`${API_BASE}/assignments/${a.id}`, { method: "PATCH", body: { status: a.status === "done" ? "assigned" : "done" } });
         toast("Updated"); done();
       });
       $("[data-due]", d).addEventListener("click", async () => {
         const ok = await modal({ title: "Change due date", submit: "Save",
           body: `<label class="field"><span>Due date</span><input class="input" type="date" name="due" value="${esc(a.due_date || "")}"></label>`,
-          run: async m => { await api(`/api/admin/assignments/${a.id}`, { method: "PATCH", body: { due_date: $("[name=due]", m).value || null } }); return true; } });
+          run: async m => { await api(`${API_BASE}/assignments/${a.id}`, { method: "PATCH", body: { due_date: $("[name=due]", m).value || null } }); return true; } });
         if (ok) { toast("Due date changed"); done(); }
       });
       $("[data-remind]", d).addEventListener("click", async () => {
-        try { const r = await api(`/api/admin/students/${a.user_id}/remind`, { method: "POST" });
+        try { const r = await api(`${API_BASE}/students/${a.user_id}/remind`, { method: "POST" });
               toast(r.sent ? `Reminded about ${r.count} open item${r.count === 1 ? "" : "s"}` : "The reminder couldn't be sent", !r.sent); }
         catch (ex) { toast(ex.message, true); }
       });
@@ -124,13 +124,13 @@ export function openAssignment(a, reload) {
         const f = e.target.files[0];
         if (!f) return;
         const fd = new FormData(); fd.append("file", f);
-        const res = await fetch(`/api/admin/assignments/${a.id}/files`, { method: "POST", body: fd, credentials: "same-origin" });
+        const res = await fetch(`${API_BASE}/assignments/${a.id}/files`, { method: "POST", body: fd, credentials: "same-origin" });
         if (!res.ok) { toast((await res.json().catch(() => ({}))).detail || "Upload failed", true); return; }
         toast("File attached"); done();
       });
       $("[data-del]", d).addEventListener("click", async () => {
         if (!(await confirmBox("Delete homework", `Delete "${a.title}"?`, "Delete", true))) return;
-        await api(`/api/admin/assignments/${a.id}`, { method: "DELETE" });
+        await api(`${API_BASE}/assignments/${a.id}`, { method: "DELETE" });
         toast("Deleted"); done();
       });
     },
@@ -147,7 +147,7 @@ const MAX_MB = 25;
 
 export async function setHomework(preset = []) {
   const [subjects, resources] = await Promise.all([lookup("subjects"),
-    api("/api/admin/resources-flat").then(d => d.files).catch(() => [])]);
+    api(`${API_BASE}/resources-flat`).then(d => d.files).catch(() => [])]);
   const picked = new Map(preset.map(s => [s.id, s]));
   const files = [];                 // File objects to upload after the assignment exists
   const res = new Map();            // rel -> resource
@@ -202,7 +202,7 @@ export async function setHomework(preset = []) {
       const find = debounce(async q => {
         const box = $("[data-results]", m);
         if (q.length < 2) { box.hidden = true; return; }
-        const { rows } = await api(`/api/admin/students/table?q=${encodeURIComponent(q)}&per=8&sort=name&dir=asc`);
+        const { rows } = await api(`${API_BASE}/students/table?q=${encodeURIComponent(q)}&per=8&sort=name&dir=asc`);
         box.hidden = false;
         box.innerHTML = rows.map(r => `<button type="button" class="list-row link" data-pick="${esc(r.id)}">${avatar(r)}<span class="grow">${esc(r.name || r.email)}
           <span class="small faint">${esc(r.email)}</span></span>${icon("plus")}</button>`).join("") || `<p class="small muted">No match.</p>`;
@@ -306,18 +306,18 @@ export async function setHomework(preset = []) {
       for (const [id, s] of picked) {
         const attachments = [...res.values()].map(f => ({ type: "resource", rel: f.rel, name: f.name }));
         if (paper.on) {
-          const b = await api(`/api/admin/students/${encodeURIComponent(id)}/booklets`, { method: "POST", body: paperSel(m, paper) });
+          const b = await api(`${API_BASE}/students/${encodeURIComponent(id)}/booklets`, { method: "POST", body: paperSel(m, paper) });
           attachments.push({ type: "paper", booklet_id: b.id, name: b.title });
         }
         // Files go up after the assignment exists, so email the student only once they're attached.
-        const { assignment } = await api(`/api/admin/students/${encodeURIComponent(id)}/assignments?notify=${notify && !files.length}`,
+        const { assignment } = await api(`${API_BASE}/students/${encodeURIComponent(id)}/assignments?notify=${notify && !files.length}`,
                                          { method: "POST", body: { ...base, attachments } });
         for (const f of files) {
           const fd = new FormData(); fd.append("file", f);
-          const r = await fetch(`/api/admin/assignments/${assignment.id}/files`, { method: "POST", body: fd, credentials: "same-origin" });
+          const r = await fetch(`${API_BASE}/assignments/${assignment.id}/files`, { method: "POST", body: fd, credentials: "same-origin" });
           if (!r.ok) problems.push(`${f.name}: ${(await r.json().catch(() => ({}))).detail || r.status}`);
         }
-        if (notify && files.length) await api(`/api/admin/students/${encodeURIComponent(id)}/remind`, { method: "POST" }).catch(() => {});
+        if (notify && files.length) await api(`${API_BASE}/students/${encodeURIComponent(id)}/remind`, { method: "POST" }).catch(() => {});
       }
       if (problems.length) toast(`Set, but some files were refused - ${problems.join("; ")}`, true);
       else toast(`Set for ${picked.size} student${picked.size === 1 ? "" : "s"}`);

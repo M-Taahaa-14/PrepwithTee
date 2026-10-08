@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Teach · PrepWithTee</title>
+  <link rel="icon" href="/logo-nav.webp">
+  <script>try{var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261009g">
+  <link rel="stylesheet" href="/teach/teach.css?v=20261009g">
+</head>
+<body>
+  <div id="boot" class="loading" role="status"><span class="spin"></span>Opening your teaching space…</div>
+
+  <div id="gate" class="gate" hidden>
+    <div class="card">
+      <img src="/logo-nav.webp" alt="">
+      <h1>PrepWithTee for teachers</h1>
+      <p>Sign in with your teacher account to see your students.</p>
+      <a class="btn primary" href="/auth/google">Continue with Google</a>
+      <a class="btn" href="/login.html?next=%2Fteach">Sign in with email</a>
+      <p class="small faint" id="gate-note" hidden></p>
+    </div>
+  </div>
+
+  <div id="app" class="shell" hidden>
+    <aside class="side" aria-label="Teaching sections">
+      <a class="brand" href="#/today"><img src="/logo-nav.webp" alt=""><span><b>PrepWithTee</b><small>Teaching</small></span></a>
+      <nav id="nav"></nav>
+      <div class="side-foot">
+        <a class="nav-item" href="/" target="_blank" rel="noopener"><i class="ti ti-world" aria-hidden="true"></i>View site</a>
+        <a class="nav-item" href="/whiteboard" target="_blank" rel="noopener"><i class="ti ti-chalkboard" aria-hidden="true"></i>My boards</a>
+        <button class="nav-item" id="theme-btn" type="button"><i class="ti ti-moon" aria-hidden="true"></i><span>Dark mode</span></button>
+        <button class="nav-item" id="signout-btn" type="button"><i class="ti ti-logout" aria-hidden="true"></i>Sign out</button>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <button class="btn icon burger" id="burger" aria-label="Open menu"><i class="ti ti-menu-2" aria-hidden="true"></i></button>
+        <button class="search-trigger" id="search-btn" type="button">
+          <i class="ti ti-search" aria-hidden="true"></i><span>Find a student or a section</span><kbd>Ctrl K</kbd>
+        </button>
+        <span class="grow"></span>
+        <span id="me" class="row small muted"></span>
+      </header>
+      <main class="content" id="view" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- Every module through this map at ONE version (static JS is immutable for a
+       year). The shared admin parts (core, datatable, student-manage, homework)
+       are listed too. scripts/bump_admin_assets.py rebuilds it;
+       tests/api/test_admin_assets.py checks it. -->
+  <script type="importmap">
+  {"imports": {
+    "/teach/sections/folder.js": "/teach/sections/folder.js?v=20261009g",
+    "/teach/sections/groups.js": "/teach/sections/groups.js?v=20261009g",
+    "/teach/sections/homework.js": "/teach/sections/homework.js?v=20261009g",
+    "/teach/sections/messages.js": "/teach/sections/messages.js?v=20261009g",
+    "/teach/sections/settings.js": "/teach/sections/settings.js?v=20261009g",
+    "/teach/sections/student.js": "/teach/sections/student.js?v=20261009g",
+    "/teach/sections/students.js": "/teach/sections/students.js?v=20261009g",
+    "/teach/sections/today.js": "/teach/sections/today.js?v=20261009g",
+    "/admin/core.js": "/admin/core.js?v=20261009g",
+    "/admin/datatable.js": "/admin/datatable.js?v=20261009g",
+    "/admin/sections/audit.js": "/admin/sections/audit.js?v=20261009g",
+    "/admin/sections/blog.js": "/admin/sections/blog.js?v=20261009g",
+    "/admin/sections/calendly.js": "/admin/sections/calendly.js?v=20261009g",
+    "/admin/sections/courses.js": "/admin/sections/courses.js?v=20261009g",
+    "/admin/sections/emails.js": "/admin/sections/emails.js?v=20261009g",
+    "/admin/sections/groups.js": "/admin/sections/groups.js?v=20261009g",
+    "/admin/sections/homework.js": "/admin/sections/homework.js?v=20261009g",
+    "/admin/sections/inbox.js": "/admin/sections/inbox.js?v=20261009g",
+    "/admin/sections/newsletter.js": "/admin/sections/newsletter.js?v=20261009g",
+    "/admin/sections/overview.js": "/admin/sections/overview.js?v=20261009g",
+    "/admin/sections/payments.js": "/admin/sections/payments.js?v=20261009g",
+    "/admin/sections/post.js": "/admin/sections/post.js?v=20261009g",
+    "/admin/sections/student-manage.js": "/admin/sections/student-manage.js?v=20261009g",
+    "/admin/sections/student.js": "/admin/sections/student.js?v=20261009g",
+    "/admin/sections/students.js": "/admin/sections/students.js?v=20261009g",
+    "/admin/sections/support.js": "/admin/sections/support.js?v=20261009g",
+    "/admin/sections/teachers.js": "/admin/sections/teachers.js?v=20261009g"
+  }}
+  </script>
+  <script type="module" src="/teach/app.js?v=20261009g"></script>
+</body>
+</html>

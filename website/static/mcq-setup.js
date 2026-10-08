@@ -8,7 +8,7 @@
  * ?topics=A|B pre-selects (links from the yearly pages and the results screen);
  * &subs=A::x|A::y narrows those chapters to subtopics.
  */
-import { api } from "/auth.js?v=20261005c";
+import { api } from "/auth.js?v=20261009a";
 
 const box = document.getElementById("mq-setup");
 const code = box?.dataset.syllabus;

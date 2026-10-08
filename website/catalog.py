@@ -425,10 +425,10 @@ def _shell(*, title: str, desc: str, path: str, body: str, crumbs: list[tuple[st
 </main>
 {_blog._foot()}
 <script id="cat-state" type="application/json">{json.dumps(page_state)}</script>
-<script src="/main.js?v=20261005a"></script>
+<script src="/main.js?v=20261009a"></script>
 <script src="/tools-core.js?v=20261005a"></script>
 <script src="/tools-nav.js?v=20260811d"></script>
-<script type="module" src="/auth.js?v=20261005c"></script>
+<script type="module" src="/auth.js?v=20261009a"></script>
 <script type="module" src="/catalog.js?v={CSS_V}"></script>
 {''.join(f'<script type="module" src="{src}"></script>' for src in scripts)}
 </body>

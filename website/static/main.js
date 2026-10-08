@@ -898,15 +898,16 @@ document.addEventListener("DOMContentLoaded", () => {
   window.openGlobalNote = openGnf;
 })();
 
-// ── Load chatbot widget on all pages that include main.js ─────────────────────
+// ── Load the help centre on all pages that include main.js ────────────────────
 (function () {
+  if (window.pwtSupport || document.querySelector('script[src^="/support.js"]')) return;
   var s = document.createElement('script');
-  s.src = '/chatbot-widget.js?v=20260927b';   // absolute: pages also live at /papers/..., /blog/...
+  s.src = '/support.js?v=20261009a';   // absolute: pages also live at /papers/..., /blog/...
   s.defer = true;
   document.head.appendChild(s);
 })();
 
 // The pen button on every non-PDF page (scratch ink, never saved). auth.js loads it too;
 // scratch-pen.js starts only once.
-import("/scratch-pen.js?v=20261005c").catch(function () {});
+import("/scratch-pen.js?v=20261009t").catch(function () {});
 

@@ -304,7 +304,9 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
   tab.className = "an-tab";
   tab.title = "Annotate — pens, shapes, stickers, ruler, compass";
   tab.setAttribute("aria-label", "Show annotation tools");
-  tab.innerHTML = `${svg("pen")}<span>Ink</span>`;
+  tab.innerHTML = `<span class="an-tab-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20h9"/>`
+    + `<path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.8a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/>`
+    + `<path d="M15 5l4 4"/></svg></span><span>Draw</span>`;
   mount.appendChild(tab);
 
   function persist() {
@@ -668,6 +670,40 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
     }
   }, { rootMargin: "800px 0px" });
 
+  /** Shared layers: ink by authors switched off with hideAuthors() is not drawn or touched. */
+  const hiddenInk = (s) => !!(A.hideBy && s.by && A.hideBy.has(s.by));
+
+  /** Is a page in the middle of something local (unsaved edit, stroke, drag, text box)?
+   *  Remote updates wait for it - the save that follows merges them in. */
+  function busy(doc, page) {
+    const key = `${doc}|${page}`;
+    const p = A.pages.get(key);
+    return A.saveTimers.has(key) || !!(p && (p.live || p.drag || p.lasso?.length))
+      || TX.ed?.p.key === key || NOTE.ed?.p.key === key;
+  }
+
+  /** Someone else's saved version of a page: take it, unless busy (returns false). */
+  async function remote(doc, page, objects) {
+    if (busy(doc, page)) return false;
+    const key = `${doc}|${page}`;
+    const list = withIds(objects || []);
+    const cached = await load(doc);
+    cached[String(page)] = list;
+    const p = A.pages.get(key);
+    if (p && p.strokes) {
+      if (A.sel?.key === key) A.sel = null;
+      if (A.msel?.key === key) A.msel = null;
+      p.strokes = list;
+      paintLayer(p);
+    }
+    // undo would put back a whole earlier copy of the page and wipe out the other
+    // person's work, so a page's history starts again when their change arrives
+    A.undo = A.undo.filter((u) => u.key !== key);
+    A.redo = A.redo.filter((u) => u.key !== key);
+    paintBar();
+    return true;
+  }
+
   const withIds = (list) => list.map((s) => (s && typeof s === "object" && !s.id ? { ...s, id: uid() } : s))
     .filter((s) => s && typeof s === "object" && typeof s.t === "string");
 
@@ -755,7 +791,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
     b.setTransform(dpr, 0, 0, dpr, -ox * dpr, -oy * dpr);
     const vis = p.cam ? [ox / w, oy / h, (ox + p.el.clientWidth) / w, (oy + p.el.clientHeight) / h] : null;
     p.strokes.forEach((s, i) => {
-      if (i === p.hideIndex) return;
+      if (i === p.hideIndex || hiddenInk(s)) return;
       if (vis) {                                   // infinite canvas: skip what is off screen
         const bb = bbox(s, w, h);
         if (bb[2] < vis[0] || bb[0] > vis[2] || bb[3] < vis[1] || bb[1] > vis[3]) return;
@@ -1226,6 +1262,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
 
   /** Does point q (page fractions) touch object s, within radius r (fraction of width)? */
   function hit(s, q, r, w, h) {
+    if (hiddenInk(s)) return false;                  // someone's ink switched off: can't be touched
     const k = h / w;                                  // compare distances in width units
     if (s.pts) return s.pts.some((a, i) => segDist(q, a, s.pts[i + 1] || a, k) < r + (s.w || 0) * (s.t === "marker" ? 1.6 : 0.5));
     if (s.t === "text" || s.t === "img" || s.t === "stk" || s.t === "note") {
@@ -1240,6 +1277,7 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
 
   /** For "select": anywhere inside a shape or text counts, not just its outline. */
   function grabs(s, q, w, h) {
+    if (hiddenInk(s)) return false;
     if (s.t === "text" || isBox(s) || (s.t === "poly")) return inBox(q, bbox(s, w, h), 0.008);
     return hit(s, q, 0.01, w, h);
   }
@@ -2997,6 +3035,10 @@ export function createAnnotator({ mount = document.body, persist: saveInk = true
     setOpen, flush, insertImage, setCamera, render, bbox: (s, w, h) => bbox(s, w, h),
     get pending() { return A.pending; },
     page: (doc, page) => A.pages.get(`${doc}|${page}`),
+    busy, remote,
+    hideAuthors: (ids) => { A.hideBy = ids && ids.length ? new Set(ids) : null;
+                            A.sel = null; A.msel = null;
+                            for (const p of A.pages.values()) if (p.el.isConnected) paintLayer(p); },
     quiet: (v) => { A.quietSaves = v; },
     el: bar,
   };

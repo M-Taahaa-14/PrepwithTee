@@ -3,19 +3,28 @@
     .venv\\Scripts\\python scripts\\class_pages.py          # rewrite the blocks
     .venv\\Scripts\\python scripts\\class_pages.py --check  # exit 1 if a page is stale
 
-website/static/{maths,physics,cs}-classes.html carry two generated blocks:
+website/static/{maths,physics,cs}-classes.html carry two generated blocks
+(and website/static/courses.html one, <!--CP:COURSES-->: every course, by level):
 
     <!--CP:SHOW:START--> ... <!--CP:SHOW:END-->   how we teach (real screenshots),
                                                   parents / students, outcomes
     <!--CP:SYL:START-->  ... <!--CP:SYL:END-->    week-by-week plan per course
 
 Everything else on those pages is hand-written. Edit the WEEKS / COURSES data
-below (one line per week), run the script, done. Week 1 starts on Saturday
+below (one line per week), run the script, done.
+
+Every "free demo" WhatsApp button carries data-demo="<key>" (DEMOS below), on
+the class pages, courses.html, pricing.html and contact.html. The script writes
+its href: a filled-in request (course, papers, batch date, fee, mode, exam
+session, name, school, best time, the page it came from) so Tee knows exactly
+what the demo is for (tutor, 2026-10-09). New demo button = add the attribute
+and run the script. Week 1 starts on Saturday
 31 October 2026; weeks 1-13 are the syllabus (Nov-Jan), 14-26 past papers.
 """
 from __future__ import annotations
 
 import argparse
+from urllib.parse import quote
 import html
 import re
 import sys
@@ -238,29 +247,104 @@ PAPERS = {  # what the Feb-Apr past paper sessions use
     "cs1": "9618 Paper 1", "cs2": "9618 Paper 2", "cs3": "9618 Paper 3", "cs4": "9618 Paper 4",
 }
 
-# page -> tabs: (key, tab label, heading, subtitle, weeks, papers key)
-PAGES = {
-    "maths-classes.html": [
-        ("ol", "O Level &amp; IGCSE", "O Level &amp; IGCSE Mathematics", "4024 · 0580 Extended · from PKR 8,499/month", OL_MATHS, "ol-maths"),
-        ("p1", "P1", "P1 · Pure Mathematics 1", "AS · separate course · from PKR 12,999/month", P1, "p1"),
-        ("p3", "P3", "P3 · Pure Mathematics 3", "A2 · separate course · from PKR 12,999/month", P3, "p3"),
-        ("m1", "M1", "M1 · Mechanics", "9709 Paper 4 · separate course · from PKR 12,999/month", M1, "m1"),
-        ("s1", "S1", "S1 · Probability &amp; Statistics 1", "9709 Paper 5 · separate course · from PKR 12,999/month", S1, "s1"),
-    ],
-    "physics-classes.html": [
-        ("ol", "O Level &amp; IGCSE", "O Level &amp; IGCSE Physics", "5054 · 0625 · from PKR 8,499/month", OL_PHYSICS, "ol-physics"),
-        ("as", "AS Physics", "AS Physics", "9702 Papers 1, 2 &amp; 3 · separate course · from PKR 12,999/month", AS_PHYSICS, "as"),
-        ("a2", "A2 Physics", "A2 Physics", "9702 Papers 4 &amp; 5 · separate course · from PKR 12,999/month", A2_PHYSICS, "a2"),
-    ],
-    "cs-classes.html": [
-        ("ol", "O Level &amp; IGCSE", "O Level &amp; IGCSE Computer Science", "2210 · 0478 · from PKR 8,499/month", OL_CS, "ol-cs"),
-        ("p1", "P1", "P1 · Theory Fundamentals", "AS · separate course · from PKR 12,999/month", CS_P1, "cs1"),
-        ("p2", "P2", "P2 · Problem-solving &amp; Programming", "AS · separate course · from PKR 12,999/month", CS_P2, "cs2"),
-        ("p3", "P3", "P3 · Advanced Theory", "A2 · separate course · from PKR 12,999/month", CS_P3, "cs3"),
-        ("p4", "P4", "P4 · Practical", "A2 · separate course · from PKR 12,999/month", CS_P4, "cs4"),
-    ],
+OL_PRICE, AL_PRICE = "8,499", "12,999"
+WA = "https://wa.me/923204884375?text="
+
+# ── Free-demo WhatsApp messages ──────────────────────────────────────────────
+# key -> (course, papers line or None, fee line or None). "Keep one" lists are
+# for the student to trim before sending.
+_OL_FEE = f"PKR {OL_PRICE}/month per subject"
+_AL_FEE = f"from PKR {AL_PRICE}/month per paper course (ask about bundles)"
+DEMOS = {
+    "ol-maths": ("O Level / IGCSE Maths - 4024 or 0580 Extended (keep one)", None, _OL_FEE),
+    "al-maths": ("A Level Maths 9709", "P1 / P3 / M1 / S1 (keep the ones you're sitting)", _AL_FEE),
+    "maths": ("Maths - O Level 4024 / IGCSE 0580 / A Level 9709 (keep one)",
+              "if A Level: P1 / P3 / M1 / S1", None),
+    "ol-physics": ("O Level / IGCSE Physics - 5054 or 0625 (keep one)", None, _OL_FEE),
+    "al-physics": ("A Level Physics 9702", "AS (Papers 1-3) / A2 (Papers 4-5) (keep what you're sitting)", _AL_FEE),
+    "physics": ("Physics - O Level 5054 / IGCSE 0625 / A Level 9702 (keep one)",
+                "if A Level: AS / A2", None),
+    "ol-cs": ("O Level / IGCSE Computer Science - 2210 or 0478 (keep one)", None, _OL_FEE),
+    "al-cs": ("A Level Computer Science 9618", "P1 / P2 / P3 / P4 (keep the ones you're sitting)", _AL_FEE),
+    "cs": ("Computer Science - O Level 2210 / IGCSE 0478 / A Level 9618 (keep one)",
+           "if A Level: P1 / P2 / P3 / P4", None),
+    "any": ("Subject + board (e.g. O Level Physics 5054): ", None, None),
+    "plan-1": ("1 subject - which one + board: ", None, "1-subject plan"),
+    "plan-2": ("2 subjects - which ones + board: ", None, "2-subject plan"),
+    "plan-3": ("3 subjects - which ones + board: ", None, "3-subject plan"),
 }
-SUBJECT = {"maths-classes.html": "Maths", "physics-classes.html": "Physics", "cs-classes.html": "Computer Science"}
+
+
+def demo_text(key: str, page: str) -> str:
+    course, papers, fee = DEMOS[key]
+    lines = ["Hi Tee! I'd like to book a FREE DEMO class.", "",
+             f"📚 Course: {course}"]
+    if papers:
+        lines.append(f"📝 Papers: {papers}")
+    lines.append(f"📅 Batch: starts Saturday {START.day} {START.strftime('%B %Y')} (groups of 4-6)")
+    if fee:
+        lines.append(f"💰 Fee: {fee}")
+    lines += ["📍 Online or in person in Lahore: ",
+              "🎯 Exam session (e.g. May/June 2027): ",
+              "👤 Student's name: ",
+              "🏫 School & current grade/year: ",
+              "🕒 Best days & time for the demo: ",
+              "",
+              f"(Sent from prepwithtee.com/{page})"]
+    return "\n".join(lines)
+
+
+def demo_href(key: str, page: str) -> str:
+    return WA + quote(demo_text(key, page), safe="")
+
+
+DEMO_A = re.compile(r'<a\b[^>]*\bdata-demo="([a-z0-9-]+)"[^>]*>')
+
+
+def stamp_demos(page: str, s: str) -> str:
+    """Write the detailed message into every <a data-demo="key"> on the page."""
+    def one(m):
+        tag, key = m.group(0), m.group(1)
+        assert key in DEMOS, f"{page}: unknown data-demo={key!r}"
+        new, n = re.subn(r'href="[^"]*"', lambda _: f'href="{html.escape(demo_href(key, page))}"', tag, count=1)
+        assert n == 1, f"{page}: data-demo={key} has no href"
+        return new
+    return DEMO_A.sub(one, s)
+
+# The catalogue: one entry per subject page, each with its courses. A course is
+# (key, level, code, name, tag, weeks, papers key). level "ol" = O Level & IGCSE,
+# "al" = A Level. Adding a subject or course here adds it to its page AND /courses.
+SUBJECTS = [
+    {"page": "maths-classes.html", "key": "maths", "name": "Maths", "icon": "📐", "tone": "lav",
+     "ol_codes": "4024 · 0580 Extended", "al_code": "9709",
+     "courses": [
+         ("ol", "ol", "O Level &amp; IGCSE", "Mathematics", "4024 · 0580 Extended", OL_MATHS, "ol-maths"),
+         ("p1", "al", "P1", "Pure Mathematics 1", "AS", P1, "p1"),
+         ("p3", "al", "P3", "Pure Mathematics 3", "A2", P3, "p3"),
+         ("m1", "al", "M1", "Mechanics", "Paper 4", M1, "m1"),
+         ("s1", "al", "S1", "Probability &amp; Statistics 1", "Paper 5", S1, "s1"),
+     ]},
+    {"page": "physics-classes.html", "key": "physics", "name": "Physics", "icon": "⚛️", "tone": "green",
+     "ol_codes": "5054 · 0625", "al_code": "9702",
+     "courses": [
+         ("ol", "ol", "O Level &amp; IGCSE", "Physics", "5054 · 0625", OL_PHYSICS, "ol-physics"),
+         ("as", "al", "AS", "AS Physics", "Papers 1, 2 &amp; 3", AS_PHYSICS, "as"),
+         ("a2", "al", "A2", "A2 Physics", "Papers 4 &amp; 5", A2_PHYSICS, "a2"),
+     ]},
+    {"page": "cs-classes.html", "key": "cs", "name": "Computer Science", "icon": "💻", "tone": "pink",
+     "ol_codes": "2210 · 0478", "al_code": "9618",
+     "courses": [
+         ("ol", "ol", "O Level &amp; IGCSE", "Computer Science", "2210 · 0478", OL_CS, "ol-cs"),
+         ("p1", "al", "P1", "Theory Fundamentals", "AS", CS_P1, "cs1"),
+         ("p2", "al", "P2", "Problem-solving &amp; Programming", "AS", CS_P2, "cs2"),
+         ("p3", "al", "P3", "Advanced Theory", "A2", CS_P3, "cs3"),
+         ("p4", "al", "P4", "Practical", "A2", CS_P4, "cs4"),
+     ]},
+]
+BY_PAGE = {s["page"]: s for s in SUBJECTS}
+PAGES = BY_PAGE                                     # the subject pages this script rewrites
+SUBJECT = {s["page"]: s["name"] for s in SUBJECTS}
+MONTH_TONES = {"Nov": "lav", "Dec": "green", "Jan": "blue"}
 
 
 def past_paper_plan(papers: str) -> list[tuple[str, str, str]]:
@@ -279,44 +363,68 @@ def esc(s: str) -> str:
     return s  # data above is already HTML-safe (&amp; written out)
 
 
-def panel(key, label, title, sub, weeks, papers_key, first):
-    assert len(weeks) == 13, (title, len(weeks))
+def month_titles(weeks, rng) -> list[str]:
+    return [weeks[n - 1][0] for n in rng]
+
+
+def panel(subj, course, first):
+    key, level, code, name, tag, weeks, papers_key = course
+    assert len(weeks) == 13, (name, len(weeks))
     months = []
     for short, long_, rng in MONTHS:
         cards = []
         for n in rng:
             t, subs = weeks[n - 1]
             lis = "".join(f"<li>{esc(x)}</li>" for x in subs)
-            cards.append(f'<li class="cp-wk"><div class="cp-wk-top"><span class="cp-wk-n">Week {n}</span>'
-                         f'<span class="cp-wk-d">{week_dates(n)}</span></div><b>{esc(t)}</b><ul>{lis}</ul></li>')
-        heads = " · ".join(weeks[n - 1][0] for n in rng)
-        months.append(f'<details class="cp-month"{" open" if short == "Nov" else ""}><summary><span class="cp-mon">{long_}</span>'
-                      f'<span class="cp-mon-t">{esc(heads)}</span><span class="cp-mon-n">{len(rng)} weeks</span></summary>'
-                      f'<ol class="cp-wks">{"".join(cards)}</ol></details>')
+            cards.append(f'<li class="cp-wk"><div class="cp-wk-top"><span class="cp-wk-n" aria-hidden="true">{n}</span>'
+                         f'<div><span class="cp-wk-lbl">Week {n}</span><span class="cp-wk-d">{week_dates(n)}</span></div></div>'
+                         f'<b>{esc(t)}</b><ul class="cp-wk-subs">{lis}</ul>'
+                         f'<span class="cp-wk-test">📝 Day 5 test · 📚 topical homework</span></li>')
+        chips = "".join(f"<span>{esc(x)}</span>" for x in month_titles(weeks, rng))
+        first_w, last_w = rng[0], rng[-1]
+        months.append(
+            f'<details class="cp-month cp-m-{MONTH_TONES[short]}"{" open" if short == "Nov" else ""}>'
+            f'<summary><span class="cp-mon"><b>{long_}</b><small>Weeks {first_w}–{last_w}</small></span>'
+            f'<span class="cp-mon-chips">{chips}</span><span class="cp-mon-tog" aria-hidden="true"></span></summary>'
+            f'<ol class="cp-wks">{"".join(cards)}</ol></details>')
     pp = "".join(f'<li><span class="cp-pp-w">Week {w}</span><b>{t}</b><p>{d}</p></li>' for w, t, d in past_paper_plan(PAPERS[papers_key]))
-    return f'''      <div role="tabpanel" id="panel-{key}" aria-labelledby="tab-{key}"{"" if first else " hidden"}>
-        <div class="mc-panel-head"><h3>{title}</h3><p>{sub}</p></div>
-        <p class="cp-phase-lbl"><span>Phase 1</span> The whole syllabus, week by week · Nov – Jan</p>
+    lvl = "O Level &amp; IGCSE" if level == "ol" else f"A Level {subj['al_code']} · {tag}"
+    title = f"{subj['name']} · {lvl}" if level == "ol" else f"{code} · {name}"
+    price = f"PKR {OL_PRICE}/month" if level == "ol" else f"from PKR {AL_PRICE}/month · separate course"
+    return f'''      <div class="cp-panel" role="tabpanel" id="panel-{key}" aria-labelledby="tab-{key}" data-level="{level}"{"" if first else " hidden"}>
+        <div class="cp-panel-head"><div><p class="cp-panel-lvl">{"O Level &amp; IGCSE · " + subj["ol_codes"] if level == "ol" else "A Level " + subj["al_code"] + " · " + tag}</p><h3>{title}</h3></div><p class="cp-panel-price">{price}</p></div>
+        <div class="cp-phase"><span class="cp-phase-n">1</span><div><b>The whole syllabus, week by week</b><small>November – January · 13 weeks</small></div></div>
         {"".join(months)}
-        <p class="cp-phase-lbl is-pp"><span>Phase 2</span> Past paper sessions · Feb – Apr · {PAPERS[papers_key]}</p>
+        <div class="cp-phase is-pp"><span class="cp-phase-n">2</span><div><b>Past paper sessions</b><small>February – April · {PAPERS[papers_key]}</small></div></div>
         <ol class="cp-pp">{pp}</ol>
       </div>
 '''
 
 
 def syllabus_block(page: str) -> str:
-    tabs = PAGES[page]
-    btns = "\n".join(f'        <button type="button" role="tab" id="tab-{k}" aria-controls="panel-{k}" aria-selected="{"true" if i == 0 else "false"}"'
-                     f'{"" if i == 0 else " tabindex=\"-1\""}>{lab}</button>' for i, (k, lab, *_r) in enumerate(tabs))
-    panels = "\n".join(panel(*t, first=(i == 0)) for i, t in enumerate(tabs))
+    subj = BY_PAGE[page]
+    ol = [c for c in subj["courses"] if c[1] == "ol"]
+    al = [c for c in subj["courses"] if c[1] == "al"]
+    al_btns = "\n".join(
+        f'          <button type="button" role="tab" id="tab-{c[0]}" aria-controls="panel-{c[0]}" aria-selected="{"true" if i == 0 else "false"}"'
+        f'{"" if i == 0 else " tabindex=\"-1\""}><b>{c[2]}</b><span>{c[3]}</span><small>{c[4]}</small></button>' for i, c in enumerate(al))
+    panels = "\n".join(panel(subj, c, first=(c in ol)) for c in ol + al)
+    al_names = " · ".join(c[2] for c in al)
     return f'''<!--CP:SYL:START - generated by scripts/class_pages.py, edit the data there -->
   <section class="mc-sec" id="syllabus">
     <div class="container">
       <p class="eyebrow">What each course covers</p>
       <h2 class="mc-h">Week by week, <em>course by course.</em></h2>
-      <p class="mc-lede">Pick a course to see exactly what is taught each week. Every week ends with a test on that week's topics, and every chapter comes with its topical past papers as homework.</p>
-      <div class="mc-tabs" role="tablist" aria-label="Course">
-{btns}
+      <p class="mc-lede">First choose your level. Every week ends with a test on that week's topics, and every chapter comes with its topical past papers as homework.</p>
+      <div class="cp-levels" role="group" aria-label="Level">
+        <button type="button" class="cp-level" data-level="ol" aria-pressed="true"><span class="cp-level-ic" aria-hidden="true">🎓</span><span><b>O Level &amp; IGCSE</b><small>{subj["ol_codes"]} · PKR {OL_PRICE}/month</small></span></button>
+        <button type="button" class="cp-level" data-level="al" aria-pressed="false"><span class="cp-level-ic" aria-hidden="true">🏛️</span><span><b>A Level {subj["al_code"]}</b><small>{len(al)} separate courses: {al_names} · from PKR {AL_PRICE}</small></span></button>
+      </div>
+      <div class="cp-al" hidden>
+        <p class="cp-al-lbl">A Level {subj["al_code"]} is taught as {len(al)} separate courses. Pick the one you want to see:</p>
+        <div class="cp-papers" role="tablist" aria-label="A Level course">
+{al_btns}
+        </div>
       </div>
 
 {panels}      <div class="cp-every">
@@ -326,7 +434,88 @@ def syllabus_block(page: str) -> str:
       </div>
     </div>
   </section>
+  <script>
+  (function () {{  /* level switch + A Level course tabs (scripts/class_pages.py) */
+    var sec = document.getElementById('syllabus');
+    var levels = sec.querySelectorAll('.cp-level'), alBox = sec.querySelector('.cp-al');
+    var tabs = sec.querySelectorAll('.cp-papers [role="tab"]'), panels = sec.querySelectorAll('.cp-panel');
+    var alKey = tabs.length ? tabs[0].id.slice(4) : null;
+    function showPanel(key) {{
+      panels.forEach(function (p) {{ p.hidden = p.id !== 'panel-' + key; }});
+      var lvl = key === 'ol' ? 'ol' : 'al';
+      levels.forEach(function (b) {{ b.setAttribute('aria-pressed', String(b.dataset.level === lvl)); }});
+      alBox.hidden = lvl !== 'al';
+      if (lvl === 'al') {{
+        alKey = key;
+        tabs.forEach(function (t) {{ var on = t.id === 'tab-' + key; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; }});
+      }}
+    }}
+    levels.forEach(function (b) {{ b.addEventListener('click', function () {{ showPanel(b.dataset.level === 'ol' ? 'ol' : alKey); }}); }});
+    tabs.forEach(function (t, i) {{
+      t.addEventListener('click', function () {{ showPanel(t.id.slice(4)); }});
+      t.addEventListener('keydown', function (e) {{
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+        showPanel(n.id.slice(4)); n.focus();
+      }});
+    }});
+    document.querySelectorAll('[data-tab]').forEach(function (a) {{
+      a.addEventListener('click', function () {{ showPanel(a.getAttribute('data-tab')); }});
+    }});
+    var h = location.hash.slice(1);
+    if (h === 'alevel' && alKey) showPanel(alKey);
+    else if (document.getElementById('panel-' + h)) {{ showPanel(h); sec.scrollIntoView(); }}
+  }})();
+  </script>
 <!--CP:SYL:END-->'''
+
+
+# ── /courses: every course, switched by level ────────────────────────────────
+def courses_block() -> str:
+    def months_summary(weeks):
+        return "".join(f'<li><span>{short}</span>{" · ".join(month_titles(weeks, rng))}</li>' for short, _l, rng in MONTHS)
+
+    ol_cards, al_groups = [], []
+    for s in SUBJECTS:
+        for key, level, code, name, tag, weeks, pk in s["courses"]:
+            if level != "ol":
+                continue
+            ol_cards.append(f'''        <article class="cl-card cl-{s["tone"]}">
+          <div class="cl-card-head"><span class="cl-ic" aria-hidden="true">{s["icon"]}</span><div><h3>{s["name"]}</h3><p>{s["ol_codes"]}</p></div></div>
+          <div class="cl-price"><small>As low as PKR</small><b>{OL_PRICE}</b><span>/month</span></div>
+          <ul class="cl-months">{months_summary(weeks)}<li><span>Feb–Apr</span>Past paper sessions: {PAPERS[pk]}</li></ul>
+          <div class="cl-acts"><a class="cl-btn" href="/{s["page"]}#ol">Week-by-week plan →</a>
+            <a class="cl-btn is-wa" data-demo="ol-{s["key"]}" href="#" target="_blank" rel="noopener">Free demo</a></div>
+        </article>''')
+        als = [c for c in s["courses"] if c[1] == "al"]
+        cards = "".join(f'''
+          <a class="cl-al-card" href="/{s["page"]}#{key}"><span class="cl-al-code">{code}</span><b>{name}</b><small>{tag}</small>
+            <ul class="cl-months is-mini">{months_summary(weeks)}</ul><span class="cl-al-go">Week-by-week plan →</span></a>'''
+                        for key, level, code, name, tag, weeks, pk in als)
+        al_groups.append(f'''        <section class="cl-al-group cl-{s["tone"]}" aria-label="A Level {s["name"]}">
+          <div class="cl-al-head"><span class="cl-ic" aria-hidden="true">{s["icon"]}</span><div><h3>{s["name"]} <span>{s["al_code"]}</span></h3><p>{len(als)} separate courses · from PKR {AL_PRICE}/month each</p></div>
+            <a class="cl-btn is-wa" data-demo="al-{s["key"]}" href="#" target="_blank" rel="noopener">Free demo</a></div>
+          <div class="cl-al-grid">{cards}
+          </div>
+        </section>''')
+    return f'''<!--CP:COURSES:START - generated by scripts/class_pages.py, edit the data there -->
+      <div class="cl-switch" role="group" aria-label="Level">
+        <button type="button" class="cl-lvl" data-level="o-level" aria-pressed="true"><span aria-hidden="true">🎓</span><b>O Level &amp; IGCSE</b><small>PKR {OL_PRICE}/month per subject</small></button>
+        <button type="button" class="cl-lvl" data-level="a-level" aria-pressed="false"><span aria-hidden="true">🏛️</span><b>A Level</b><small>Each paper its own course · from PKR {AL_PRICE}</small></button>
+      </div>
+
+      <div class="cl-view" data-view="o-level">
+        <p class="cl-view-lede">One course per subject, covering the whole O Level / IGCSE syllabus by January, then three months of past papers.</p>
+        <div class="cl-grid">
+{chr(10).join(ol_cards)}
+        </div>
+      </div>
+
+      <div class="cl-view" data-view="a-level" hidden>
+        <p class="cl-view-lede">A Level is split into separate courses, one per paper (or AS / A2), so you only join what you're sitting. Taking two or more? Ask about bundle fees.</p>
+{chr(10).join(al_groups)}
+      </div>
+<!--CP:COURSES:END-->'''
 
 
 # ── how we teach (screenshots), parents & students, outcomes ─────────────────
@@ -421,15 +610,26 @@ def render(page: str, s: str) -> str:
     return s
 
 
+COURSES_RE = re.compile(r"<!--CP:COURSES:START.*?<!--CP:COURSES:END-->", re.S)
+
+
+def render_courses(s: str) -> str:
+    s, n = COURSES_RE.subn(lambda _: courses_block(), s, count=1)
+    assert n == 1, "courses.html: CP:COURSES markers not found"
+    return s
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
     stale = []
-    for page in PAGES:
+    for page in [*PAGES, "courses.html", "pricing.html", "contact.html"]:
         p = STATIC / page
         src = p.read_text(encoding="utf-8")
-        new = render(page, src)
+        new = (render_courses(src) if page == "courses.html" else
+               src if page in ("pricing.html", "contact.html") else render(page, src))
+        new = stamp_demos(page, new)
         if new != src:
             stale.append(page)
             if not a.check:

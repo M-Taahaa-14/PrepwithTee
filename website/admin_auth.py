@@ -103,6 +103,11 @@ def require_admin(request: Request,
         admin_students.invalidate()
     except Exception:
         pass
+    try:                                   # teacher <-> student links may have changed
+        import teaching
+        teaching.clear()
+    except Exception:
+        pass
 
 
 Admin = Depends(require_admin)
