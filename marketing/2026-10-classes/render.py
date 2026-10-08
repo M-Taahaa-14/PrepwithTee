@@ -1,6 +1,6 @@
 """Render every poster in posters.html to an HD PNG in png/.
 
-    .venv\\Scripts\\python marketing\\2026-10-maths-batch\\render.py [--only 01]
+    .venv\\Scripts\\python marketing\\2026-10-classes\\render.py [--only 01]
 
 Each <section class="p" id="..."> becomes png/<id>.png at 2x (feed posts
 2160x2700, stories 2160x3840) - Instagram downscales to 1080 wide and keeps it sharp.
@@ -27,9 +27,11 @@ def main() -> None:
         page = browser.new_page(viewport={"width": 1200, "height": 2000},
                                 device_scale_factor=args.scale)
         page.goto((HERE / "posters.html").as_uri(), wait_until="networkidle")
-        page.evaluate("document.fonts.ready")
-        missing = page.evaluate("""() => ['Playfair Display','Archivo','Hanken Grotesk']
-            .filter(f => !document.fonts.check(`700 40px "${f}"`))""")
+        missing = page.evaluate("""async () => { const bad = [];
+            for (const f of ['Playfair Display', 'Archivo', 'Hanken Grotesk']) {
+              const got = await document.fonts.load(`700 40px "${f}"`, 'Maths 8,499');
+              if (!got.length) bad.push(f); }
+            await document.fonts.ready; return bad; }""")
         if missing:
             raise SystemExit(f"fonts did not load: {missing}")
         for sec in page.query_selector_all("section.p"):

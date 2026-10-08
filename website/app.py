@@ -3995,7 +3995,7 @@ app.mount("/uploads", StaticFiles(directory=_UPLOADS_DIR), name="uploads")
 
 _PUBLIC_PATHS = [
     "/", "/subjects.html", "/explore",
-    "/pricing.html", "/teachers.html", "/tools.html",
+    "/pricing.html", "/maths-classes.html", "/physics-classes.html", "/cs-classes.html", "/teachers.html", "/tools.html",
     "/teacher-apply.html", "/contact.html", "/guide.html", "/walkthrough.html", "/blog",
     "/solver", "/whiteboard", "/features",
     # Study tools — each has a distinct meta description and real student value
@@ -4045,6 +4045,9 @@ def sitemap_xml():
         "/whiteboard": "0.85",
         "/features": "0.85",
         "/pricing.html": "0.80",
+        "/maths-classes.html": "0.85",
+        "/physics-classes.html": "0.85",
+        "/cs-classes.html": "0.85",
         "/tools.html": "0.80",
         "/formulas.html": "0.80",
         "/blog": "0.80",

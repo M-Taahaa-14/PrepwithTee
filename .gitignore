@@ -20,3 +20,6 @@ website/public/
 scratchpad/classify_cs_rules.py
 scratchpad/digest_cs.py
 e2e-shots/
+
+# regenerable poster renders (marketing/*/render.py)
+marketing/*/png/
