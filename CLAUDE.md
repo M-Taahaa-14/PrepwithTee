@@ -1040,3 +1040,18 @@ linked), not agreement with any external file.
     - Tests: tests/api/test_test_builder.py (20), tests/e2e/test_test_review.py.
     - Known unrelated failure: tests/e2e/test_annotations.py ruler width (expects 160/210 of the page;
       annotate.js changed after the test in 880fc26).
+
+42. **Class launch campaign - DEPLOYED 2026-10-08 16:45 UTC (commit 6278726; backup
+    /srv/backup-code-20261008-1645-classes.tgz).** Maths, Physics and CS small-group batches
+    from 31 Oct 2026: syllabus Nov-Jan (+ topical papers), past paper sessions Feb-Apr,
+    4 classes + 1 test a week, money-back after the first paid class. O Level / IGCSE
+    PKR 8,499/month; A Level papers as separate courses from PKR 12,999/month (bundle fees
+    "ask"): Maths 9709 P1/P3/M1/S1, Physics 9702 AS/A2, CS 9618 P1-P4.
+    - Pages `/maths-classes.html`, `/physics-classes.html`, `/cs-classes.html` share
+      `static/classes.css`; Physics/CS were generated from the Maths page (shared sections
+      must stay identical - edit all three).
+    - `static/promo-bar.js` (loaded from partials/nav.html) = bar above the header + slide-in
+      card; campaign data in its `PROMO` object, ends itself after `until` (2026-11-15).
+      A new `id` re-shows it to everyone. Bump its ?v in nav.html + `python sync_nav.py`.
+    - Instagram posters: `marketing/2026-10-classes/posters.html` -> `render.py` -> `png/`
+      (gitignored, regenerable); captions in CAPTIONS.md.
