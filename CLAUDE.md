@@ -1005,7 +1005,8 @@ linked), not agreement with any external file.
     /features, sitemap, all new assets 200, no errors in journalctl after restart.
 
 
-41. **Test builder v2: preview, customise, share (tutor, 2026-10-08, local, not deployed).** Plan:
+41. **Test builder v2: preview, customise, share (tutor, 2026-10-08) - DEPLOYED 2026-10-08 13:14 UTC
+    (commit ebefdca; migration 028 already on Supabase; backup /srv/backup-code-20261008-1314-testbuilder.tgz).** Plan:
     `~/.claude/plans/as-for-the-mock-bubbly-giraffe.md`. **Run `website/migrations/028_test_builder.sql`
     on Supabase before deploying** (question_ratings + booklet_shares; the code degrades to "unrated" /
     no sharing without it).
